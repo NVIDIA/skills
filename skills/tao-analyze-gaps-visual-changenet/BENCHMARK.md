@@ -10,7 +10,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 - Skill: `tao-analyze-gaps-visual-changenet`
 - Validation status: `passed`
-- Evaluation date: 2026-11-20
+- Evaluation date: 2026-11-24
 - Evaluator version: `1.6.10`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 1 evaluation tasks (1 positive)
@@ -50,9 +50,9 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 99.5% — baseline ran, but no comparable score was available; uplift unavailable | 57.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 99.5% — baseline ran, but no comparable score was available; uplift unavailable | 61.4% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 0.0% → 100.0% (+100.0 points) | 20.0% → 60.0% (+40.0 points) |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 20.0% → 80.0% (+60.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 0.0% — baseline ran, but no comparable score was available; uplift unavailable |
 | Effectiveness | 16.7% → 100.0% (+83.3 points) | 33.3% → 33.3% (±0.0 points) |
 | Efficiency | 97.5% — baseline ran, but no comparable score was available; uplift unavailable | 93.8% → 93.7% (-0.1 points) |
@@ -79,11 +79,11 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 79,260 | 35,566 | +43,694 | +122.85% | skill 1/1; base 1/1 |
-| claude-code | tao-analyze-gaps-visual-changenet-basic | 79,260 | 35,566 | +43,694 | +122.85% | skill 1/1; base 1/1 |
-| codex | All cases | 13,564 | 13,324 | +240 | +1.80% | skill 1/1; base 1/1 |
-| codex | tao-analyze-gaps-visual-changenet-basic | 13,564 | 13,324 | +240 | +1.80% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 92,824 | 48,890 | +43,934 | +89.86% | skill 2/2; base 2/2 |
+| claude-code | All cases | 79,426 | 35,546 | +43,880 | +123.45% | skill 1/1; base 1/1 |
+| claude-code | tao-analyze-gaps-visual-changenet-basic | 79,426 | 35,546 | +43,880 | +123.45% | skill 1/1; base 1/1 |
+| codex | All cases | 13,527 | 13,311 | +216 | +1.62% | skill 1/1; base 1/1 |
+| codex | tao-analyze-gaps-visual-changenet-basic | 13,527 | 13,311 | +216 | +1.62% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 92,953 | 48,857 | +44,096 | +90.26% | skill 2/2; base 2/2 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 

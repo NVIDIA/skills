@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and ML engineers use this skill to analyze NVIDIA TAO VCN Classify inference failures, choose a recall-constrained decision threshold, pick synthetic-data augmentation targets, and audit PASS/NO_PASS boundary cases, producing a gap-analysis report with spot-checked weak samples. <br>
+Developers and engineers working with NVIDIA TAO VCN Classify use this skill to analyze classification failures, select the optimal PASS/NO_PASS decision threshold, rank the weakest samples per label, and pick SDA augmentation or relabeling targets, producing a seven-section RCA report. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -34,9 +34,9 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Skill Output: <br>
 **Output Type(s):** [Shell commands, Files, Analysis] <br>
-**Output Format:** [Markdown report (RCA_Report.md) plus container-produced parquet and text artifacts (kpi_gaps.parquet, threshold.txt, weak_samples_breakdown.txt) and spot-check thumbnails] <br>
+**Output Format:** [Parquet, plain-text threshold and breakdown files, image thumbnails, and a Markdown RCA report] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [Outputs are written to a timestamped rca_results directory under the experiment result directory; the report targets 1000–1800 words in seven sections.] <br>
+**Other Properties Related to Output:** [Outputs written to a timestamped rca_results folder; RCA_Report.md kept to 1000–1800 words] <br>
 
 ## Evaluation Agents Used: <br>
 - Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`) <br>
@@ -45,7 +45,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive), 1 attempt per task, run in the `k8s-sandbox` environment with each task attempt in its own isolated sandbox pod; each task was also attempted without the skill as a baseline. <br>
+1 evaluation tasks (1 positive), 1 attempt per task, each run in an isolated sandbox pod (`k8s-sandbox`); each task was also attempted without the skill as a baseline. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -69,20 +69,24 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 > ✅ **Overall verdict: PASS — Recommended for publication**
 
-**Publication Recommendation:** Recommended for publication based on the completed evaluation evidence in this report.
+### Publication Recommendation
+
+Recommended for publication based on the completed evaluation evidence in this report.
 
 ### Results at a Glance
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 99.5% — baseline ran, but no comparable score was available; uplift unavailable | 57.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 99.5% — baseline ran, but no comparable score was available; uplift unavailable | 61.4% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 0.0% → 100.0% (+100.0 points) | 20.0% → 60.0% (+40.0 points) |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 20.0% → 80.0% (+60.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 0.0% — baseline ran, but no comparable score was available; uplift unavailable |
 | Effectiveness | 16.7% → 100.0% (+83.3 points) | 33.3% → 33.3% (±0.0 points) |
 | Efficiency | 97.5% — baseline ran, but no comparable score was available; uplift unavailable | 93.8% → 93.7% (-0.1 points) |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
+
+Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92.0%, 45.0 percentage points above its 47.0% no-skill baseline.
 
 A partial dimension was calculated from only the available configured signals; review the detailed report before relying on it.
 

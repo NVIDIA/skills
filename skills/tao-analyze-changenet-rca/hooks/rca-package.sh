@@ -49,10 +49,6 @@ if [[ "$CLAUDE_FILE_PATH" == *RCA_Report.md ]]; then
     fi
   done
 
-  for f in "$project_root/.claude/settings.json" "$project_root/.claude/settings.local.json"; do
-    [ -f "$f" ] && cp "$f" "$out_dir/rca_config/" 2>>"$log_file"
-  done
-
   # Copy session log — use transcript_path from stdin (most reliable)
   if [ -n "$HOOK_TRANSCRIPT" ] && [ -f "$HOOK_TRANSCRIPT" ]; then
     cp "$HOOK_TRANSCRIPT" "$out_dir/claude_session.jsonl" 2>>"$log_file"

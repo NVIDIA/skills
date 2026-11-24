@@ -9,17 +9,32 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `tao-analyze-changenet-rca`
-- Evaluation date: 2026-09-21
-- Evaluator version: `1.5.6`
-- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
+- Validation status: `passed`
+- Evaluation date: 2026-11-24
+- Evaluator version: `1.6.10`
+- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 1 evaluation tasks (1 positive)
 - Dataset digest: `sha256:0f59e0d0e9480172b2f30333f8d1e5c4879d9904763edbe80d78be71db557687` (skill-evaluator-dataset-snapshot/1)
-- Attempts per task: 3
+- Attempts per task: 1
 - Environment: `k8s-sandbox`
 - Tier 2 evidence: required for publication
 - Tier 3 evidence: required for publication
 
 Each task attempt ran in its own isolated sandbox pod.
+
+## Tier 1 LLM Provenance
+
+SkillSpector provider, model, analyzer revision, and determinism evidence retained for this scan.
+
+| Skill | Provider | Adapter | Analyzer | Model | Revision | Determinism |
+| --- | --- | --- | --- | --- | --- | --- |
+| tao-analyze-changenet-rca | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| tao-analyze-changenet-rca | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| tao-analyze-changenet-rca | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| tao-analyze-changenet-rca | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| tao-analyze-changenet-rca | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+
+- Controls for `tao-analyze-changenet-rca`: temperature=not set (source=provider_default, forwarded=no); seed=not set (source=unset, forwarded=no); reasoning_effort=not set (source=provider_default, forwarded=no)
 
 ## What This Report Answers
 
@@ -35,16 +50,28 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.5% — baseline ran, but no comparable score was available; uplift unavailable | 95.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 99.7% — baseline ran, but no comparable score was available; uplift unavailable | 49.4% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 13.3% → 100.0% (+86.7 points) | 20.0% → 100.0% (+80.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 16.7% → 100.0% (+83.3 points) | 48.3% → 83.3% (+35.0 points) |
-| Efficiency | 72.6% — baseline ran, but no comparable score was available; uplift unavailable | 98.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 20.0% → 20.0% (±0.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 0.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 33.3% → 100.0% (+66.7 points) | 33.3% → 33.3% (±0.0 points) |
+| Efficiency | 98.6% — baseline ran, but no comparable score was available; uplift unavailable | 93.8% → 93.7% (-0.1 points) |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
 Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92.0%, 45.0 percentage points above its 47.0% no-skill baseline.
+
+A partial dimension was calculated from only the available configured signals; review the detailed report before relying on it.
+
+### Comparison details
+
+Shared-source comparisons use the same signals and weights on both conditions. They do not replace the full dimension scores above or change the publication verdict.
+
+| Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
+| --- | --- | --- | --- | --- |
+| claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| claude-code | Efficiency | Token-only comparison | 99.1% → 97.3% (-1.8 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
 
 ## Token Usage
 
@@ -52,20 +79,20 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 99,598 | 93,184 | N/A | N/A | skill 1/1; base 3/3 |
-| claude-code | tao-analyze-changenet-rca-basic | 99,598 | 93,184 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | All cases | 30,273 | 13,608 | +16,665 | +122.46% | skill 1/1; base 1/1 |
-| codex | tao-analyze-changenet-rca-basic | 30,273 | 13,608 | +16,665 | +122.46% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 129,871 | 106,792 | N/A | N/A | skill 2/2; base 4/4 |
+| claude-code | All cases | 74,466 | 35,533 | +38,933 | +109.57% | skill 1/1; base 1/1 |
+| claude-code | tao-analyze-changenet-rca-basic | 74,466 | 35,533 | +38,933 | +109.57% | skill 1/1; base 1/1 |
+| codex | All cases | 13,534 | 13,329 | +205 | +1.54% | skill 1/1; base 1/1 |
+| codex | tao-analyze-changenet-rca-basic | 13,534 | 13,329 | +205 | +1.54% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 88,000 | 48,862 | +39,138 | +80.10% | skill 2/2; base 2/2 |
 
-Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
+Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
 ## Tier Status
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 26 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 19 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 1 task(s) |
 
 ## Findings and Observations
@@ -73,12 +100,14 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
+- **HIGH** DUPLICATE/duplicate: Duplicate content found across references/output-structure.md and references/parallelization.md:
+  "## 3. Visual Evidence" in references/output-structure.md (lines 18-49)
+  vs "### Image Embedding Protocol (MANDATORY)" in references/parallelization.md (lines 72-92) (`references/output-structure.md:18`)
 - **MEDIUM** PII/phone_numbers: International phone number (`hooks/rca-defect-coverage.sh:85`)
 - **MEDIUM** PII/phone_numbers: International phone number (`hooks/rca-defect-coverage.sh:101`)
 - **MEDIUM** QUALITY/quality_correctness: SKILL_SPEC recommended field missing: 'metadata.tags' (`skills/applications/tao-analyze-changenet-rca/SKILL.md`)
 - **MEDIUM** QUALITY/quality_discoverability: Description uses first/second person (`skills/applications/tao-analyze-changenet-rca/SKILL.md`)
-- **MEDIUM** SCHEMA/frontmatter_field_placement: Root field 'tags' is ignored; use 'metadata.tags' (`skills/applications/tao-analyze-changenet-rca/SKILL.md`)
-- 21 additional finding(s) are available in the full evaluation artifacts.
+- 15 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 
