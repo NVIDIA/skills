@@ -1,9 +1,11 @@
 ---
 title: "Release Checklist"
-description: "A practical checklist for preparing an agent skill for enterprise review and publication."
+description: "A practical checklist for preparing an agent skill or plugin for enterprise review and publication."
 ---
 
 Use this checklist when preparing a skill for review, publication, or internal deployment.
+
+For an NVIDIA Verified Plugin, complete this checklist for every bundled skill, then the [plugin checklist](#plugins).
 
 ## Before Scanning
 
@@ -61,7 +63,21 @@ For installation and the commands to run an evaluation, see the [SkillEvaluator 
 ```bash
 model_signing verify certificate SKILL_DIR \
   --signature SKILL_DIR/skill.oms.sig \
-  --certificate-chain nv-agent-root-cert.pem
+  --certificate_chain nv-agent-root-cert.pem
+```
+
+## Plugins
+
+- Every bundled skill has passed the skill checklist above.
+- Any MCP server, hooks, commands, or subagents in the plugin are needed for its stated use case.
+- The plugin's `BENCHMARK.md` verdict is PASS.
+- The Plugin Card (`plugin-card.md`) lists everything in the bundle.
+- `plugin.oms.sig` is at the top level of the plugin directory and verifies:
+
+```bash
+model_signing verify certificate PLUGIN_DIR \
+  --signature PLUGIN_DIR/plugin.oms.sig \
+  --certificate_chain nv-agent-root-cert.pem
 ```
 
 ## Release Packet
@@ -76,3 +92,5 @@ The release packet should include:
 - Detached OMS signature (`skill.oms.sig`)
 - Verification instructions
 - Known limitations and support contact
+
+For an NVIDIA Verified Plugin, also include the Plugin Card (`plugin-card.md`), the plugin's `BENCHMARK.md`, and `plugin.oms.sig`.

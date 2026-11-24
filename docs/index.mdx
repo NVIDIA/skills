@@ -1,17 +1,28 @@
 ---
-title: "NVIDIA-Verified Agent Skills"
-description: "Capability governance for portable AI agent skills: what skills do, how to discover them, and how verification works."
+title: "NVIDIA-Verified Agent Skills and Plugins"
+description: "Capability governance for portable AI agent skills and plugins: what they do, how to discover and install them, and how verification works."
 ---
 
 Agent skills are portable instruction sets that extend what an AI agent can do. They can teach an agent how to use NVIDIA CUDA-X libraries, AI Blueprints, Omniverse and Physical AI workflows, NeMo training and inference tools, and other platform components correctly.
 
 As skills become a reusable capability layer, teams need more than runtime guardrails. They need to know what capability entered the workflow, where it came from, whether it was reviewed for common risks, and whether it changed after publication. NVIDIA-verified skills provide that capability governance for the skill layer.
 
-For the current catalog, use [skills.sh](https://www.skills.sh/nvidia/skills) or [NVIDIA Build](https://build.nvidia.com/skills) as the source of truth. Install from the catalog with:
+Related skills can also be bundled into an agent plugin: a single installable package that combines skills and, where needed, an MCP server and other agent resources such as hooks, commands, and subagents for a specific product or workflow. NVIDIA Verified Plugins install in one step on Claude Code, Codex, Cursor, and other agents, and extend NVIDIA's skill verification to the whole bundle.
+
+For the current catalog, use [skills.sh](https://www.skills.sh/nvidia/skills) or [NVIDIA Build](https://build.nvidia.com/skills) as the source of truth. Install individual skills from the catalog with:
 
 ```bash
 npx skills add nvidia/skills
 ```
+
+Or install a whole product toolset as a Verified Plugin, for example in Claude Code:
+
+```bash
+/plugin marketplace add NVIDIA/skills
+/plugin install <plugin>@nvidia-official
+```
+
+See [Advanced Installation](/skills/advanced-install) for other agents and for agent-specific, global, and non-interactive installs.
 
 ## Works Across Agents
 
@@ -23,7 +34,7 @@ Vercel's [`skills` CLI](https://github.com/vercel-labs/skills#supported-agents) 
 npx skills add nvidia/skills --agent codex
 ```
 
-Marketplace and hub discovery are additional distribution paths. Developers will be able to discover the NVIDIA skills plugin directly through the Claude Code and Codex marketplaces. NVIDIA skills are also planned for Hermes Skillhub and Clawhub as those partner channels come online.
+Marketplace and hub discovery are additional distribution paths. NVIDIA Verified Plugins are available through build.nvidia.com, the `nvidia-official` marketplace for Claude Code, Codex, and Cursor, ClawHub for OpenClaw, and the Hermes marketplace.
 
 ## What Skills Give Your Agent
 
@@ -53,6 +64,10 @@ The catalogs group skills by the kind of work the user is trying to do, while th
 | Vision AI | Video analytics, search, summarization, perception pipelines, and model import | DeepStream and Video Search and Summarization |
 | Physical AI and Omniverse | USD asset workflows, SimReady conversion, realtime viewing, infrastructure, and neural reconstruction | Omniverse and Physical AI workflows |
 
+## Verified Plugins
+
+An agent plugin packages a set of related agent capabilities, such as skills and MCP servers, into a single installable bundle. Where a skill teaches an agent how to perform one task, a plugin gives the agent a complete toolset for a product or workflow in one install, instead of choosing skills one by one. Skills and MCP servers work across agent platforms, and a plugin can also include platform-specific additions, such as hooks, commands, and subagents, for platforms that support them.
+
 ## Trust Controls
 
 NVIDIA-verified skills are also release artifacts. Before a skill is published, the catalog expects the same discipline we expect from deployable software: security review, provenance, ownership, clear use boundaries, and verification instructions.
@@ -65,42 +80,58 @@ Verified means the skill is cataloged, scanned, evaluated, signed, and documente
 - **Signed** with a detached `skill.oms.sig` so users can verify that the downloaded skill is authentic and unchanged.
 - **Documented** with a skill card that records what the skill does, who owns it, how it is licensed, what it depends on, and what limitations or risks users should understand.
 
-Runtime controls govern what an agent can do during execution. Verified skills govern which capabilities enter the workflow in the first place.
+NVIDIA Verified Plugins carry the same guarantees as NVIDIA Verified Skills (signed, verified, evaluated), applied at the bundle level. Two things are specific to plugins: a detached `plugin.oms.sig` that signs the whole bundle, including any MCP server, hooks, commands, and subagents, with each skill inside still carrying its own signature, and a machine-readable `plugin-card.md` that covers the bundle's identity, provenance, contents, evaluation results, and behavioral boundaries. Bundled MCP servers currently run locally (stdio).
+
+Runtime controls govern what an agent can do during execution. Verified skills and plugins govern which capabilities enter the workflow in the first place.
 
 <Cards>
   <Card
-    title="A Trust Pipeline for Agent Skills"
+    title="A Trust Pipeline for Agent Skills and Plugins"
     icon="route"
     href="/skills/agent-skill-trust-pipeline"
   >
     The end-to-end workflow that links scanning, evaluation, skill cards, and cryptographic signing into a release gate.
   </Card>
   <Card
-    title="Scan Agent Skills Before Installation"
+    title="Scan Agent Skills and Plugins Before Installation"
     icon="scan-search"
     href="/skills/scanning-agent-skills"
   >
     How SkillSpector checks skill bundles for security risks, malicious patterns, and supply-chain issues.
   </Card>
   <Card
-    title="Evaluate Agent Skills Before Publication"
+    title="Evaluate Agent Skills and Plugins Before Publication"
     icon="gauge"
     href="/skills/evaluating-agent-skills"
   >
     How SkillEvaluator measures whether a skill improves an agent's output, and how to read the result.
   </Card>
   <Card
-    title="Verify Signed Agent Skills"
+    title="Verify Signed Agent Skills and Plugins"
     icon="badge-check"
     href="/skills/signing-agent-skills"
   >
-    How detached OMS signatures help consumers verify skill integrity after publishing and installation.
+    How detached OMS signatures help consumers verify skill and plugin integrity after publishing and installation.
   </Card>
   <Card
-    title="Write Skill Cards People Can Trust"
+    title="Write Skill and Plugin Cards People Can Trust"
     icon="id-card"
     href="/skills/skill-cards"
   >
-    A practical skill-card template for owners, users, risk reviewers, and deployment teams.
+    A practical skill-card template for owners, users, risk reviewers, and deployment teams, plus what a Plugin Card adds.
+  </Card>
+  <Card
+    title="Release Checklist"
+    icon="list-checks"
+    href="/skills/release-checklist"
+  >
+    A practical checklist for preparing an agent skill or plugin for enterprise review and publication.
+  </Card>
+  <Card
+    title="Advanced Installation"
+    icon="download"
+    href="/skills/advanced-install"
+  >
+    How to install, update, and remove NVIDIA skills and plugins with control over agent, scope, and non-interactive workflows.
   </Card>
 </Cards>

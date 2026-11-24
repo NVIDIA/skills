@@ -1,11 +1,13 @@
 ---
-title: "Scan Agent Skills Before Installation"
-description: "Use SkillSpector to detect vulnerabilities, malicious patterns, and policy risks in AI agent skills."
+title: "Scan Agent Skills and Plugins Before Installation"
+description: "Use SkillSpector to detect vulnerabilities, malicious patterns, and policy risks in AI agent skills and the skills bundled in plugins."
 ---
 
 Agent skills can look harmless while still containing risky instructions, hidden metadata, overbroad permissions, or executable code that does more than the description says. SkillSpector is a security scanner for AI agent skills that helps answer: should this skill be installed?
 
-SkillSpector is also the security tier inside SkillEvaluator. If you are preparing a skill for publication, running SkillEvaluator runs these checks as Tier 1 — see [Evaluate Agent Skills Before Publication](/skills/evaluating-agent-skills). This page covers running the scanner directly, which is what you want when reviewing a skill before installing it.
+SkillSpector is also the security tier inside SkillEvaluator. If you are preparing a skill for publication, running SkillEvaluator runs these checks as Tier 1 — see [Evaluate Agent Skills and Plugins Before Publication](/skills/evaluating-agent-skills). This page covers running the scanner directly, which is what you want when reviewing a skill before installing it.
+
+To scan the skills inside a plugin, see [Scan a Plugin](#scan-a-plugin).
 
 SkillSpector accepts Git repositories, URLs, zip files, directories, and single files. It runs fast static checks by default and can add optional LLM semantic analysis for issues that require intent comparison.
 
@@ -68,6 +70,16 @@ skillspector scan https://github.com/user/my-skill
 skillspector scan ./my-skill.zip
 ```
 
+## Scan a Plugin
+
+Point SkillSpector at the plugin's `skills/` folder to scan every bundled skill:
+
+```bash
+skillspector scan ./plugin-name/skills/ --recursive
+```
+
+This scans the bundled skills only. Review a plugin's MCP server, hooks, commands, and subagents separately before installing. For an NVIDIA Verified Plugin, [verify the plugin signature](/skills/signing-agent-skills#verify-a-signed-plugin) to confirm you have the reviewed bundle.
+
 ## Choose an Output Format
 
 Use terminal output while iterating locally, JSON for automation, Markdown for review packets, and SARIF for CI or code scanning systems.
@@ -117,6 +129,8 @@ Use scan results as one of the release gates. Scanning determines whether a skil
 | Underdeclared capability | Update permissions or remove the behavior |
 | Known vulnerable dependency | Upgrade, pin a fixed version, or document why the dependency is acceptable |
 | Description-behavior mismatch | Rewrite the skill description or change the code |
+
+For a plugin, treat a blocking finding in any bundled skill as a finding against the whole plugin.
 
 The goal is not just a clean report. The goal is a skill whose declared purpose, permissions, code, and documented risks all agree.
 
