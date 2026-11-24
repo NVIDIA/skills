@@ -15,9 +15,10 @@ collective timeouts instead of an immediate validation error.
 
 AutoML runs training — all requirements from **Training Requirements** above apply. The agent must read that section first.
 
-For no-input local DINO AutoML smoke runs, use `DINO_AUTOML_PROFILE` from
-**Training Requirements**. Do not inspect previous AutoML runs to infer dataset
-URIs, `num_classes`, recommendation count, or interval settings.
+When the user gives no dataset for a DINO AutoML run, apply the rule in
+**Training Requirements**: look for a COCO-format dataset in the working
+directory and ask; never assume one. Do not inspect previous AutoML runs to
+infer dataset URIs, `num_classes`, recommendation count, or interval settings.
 
 **Recommended AutoML metric:** for training-log-only quick operational checks,
 use `metric="val_mAP50"` with `direction="maximize"` and pass a custom metric
@@ -46,8 +47,6 @@ Suggested knobs: `train.optim.lr`, `train.optim.weight_decay`,
 `model.backbone`, `model.num_queries`, and `model.dropout_ratio`. Constrain
 `model.backbone` to supported names such as `resnet_50` and `resnet_34`; the
 LLM brain may otherwise propose legacy or invalid DINO backbone names.
-
-`train.optim.weight_decay` is not in the default DINO spec schema — the runner accepts it with a warning. It still works; the DINO training code picks it up from the config.
 
 All model-specific metadata is documented in the Training Requirements table and
 `references/skill_info.yaml`. DINO data-source arrays are not auto-resolved from

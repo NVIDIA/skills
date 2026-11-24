@@ -18,8 +18,9 @@ If imports fail, append `preflight FAIL` and stop. Have the operator run the app
 
 2) Docker + GPU + image (LOCAL ONLY — never docker pull; the driver resolves TRAIN_IMG from $SB/versions.yaml unless explicitly overridden):
 ```bash
-bash -c 'docker image inspect $TRAIN_IMG --format "image OK: {{.Id}}" | head -1 && nvidia-smi --query-gpu=name,memory.total --format=csv,noheader'
+bash -c 'docker image inspect $TRAIN_IMG --format "image OK: {{.Id}}" | head -1 && nvidia-smi --query-gpu=name,memory.total --format=csv,noheader && { [ -s "$BACKBONE" ] && echo "backbone OK: $BACKBONE" || echo "backbone MISSING: $BACKBONE"; }'
 ```
+`backbone MISSING` → `echo "preflight FAIL" >> $RD/progress.log`, print `STAGE_DONE A00`, stop. Never download or hand-place the backbone from this card; the operator stages it with `tao-run-deft-aoi/scripts/stage_backbone.py` (see cards/README.md).
 
 3) Model gate (automl_enabled + packaged search-space schema):
 ```bash

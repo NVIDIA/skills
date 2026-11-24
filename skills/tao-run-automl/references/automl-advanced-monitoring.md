@@ -327,11 +327,15 @@ Before either fresh or resumed `runner.run(...)`, call the bundled
 shown in `SKILL.md`. Missing identities fail before the wheel can apply its
 random default; resumed identities must resolve to an existing controller.
 
-This is a skill-boundary safeguard. The currently packaged
-`nvidia-tao-automl` wheel still permits `resume=True` without a matching
-`session_id` and may silently create a fresh controller for callers outside
-this skill. NVBug 6662913 tracks that upstream fail-loud behavior; until the
-wheel changes, non-skill callers must apply the same explicit identity gate.
+This remains a skill-boundary safeguard: the sealed settings carry an explicit
+identity for both fresh and resumed runs. The `nvidia-tao-automl` 7.3.1 wheel
+already fails closed on resume.
+Outside this skill, callers may omit `session_id` only when the full
+run workspace contains exactly one controller; the wheel resolves that identity
+instead of creating a new one. Missing or ambiguous controllers, invalid
+identities, and missing, unreadable, or malformed selected controller state
+raise an error before workspace creation or backend recovery. Callers using
+older wheels that lack this validation must apply the explicit identity gate.
 
 Behaviour on resume:
 1. **Brain state** is reloaded from `<workspace>/.automl/*` for the explicit
@@ -412,7 +416,7 @@ Model-specific notes do not belong in this AutoML skill. For every requested mod
 ## Common Pitfalls
 
 1. **`skill_dir` not passed (or wrong path).** `AutoMLRunner(skill_dir=...)` requires an absolute path to a model directory inside the skill bank. The runner raises `FileNotFoundError: skill_info.yaml not found at <skill_dir>/references/skill_info.yaml` if the path is wrong. Use the same bank root the agent loaded this SKILL.md from; combine with `skills/models/<model_skill>/` after resolving aliases.
-2. **Wrong LLM endpoint (404).** Use `https://inference-api.nvidia.com` for NVIDIA inference API testing and pass it explicitly in `automl_settings`. The LLM brain falls back to random sampling on LLM failure, so check logs for "LLM call failed" before trusting the run as LLM-guided.
+2. **Wrong LLM endpoint (404).** Use the base URL of the user's own OpenAI-compatible endpoint and pass it explicitly in `automl_settings`. The LLM brain falls back to random sampling on LLM failure, so check logs for "LLM call failed" before trusting the run as LLM-guided.
 3. **Model-specific training failures (data format, missing datasets, invalid params).** Each network has unique training requirements. ALWAYS read `<bank-root>/skills/models/<model_skill>/SKILL.md` — the "Training Requirements" and "Error Patterns" sections document model-specific failure modes that apply to AutoML recs too.
 4. **Workspace path collisions.** Running the same script twice overwrites the previous experiment. Always include a timestamp: `workspace_path=f"./automl_workspace/{TIMESTAMP}"` where `TIMESTAMP = datetime.now().strftime("%Y%m%d_%H%M%S")`.
 5. **Using a weak proxy metric.** The brain can optimize a metric that does not reflect real task quality. Use the metric recommended by the model skill or provide `eval_fn`.

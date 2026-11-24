@@ -6,16 +6,17 @@ HOST FACTS (measured, non-negotiable):
 - Pool CSV paths are directory-form; the REAL pool files are flat `{object_name}_SolderLight.jpg` under `$WS/augmentation/mining_pool/images/`.
 - Cosine retention cutoff = 0.9 (`state.config.mining_filter.min_similarity`).
 
-STATE GATE:
+STATE GATE — the state decides, not you:
 ```bash
-bash -c '$DPY -c "import json,pandas as pd;st=json.load(open(\"$RD/deft_state.json\"));p=st[\"iterations\"][\"$ITER\"][\"routing_mining_parquet\"];print(\"ROWS=\"+str(len(pd.read_parquet(p))))"'
+bash -c '$DPY $SKILL_ROOT/scripts/deft_context.py --state $RD/deft_state.json --stage data_mining && $DPY -c "import json,pandas as pd;st=json.load(open(\"$RD/deft_state.json\"));p=st[\"iterations\"][\"$ITER\"][\"routing_mining_parquet\"];print(\"ROWS=\"+str(len(pd.read_parquet(p))))"'
 ```
 | gate output | do |
 |---|---|
+| `deft_context: ... durable next_stage is ...` | STOP — print `STAGE_DONE 50` (the driver re-routes) |
 | `ROWS=0` | legal skip: `$DPY $SKILL_ROOT/scripts/commit_stage.py --duration-sec $(( $(date +%s) - STAGE_T0 + 1 )) --results-dir $RD --iter-label $ITER --stage data_mining --skip --summary "routing produced zero mining rows"` → `STAGE_DONE 50` |
 | `ROWS=N` (N>0) | steps 1→4 |
 
-1) Embed targets + pool (CPU), then k-NN (GPU) — ONE command, three container runs, evidence logs kept. For iter2+ the pool embeddings AND their PASS log are copied from iter1 (the audit requires a real TAO PASS marker in every mining log — never hand-write a log):
+1) Embed targets + pool (CPU), then k-NN (GPU) — ONE command, three container runs, evidence logs kept. For iter2+ the pool embeddings AND their PASS log are copied from iter1 (commit_stage rejects placeholder mining logs — never hand-write a log):
 ```bash
 bash -c 'set -e; MF=$RD/$ITER/mining_filter; mkdir -p $MF/pkg_specs/{embedding,tmm}; TP=$($DPY -c "import json;print(json.load(open(\"$RD/deft_state.json\"))[\"iterations\"][\"$ITER\"][\"routing_mining_parquet\"])"); printf "model: SigLIP\nmodel_path: google/siglip-base-patch16-224\nmodel_config_path: \"\"\nbatch_size: 64\ninput_parquet: \"\"\noutput_parquet: \"\"\n" > $MF/pkg_specs/embedding/image_embeddings.yaml; printf "topn: 5\nknn_metric: cosine\nfilter_by_label: false\nsource_embed_column_name: embedding\ntarget_embed_column_name: embedding\nsource_parquet: \"\"\ntarget_parquet: \"\"\noutput_parquet: \"\"\n" > $MF/pkg_specs/tmm/nearest_neighbors.yaml; PKG=/usr/local/lib/python3.12/dist-packages/nvidia_tao_ds/mining; $DPY -c "
 import os, pandas as pd
@@ -44,6 +45,6 @@ On leakage: commit data_mining `--status error --summary "train/val leakage in m
 ```bash
 bash -c 'set -e; MF=$RD/$ITER/mining_filter; K=$($DPY -c "import json;print(json.load(open(\"$RD/$ITER/mining_filter/mining_history_summary.json\"))[\"selected_count\"])"); $DPY $SKILL_ROOT/scripts/commit_stage.py --duration-sec $(( $(date +%s) - STAGE_T0 + 1 )) --results-dir $RD --iter-label $ITER --stage data_mining --mining-parquet $MF/mined_filtered.parquet --mining-count "$K" --mining-candidates $MF/mining_candidates.parquet --mining-history $RD/mining_history.json --mining-history-summary $MF/mining_history_summary.json --mining-summary $MF/knn_summary.csv --mining-source-embeddings $MF/source_embeddings.parquet --mining-target-embeddings $MF/target_embeddings.parquet --mining-source-log $MF/source_embeddings.log --mining-target-log $MF/target_embeddings.log --mining-knn-log $MF/nearest_neighbors.log --summary "mined novel=$K (cosine>=0.9)"'
 ```
-If commit_stage rejects, report its diagnostic and stop. Never fabricate evidence or bypass the audit.
+If commit_stage rejects, report its diagnostic and stop. Never fabricate evidence or bypass commit_stage.
 
 Final message exactly: `STAGE_DONE 50`

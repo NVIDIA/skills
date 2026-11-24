@@ -15,6 +15,10 @@ model:
   pretrained_model_path: null
   precision: bf16
   fsdp_shard_size: 1
+  # For a LoRA checkpoint copy the training spec's model.lora block here, with the exact
+  # target_modules that were trained.
+  lora:
+    enabled: false
   input_hw: [224, 224]
   network:
     embed_dim: 256
@@ -49,3 +53,7 @@ dataset:
     random_caption: false
     skip_missing_files: false
     caption_to_label: {}
+    # Text->video retrieval benchmark instead of MSR-VTT (release root holding gt/, additional_gt/, clips/):
+    # dataset_type: retrieval_benchmark
+    # metadata: /data/retrieval_benchmark
+    # resolution: [448, 448]

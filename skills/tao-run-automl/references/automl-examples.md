@@ -48,18 +48,18 @@ User: confirmed
 ```
 Agent: I'll use the LLM algorithm — it reasons about your network architecture and learns from each experiment.
 I need three things for the LLM brain:
-1. LLM endpoint URL (default: https://inference-api.nvidia.com)
-2. LLM model name (default: gcp/google/gemini-3.1-pro-preview)
+1. LLM endpoint URL: the base URL of your OpenAI-compatible endpoint (required)
+2. LLM model name: a model id that endpoint serves (required)
 3. API key available in `AUTOML_LLM_API_KEY` or `NVIDIA_API_KEY`
 
-User: endpoint "https://inference-api.nvidia.com", model "gcp/google/gemini-3.1-pro-preview"
+User: endpoint "https://<your-llm-endpoint>/v1", model "<model-id>"
 
 Agent: I verified the LLM endpoint/key env var is available, the selected train image is confirmed, and platform/data preflight passed. Launch review: 10 LLM-guided recs, metric/direction, search bounds, workspace, GPU/node shape, and estimated runtime.
 User: confirmed
 [executes runner.run(automl_settings={
     "algorithm": "llm",
-    "llm_endpoint": "https://inference-api.nvidia.com",
-    "llm_model": "gcp/google/gemini-3.1-pro-preview",
+    "llm_endpoint": "https://<your-llm-endpoint>/v1",
+    "llm_model": "<model-id>",
     "llm_api_key": os.environ["AUTOML_LLM_API_KEY"],
     "session_id": session_id,
     ...
@@ -77,19 +77,19 @@ Agent: I'll use the autoresearch algorithm. It will:
 
 I'll cap it at 30 experiments. I need:
 - Dataset URI
-- LLM endpoint (default: https://inference-api.nvidia.com)
-- LLM model (default: gcp/google/gemini-3.1-pro-preview)
+- LLM endpoint: the base URL of your OpenAI-compatible endpoint (required)
+- LLM model: a model id that endpoint serves (required)
 - LLM API key in `AUTOML_LLM_API_KEY` or `NVIDIA_API_KEY`
 
-User: dataset s3://bucket/data, endpoint https://inference-api.nvidia.com, model gcp/google/gemini-3.1-pro-preview
+User: dataset s3://bucket/data, endpoint https://<your-llm-endpoint>/v1, model <model-id>
 
 [shows launch review with 30-experiment cap, LLM config source, data/image/platform checks, exact generated configs for the initial launch batch, and estimated runtime]
 User: confirmed
 
 [executes runner.run(automl_settings={
     "algorithm": "autoresearch", "automl_max_experiments": 30,
-    "llm_endpoint": "https://inference-api.nvidia.com",
-    "llm_model": "gcp/google/gemini-3.1-pro-preview",
+    "llm_endpoint": "https://<your-llm-endpoint>/v1",
+    "llm_model": "<model-id>",
     "llm_api_key": os.environ["AUTOML_LLM_API_KEY"],
     "session_id": session_id,
     ...

@@ -32,16 +32,16 @@ actions:
     metric_direction: minimize
     metric_file: metrics.json
   inference_hpo:
-    command: python inference_hpo_trial.py --run-config {config_path}
+    command: python scripts/inference_hpo_trial.py --run-config {config_path}
     config_format: yaml
     mode: config
     # Tunes nsample against F1 on labeled data.
     # Run separately for each threshold_strategy (scs, macs) and compare.
-    # See SKILL.md § "Inference HPO with AutoML" for the trial script and runner.
+    # The trial script ships with this skill: scripts/inference_hpo_trial.py (see references/automl.md).
     #
     # execution:
     #   type: python_script
-    #   script: /absolute/path/to/Kumo-TS/Kumo-Anomaly/inference_hpo_trial.py
+    #   script: /absolute/path/to/tao-skill-bank/skills/models/tao-finetune-kumo-anomaly/scripts/inference_hpo_trial.py
     #   args: ["--run-config", "{config_path}"]
     #   cwd: /absolute/path/to/Kumo-TS/Kumo-Anomaly
     #   config_format: yaml
@@ -61,6 +61,7 @@ spec_templates:
 description: >-
   Kumo-Anomaly fine-tuning and inference HPO via VirtualEnvSDK.
   No container required. Fine-tuning AutoML minimizes val_loss over lr,
-  weight_decay, batch_size, grad_clip, mask_ratio, and window_length.
+  weight_decay, batch_size and grad_clip (mask_ratio and window_length are fixed:
+  they change what val_loss measures).
   Inference HPO maximizes F1 over nsample (run once per threshold strategy).
   Supply execution= to AutoMLRunner.run() with absolute paths to your clone.

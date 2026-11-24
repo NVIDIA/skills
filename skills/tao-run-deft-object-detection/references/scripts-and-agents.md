@@ -16,7 +16,7 @@ Run every bundled script through `scripts/deft_python.sh`. Resolve every path ar
 
 ## Pipeline glue scripts
 
-These replace internal container images from the reference pipeline whose scripts are not published. All are pure host Python.
+These are bundled host scripts, so the loop does not depend on a container image for file manipulation. All are pure host Python.
 
 | Script | Stage | Purpose |
 |---|---|---|

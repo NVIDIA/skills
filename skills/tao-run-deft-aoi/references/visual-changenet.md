@@ -222,7 +222,7 @@ it.
 
 `model.backbone.pretrained_backbone_path` **must point to an existing local file on the host that is bind-mounted into the container.** TAO's `ptm_utils.load_pretrained_weights()` hands the string straight to `torch.load(path, ...)` (with a special-case branch when the suffix is `.safetensors`, calling `safetensors.torch.load_file`). It does **not** dereference `https://`, `hf://`, or HuggingFace repo IDs — passing a URL produces `FileNotFoundError: [Errno 2] No such file or directory: 'https://...'` and `Execution status: FAIL` within ~3 s.
 
-Accepted forms (TAO 7.0.0-rc-224):
+Accepted forms (TAO 7.0.0):
 
 | Form | Status |
 |---|---|

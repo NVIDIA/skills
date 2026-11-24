@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and ML engineers use this skill to auto-label raw videos with VLM/LLM teacher models inside the TAO Toolkit container, producing captions, structured descriptions, and Chain-of-Thought QA datasets (tao-vl-reason-v1.0 JSON) for training video understanding models in general, traffic, warehouse, or custom domains. <br>
+Developers and ML engineers use this skill to auto-label raw videos into Chain-of-Thought video QA training datasets (captions, structured descriptions, and MCQ/binary/open-ended QA with reasoning traces) by running the TAO Toolkit data-services video_reasoning_annotation pipeline against a VLM/LLM endpoint. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,57 +25,87 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Video Reasoning Annotation — Full Configuration Reference](references/configuration.md) <br>
-- [Video Reasoning Annotation — Domain Adaptation Guide](references/domain_adaptation.md) <br>
-- [Traffic domain prompts module (prompts_traffic.py)](references/prompts_traffic.py) <br>
-- [Warehouse domain prompts module (prompts_warehouse.py)](references/prompts_warehouse.py) <br>
-- [Skill contract (skill_info.yaml)](references/skill_info.yaml) <br>
-- [NVIDIA TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
+- [configuration.md](references/configuration.md) <br>
+- [domain_adaptation.md](references/domain_adaptation.md) <br>
+- [prompts_traffic.py](references/prompts_traffic.py) <br>
+- [prompts_warehouse.py](references/prompts_warehouse.py) <br>
+- [skill_info.yaml](references/skill_info.yaml) <br>
+- [TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Shell commands, Configuration instructions, Files] <br>
-**Output Format:** [Markdown with inline bash and YAML code blocks; pipeline writes JSONL per step and tao-vl-reason-v1.0 JSON task files] <br>
+**Output Format:** [Markdown with inline bash and YAML code blocks; pipeline produces JSONL per step and tao-vl-reason-v1.0 JSON files] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [Outputs are written to results_dir with per-step subdirectories; the pipeline resumes by skipping already-processed videos.] <br>
+**Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
-- Codex (`openai/openai/gpt-5.5`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`) <br>
+- Codex (`openai/openai/gpt-6.1-sol`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive), 1 attempt per task, each run in an isolated k8s sandbox pod and compared against a no-skill baseline. <br>
+1 evaluation task (1 positive), 1 attempt per task, run in the `k8s-sandbox` environment with each task attempt in its own isolated sandbox pod; each task was also attempted without the skill as a baseline. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Is it safe to use? Scored from the security signal. <br>
-- Correctness: Is the answer correct? Scored from the accuracy signal. <br>
-- Discoverability: Was the right skill loaded when needed? Scored from the skill_execution signal. <br>
-- Effectiveness: Did the skill help complete the task? Equal-weight mean of goal_accuracy and behavior_check. <br>
-- Efficiency: Did it avoid wasted tool calls and token usage? Equal-weight mean of skill_efficiency and token_efficiency. <br>
+- Security: Is it safe to use? Scored from `security` (100%). <br>
+- Correctness: Is the answer correct? Scored from `accuracy` (100%). <br>
+- Discoverability: Was the right skill loaded when needed? Scored from `skill_execution` (100%). <br>
+- Effectiveness: Did the skill help complete the task? Scored from `goal_accuracy` (50%) + `behavior_check` (50%). <br>
+- Efficiency: Did it avoid wasted tool calls and token usage? Scored from `skill_efficiency` (50%) + `token_efficiency` (50%). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
-- `skill_efficiency`: Tool-call productivity. <br>
-- `accuracy`: Final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Whether the user's goal was achieved. <br>
-- `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
+- `security`: Security: unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Skill Execution: whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool Productivity: tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
+- `accuracy`: Accuracy: final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Goal Accuracy: whether the user's goal was achieved. <br>
+- `behavior_check`: Behavior Check: whether the expected workflow behavior was followed. <br>
+- `token_efficiency`: Token Efficiency: actual uncached prompt plus completion usage (50% of Efficiency). <br>
 
 
 
 ## Evaluation Results: <br>
+**Overall verdict: PASS — Recommended for publication**
+
+**Publication Recommendation:** Recommended for publication based on the completed evaluation evidence in this report.
+
+### Results at a Glance
+
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 99.6% — baseline ran, but no comparable score was available; uplift unavailable | 73.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 99.6% — baseline ran, but no comparable score was available; uplift unavailable | 57.4% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 0.0% → 100.0% (+100.0 points) | 20.0% → 100.0% (+80.0 points) |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 20.0% → 60.0% (+40.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 0.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 16.7% → 100.0% (+83.3 points) | 48.3% → 70.0% (+21.7 points) |
-| Efficiency | 98.0% — baseline ran, but no comparable score was available; uplift unavailable | 99.7% → 98.5% (-1.2 points) |
+| Effectiveness | 16.7% → 100.0% (+83.3 points) | 33.3% → 33.3% (±0.0 points) |
+| Efficiency | 98.1% — baseline ran, but no comparable score was available; uplift unavailable | 93.8% → 93.6% (-0.2 points) |
+
+**How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
+
+Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92.0%, 45.0 percentage points above its 47.0% no-skill baseline.
+
+A partial dimension was calculated from only the available configured signals; review the detailed report before relying on it.
+
+#### Comparison details
+
+Shared-source comparisons use the same signals and weights on both conditions. They do not replace the full dimension scores above or change the publication verdict.
+
+| Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
+| --- | --- | --- | --- | --- |
+| claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| claude-code | Efficiency | Token-only comparison | 99.1% → 96.2% (-2.9 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+
+### Tier Status
+
+| Tier | Purpose | Status | Evidence |
+|---|---|---|---|
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 17 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 2 finding(s) |
+| Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 1 task(s) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

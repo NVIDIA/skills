@@ -2,7 +2,7 @@
 name: tao-setup
 description: One-time session setup and orchestration map for the TAO skill bank. Run this first when the TAO skills were installed individually (e.g. from a public skills catalog) so the session gets the cross-skill discovery flow, credential checks, and host preflight that the bundled plugin hook would otherwise inject automatically. Trigger phrases include "set up TAO skills", "TAO session setup", "prepare TAO environment", "TAO getting started".
 license: Apache-2.0
-compatibility: Requires bash and Python 3.10+. Docker plus the NVIDIA container toolkit are needed by most downstream TAO skills but are only checked (not installed) here.
+compatibility: Requires bash and Python 3.10+ with PyYAML (the shared helper scripts import it). Docker plus the NVIDIA container toolkit are needed by most downstream TAO skills but are only checked (not installed) here.
 metadata:
   author: NVIDIA Corporation
   version: "0.1.0"
@@ -45,7 +45,9 @@ done
 
 set -a; source /path/to/.env; set +a   # omit if already exported
 
-# 1. Host preflight — most TAO skills dispatch docker containers on a GPU host.
+# 1. Host preflight — the shared helper scripts need PyYAML for python3, and
+#    most TAO skills dispatch docker containers on a GPU host.
+python3 -c 'import yaml' 2>/dev/null && echo "OK: PyYAML" || echo "MISSING: PyYAML (python3 cannot import yaml; the shared helper scripts need it). Install it with: python3 -m pip install pyyaml"
 docker info > /dev/null && echo "OK: docker" || echo "MISSING: docker"
 nvidia-smi > /dev/null && echo "OK: GPU" || echo "MISSING: NVIDIA GPU/driver"
 
@@ -62,6 +64,12 @@ done
 #    ~/.tao-kit/kit.env. Non-invasive; see skills/core/tao-token-efficient-execution.
 bash "${TAO_SKILL_BANK_PATH}/skills/core/tao-token-efficient-execution/scripts/install.sh"
 ```
+
+If the check prints `MISSING: PyYAML`, the machine is not ready: the listing,
+resolver, and launch-preflight helpers under `scripts/` cannot start without
+it. Install PyYAML into the Python that `python3` runs (in a virtual
+environment when the system Python refuses the install), rerun the check, and
+do not report setup as complete before it prints `OK: PyYAML`.
 
 If Docker or the NVIDIA host runtime is missing, use the
 `tao-setup-nvidia-gpu-host` skill — it checks and (with approval) installs
@@ -92,11 +100,13 @@ application workflows as fresh per-stage sessions instead of one long
 conversation (measured 74-91% cheaper, 4-5x lower peak context, and the only
 mode validated on small execution models). Setup only scaffolds the config;
 the routing rule applies at launch time: **when a card pack exists for the
-requested workflow (`skills/applications/<skill>/cards/`), prefer its
-`driver.sh` over in-conversation stage execution.** The `tao-launch-workflow`
-gate still applies in full — the driver launch is the side-effecting action
-it reviews. Packs ship today for `tao-run-deft-aoi` and `tao-run-automl`; the
-kit's authoring prompt compiles packs for other workflows.
+requested workflow (`skills/applications/<skill>/cards/`), the `pi` harness
+is installed, and the user asked for the card-pack route, use its `driver.sh`
+instead of in-conversation stage execution; otherwise run the stages in the
+conversation.** The `tao-launch-workflow` gate still applies in full — the
+driver launch is the side-effecting action it reviews. Packs ship today for
+`tao-run-deft-aoi` and `tao-run-automl`; the kit's authoring prompt compiles
+packs for other workflows.
 
 ## Discovery flow (how TAO skills chain)
 
@@ -156,12 +166,11 @@ kit's authoring prompt compiles packs for other workflows.
   (`tao-run-automl`), which uses the `nvidia-tao-automl` wheel and its
   transitive SDK.
 
-## Optional: Codex agent identity
+## Optional: agent identity for Codex and Cursor
 
-For Codex sessions, `scripts/install-codex-agents.sh` registers the TAO skill
-marketplace, installs the plugin, and copies the TAO agent identity to
-`~/.codex/AGENTS.md` so it loads in every session:
+With user approval, add the TAO identity to the project's `AGENTS.md` as a
+marked block (`add` again updates it, `remove` deletes it). In the project:
 
 ```bash
-bash scripts/install-codex-agents.sh
+python3 "${TAO_SKILL_BANK_PATH:?}/scripts/tao_agent_identity.py" add
 ```

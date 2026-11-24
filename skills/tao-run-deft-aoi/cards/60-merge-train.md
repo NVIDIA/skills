@@ -1,10 +1,10 @@
 # CARD 60 — assemble+validate training CSV, commit data_merge, launch train (detached) — iteration $ITER
 
-STATE GATE:
+STATE GATE — the state decides, not you:
 ```bash
-$DPY $SKILL_ROOT/scripts/audit_deft_run.py --results-dir $RD
+$DPY $SKILL_ROOT/scripts/deft_context.py --state $RD/deft_state.json --stage data_merge
 ```
-Proceed only if `next_action` names data_merge (or merge/assemble) for $ITER; otherwise do what it names.
+Proceed only on exit 0 with `"iteration": "$ITER"`. A non-zero exit (`durable next_stage is ...`) → STOP, print `STAGE_DONE 60` (the driver re-routes).
 
 1) Assemble the combined CSV with monotonic growth + provenance + label normalization — ONE command:
    (iter1 = base_train with `kpi/images/` prefixed ONCE onto relative paths + mining_pool; iterN>1 = previous combined [already workspace-coordinates — do NOT re-prefix] + mining_pool. label: keep `PASS` uppercase, lowercase+strip everything else.)

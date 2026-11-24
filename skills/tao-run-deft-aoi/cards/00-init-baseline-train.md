@@ -17,9 +17,9 @@ mkdir -p $RD/specs $RD/baseline/{train,inference} $RD/iter1/{routing_results,ano
 
 2) Initialize state — NEVER hand-author deft_state.json:
 ```bash
-$DPY $SKILL_ROOT/scripts/init_deft_state.py --results-dir $RD --workspace $WS --kpi-target "FAR < 0.5 %" --max-iterations 3 --num-gpus 1 --num-epochs 10 --num-sdg 1 --project NV_PCB_Siamese --step 0 --batch-size 8 --min-similarity 0.9 --train-container $TRAIN_IMG --ag-container $DS_IMG
+$DPY $SKILL_ROOT/scripts/init_deft_state.py --results-dir $RD --workspace $WS --kpi-target "FAR < 0.5 %" --max-iterations 3 --num-gpus 1 --gpu-model "$GPU_MODEL" --num-epochs 10 --num-sdg 1 --project NV_PCB_Siamese --step 0 --batch-size 8 --min-similarity 0.9 --train-container $TRAIN_IMG --ag-container $DS_IMG
 ```
-(`--num-sdg` must be a positive int; the value is inert here — SDG is disabled and card 40 records the documented skip. If init errors on an unknown flag, drop ONLY that flag and rerun; do not switch tools.)
+(`--num-sdg` must be a positive int; the value is inert here — SDG is disabled and card 40 records the documented skip. `$GPU_MODEL` is the driver's preflight `nvidia-smi` name+memory string; never replace it with a literal. If init errors on an unknown flag, drop ONLY that flag and rerun; if it reports a missing required argument, do not invent a value — STOP, quote the argparse error as your final message, and skip steps 3-4; do not switch tools.)
 
 3) Stage the baseline spec, launch-ready (one command; the workspace copy is NOT ready —
    its checkpoint_interval exceeds the epoch budget, and its backbone points at a

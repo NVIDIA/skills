@@ -15,6 +15,10 @@ model:
   pretrained_model_path: null
   precision: bf16
   fsdp_shard_size: 1
+  # For a LoRA checkpoint copy the training spec's model.lora block here, with the exact
+  # target_modules that were trained. A merged HF export needs enabled: false.
+  lora:
+    enabled: false
   input_hw: [224, 224]
   network:
     embed_dim: 256

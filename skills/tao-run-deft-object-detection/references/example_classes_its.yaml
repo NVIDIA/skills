@@ -1,7 +1,6 @@
 # Class mapping for scripts/prepare_class_mappings_for_mining_data_prep.py
 #
-# ITS mapping, based on the reference implementation
-# (video-tools/curate/codino_pl/its_mapping_codino.py) with one deliberate
+# ITS mapping, based on the reference implementation, with one deliberate
 # change, noted below. Left = a class you train on. Right = the Co-DETR
 # (COCO-80) classes that fold into it. Anything not listed on the right is
 # dropped.

@@ -9,9 +9,10 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `tao-train-sparse4d`
-- Evaluation date: 2026-10-16
-- Evaluator version: `1.5.6`
-- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
+- Validation status: `passed`
+- Evaluation date: 2026-11-20
+- Evaluator version: `1.6.10`
+- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 7 evaluation tasks (7 positive)
 - Dataset digest: `sha256:2b0115d60b2ccf67771cdf91e07158641e64d575b9497430129ea837a8b28084` (skill-evaluator-dataset-snapshot/1)
 - Attempts per task: 1
@@ -20,6 +21,20 @@ Recommended for publication based on the completed evaluation evidence in this r
 - Tier 3 evidence: required for publication
 
 Each task attempt ran in its own isolated sandbox pod.
+
+## Tier 1 LLM Provenance
+
+SkillSpector provider, model, analyzer revision, and determinism evidence retained for this scan.
+
+| Skill | Provider | Adapter | Analyzer | Model | Revision | Determinism |
+| --- | --- | --- | --- | --- | --- | --- |
+| tao-train-sparse4d | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| tao-train-sparse4d | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| tao-train-sparse4d | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| tao-train-sparse4d | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| tao-train-sparse4d | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+
+- Controls for `tao-train-sparse4d`: temperature=not set (source=provider_default, forwarded=no); seed=not set (source=unset, forwarded=no); reasoning_effort=not set (source=provider_default, forwarded=no)
 
 ## What This Report Answers
 
@@ -35,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 98.5% — baseline ran, but no comparable score was available; uplift unavailable | 77.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 91.5% — baseline ran, but no comparable score was available; uplift unavailable | 62.3% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 5.7% → 100.0% (+94.3 points) | 51.4% → 100.0% (+48.6 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 0.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 29.8% → 95.5% (+65.7 points) | 51.0% → 86.9% (+35.9 points) |
-| Efficiency | 96.8% — baseline ran, but no comparable score was available; uplift unavailable | 99.4% → 99.4% (±0.0 points) |
+| Correctness | 54.3% → 97.1% (+42.8 points) | 31.4% → 77.1% (+45.7 points) |
+| Discoverability | 85.7% — baseline ran, but no comparable score was available; uplift unavailable | 0.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 50.1% → 76.6% (+26.5 points) | 27.5% → 40.9% (+13.4 points) |
+| Efficiency | 98.1% — baseline ran, but no comparable score was available; uplift unavailable | 93.6% → 93.5% (-0.1 points) |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -48,37 +63,47 @@ Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92
 
 A partial dimension was calculated from only the available configured signals; review the detailed report before relying on it.
 
+### Comparison details
+
+Shared-source comparisons use the same signals and weights on both conditions. They do not replace the full dimension scores above or change the publication verdict.
+
+| Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
+| --- | --- | --- | --- | --- |
+| claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| claude-code | Efficiency | Token-only comparison | 98.8% → 96.2% (-2.6 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+
 ## Token Usage
 
 Actual Tier 3 execution usage is reported for every observed agent/case pair and both conditions.
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 610,453 | 1,888,555 | -1,278,102 | -67.68% | skill 7/7; base 7/7 |
-| claude-code | tao-train-sparse4d-basic | 68,595 | 30,852 | +37,743 | +122.34% | skill 1/1; base 1/1 |
-| claude-code | tao-train-sparse4d-evaluate-checkpoint | 69,056 | 612,417 | -543,361 | -88.72% | skill 1/1; base 1/1 |
-| claude-code | tao-train-sparse4d-missing-backbone | 66,867 | 449,067 | -382,200 | -85.11% | skill 1/1; base 1/1 |
-| claude-code | tao-train-sparse4d-resnet101-ltt | 162,336 | 327,520 | -165,184 | -50.43% | skill 1/1; base 1/1 |
-| claude-code | tao-train-sparse4d-resnet50 | 67,350 | 30,921 | +36,429 | +117.81% | skill 1/1; base 1/1 |
-| claude-code | tao-train-sparse4d-resume | 67,219 | 405,633 | -338,414 | -83.43% | skill 1/1; base 1/1 |
-| claude-code | tao-train-sparse4d-taxonomy-mismatch | 109,030 | 32,145 | +76,885 | +239.18% | skill 1/1; base 1/1 |
-| codex | All cases | 99,412 | 98,635 | +777 | +0.79% | skill 7/7; base 7/7 |
-| codex | tao-train-sparse4d-basic | 14,165 | 14,145 | +20 | +0.14% | skill 1/1; base 1/1 |
-| codex | tao-train-sparse4d-evaluate-checkpoint | 14,185 | 14,104 | +81 | +0.57% | skill 1/1; base 1/1 |
-| codex | tao-train-sparse4d-missing-backbone | 14,182 | 14,026 | +156 | +1.11% | skill 1/1; base 1/1 |
-| codex | tao-train-sparse4d-resnet101-ltt | 14,305 | 14,192 | +113 | +0.80% | skill 1/1; base 1/1 |
-| codex | tao-train-sparse4d-resnet50 | 14,190 | 14,202 | -12 | -0.08% | skill 1/1; base 1/1 |
-| codex | tao-train-sparse4d-resume | 14,095 | 13,973 | +122 | +0.87% | skill 1/1; base 1/1 |
-| codex | tao-train-sparse4d-taxonomy-mismatch | 14,290 | 13,993 | +297 | +2.12% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 709,865 | 1,987,190 | -1,277,325 | -64.28% | skill 14/14; base 14/14 |
+| claude-code | All cases | 502,504 | 252,460 | +250,044 | +99.04% | skill 7/7; base 7/7 |
+| claude-code | tao-train-sparse4d-basic | 77,861 | 36,116 | +41,745 | +115.59% | skill 1/1; base 1/1 |
+| claude-code | tao-train-sparse4d-evaluate-checkpoint | 77,350 | 36,347 | +41,003 | +112.81% | skill 1/1; base 1/1 |
+| claude-code | tao-train-sparse4d-missing-backbone | 77,473 | 35,964 | +41,509 | +115.42% | skill 1/1; base 1/1 |
+| claude-code | tao-train-sparse4d-resnet101-ltt | 36,832 | 36,198 | +634 | +1.75% | skill 1/1; base 1/1 |
+| claude-code | tao-train-sparse4d-resnet50 | 77,775 | 35,977 | +41,798 | +116.18% | skill 1/1; base 1/1 |
+| claude-code | tao-train-sparse4d-resume | 77,653 | 35,916 | +41,737 | +116.21% | skill 1/1; base 1/1 |
+| claude-code | tao-train-sparse4d-taxonomy-mismatch | 77,560 | 35,942 | +41,618 | +115.79% | skill 1/1; base 1/1 |
+| codex | All cases | 96,945 | 95,374 | +1,571 | +1.65% | skill 7/7; base 7/7 |
+| codex | tao-train-sparse4d-basic | 14,027 | 13,645 | +382 | +2.80% | skill 1/1; base 1/1 |
+| codex | tao-train-sparse4d-evaluate-checkpoint | 13,785 | 13,554 | +231 | +1.70% | skill 1/1; base 1/1 |
+| codex | tao-train-sparse4d-missing-backbone | 13,667 | 13,512 | +155 | +1.15% | skill 1/1; base 1/1 |
+| codex | tao-train-sparse4d-resnet101-ltt | 14,058 | 13,890 | +168 | +1.21% | skill 1/1; base 1/1 |
+| codex | tao-train-sparse4d-resnet50 | 13,779 | 13,569 | +210 | +1.55% | skill 1/1; base 1/1 |
+| codex | tao-train-sparse4d-resume | 13,794 | 13,575 | +219 | +1.61% | skill 1/1; base 1/1 |
+| codex | tao-train-sparse4d-taxonomy-mismatch | 13,835 | 13,629 | +206 | +1.51% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 599,449 | 347,834 | +251,615 | +72.34% | skill 14/14; base 14/14 |
 
-Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
+Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
 ## Tier Status
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 26 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 21 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 7 task(s) |
 
@@ -92,7 +117,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 - **MEDIUM** QUALITY/quality_correctness: SKILL_SPEC recommended field missing: 'metadata.tags' (`skills/models/tao-train-sparse4d/SKILL.md`)
 - **MEDIUM** SCHEMA/frontmatter_field_placement: Root field 'tags' is ignored; use 'metadata.tags' (`skills/models/tao-train-sparse4d/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/models/tao-train-sparse4d`)
-- 21 additional finding(s) are available in the full evaluation artifacts.
+- 16 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

@@ -13,7 +13,7 @@ import unittest
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-import audit_deft_run
+import commit_stage
 import prepare_card_mining
 
 
@@ -47,7 +47,28 @@ class CardMiningTests(unittest.TestCase):
     def prepare(self, iteration):
         return prepare_card_mining.prepare(self.rd, self.workspace, iteration)
 
-    def test_history_excludes_prior_selection_and_audit_accepts_artifacts(self):
+    def mining_commit_argv(self, root, iteration, count):
+        for name in ("source_embeddings", "target_embeddings"):
+            pd.DataFrame({"embedding": [[0.1, 0.2]]}).to_parquet(root / f"{name}.parquet")
+        for name in ("source_embeddings", "target_embeddings", "nearest_neighbors"):
+            (root / f"{name}.log").write_text("embedding finished\nExecution status: PASS\n")
+        return [
+            "--results-dir", str(self.rd), "--iter-label", iteration, "--stage", "data_mining",
+            "--duration-sec", "1", "--summary", "fixture",
+            "--mining-parquet", str(root / "mined_filtered.parquet"),
+            "--mining-count", str(count),
+            "--mining-candidates", str(root / "mining_candidates.parquet"),
+            "--mining-history", str(self.rd / "mining_history.json"),
+            "--mining-history-summary", str(root / "mining_history_summary.json"),
+            "--mining-summary", str(root / "knn_summary.csv"),
+            "--mining-source-embeddings", str(root / "source_embeddings.parquet"),
+            "--mining-target-embeddings", str(root / "target_embeddings.parquet"),
+            "--mining-source-log", str(root / "source_embeddings.log"),
+            "--mining-target-log", str(root / "target_embeddings.log"),
+            "--mining-knn-log", str(root / "nearest_neighbors.log"),
+        ]
+
+    def test_history_excludes_prior_selection_and_commit_accepts_artifacts(self):
         self.candidates("iter1", ["a", "b", "low"], [0.99, 0.99, 0.5])
         self.prepare("iter1")
         root = self.candidates("iter2", ["b", "c", "c"])
@@ -57,17 +78,25 @@ class CardMiningTests(unittest.TestCase):
         csv = pd.read_csv(root / "mining_pool.csv")
         self.assertEqual(csv["object_name"].tolist(), ["c"])
         self.assertEqual(pd.read_csv(root / "knn_summary.csv")["kept_count"].tolist(), [2])
-        info = {
-            "mining_candidate_parquet": str(root / "mining_candidates.parquet"),
-            "mining_mined_parquet": str(root / "mined_filtered.parquet"),
-            "mining_history": str(self.rd / "mining_history.json"),
-            "mining_history_summary": str(root / "mining_history_summary.json"),
-            "mining_mined_count": 1,
-        }
-        errors = []
-        audit_deft_run._mining_summary_proof(root / "knn_summary.csv", 2, "summary", errors)
-        audit_deft_run._mining_history_proof("iter2", info, self.state, 2, 1, errors)
-        self.assertEqual(errors, [])
+        self.state["iterations"] = {"iter2": {"status": "in_progress", "stage_completed": "anomalygen"}}
+        (self.rd / "deft_state.json").write_text(json.dumps(self.state))
+
+        self.assertEqual(commit_stage.main(self.mining_commit_argv(root, "iter2", 1)), 0)
+
+        phase = json.loads((self.rd / "deft_state.json").read_text())["iterations"]["iter2"]
+        self.assertEqual(phase["stage_completed"], "data_mining")
+        self.assertEqual(phase["mining_mined_count"], 1)
+        self.assertEqual(phase["mining_candidate_parquet"], str((root / "mining_candidates.parquet").resolve()))
+
+    def test_commit_rejects_count_that_disagrees_with_selected_rows(self):
+        root = self.candidates("iter1", ["a", "b"])
+        self.prepare("iter1")
+        self.state["iterations"] = {"iter1": {"status": "in_progress", "stage_completed": "anomalygen"}}
+        (self.rd / "deft_state.json").write_text(json.dumps(self.state))
+        before = (self.rd / "deft_state.json").read_text()
+
+        self.assertEqual(commit_stage.main(self.mining_commit_argv(root, "iter1", 5)), 2)
+        self.assertEqual((self.rd / "deft_state.json").read_text(), before)
 
     def test_resume_does_not_change_history_or_candidate_hashes(self):
         root = self.candidates("iter1", ["a"])

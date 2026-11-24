@@ -45,7 +45,7 @@ minikube delete            # the cluster is disposable — always tear it down
 `kind` is an alternative (`kind create cluster` / `kind delete cluster`) but
 requires a working Docker daemon; minikube's vfkit/qemu drivers do not.
 
-**Inside a container with the host Docker socket mounted** (the skill-eval
+**Inside a container with the host Docker socket mounted** (the eval-container
 setup), `--driver=docker` makes minikube create its cluster as a *sibling*
 container on the host. That works, and `kubectl` can reach the API server
 **only because the eval container uses host networking** — minikube binds the

@@ -78,9 +78,11 @@ Before running AutoML:
    - Proceed to recommendations; only the impact-versus-starting-point delta is unavailable.
    - Supply `baseline_fn` or `automl_settings["baseline_metric"]` only when a checkpoint exists. `final_eval_fn` still applies; a from-scratch smoke test may explicitly use `reuse_best_metric_for_final_evaluation=True`.
 
+   **Models with no `evaluate` action by design.** A model skill may declare in its own `references/automl.md` that it has no `evaluate` action because its training loop reports the validation metric itself (the Kumo-Anomaly and Kumo-Forecast skills do). The "stop and report the blocker" rule does not apply to those models: record the baseline as unavailable with that reason, state it in the launch review, and continue.
+
 3. **Dataset**: Training data accessible from the compute backend. URI format depends on the SDK's platform:
    - Brev / cloud: `s3://bucket/path` (S3-compatible; do not generate `aws://...`)
-   - Slurm / internal shared storage: an absolute shared filesystem path visible to the Slurm job, e.g. `/lustre/fsw/tao_datasets/<model>/train` and `/lustre/fsw/tao_datasets/<model>/eval`
+   - Slurm / shared storage: an absolute shared filesystem path visible to the Slurm job, e.g. `/lustre/<project>/datasets/<model>/train` and `/lustre/<project>/datasets/<model>/eval`
    - Azure: `azure://container/path`
    - Local / Docker: local filesystem path
    Accept either dataset roots or exact spec-key paths. For exact spec paths,

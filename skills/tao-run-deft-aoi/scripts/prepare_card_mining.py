@@ -59,7 +59,7 @@ def prepare(results_dir: Path, workspace: Path, iteration: str) -> dict:
             raise ValueError("candidate evidence changed; refusing to overwrite a resumed selection")
     else:
         candidates.to_parquet(candidate_path, index=False)
-    # kept_count is PRE-history, as required by audit_deft_run.py.
+    # kept_count is PRE-history; history filtering is reported in mining_history_summary.json.
     pd.DataFrame([{
         "candidate_count": candidate_count,
         "kept_count": len(candidates),

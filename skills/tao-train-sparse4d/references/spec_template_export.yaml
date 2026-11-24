@@ -351,7 +351,7 @@ dataset:
   - 2
   - 1
   max_cameras: -1
-  eval_dist_fcn: center_distance
+  eval_dist_fcn: iou_3d
   eval_hota: false
   ltt_2dgt_sidecar_dir: ''
   ltt_2dgt_frame_regex: ''

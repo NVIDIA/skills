@@ -9,13 +9,13 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers who want to improve NVIDIA TAO Grounding DINO object-detection accuracy through automated smart data augmentation, including one-time source-pool preparation (Co-DETR pseudo-labeling, ODVG conversion, embedding), per-class gap analysis, unique-neighbor mining, and iterative retraining. <br>
+Developers and ML engineers use this skill to have an agent run an iterative DEFT smart-data-augmentation loop for TAO Grounding DINO object detection (baseline, gap analysis, unique-neighbor mining, ODVG staging, and retraining across N iterations), and to prepare the Co-DETR pseudo-labeled, embedded source pool the loop mines from. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
-**Requires API Key or External Credential:** [Optional] <br>
+**Requires API Key or External Credential:** [Yes] <br>
 **Credential Type(s):** [API key] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
@@ -25,64 +25,92 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [data-layout.md](references/data-layout.md) <br>
-- [grounding-dino.md](references/grounding-dino.md) <br>
-- [pipeline-and-state.md](references/pipeline-and-state.md) <br>
-- [preflight.md](references/preflight.md) <br>
-- [prep-source-pool.md](references/prep-source-pool.md) <br>
-- [scripts-and-agents.md](references/scripts-and-agents.md) <br>
-- [stage-mined-data.md](references/stage-mined-data.md) <br>
-- [tao-analyze-detection-kpi.md](references/tao-analyze-detection-kpi.md) <br>
-- [tao-analyze-gaps-od-map.md](references/tao-analyze-gaps-od-map.md) <br>
-- [tao-generate-image-embeddings.md](references/tao-generate-image-embeddings.md) <br>
-- [tao-mine-od-images.md](references/tao-mine-od-images.md) <br>
-- [NVIDIA TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
-- [Agent Skills Open Standard](https://agentskills.io) <br>
+- [Data layout](references/data-layout.md) <br>
+- [Source-pool prep](references/prep-source-pool.md) <br>
+- [Pre-Flight checks](references/preflight.md) <br>
+- [Pipeline and state](references/pipeline-and-state.md) <br>
+- [Scripts and agents](references/scripts-and-agents.md) <br>
+- [Grounding DINO overlay](references/grounding-dino.md) <br>
+- [Gap analysis overlay](references/tao-analyze-gaps-od-map.md) <br>
+- [Image embeddings overlay](references/tao-generate-image-embeddings.md) <br>
+- [Mining overlay](references/tao-mine-od-images.md) <br>
+- [Stage mined data](references/stage-mined-data.md) <br>
+- [Detection KPI overlay](references/tao-analyze-detection-kpi.md) <br>
+- [TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions, Files, Analysis] <br>
-**Output Format:** [Markdown with inline bash code blocks; run artifacts (deft_state.json, loop_log.jsonl, DEFT_Loop_Report.md, checkpoints, KPI files)] <br>
+**Output Type(s):** [Shell commands, Files, Analysis] <br>
+**Output Format:** [Markdown with inline bash code blocks; run artifacts (deft_state.json, loop_log.jsonl, checkpoints, KPI files, DEFT_Loop_Report.md)] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [None] <br>
+**Other Properties Related to Output:** [Verbose train, inference, and Docker output is redirected to files; stage state is committed through commit_stage.py.] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
-- Codex (`openai/openai/gpt-5.5`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`) <br>
+- Codex (`openai/openai/gpt-6.1-sol`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-4 evaluation tasks (4 positive), 1 attempt per task, each run in its own isolated k8s-sandbox pod. <br>
+4 evaluation tasks (4 positive), 1 attempt per task, each task attempt run in its own isolated sandbox pod (`k8s-sandbox`); dataset digest `sha256:d3fce2a83efb9ec178ecc5fc8a20f8c2280adffa3b279916a073015372c25237` (skill-evaluator-dataset-snapshot/1); evaluator version `1.6.10`; evaluation date 2026-11-24. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Whether the skill is safe to use (unsafe operations, secret leakage, unauthorized access). <br>
-- Correctness: Whether the final answer is correct against the reference answer. <br>
-- Discoverability: Whether the right skill was loaded when needed. <br>
-- Effectiveness: Whether the skill helped complete the task (50% goal accuracy + 50% behavior check). <br>
-- Efficiency: Whether wasted tool calls and token usage were avoided (50% tool productivity + 50% token efficiency). <br>
+- Security: Is it safe to use? Scored from `security` (100%). <br>
+- Correctness: Is the answer correct? Scored from `accuracy` (100%). <br>
+- Discoverability: Was the right skill loaded when needed? Scored from `skill_execution` (100%). <br>
+- Effectiveness: Did the skill help complete the task? Scored from `goal_accuracy` (50%) + `behavior_check` (50%). <br>
+- Efficiency: Did it avoid wasted tool calls and token usage? Scored from `skill_efficiency` (50%) + `token_efficiency` (50%). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
-- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
-- `accuracy`: Final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Whether the user's goal was achieved. <br>
-- `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `token_efficiency`: Actual uncached prompt plus completion usage. <br>
+- `security`: Security: unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Skill Execution: whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool Productivity: tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
+- `accuracy`: Accuracy: final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Goal Accuracy: whether the user's goal was achieved. <br>
+- `behavior_check`: Behavior Check: whether the expected workflow behavior was followed. <br>
+- `token_efficiency`: Token Efficiency: actual uncached prompt plus completion usage (50% of Efficiency). <br>
 
 
 
 ## Evaluation Results: <br>
+**Overall verdict: PASS — Recommended for publication**
+
+### Publication Recommendation
+
+Recommended for publication based on the completed evaluation evidence in this report.
+
+### Results at a Glance
+
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.2% — baseline ran, but no comparable score was available; uplift unavailable | 81.1% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 75.0% → 100.0% (+25.0 points) | 75.0% → 100.0% (+25.0 points) |
-| Correctness | 10.0% → 100.0% (+90.0 points) | 20.0% → 75.0% (+55.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 71.3% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 5.1% → 87.6% (+82.5 points) | 21.4% → 67.0% (+45.6 points) |
-| Efficiency | 83.2% — baseline ran, but no comparable score was available; uplift unavailable | 92.5% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 83.4% — baseline ran, but no comparable score was available; uplift unavailable | 63.6% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 75.0% → 100.0% (+25.0 points) |
+| Correctness | 15.0% → 90.0% (+75.0 points) | 20.0% → 70.0% (+50.0 points) |
+| Discoverability | 75.0% — baseline ran, but no comparable score was available; uplift unavailable | 23.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 14.4% → 62.5% (+48.1 points) | 16.2% → 27.8% (+11.6 points) |
+| Efficiency | 89.7% — baseline ran, but no comparable score was available; uplift unavailable | 96.5% — baseline ran, but no comparable score was available; uplift unavailable |
+
+Baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points. A partial dimension was calculated from only the available configured signals.
+
+#### Comparison details
+
+| Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
+| --- | --- | --- | --- | --- |
+| claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| claude-code | Efficiency | Token-only comparison | 98.6% → 96.0% (-2.6 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| codex | Efficiency | Token-only comparison | 93.2% → 93.1% (-0.1 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+
+### Tier Status
+
+| Tier | Purpose | Status | Evidence |
+|---|---|---|---|
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 97 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 5 finding(s) |
+| Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
+
+Scoring: dimension bands are PASS at 50% or above, NEUTRAL from 40% to below 50%, FAIL below 40%. Overall verdict is PASS only when every configured dimension passes for at least one supported agent; lift is reported as diagnostic evidence and does not override this gate.
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

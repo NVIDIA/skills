@@ -9,17 +9,32 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `tao-run-on-slurm`
-- Evaluation date: 2026-09-21
-- Evaluator version: `1.5.6`
-- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
+- Validation status: `passed`
+- Evaluation date: 2026-11-24
+- Evaluator version: `1.6.10`
+- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 1 evaluation tasks (1 positive)
 - Dataset digest: `sha256:dfd65a7abfa0842fb6b147b51eb76b88ccc9ef8a74bc920d184c85aac501756b` (skill-evaluator-dataset-snapshot/1)
-- Attempts per task: 3
+- Attempts per task: 1
 - Environment: `k8s-sandbox`
 - Tier 2 evidence: required for publication
 - Tier 3 evidence: required for publication
 
 Each task attempt ran in its own isolated sandbox pod.
+
+## Tier 1 LLM Provenance
+
+SkillSpector provider, model, analyzer revision, and determinism evidence retained for this scan.
+
+| Skill | Provider | Adapter | Analyzer | Model | Revision | Determinism |
+| --- | --- | --- | --- | --- | --- | --- |
+| tao-run-on-slurm | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| tao-run-on-slurm | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| tao-run-on-slurm | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| tao-run-on-slurm | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| tao-run-on-slurm | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+
+- Controls for `tao-run-on-slurm`: temperature=not set (source=provider_default, forwarded=no); seed=not set (source=unset, forwarded=no); reasoning_effort=not set (source=provider_default, forwarded=no)
 
 ## What This Report Answers
 
@@ -35,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 99.3% — baseline ran, but no comparable score was available; uplift unavailable | 62.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 99.4% — baseline ran, but no comparable score was available; uplift unavailable | 53.4% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 0.0% → 100.0% (+100.0 points) | 20.0% → 60.0% (+40.0 points) |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 20.0% → 40.0% (+20.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 0.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 16.7% → 100.0% (+83.3 points) | 43.3% → 53.3% (+10.0 points) |
-| Efficiency | 96.3% — baseline ran, but no comparable score was available; uplift unavailable | 99.8% → 98.4% (-1.4 points) |
+| Effectiveness | 33.3% → 100.0% (+66.7 points) | 33.3% → 33.3% (±0.0 points) |
+| Efficiency | 97.1% — baseline ran, but no comparable score was available; uplift unavailable | 93.8% → 93.7% (-0.1 points) |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -48,26 +63,36 @@ Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92
 
 A partial dimension was calculated from only the available configured signals; review the detailed report before relying on it.
 
+### Comparison details
+
+Shared-source comparisons use the same signals and weights on both conditions. They do not replace the full dimension scores above or change the publication verdict.
+
+| Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
+| --- | --- | --- | --- | --- |
+| claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| claude-code | Efficiency | Token-only comparison | 99.1% → 94.3% (-4.8 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+
 ## Token Usage
 
 Actual Tier 3 execution usage is reported for every observed agent/case pair and both conditions.
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 73,480 | 90,721 | N/A | N/A | skill 1/1; base 3/3 |
-| claude-code | tao-run-on-slurm-basic | 73,480 | 90,721 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | All cases | 14,040 | 13,432 | +608 | +4.53% | skill 1/1; base 1/1 |
-| codex | tao-run-on-slurm-basic | 14,040 | 13,432 | +608 | +4.53% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 87,520 | 104,153 | N/A | N/A | skill 2/2; base 4/4 |
+| claude-code | All cases | 80,972 | 35,521 | +45,451 | +127.96% | skill 1/1; base 1/1 |
+| claude-code | tao-run-on-slurm-basic | 80,972 | 35,521 | +45,451 | +127.96% | skill 1/1; base 1/1 |
+| codex | All cases | 13,541 | 13,316 | +225 | +1.69% | skill 1/1; base 1/1 |
+| codex | tao-run-on-slurm-basic | 13,541 | 13,316 | +225 | +1.69% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 94,513 | 48,837 | +45,676 | +93.53% | skill 2/2; base 2/2 |
 
-Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
+Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
 ## Tier Status
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 19 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 10 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 18 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 12 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 1 task(s) |
 
 ## Findings and Observations
@@ -79,22 +104,20 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
   "# 1. SSH to the login node works without a password prompt" in references/slurm-preflight-storage.md (lines 27-39)
   vs "# 1. SSH to the login node works without a password prompt" in references/slurm-ssh-credentials.md (lines 8-20) (`references/slurm-preflight-storage.md:27`)
 - **HIGH** DUPLICATE/duplicate: Duplicate content found across references/slurm-preflight-storage.md and references/slurm-ssh-credentials.md:
-  "## SSH Failure Remediation Prompt" in references/slurm-preflight-storage.md (lines 220-251)
-  vs "## SSH Failure Remediation Prompt" in references/slurm-ssh-credentials.md (lines 190-221) (`references/slurm-preflight-storage.md:220`)
+  "## Prerequisites" in references/slurm-preflight-storage.md (lines 84-147)
+  vs "## Prerequisites" in references/slurm-ssh-credentials.md (lines 54-117) (`references/slurm-preflight-storage.md:84`)
+- **HIGH** DUPLICATE/duplicate: Duplicate content found across SKILL.md and references/slurm-preflight-storage.md and references/slurm-ssh-credentials.md:
+  "## Storage" in SKILL.md (lines 175-190)
+  vs "## Storage" in references/slurm-preflight-storage.md (lines 194-224)
+  vs "## Storage" in references/slurm-ssh-credentials.md (lines 164-194) (`SKILL.md:175`)
+- **HIGH** DUPLICATE/duplicate: Duplicate content found across SKILL.md and references/slurm-preflight-storage.md and references/slurm-ssh-credentials.md:
+  "## Required inputs" in SKILL.md (lines 293-315)
+  vs "## Credentials" in references/slurm-preflight-storage.md (lines 148-176)
+  vs "## Credentials" in references/slurm-ssh-credentials.md (lines 118-146) (`SKILL.md:293`)
 - **HIGH** DUPLICATE/duplicate: Duplicate content found across references/slurm-preflight-storage.md and references/slurm-ssh-credentials.md:
-  "## Backend Details" in references/slurm-preflight-storage.md (lines 172-188)
-  vs "## Backend Details" in references/slurm-ssh-credentials.md (lines 142-158) (`references/slurm-preflight-storage.md:172`)
-- **HIGH** DUPLICATE/duplicate: Duplicate content found across SKILL.md and references/slurm-preflight-storage.md and references/slurm-ssh-credentials.md:
-  "## Required inputs" in SKILL.md (lines 281-300)
-  vs "## Prerequisites" in references/slurm-preflight-storage.md (lines 83-146)
-  vs "## Credentials" in references/slurm-preflight-storage.md (lines 147-171)
-  vs "## Prerequisites" in references/slurm-ssh-credentials.md (lines 53-116)
-  vs "## Credentials" in references/slurm-ssh-credentials.md (lines 117-141) (`SKILL.md:281`)
-- **HIGH** DUPLICATE/duplicate: Duplicate content found across SKILL.md and references/slurm-preflight-storage.md and references/slurm-ssh-credentials.md:
-  "## Storage" in SKILL.md (lines 164-179)
-  vs "## Storage" in references/slurm-preflight-storage.md (lines 189-219)
-  vs "## Storage" in references/slurm-ssh-credentials.md (lines 159-189) (`SKILL.md:164`)
-- 24 additional finding(s) are available in the full evaluation artifacts.
+  "## Backend Details" in references/slurm-preflight-storage.md (lines 177-193)
+  vs "## Backend Details" in references/slurm-ssh-credentials.md (lines 147-163) (`references/slurm-preflight-storage.md:177`)
+- 25 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

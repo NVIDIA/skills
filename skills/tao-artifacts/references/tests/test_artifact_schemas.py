@@ -63,8 +63,8 @@ DINO_BUNDLE = {
         "dataset": {
             "train_data_sources": [
                 {
-                    "image_dir": "/lustre/fsw/portfolios/data/coco/train2017",
-                    "json_file": "/lustre/fsw/portfolios/data/coco/train.json",
+                    "image_dir": "/lustre/data/coco/train2017",
+                    "json_file": "/lustre/data/coco/train.json",
                 }
             ],
             "batch_size": 4,
@@ -75,7 +75,7 @@ DINO_BUNDLE = {
         {
             "spec_key": "dataset.train_data_sources[0].image_dir",  # dotted POINTER — allowed
             "type": "folder",
-            "uri": "lustre:///lustre/fsw/portfolios/data/coco/train2017",
+            "uri": "lustre:///lustre/data/coco/train2017",
         },
         {
             "spec_key": "train.pretrained_model_path",
@@ -292,7 +292,7 @@ RECORD = {
     "image": "nvcr.io/nvidia/tao/tao-toolkit:6.26.3-pyt",  # unpinned: test fixture
     "network_arch": "dino",
     "action": "train",
-    "results_dir": "/lustre/fsw/portfolios/project/results/dino-train-a1b2c3",
+    "results_dir": "/lustre/project/results/dino-train-a1b2c3",
     "storage_tier": "A",
     "upload_excludes": ["inputs/"],
     "submitted_at": "2026-07-09T18:00:00+00:00",

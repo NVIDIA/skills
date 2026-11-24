@@ -36,7 +36,7 @@ image_grounding:
       timeout: 120
     openai:                             # For OpenAI-compatible endpoints (NIM, vLLM, etc.)
       api_key: ""
-      base_url: ""                      # e.g. "https://inference-api.nvidia.com/v1" — no /chat/completions suffix
+      base_url: ""                      # e.g. "https://<your-endpoint>/v1" — no /chat/completions suffix
       model_name: ""                    # e.g. "Qwen/Qwen3-VL-235B-A22B-Instruct"
       temperature: 0.7
       max_tokens: 4096

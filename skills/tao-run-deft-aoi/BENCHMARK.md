@@ -9,9 +9,10 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `tao-run-deft-aoi`
-- Evaluation date: 2026-10-16
-- Evaluator version: `1.5.6`
-- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
+- Validation status: `passed`
+- Evaluation date: 2026-11-24
+- Evaluator version: `1.6.10`
+- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 3 evaluation tasks (3 positive)
 - Dataset digest: `sha256:ec1289a65b99daada0be3fb22c3130744571015a752689cf955682ed47b014f3` (skill-evaluator-dataset-snapshot/1)
 - Attempts per task: 1
@@ -20,6 +21,20 @@ Recommended for publication based on the completed evaluation evidence in this r
 - Tier 3 evidence: required for publication
 
 Each task attempt ran in its own isolated sandbox pod.
+
+## Tier 1 LLM Provenance
+
+SkillSpector provider, model, analyzer revision, and determinism evidence retained for this scan.
+
+| Skill | Provider | Adapter | Analyzer | Model | Revision | Determinism |
+| --- | --- | --- | --- | --- | --- | --- |
+| tao-run-deft-aoi | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| tao-run-deft-aoi | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| tao-run-deft-aoi | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| tao-run-deft-aoi | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| tao-run-deft-aoi | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+
+- Controls for `tao-run-deft-aoi`: temperature=not set (source=provider_default, forwarded=no); seed=not set (source=unset, forwarded=no); reasoning_effort=not set (source=provider_default, forwarded=no)
 
 ## What This Report Answers
 
@@ -35,16 +50,29 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 96.2% — baseline ran, but no comparable score was available; uplift unavailable | 89.9% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 40.0% → 100.0% (+60.0 points) | 40.0% → 86.7% (+46.7 points) |
-| Discoverability | 98.3% — baseline ran, but no comparable score was available; uplift unavailable | 85.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 40.6% → 90.0% (+49.4 points) | 52.5% → 88.3% (+35.8 points) |
-| Efficiency | 92.5% — baseline ran, but no comparable score was available; uplift unavailable | 89.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 87.1% — baseline ran, but no comparable score was available; uplift unavailable | 80.9% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 66.7% → 100.0% (+33.3 points) |
+| Correctness | 40.0% → 100.0% (+60.0 points) | 60.0% → 93.3% (+33.3 points) |
+| Discoverability | 91.7% — baseline ran, but no comparable score was available; uplift unavailable | 55.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 17.8% → 52.2% (+34.4 points) | 37.2% → 61.1% (+23.9 points) |
+| Efficiency | 91.7% — baseline ran, but no comparable score was available; uplift unavailable | 94.9% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
 Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92.0%, 45.0 percentage points above its 47.0% no-skill baseline.
+
+A partial dimension was calculated from only the available configured signals; review the detailed report before relying on it.
+
+### Comparison details
+
+Shared-source comparisons use the same signals and weights on both conditions. They do not replace the full dimension scores above or change the publication verdict.
+
+| Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
+| --- | --- | --- | --- | --- |
+| claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| claude-code | Efficiency | Token-only comparison | 98.0% → 92.9% (-5.1 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| codex | Efficiency | Token-only comparison | 89.2% → 89.9% (+0.7 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -52,24 +80,24 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 602,208 | 545,786 | +56,422 | +10.34% | skill 3/3; base 3/3 |
-| claude-code | tao-run-deft-aoi-basic | 71,084 | 30,373 | +40,711 | +134.04% | skill 1/1; base 1/1 |
-| claude-code | tao-run-deft-aoi-customer-metric | 184,995 | 192,209 | -7,214 | -3.75% | skill 1/1; base 1/1 |
-| claude-code | tao-run-deft-aoi-resume-state | 346,129 | 323,204 | +22,925 | +7.09% | skill 1/1; base 1/1 |
-| codex | All cases | 380,734 | 185,932 | +194,802 | +104.77% | skill 3/3; base 3/3 |
-| codex | tao-run-deft-aoi-basic | 71,005 | 13,530 | +57,475 | +424.80% | skill 1/1; base 1/1 |
-| codex | tao-run-deft-aoi-customer-metric | 169,793 | 70,327 | +99,466 | +141.43% | skill 1/1; base 1/1 |
-| codex | tao-run-deft-aoi-resume-state | 139,936 | 102,075 | +37,861 | +37.09% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 982,942 | 731,718 | +251,224 | +34.33% | skill 6/6; base 6/6 |
+| claude-code | All cases | 523,752 | 363,909 | +159,843 | +43.92% | skill 3/3; base 3/3 |
+| claude-code | tao-run-deft-aoi-basic | 79,745 | 35,509 | +44,236 | +124.58% | skill 1/1; base 1/1 |
+| claude-code | tao-run-deft-aoi-customer-metric | 234,168 | 108,690 | +125,478 | +115.45% | skill 1/1; base 1/1 |
+| claude-code | tao-run-deft-aoi-resume-state | 209,839 | 219,710 | -9,871 | -4.49% | skill 1/1; base 1/1 |
+| codex | All cases | 290,750 | 142,413 | +148,337 | +104.16% | skill 3/3; base 3/3 |
+| codex | tao-run-deft-aoi-basic | 13,653 | 13,324 | +329 | +2.47% | skill 1/1; base 1/1 |
+| codex | tao-run-deft-aoi-customer-metric | 96,935 | 85,950 | +10,985 | +12.78% | skill 1/1; base 1/1 |
+| codex | tao-run-deft-aoi-resume-state | 180,162 | 43,139 | +137,023 | +317.63% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 814,502 | 506,322 | +308,180 | +60.87% | skill 6/6; base 6/6 |
 
-Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
+Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
 ## Tier Status
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 165 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 104 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 5 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 3 task(s) |
 
 ## Findings and Observations
@@ -77,14 +105,23 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
+- **HIGH** DUPLICATE/duplicate: Duplicate content found across references/metric-contract.md and references/visual-changenet.md:
+  "## Evaluate commit" in references/metric-contract.md (lines 104-128)
+  vs "## Output to deft_state.json" in references/visual-changenet.md (lines 185-220)
+  vs "# Commit the evaluator result and ordered evaluate event together." in references/visual-changenet.md (lines 344-356) (`references/metric-contract.md:104`)
+- **HIGH** DUPLICATE/duplicate: Duplicate content found across cards/60-merge-train.md and references/pipeline-and-state.md:
+  "# CARD 60 — assemble+validate training CSV, commit data_merge, launch train (detached) — iteration $ITER" in cards/60-merge-train.md (lines 39-42)
+  vs "## Pipeline" in references/pipeline-and-state.md (lines 70-80) (`cards/60-merge-train.md:39`)
 - **HIGH** DUPLICATE/duplicate: Duplicate content found across references/preflight.md and references/tao-mine-aoi-images.md:
   "## Pre-Flight" in references/preflight.md (lines 31-38)
   vs "## DEFT-Loop Inputs" in references/tao-mine-aoi-images.md (lines 23-32) (`references/preflight.md:31`)
-- **MEDIUM** QUALITY/quality_correctness: No documented scripts in table format (`skills/applications/tao-run-deft-aoi/SKILL.md`)
-- **MEDIUM** QUALITY/quality_correctness: Instructions don't mention 'run_script' (`skills/applications/tao-run-deft-aoi/SKILL.md`)
-- **MEDIUM** QUALITY/quality_correctness: SKILL_SPEC recommended field missing: 'metadata.tags' (`skills/applications/tao-run-deft-aoi/SKILL.md`)
-- **MEDIUM** SCHEMA/frontmatter_field_placement: Root field 'tags' is ignored; use 'metadata.tags' (`skills/applications/tao-run-deft-aoi/SKILL.md`)
-- 161 additional finding(s) are available in the full evaluation artifacts.
+- **HIGH** DUPLICATE/duplicate: Duplicate content found across SKILL.md and references/pipeline-and-state.md:
+  "## Workflow" in SKILL.md (lines 183-203)
+  vs "## Pipeline" in references/pipeline-and-state.md (lines 5-5) (`SKILL.md:183`)
+- **HIGH** DUPLICATE/duplicate: Duplicate content found across SKILL.md and references/scripts-and-agents.md:
+  "## Train AutoML Policy" in SKILL.md (lines 94-119)
+  vs "## Workflow-level Pitfall — AutoML policy in the spec" in references/scripts-and-agents.md (lines 154-168) (`SKILL.md:94`)
+- 104 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

@@ -1,5 +1,5 @@
 ## Description: <br>
-Co-DETR (CoDINO) for object detection — a DETR-family detector with collaborative hybrid assignment that uses auxiliary one-to-many heads to supervise the encoder during training, providing strong closed-set accuracy for training, evaluating, and running inference on TAO Co-DETR models. <br>
+Co-DETR (CoDINO) for object detection: a DETR-family detector with collaborative hybrid assignment — auxiliary one-to-many heads supervise the encoder during training, giving strong closed-set accuracy at high inference cost — used for training, evaluating, or running inference for a TAO Co-DETR model. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, and running inference with NVIDIA TAO Co-DETR (CoDINO) object detection models using Docker and NVIDIA Container Toolkit. <br>
+Developers and ML engineers use this skill to have a coding agent train, evaluate, and run inference with NVIDIA TAO Co-DETR object detectors in the TAO PyTorch container, including deriving specs from checkpoints, folding COCO classes with category mapping, and converting KITTI label output for downstream training. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -26,55 +26,75 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [checkpoint-spec-pairing.md](references/checkpoint-spec-pairing.md) <br>
-- [coco80_classmap.txt](references/coco80_classmap.txt) <br>
 - [skill_info.yaml](references/skill_info.yaml) <br>
 - [spec_template_inference.yaml](references/spec_template_inference.yaml) <br>
-- [NVIDIA TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
+- [coco80_classmap.txt](references/coco80_classmap.txt) <br>
+- [TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Shell commands, Configuration instructions, Files] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Format:** [Markdown with inline bash and YAML code blocks; YAML experiment specs; KITTI-style detection label files and annotated images] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
-- Codex (`openai/openai/gpt-5.5`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`) <br>
+- Codex (`openai/openai/gpt-6.1-sol`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive) in isolated k8s-sandbox pods, 3 attempts per task. <br>
+1 evaluation task (1 positive), 1 attempt per task, each attempt in its own isolated sandbox pod (`k8s-sandbox` environment); evaluator version `1.6.10`, evaluated 2026-11-20. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Verifies final-answer correctness against the reference answer. <br>
-- Discoverability: Whether the expected skill was selected and the workflow executed. <br>
-- Effectiveness: Goal completion (goal_accuracy) and expected workflow adherence (behavior_check). <br>
-- Efficiency: Tool-call productivity and token efficiency. <br>
+- Security: Is it safe to use? Scored from `security` (100%). <br>
+- Correctness: Is the answer correct? Scored from `accuracy` (100%). <br>
+- Discoverability: Was the right skill loaded when needed? Scored from `skill_execution` (100%). <br>
+- Effectiveness: Did the skill help complete the task? Scored from `goal_accuracy` (50%) + `behavior_check` (50%). <br>
+- Efficiency: Did it avoid wasted tool calls and token usage? Scored from `skill_efficiency` (50%) + `token_efficiency` (50%). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
-- `skill_efficiency`: Tool-call productivity (routing is scored under Discoverability). <br>
-- `accuracy`: Final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Whether the user's goal was achieved. <br>
-- `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `token_efficiency`: Actual uncached prompt plus completion usage. <br>
+- `security`: Security: unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Skill Execution: whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool Productivity: tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
+- `accuracy`: Accuracy: final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Goal Accuracy: whether the user's goal was achieved. <br>
+- `behavior_check`: Behavior Check: whether the expected workflow behavior was followed. <br>
+- `token_efficiency`: Token Efficiency: actual uncached prompt plus completion usage (50% of Efficiency). <br>
 
 
 
 ## Evaluation Results: <br>
+> ✅ **Overall verdict: PASS — Recommended for publication**
+
+**Publication Recommendation:** Recommended for publication based on the completed evaluation evidence in this report.
+
+### Results at a Glance
+
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.3% — baseline ran, but no comparable score was available; uplift unavailable | 70.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 96.1% — baseline ran, but no comparable score was available; uplift unavailable | 50.1% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 0.0% → 100.0% (+100.0 points) | 0.0% → 100.0% (+100.0 points) |
+| Correctness | 20.0% → 100.0% (+80.0 points) | 0.0% → 40.0% (+40.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 0.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 8.3% → 75.0% (+66.7 points) | 8.3% → 51.7% (+43.4 points) |
-| Efficiency | 96.3% — baseline ran, but no comparable score was available; uplift unavailable | 99.6% → 98.4% (-1.2 points) |
+| Effectiveness | 8.3% → 83.3% (+75.0 points) | 8.3% → 16.7% (+8.4 points) |
+| Efficiency | 97.3% — baseline ran, but no comparable score was available; uplift unavailable | 93.7% → 93.7% (±0.0 points) |
+
+**How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
+
+A partial dimension was calculated from only the available configured signals; review the detailed report before relying on it.
+
+#### Comparison details
+
+Shared-source comparisons use the same signals and weights on both conditions. They do not replace the full dimension scores above or change the publication verdict.
+
+| Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
+| --- | --- | --- | --- | --- |
+| claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| claude-code | Efficiency | Token-only comparison | 99.0% → 94.6% (-4.4 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

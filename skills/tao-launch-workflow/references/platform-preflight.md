@@ -13,6 +13,8 @@ export TAO_SKILL_BANK_PATH="${TAO_SKILL_BANK_PATH:-$HOME/tao-skill-bank}"
 for item in versions.yaml scripts/resolve_tao_model.py scripts/resolve_tao_image.py scripts/check_tao_launch_preflight.py scripts/redact_secrets.py scripts/tao_job_record.py skills/models skills/platform; do
   [ -e "$TAO_SKILL_BANK_PATH/$item" ] || { echo "Incomplete TAO skill bank: missing $item under $TAO_SKILL_BANK_PATH" >&2; exit 1; }
 done
+# The shared helpers import PyYAML; stop here when python3 cannot import it.
+python3 -c 'import yaml' 2>/dev/null || { echo "MISSING: PyYAML (python3 cannot import yaml; the shared helper scripts need it). Install it with: python3 -m pip install pyyaml" >&2; exit 1; }
 ```
 
 Run the selected platform's preflight checks before any launch artifact is
@@ -85,7 +87,8 @@ For SLURM:
    Use the selected platform helper's `Resource defaults` for runtime values.
    For the packaged SLURM defaults, generate launchers with
    `SLURM_TIME_HOURS=4` and `SLURM_TIMEOUT_HOURS=3.8`; never invent a
-   12-hour default for the 4-hour partition list.
+   12-hour default. A longer wall time is the user's choice and must fit
+   the limit of their partition.
    Launching the orchestrator with `nohup` or in the background is allowed for
    durability, but it does not satisfy chat monitoring by itself. After launch,
    keep a foreground chat-side polling loop attached until terminal state or

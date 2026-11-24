@@ -33,24 +33,24 @@ For direct invocation, run the complete-checkout check in
 skill installs lack shared scripts; stop if the check fails. Use its verified
 `TAO_SKILL_BANK_PATH` for every helper.
 
-## Step 0 — Execution Mode: Card Packs (check first)
+## Step 0 — Execution Mode: Card Packs (only on request)
 
-Before running a multi-stage application workflow inside this conversation,
-check whether a compiled card pack ships next to the application skill:
+A compiled card pack may ship next to a multi-stage application skill:
 
 ```bash
 ls "${TAO_SKILL_BANK_PATH}/skills/applications/<skill>/cards/" 2>/dev/null
 ```
 
-- **Pack exists** → prefer the token-efficient path: the pack's `driver.sh`
-  runs the workflow as fresh per-stage sessions (measured 74-91% cheaper than
+- **Pack exists, the `pi` harness is installed (`command -v pi`), and the
+  user asked for the card-pack route** → the pack's `driver.sh` runs the
+  workflow as fresh per-stage sessions (measured 74-91% cheaper than
   in-conversation execution, and the only mode validated on small models).
   Read the pack's `README.md` for required env, complete THIS gate's items
   1-9 for the launch review, then start the pack driver detached instead of
   executing stages in this conversation. Monitor via the driver log and the
   run dir's progress marks.
-- **No pack** → execute normally through this gate. If the workflow will be
-  run repeatedly, suggest compiling a pack once with a strong model — see
+- **Otherwise** → execute normally through this gate; pack drivers need
+  `pi`. If the workflow will be run repeatedly, mention the card route — see
   `skills/core/tao-token-efficient-execution` (authoring prompt + contracts).
 
 The card path replaces only in-conversation stage execution; it never skips

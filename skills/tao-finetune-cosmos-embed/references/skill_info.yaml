@@ -1,6 +1,8 @@
 network_arch: cosmos-embed
 huggingface_model_ids:
 - nvidia/Cosmos-Embed1-224p
+- nvidia/Cosmos-Embed1-336p
+- nvidia/Cosmos-Embed1-448p
 automl_enabled: false
 container_image: nvcr.io/nvidia/tao/tao-toolkit:7.3.0-cosmos-embed  # versions-key: images.tao_toolkit.cosmos_embed
 required_credentials:
@@ -9,7 +11,7 @@ data_format: msrvtt
 gpu_spec_key: train.num_gpus
 actions:
   train:
-    command: bash -lc 'python -m pip install "protobuf<7" && cosmos-embed1 train -e {config_path}'
+    command: cosmos-embed1 train -e {config_path}
     config_format: yaml
     mode: config
     inputs:
@@ -30,7 +32,7 @@ actions:
     upload_excludes:
     - inputs/
   evaluate:
-    command: bash -lc 'python -m pip install "protobuf<7" && cosmos-embed1 evaluate -e {config_path}'
+    command: cosmos-embed1 evaluate -e {config_path}
     config_format: yaml
     mode: config
     inputs:
@@ -46,7 +48,7 @@ actions:
     upload_excludes:
     - inputs/
   inference:
-    command: bash -lc 'python -m pip install "protobuf<7" && cosmos-embed1 inference -e {config_path}'
+    command: cosmos-embed1 inference -e {config_path}
     config_format: yaml
     mode: config
     inputs:
@@ -62,7 +64,7 @@ actions:
     upload_excludes:
     - inputs/
   export:
-    command: bash -lc 'python -m pip install "protobuf<7" && cosmos-embed1 export -e {config_path}'
+    command: cosmos-embed1 export -e {config_path}
     config_format: yaml
     mode: config
     inputs:
@@ -102,5 +104,7 @@ spec_shorthand_keys:
   max_iter: train.max_iter
   batch_size: dataset.train_dataset.batch_size
   learning_rate: train.optim.lr
+  grad_accum_iter: train.grad_accum_iter
+  lora_rank: model.lora.lora_rank
   checkpoint: evaluate.checkpoint
   query_texts: inference.query.input_texts

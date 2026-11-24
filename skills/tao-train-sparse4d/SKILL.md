@@ -41,7 +41,7 @@ Sparse4D predicts 3D boxes and tracking IDs from synchronized, calibrated multi-
 
 Read `references/skill_info.yaml` before train requests. This model is AutoML-enabled. Preserve an explicit `automl_policy: on` / `off`; requests for plain training, no HPO, a fixed-specification reproduction, a bounded wiring smoke test, or an exact continuation mean `off` for that run. Otherwise default to `on` and route through `tao-skill-bank:tao-run-automl` when both `schemas/train.schema.json` and `references/spec_template_train.yaml` are available. Preserve dataset, checkpoint, specification, GPU/platform, and budget overrides. If the schema/template is missing, report that AutoML is unavailable and use direct training within the user's request.
 
-AutoML's monitoring name is `val_mAP`; Sparse4D emits `img_bbox_NuScenes/mAP` and `mAP` as aliases. A promoted resume job may carry the source rung's metric without a new evaluation: report its provenance and verify the resumed checkpoint independently. Follow the AutoML skill's baseline-evaluation requirement. Evaluate, inference, export, and quantize remain in this skill.
+Sparse4D's default IoU3D evaluation reports `img_bbox_IoU3D/mAP`; `center_distance` reports `img_bbox_NuScenes/mAP`. Verify the AutoML monitoring metric resolves to the selected protocol in the installed runtime; do not assume these metric names are aliases or compare results across protocols. A promoted resume job may carry the source rung's metric without a new evaluation: report its provenance and verify the resumed checkpoint independently. Follow the AutoML skill's baseline-evaluation requirement. Evaluate, inference, export, and quantize remain in this skill.
 
 ## Training Requirements
 
@@ -91,7 +91,7 @@ Generated schemas and templates describe the packaged contract; `schemas/manifes
 - `train.precision`: `bf16`, `fp16`, or `fp32`, subject to hardware/runtime support. BF16 is not mandatory.
 - `train.num_gpus`, `train.gpu_ids`, `train.num_nodes`: use the selected platform's allocation. One-GPU smoke training is supported; memory needs depend on the backbone, resolution, cameras, batch size, and temporal configuration.
 - `dataset.num_frames` and `dataset.num_bev_groups` are scheduling/data-size settings, not an activation-memory sequence-length knob. Inspect actual dataloader length and iteration counts before comparing training budgets across datasets or GPU counts.
-- `dataset.eval_dist_fcn` and `dataset.eval_hota`: select supported detection/tracking evaluation. Keep thresholds, class order, dataset, and raw-versus-EMA checkpoint choice identical for comparisons.
+- `dataset.eval_dist_fcn` defaults to `iou_3d`; `dataset.eval_hota` defaults to `false`. Preserve explicit `center_distance`, `iou_3d`, or `both` overrides. HOTA requires `eval_hota: true` and `tracking` in `evaluate.metrics`. Keep thresholds, class order, dataset, and raw-versus-EMA checkpoint choice identical for comparisons.
 
 Lightning manages the local workers. Do not add a second distributed launcher. Use the platform's multi-node environment contract; TAO's `WORLD_SIZE` launcher variable denotes node count, not the global GPU count. Mixed 3D/2D distributed training additionally needs the synchronized route settings in the geometric-distillation reference.
 

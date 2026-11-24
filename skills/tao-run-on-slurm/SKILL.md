@@ -30,6 +30,17 @@ storage, and scheduler-owned GPU allocation. Do not use SLURM for local files
 that exist only on the agent machine; data and outputs must be reachable from
 the cluster.
 
+## What the cluster must provide
+
+This skill ships no cluster's names or limits; the user supplies them:
+
+- a GPU partition, named in `SLURM_PARTITION`;
+- for image conversion, a CPU partition, named in
+  `SLURM_CONVERSION_PARTITION`, that allows 4 CPUs, 7200M memory, and 120
+  minutes of wall time;
+- Pyxis and Enroot on the compute nodes;
+- a shared file system mounted on login and compute nodes.
+
 ## Preflight + SSH
 
 Confirm `SLURM_USER` and `SLURM_HOSTNAME` are exported and passwordless SSH to a
@@ -164,7 +175,7 @@ Same four verbs, with three additions at submit:
    `TAO_NODE_RANK=$SLURM_PROCID`; torchrun overwrites its standard
    `WORLD_SIZE` with the global process count. `NCCL_PROBE_OK` → proceed.
    **Timed out** (the collective hung)
-   → set the cluster's NCCL knob in `EXTRA_ENV` and re-probe — on CS-OCI-ORD that
+   → set the cluster's NCCL knob in `EXTRA_ENV` and re-probe — on some clusters that
    is `export NCCL_P2P_DISABLE=1` (the intra-node P2P hang), often with
    `NCCL_SOCKET_IFNAME=eth0` / `NCCL_IB_DISABLE=1`. **Cache the working env per
    cluster** so later jobs skip the probe. Gate on **`gpus_per_node > 1` too** —
@@ -231,7 +242,7 @@ once on a **CPU partition**, then point every later job at the resulting file:
 # One-time per image, on CPU — costs no GPU time.
 ssh $LOGIN "test -e <sqsh>" || \
   ssh $LOGIN "srun --chdir=/tmp -n1 -c4 --mem=7200M \
-    -p <cpu_partition> -t <minutes> \
+    --partition=${SLURM_CONVERSION_PARTITION:?} --time=120 \
     bash -c 'set -Eeuo pipefail
       export TMPDIR=/tmp
       export ENROOT_TEMP_PATH=/tmp/enroot-tao-\${SLURM_JOB_ID}
@@ -247,9 +258,10 @@ srun --container-image=<sqsh> ...
 The same rule governs data: stage it to Lustre before submit (tier A) rather
 than fetching inside the allocation.
 
-CS-OCI-ORD conversion uses `cpu_long`, 4 CPUs, 7200M memory, no exclusive node,
-node-local Enroot temp paths, and at least 120 minutes. The execution reference
-records the evidence and `QOSGrpMemLimit` recovery contract.
+The packaged SQSH conversion profile uses the user's
+`SLURM_CONVERSION_PARTITION`, 4 CPUs, 7200M memory, no exclusive node,
+node-local Enroot temp paths, and at least 120 minutes. The execution
+reference records the evidence and `QOSGrpMemLimit` recovery contract.
 
 Partial conversions are self-detecting: the SQSH is validated by `hsqs` magic,
 so a truncated file is rejected rather than silently used. Conversion runs once
@@ -302,8 +314,11 @@ for the full credential list, microservices schema keys, and defaults.
 
 - **SLURM_USER** (required): SSH username for the login node.
 - **SLURM_HOSTNAME** (required): Comma-separated login hostnames for failover.
-- **SLURM_PARTITION** (required): Partition list for GPU submission. Packaged
-  default `polar,polar3,polar4,grizzly`, treated as 4-hour queues.
+- **SLURM_PARTITION** (required, no default): GPU partition list of the
+  user's cluster. Never guess a name; `sinfo -h -o '%P %l %c %m %G'` on the login
+  node lists partitions with their time limit, CPUs, memory, and GPUs.
+- **SLURM_CONVERSION_PARTITION** (required to convert an image, no default):
+  the CPU partition described above.
 - **SSH_KEY_PATH** (preferred, expected before launch): private key for
   non-interactive public-key auth. Ask for this first in remediation; prefer it
   over the `SSH_AUTH_SOCK` agent-socket fallback.
@@ -325,7 +340,6 @@ Defaults from `tao-core`:
 - `cpus_per_task`: 16
 - `time_hours`: 4
 - `timeout_hours`: 3.8
-- `max_time_hours`: 4
 - `container_mounts`: explicit source-to-target mounts supplied at runtime
 - `use_requeue`: true
 - `use_sqsh`: true
@@ -333,9 +347,9 @@ Defaults from `tao-core`:
 Launchers must use the packaged 4-hour wall and 3.8-hour child-timeout
 defaults, never 12 hours. If the user supplies a longer
 `SLURM_TIME_HOURS`, verify that the selected partition supports it before
-submitting. For the packaged default partition list
-`polar,polar3,polar4,grizzly`, reject requests above 4 hours and ask for a
-different partition only if the user actually wants a longer wall time.
+submitting (`sinfo -h -p <partition> -o '%l'`) and raise
+`SLURM_TIMEOUT_HOURS` with it. The skill sets no cap: the limit is the
+partition's; `SLURM_MAX_TIME_HOURS` makes preflight reject a longer request.
 
 At or above `max_num_gpus_per_node`, allocate exclusive nodes and derive their
 count from total GPUs.

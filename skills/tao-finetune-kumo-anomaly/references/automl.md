@@ -35,11 +35,9 @@ VirtualEnvSDK with no container required:
 | Weight decay | `train.weight_decay` | `1e-6` | `[1e-9, 1e-3]` | Regularization; prevents overfitting on small datasets |
 | Batch size | `train.batch_size` | `16` | `[4, 32]` | Larger batches stabilize gradients; capped at 32 (MPS OOM) |
 | Gradient clip | `train.grad_clip` | `1.0` | `[0.1, 10.0]` | Prevents gradient explosion in diffusion fine-tuning |
-| Mask ratio | `dataset.mask_ratio` | `0.7` | `[0.3, 0.9]` | Fraction of each window masked; shapes reconstruction difficulty |
-| Window length | `dataset.window_length` | `100` | `[50, 140]` | Temporal context per training sample; must be divisible by `split` |
 
-**Fixed (not searched):** `dataset.csv`, `dataset.val_csv`, `dataset.split`,
-`dataset.window_stride`, `train.seed`, `train.output_dir`, `train.pretrained_model`,
+**Fixed (not searched):** `dataset.mask_ratio`, `dataset.window_length`, `dataset.csv`, `dataset.val_csv`,
+`dataset.split`, `dataset.window_stride`, `train.seed`, `train.output_dir`, `train.pretrained_model`,
 `train.config`.
 
 #### Inference HPO
@@ -78,24 +76,46 @@ under "VirtualEnvSDK (containerless venv runs)".
 This model reference lists Kumo-Anomaly search spaces, overrides,
 constraints, and trial payloads.
 
+> **Session gate (required).** `tao-run-automl` refuses to launch without an explicit
+> `automl_settings["session_id"]` and a call to `validate_session_settings(...)` (from
+> `skills/applications/tao-run-automl/scripts/resolve_automl_session.py`). Every example
+> below builds `automl_settings` that way; copying a bare `automl_settings={...}` without
+> `session_id` fails the gate.
+>
+> **No baseline eval by design.** This skill has no `evaluate` action: fine-tuning reports its
+> own validation metric and inference HPO scores each trial directly. `tao-run-automl`
+> therefore records the baseline as unavailable (see "Models with no `evaluate` action by
+> design" in `skills/applications/tao-run-automl/references/automl-preflight-concepts.md`)
+> and continues.
+
 ### Fine-tuning AutoML
 
 ```python
+import secrets
+import sys
 from pathlib import Path
 
+skill_bank = Path("/path/to/tao-skill-bank")
+sys.path.insert(0, str(skill_bank / "skills/applications/tao-run-automl/scripts"))
+from resolve_automl_session import validate_session_settings
+
 kumo_anomaly_dir = Path("/path/to/Kumo-TS/Kumo-Anomaly")
-skill_dir = Path("/path/to/tao-skill-bank/skills/models/tao-finetune-kumo-anomaly")
+skill_dir = skill_bank / "skills/models/tao-finetune-kumo-anomaly"
 
 # Build sdk + runner per tao-run-automl section "Runner Construction":
 # sdk = VirtualEnvSDK(venv_path=<venv>, work_dir=<scratch>)  # work_dir is not optional in practice
 
+automl_settings = {
+    "algorithm":                  "bayesian",
+    "metric":                     "val_loss",
+    "direction":                  "minimize",
+    "automl_max_recommendations": 10,           # adjust to your compute budget
+    "session_id":                 secrets.token_hex(6),   # explicit, required
+}
+validate_session_settings(automl_settings, resume=False, workspace=None)
+
 result = runner.run(
-    automl_settings={
-        "algorithm":                  "bayesian",
-        "metric":                     "val_loss",
-        "direction":                  "minimize",
-        "automl_max_recommendations": 10,           # adjust to your compute budget
-    },
+    automl_settings=automl_settings,
     # spec_overrides MUST use dotted keys ("dataset.csv"), NOT nested dicts
     # ({"dataset": {"csv": ...}}). Nested dicts replace the entire sub-tree in
     # the spec template, which removes sibling keys like window_length from the
@@ -106,16 +126,8 @@ result = runner.run(
         "train.num_epochs":   20,
         "train.output_dir":   "automl_workspace/finetune/trials",
     },
-    # window_length must be divisible by split (default 10). The schema allows
-    # any integer in [50, 140], so restrict to multiples of 10 explicitly —
-    # otherwise the Bayesian sampler proposes values like 81 or 99 and every
-    # trial fails with "window_length must be divisible by split".
-    custom_param_ranges={
-        "dataset.window_length": {
-            "valid_options": [50, 60, 70, 80, 90, 100, 110, 120, 130, 140],
-            "value_type":    "ordered_int",
-        },
-    },
+    # dataset.mask_ratio and dataset.window_length are fixed (not searched), see "Why mask_ratio and
+    # window_length are not searched" below. Set them via spec_overrides if the defaults do not fit.
     workspace_path="automl_workspace/finetune",
     execution={
         "type":          "python_script",
@@ -143,110 +155,76 @@ Each trial:
 4. Calls `<venv>/bin/python finetune_example.py --run-config {config_path}`
 5. Reads `val_loss` from `metrics.json` in the trial's `output_dir`
 
-#### Window length constraint
+#### Why `mask_ratio` and `window_length` are not searched
 
-`window_length` must be divisible by `split` (default `10`). The schema allows
-any integer in `[50, 140]`, so the Bayesian sampler will propose non-multiples
-like 81 or 99 — causing every trial to fail immediately with
-`ValueError: window_length must be divisible by split`.
+The objective is the validation reconstruction loss, and both parameters change *what that loss
+measures*: the validation set is masked and windowed with the same values. Measured on the
+pretrained model with no training (lr ~ 0): `mask_ratio` 0.3 gives val_loss ~1.0-1.1, 0.7 gives
+~0.035 and 0.9 gives ~0.057, while `window_length` 50/100/140 moves it by under 10%. Trials with
+different `mask_ratio` are therefore not comparable, and the search would pick whichever value makes
+the task easiest rather than the best model. Both are fixed; set them with `spec_overrides`
+(`dataset.window_length` must be divisible by `dataset.split`, default `10`, otherwise the trial fails
+with `ValueError: window_length must be divisible by split`).
 
-Always pass `custom_param_ranges` to restrict candidates to valid multiples:
+#### Interpreting the result
 
-```python
-custom_param_ranges={
-    "dataset.window_length": {
-        "valid_options": [50, 60, 70, 80, 90, 100, 110, 120, 130, 140],
-        "value_type":    "ordered_int",
-    },
-}
-```
-
-If your dataset is larger and you want a wider window, add more multiples of 10
-to `valid_options` rather than raising the schema cap.
+`val_loss` only ranks trials against each other on this fixed protocol; it does not guarantee a better
+detector. On a 2-epoch run the pretrained checkpoint is already close to optimal, and `lr` in
+`[1e-7, 1e-5]` is practically "no training" (val_loss within ~5%). Before adopting the winner, check
+it on labeled data: run the inference HPO action with `hpo.model_path` set to the trial's
+`best_finetuned_model.pth` (and `hpo.config_path`), and compare F1 with the pretrained model.
 
 ### Inference HPO with AutoML
 
-Requires **labeled data** — a CSV with a ground-truth `label` column (0/1).
-AutoML tunes `nsample` to maximize F1 on that eval set.
+Requires **labeled data** — a CSV with a ground-truth `label` column (0/1) plus numeric feature
+columns. AutoML tunes `nsample` to maximize F1 on that eval set.
 
-The trial script is not shipped with Kumo-TS — generate it for the user's
-working directory based on the template below, then point `execution.script` at it.
-
-**Trial script template** (save anywhere, e.g. `inference_hpo_trial.py`):
-
-```python
-"""Single inference HPO trial — called by the AutoML runner with --run-config {config_path}."""
-import argparse, json, sys
-from pathlib import Path
-import yaml, pandas as pd
-from sklearn.metrics import f1_score
-
-KUMO_ANOMALY_DIR = Path("/path/to/Kumo-TS/Kumo-Anomaly")   # adjust to actual clone path
-sys.path.insert(0, str(KUMO_ANOMALY_DIR))
-
-from sdk.anomaly_analysis import perform_anomaly_analysis_with_diffusion
-
-def main():
-    p = argparse.ArgumentParser()
-    p.add_argument("--run-config", required=True)
-    args = p.parse_args()
-
-    cfg = yaml.safe_load(Path(args.run_config).read_text())
-    ds  = cfg["dataset"]
-    inf = cfg["hpo"]
-    out = Path(cfg.get("train", {}).get("output_dir", "artifacts/inference_hpo"))
-    out.mkdir(parents=True, exist_ok=True)
-
-    df      = pd.read_csv(ds["csv"]).head(ds.get("eval_rows", 2000))
-    labels  = df[ds["label_col"]].values
-    df_feat = df.drop(columns=[ds["label_col"]], errors="ignore").select_dtypes(include="number")
-
-    results = perform_anomaly_analysis_with_diffusion(
-        df=df_feat,
-        nsample=inf["nsample"],
-        threshold_strategy=inf["threshold_strategy"],
-        model_path=inf.get("model_path") or None,
-        model_config_path=inf.get("config_path") or None,
-    )
-    f1 = f1_score(labels, results["Anomaly"].values, zero_division=0)
-    (out / "metrics.json").write_text(json.dumps({"f1_score": f1}))
-    print(f"nsample={inf['nsample']}  strategy={inf['threshold_strategy']}  F1={f1:.4f}")
-
-if __name__ == "__main__":
-    main()
-```
+The trial script ships with this skill: **`scripts/inference_hpo_trial.py`**. Point
+`execution.script` at it and set `execution.cwd` to your `Kumo-TS/Kumo-Anomaly` clone. It drops
+the label column and any non-numeric columns (for example a timestamp) before calling
+`perform_anomaly_analysis_with_diffusion`.
 
 #### Run AutoML (once per strategy, compare F1)
 
 ```python
+import secrets
+import sys
 from pathlib import Path
 
-kumo_anomaly_dir = Path("/path/to/Kumo-TS/Kumo-Anomaly")
-skill_dir = Path("/path/to/tao-skill-bank/skills/models/tao-finetune-kumo-anomaly")
+skill_bank = Path("/path/to/tao-skill-bank")
+sys.path.insert(0, str(skill_bank / "skills/applications/tao-run-automl/scripts"))
+from resolve_automl_session import validate_session_settings
 
-# Build sdk + runner per tao-run-automl section "Runner Construction":
+kumo_anomaly_dir = Path("/path/to/Kumo-TS/Kumo-Anomaly")
+skill_dir = skill_bank / "skills/models/tao-finetune-kumo-anomaly"
+
+# Build sdk + runner per tao-run-automl section "Runner Construction" (action="inference_hpo"):
 # sdk = VirtualEnvSDK(venv_path=<venv>, work_dir=<scratch>)  # work_dir is not optional in practice
 
 results_by_strategy = {}
 for strategy in ["scs", "macs"]:
+    automl_settings = {
+        "algorithm":                  "bayesian",
+        "metric":                     "f1_score",
+        "direction":                  "maximize",
+        "automl_max_recommendations": 8,          # nsample range is narrow; 8 covers it well
+        "session_id":                 secrets.token_hex(6),   # one id per run
+    }
+    validate_session_settings(automl_settings, resume=False, workspace=None)
+
     result = runner.run(
-        automl_settings={
-            "algorithm":                  "bayesian",
-            "metric":                     "f1_score",
-            "direction":                  "maximize",
-            "automl_max_recommendations": 8,          # nsample range is narrow; 8 covers it well
-        },
-        # spec_overrides MUST use dotted keys — see fine-tuning section for why.
+        automl_settings=automl_settings,
+        # spec_overrides MUST use dotted keys.
         spec_overrides={
-            "dataset.csv":                  "/path/to/labeled_data.csv",
+            "dataset.csv":            "/path/to/labeled_data.csv",
             "hpo.threshold_strategy": strategy,
-            "hpo.model_path":         None,   # None → pretrained HF weights; or path to fine-tuned .pth
-            "train.output_dir":             f"automl_workspace/inference_hpo_{strategy}/trials",
+            "hpo.model_path":         "",   # "" => pretrained HF weights; or a fine-tuned .pth. Do not use None: the spec validator rejects null.
+            "train.output_dir":       f"automl_workspace/inference_hpo_{strategy}/trials",
         },
         workspace_path=f"automl_workspace/inference_hpo_{strategy}",
         execution={
             "type":          "python_script",
-            "script":        "/path/to/inference_hpo_trial.py",   # generated trial script
+            "script":        str(skill_dir / "scripts/inference_hpo_trial.py"),
             "args":          ["--run-config", "{config_path}"],
             "cwd":           str(kumo_anomaly_dir),
             "config_format": "yaml",
@@ -261,7 +239,7 @@ winner = max(results_by_strategy, key=lambda s: results_by_strategy[s]["metric_v
 print(f"\nBest: strategy={winner}  nsample={results_by_strategy[winner]['specs']['hpo.nsample']}")
 ```
 
-**Timestamp / label columns:** drop them before passing to the inference function — the template above does this via `errors="ignore"`.
+**Timestamp / label columns:** the trial script removes them before inference.
 
 **Labeled data requirement:** skip inference HPO when you have no ground-truth
 labels — without them there is no meaningful objective. Use `nsample=15` + `scs`

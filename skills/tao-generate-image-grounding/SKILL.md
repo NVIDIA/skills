@@ -48,7 +48,7 @@ When a user wants to run this pipeline, walk through these steps:
 2. **Image root**: If any `image_path` values are relative, set `data.image_root` to the directory they should resolve from.
 3. **API access**: Ask the user which VLM endpoint they want to use. Present these five options and act on the choice:
    1. **Gemini** — set `vlm.backend: "gemini"`; require `GOOGLE_API_KEY` (env var or `vlm.gemini.api_key`).
-   2. **NIM** (e.g. `https://inference-api.nvidia.com/v1`) — set `vlm.backend: "openai"`; collect `base_url`, `model_name`, and `api_key`.
+   2. **NIM** (e.g. `https://<your-endpoint>/v1`) — set `vlm.backend: "openai"`; collect `base_url`, `model_name`, and `api_key`.
    3. **TAO inference microservice** (self-hosted, OpenAI-compatible). Confirm whether the server is already running:
       - **Running** — collect `base_url`, `model_name`, and (optionally) `api_key`; set `vlm.backend: "openai"`.
       - **Not running** — guide the user through the `skills/applications/tao-run-inference-service` skill, which stands up a local TAO inference microservice with an OpenAI-compatible API. Before promising a specific model, check `skills/applications/tao-run-inference-service/references/service.yaml` for `valid_network_arch_config_basenames`. Once the server is up, collect `base_url`, `model_name`, and (optionally) `api_key`; set `vlm.backend: "openai"`.
@@ -123,5 +123,5 @@ All outputs go to `results_dir/`:
 
 ## Prerequisites
 
-- **Container**: `nvcr.io/nvidia/tao/tao-toolkit:7.3.0-pyt` <!-- versions-key: images.tao_toolkit.pyt -->
+- **Container**: `nvcr.io/nvidia/tao/tao-toolkit:7.3.0-data-services` <!-- versions-key: images.tao_toolkit.data_services -->
 - **API access**: At least one VLM endpoint (Gemini API key or OpenAI-compatible endpoint capable of image input)
