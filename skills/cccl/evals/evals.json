@@ -1,0 +1,110 @@
+{
+  "skill_name": "cccl",
+  "evals": [
+    {
+      "id": "cccl-topk-api-question",
+      "prompt": "Quick one: we're on CUDA 13.4 (CCCL 3.5). Show me the cub::DeviceTopK call to get the 100 largest floats and their indices out of a 50M-element device array on a given cudaStream_t. Can I just pass the stream as the last argument like with other CUB algorithms? Is the output sorted?",
+      "files": [],
+      "expected_skill": "cccl",
+      "expected_script": null,
+      "expected_output": "Shows cub::DeviceTopK::MaxPairs (from <cub/device/device_topk.cuh>) with either the single-call form or the two-phase temp storage pattern, a counting iterator (cuda::make_counting_iterator(0) or thrust::counting_iterator) as the values to get indices, and an execution environment that combines cuda::stream_ref{stream} with cuda::execution::require(cuda::execution::determinism::not_guaranteed, cuda::execution::output_ordering::unsorted). Explains that in CCCL 3.5 DeviceTopK only supports non-deterministic, unsorted output and a call without these requirements (e.g. relying on the default environment or passing a raw stream) fails to compile with a static_assert. States that the 100 results are not sorted and must be sorted afterwards (e.g. thrust::sort_by_key on the k pairs with a greater comparator) if order matters.",
+      "assertions": [
+        "Uses cub::DeviceTopK::MaxPairs with a counting iterator (or index array) as values",
+        "Passes an environment that requires determinism::not_guaranteed and output_ordering::unsorted",
+        "States that passing only the stream (without those requirements) does not compile in CCCL 3.5",
+        "States that the output is unsorted and shows or describes sorting the k results if order is needed"
+      ]
+    },
+    {
+      "id": "cccl-scan-determinism-question",
+      "prompt": "Is cub::DeviceScan::InclusiveSum (or thrust::inclusive_scan) over floats bitwise reproducible from run to run on the same GPU? If not, what's the cheapest fix that keeps everything in float, and what does it cost in speed? We're on CUDA 13.",
+      "files": [],
+      "expected_skill": "cccl",
+      "expected_script": null,
+      "expected_output": "No: the default single-pass decoupled look-back scan combines partial sums in a timing-dependent order, so float results can differ in the last bits between runs (cub::DeviceScan's default determinism is not_guaranteed; DeviceReduce by contrast defaults to run_to_run). Cheapest fix in CCCL 3.x (CUDA 13): call cub::DeviceScan::InclusiveSum(d_in, d_out, n, env) with env = cuda::std::execution::env{cuda::stream_ref{stream}, cuda::execution::require(cuda::execution::determinism::run_to_run)}, which keeps float and costs essentially nothing. gpu_to_gpu is only supported for integral scans. Fixed-point/double or hand-written scans are not necessary.",
+      "assertions": [
+        "Says the default float scan is not run-to-run reproducible because of timing-dependent (decoupled look-back) combination order",
+        "Recommends cuda::execution::require(cuda::execution::determinism::run_to_run) passed to cub::DeviceScan through an environment",
+        "Does not present fixed-point, double, or a hand-written scan as the primary fix",
+        "States that the run_to_run scan costs little or nothing in speed"
+      ]
+    },
+    {
+      "id": "cccl-crossgpu-scan-question",
+      "prompt": "We compute cumulative exposure with an inclusive prefix sum over ~50M floats using CUB. The output must be bit-identical between our A100 and H100 nodes (CUDA 13, CCCL 3.5). Can I just pass the gpu_to_gpu determinism requirement to cub::DeviceScan::InclusiveSum? If not, what should I do, and what are the trade-offs?",
+      "files": [],
+      "expected_skill": "cccl",
+      "expected_script": null,
+      "expected_output": "No for float: in CCCL 3.5 cub::DeviceScan accepts determinism::gpu_to_gpu only for integral types with known operators; passing it for a float scan fails to compile with a static_assert. (run_to_run is supported for float scans and fixes same-GPU reruns, but not cross-architecture differences.) To get identical bits across A100 and H100, convert to fixed-point integers (e.g. int64 via llrint(x * scale) in a transform iterator), run the integer scan (optionally requiring gpu_to_gpu, which integral scans support), and convert back; integer addition is associative and exact so results match on every GPU, at the cost of quantization to the chosen scale and a range check. Alternatively use a fixed, architecture-independent scan order, but not just double precision.",
+      "assertions": [
+        "States that gpu_to_gpu is not available for float DeviceScan in CCCL 3.5 (integral types only; compile-time error)",
+        "Recommends scanning fixed-point/integer values (exact, associative) to get identical bits across architectures",
+        "Notes that run_to_run (or the default) does not fix cross-architecture differences, or that double alone does not",
+        "Mentions the quantization/range trade-off of the fixed-point approach"
+      ]
+    },
+    {
+      "id": "cccl-small-segments-question",
+      "prompt": "I sum every row of a row-major float matrix on the GPU, 4M rows x 16 columns, with cub::DeviceSegmentedReduce::Sum(d_in, d_out, num_rows, d_offsets, d_offsets + 1) where d_offsets is 0, 16, 32, ... (CCCL 3.5, RTX 4090). It takes about 3.5 ms for 64M floats, far slower than a plain cub::DeviceReduce over the same data. Why, and what should I call instead? Show the exact call. And what would you use if the rows had different (still small) lengths?",
+      "files": [],
+      "expected_skill": "cccl",
+      "expected_script": null,
+      "expected_output": "The offset-based overload of cub::DeviceSegmentedReduce schedules work per segment (a thread block per segment), which suits large segments but wastes almost all of each block on 16-element rows, so millions of tiny segments are slow. For uniform segments CCCL 3.x has a fixed-size overload that needs no offsets: cub::DeviceSegmentedReduce::Sum(d_in, d_out, num_segments, segment_size), i.e. Sum(d_in, d_out, 4000000, 16) (also Min/Max/Reduce, and a two-phase form with temp storage); it takes about 0.37 ms for this input, roughly 10x faster. For variable-length small segments, thrust::reduce_by_key with one key per item (row ids built once from the offsets with a vectorized upper_bound, or scatter + scan) is about 6x faster than the offsets overload (0.7 ms vs 4.7 ms for 4M segments averaging 16 items); the offsets overload is the right choice again once segments have hundreds of items or more. A hand-written kernel is not needed.",
+      "assertions": [
+        "Explains that the offset-based overload handles each segment separately (per-segment thread block / overhead), which is inefficient for millions of tiny segments",
+        "Shows the fixed-size overload with the correct name and arguments: cub::DeviceSegmentedReduce::Sum(d_in, d_out, num_segments, segment_size), optionally with temp storage or an environment",
+        "For variable-length small segments recommends thrust::reduce_by_key (or cub::DeviceReduce::ReduceByKey) with a key per item rather than a hand-written kernel"
+      ]
+    },
+    {
+      "id": "cccl-pstl-question",
+      "prompt": "We have C++17 code that calls std::transform, std::reduce and std::count_if with std::execution::par. On CUDA 13.4 (CCCL 3.5), can libcu++ run those on the GPU with the same std-style calls? Show the headers, the execution policy, how to make them run on a specific cudaStream_t, and what the iterators have to point to.",
+      "files": [],
+      "expected_skill": "cccl",
+      "expected_script": null,
+      "expected_output": "Yes. Since CCCL 3.4 (CUDA 13.4) libcu++ implements the standard parallel algorithms in namespace cuda::std with a CUDA backend selected by the cuda::execution::gpu policy: #include <cuda/std/execution> plus <cuda/std/algorithm> and <cuda/std/numeric>, then e.g. cuda::std::reduce(cuda::execution::gpu, first, last, 0.0f), cuda::std::transform(cuda::execution::gpu, first, last, out, op), cuda::std::count_if(cuda::execution::gpu, first, last, pred). Only the gpu policy has a backend: cuda::std::execution::par / seq with these algorithms is a compile error. To run on a stream attach it to the policy: auto policy = cuda::execution::gpu.with(cuda::get_stream, stream) where stream is a cuda::stream, cuda::stream_ref{raw} or a cudaStream_t (<cuda/stream> / <cuda/stream_ref>); a memory resource for temporaries is attached the same way with .with(cuda::mr::get_memory_resource, pool). The iterators must be random-access iterators into device-accessible memory (device pointers, thrust::device_vector iterators, libcu++ fancy iterators), not host std::vector iterators. The file is compiled by nvcc as CUDA, and lambdas need __host__ __device__ (or __device__) with --extended-lambda. Thrust (thrust::reduce with thrust::cuda::par.on(stream)) remains the alternative for older toolkits.",
+      "assertions": [
+        "Says yes: libcu++ provides cuda::std:: parallel algorithms that run on the GPU with the cuda::execution::gpu policy",
+        "Names the headers: <cuda/std/execution> together with <cuda/std/algorithm> and/or <cuda/std/numeric>",
+        "Shows attaching the stream to the policy with cuda::execution::gpu.with(cuda::get_stream, stream)",
+        "States that the iterators must be random-access iterators into device-accessible memory (device pointers or device_vector iterators), not host containers"
+      ]
+    },
+    {
+      "id": "cccl-unique-count-question",
+      "prompt": "CUDA 13.4 / CCCL 3.5. I have a sorted device array of 200M int keys and only need the number of distinct keys, not the keys themselves. What's the call that doesn't write a compacted copy anywhere? Show the code.",
+      "files": [],
+      "expected_skill": "cccl",
+      "expected_script": null,
+      "expected_output": "Use thrust::unique_count(thrust::device, d_keys, d_keys + n) (<thrust/unique.h>), which counts the runs of equal consecutive elements without producing any output; for sorted keys that is the number of distinct keys. Equivalent alternatives that also write nothing: counting adjacent differences with thrust::inner_product(first, last - 1, first + 1, 1, plus, not_equal_to) or a count_if over a zip of neighbours, or cub::DeviceSelect::Unique / thrust::unique_copy into thrust::make_discard_iterator() / cuda::discard_iterator. The pre-3.0 cub::DiscardOutputIterator (and the other cub fancy iterators) no longer exist in CCCL 3.x and must not be used.",
+      "assertions": [
+        "Uses thrust::unique_count, or an equivalent that writes no compacted output (adjacent-compare count, or unique into a discard iterator)",
+        "Uses only APIs that exist in CCCL 3.5 (no cub::DiscardOutputIterator or other removed cub iterators)"
+      ]
+    },
+    {
+      "id": "negative-cublas-row-major",
+      "prompt": "I'm calling cublasSgemm to compute C = A * B from C++ where A (m x k), B (k x n) and C are row-major arrays on the GPU, and the result is garbage that looks transposed. How do I call it correctly for row-major data without copying or transposing the matrices?",
+      "files": [],
+      "expected_skill": null,
+      "expected_script": null,
+      "expected_output": "cuBLAS assumes column-major storage. A row-major m x k array is the column-major storage of its transpose, so compute C^T = B^T * A^T: call cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, n, m, k, &alpha, B, n, A, k, &beta, C, n), i.e. swap the operands and use the row lengths as leading dimensions. No copies are needed. This is a cuBLAS question and does not involve CCCL.",
+      "assertions": [
+        "Explains that cuBLAS uses column-major storage, so row-major arrays are seen as transposes",
+        "Gives the fix of swapping the operands (computing C^T = B^T * A^T) with matching dimensions and leading dimensions, without copying"
+      ]
+    },
+    {
+      "id": "negative-driver-version",
+      "prompt": "nvidia-smi on our server shows 'CUDA Version: 12.4' in the header but nvcc --version says 13.4, and my program built with that nvcc fails at startup with 'CUDA driver version is insufficient for CUDA runtime version'. What is going on and how do I fix it?",
+      "files": [],
+      "expected_skill": null,
+      "expected_script": null,
+      "expected_output": "The version in the nvidia-smi header is the highest CUDA version the installed driver supports, not the installed toolkit. The toolkit (nvcc, libcudart 13.4) is newer than what the driver supports, so cudart refuses to initialize (cudaErrorInsufficientDriver). Fix it by upgrading the NVIDIA driver to one that supports CUDA 13.4 (and rebooting or reloading the kernel modules), or by building against a CUDA 12.x toolkit that the current driver supports, or by running in a container with a matching toolkit on a host with a new enough driver. This does not involve CCCL.",
+      "assertions": [
+        "Explains that the nvidia-smi header shows the maximum CUDA version supported by the driver, not the toolkit version",
+        "Recommends upgrading the driver (or using a toolkit version the driver supports)"
+      ]
+    }
+  ]
+}

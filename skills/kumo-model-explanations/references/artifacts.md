@@ -89,10 +89,17 @@ population.
 
 ## Read and plot gradient scores
 
+Training runs only. `PredictionExplanations` has no `gradient` availability entry and no
+`gradient_scores()` or `plot_gradient()`; for a prediction run, say gradient attribution is not
+produced for PRED and continue with cohorts or samples.
+
 ```python
 from IPython.display import display
 
-if explanations.availability["gradient"].available:
+gradient = explanations.availability.get("gradient")
+if gradient is None:
+    print("Gradient attribution is not produced for prediction (PRED) runs.")
+elif gradient.available:
     scores = explanations.gradient_scores().to_pandas()  # table, column, score; descending
     if scores.empty:
         print("No gradient rows were recorded.")
@@ -103,7 +110,7 @@ if explanations.availability["gradient"].available:
         axis.set_title(f"TEST gradient scores — {explanations.trial_root}")
         display(figure)
 else:
-    print(explanations.availability["gradient"])
+    print(gradient)
 ```
 
 The reader uses `explain_test/scores.csv` from the selected trial and returns the shared
@@ -205,9 +212,14 @@ Each file is a `kumoapi.explain.Subgraph`:
 List sampled graph references without loading their bodies:
 
 ```python
-samples = explanations.samples()
-if not samples:
-    print("No sampled graphs found in:", explanations.trial_root)
+try:
+    samples = explanations.samples()
+except kumo.ExplanationUnavailableError as error:  # disabled, unsupported, failed, model_only
+    print("Sampled graphs unavailable:", error)
+    samples = ()
+else:
+    if not samples:
+        print("No sampled graphs recorded:", explanations.availability.get("samples"))
 for reference in samples:
     print(reference.artifact_id, reference.categories, reference.original_ids,
           reference.available)
@@ -237,17 +249,24 @@ The typed stores use integer node keys, unlike raw JSON's string object keys. Ei
 be absent. The API preserves structure, feature values, scores, timestamps, and aggregated
 nodes; it does not render an interactive sampled graph.
 
-Absent or empty `subgraph_json/` is not "no neighbourhood": report the path, check
-`disable_explain` and post-training errors, and follow *If artifacts are missing*. The collector skips forecasting, multilabel ranking, and
+Absent or empty `subgraph_json/` is not "no neighbourhood": report the path and recorded
+availability reason; for training also check `disable_explain` and post-training errors, and follow *If artifacts are missing*. The collector skips forecasting, multilabel ranking, and
 link-prediction models other than the hybrid, ID and shallow-RHS modules. These files carry
 entity primary keys and raw feature values of real rows. Review them before sharing, and keep
 them out of shared locations unless the user asks.
 
 ## If artifacts are missing
 
-Check, in order: the selected run/path and retained files; runtime generation support;
-`disable_explain` in the actual run plan; task/module support; and post-training warning/error
-logs. For predictions, inspect the explanation manifest's per-producer outcomes and errors.
+For a **training** run, check, in order: the selected run/path and retained files; runtime
+generation support; `disable_explain` in the actual run plan; task/module support; and
+post-training warning/error logs.
+
+For a **prediction** run, check, in order: the selected `run_root` and its retained
+`xai/manifest.json`; whether that `predict` call passed `explanations=True` or
+`PredictionExplanationOptions` (the default `explanations=False` records reason `disabled`);
+each producer's recorded outcome and error (`unsupported` follows task/module support); and the
+prediction warning/error logs. `disable_explain` does not affect prediction.
+
 A successful fit or prediction alone does not prove explanations succeeded. An older run cannot acquire
 files merely by changing its plan now. Report malformed or empty artifacts explicitly instead
 of interpreting them as zero importance.
