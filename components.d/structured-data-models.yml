@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0 AND CC-BY-4.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+
+name: Structured Data Models
+repo: NVIDIA/structured-data-models
+description: Run and evaluate pretrained tabular foundation models for classification and regression in PyTorch.
+links:
+  discussions: false
+skills:
+  - path: skills/sdm-tabular-prediction/
+    catalog_dir: sdm-tabular-prediction
