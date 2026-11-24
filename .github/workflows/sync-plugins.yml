@@ -15,7 +15,8 @@
 #   - signature drift / missing / mismatch on plugin.oms.sig → revert to
 #     the last signed tree on main (drop if the plugin is new)
 #   - compliance: plugin.json, plugin-card.md, plugin.oms.sig,
-#     BENCHMARK.md, and every bundled skill must itself be compliant
+#     BENCHMARK.md (verdict PASS or PASS WITH WARNINGS), and every bundled
+#     skill must itself be compliant
 #   - version: content changed since main ⇒ plugin.json version must be
 #     higher, else hold
 #   - orphan pruning with its own cap (prune-orphan-plugins.sh)
@@ -264,6 +265,25 @@ jobs:
               hold "$dir" "missing artifacts:$(echo "$missing" | xargs)"
               continue
             fi
+
+            # BENCHMARK.md must record a publishable verdict: PASS, or PASS
+            # WITH WARNING(S) (every check passed but lift is between 0 and
+            # +5 points; the plugin onboarding guide lets these publish).
+            # The verdict is the first bold upper-case word(s) on a `> ` line,
+            # in either report layout:
+            #   > ✅ **PASS**
+            #   > **Overall verdict: PASS**  (optionally "PASS — <reason>")
+            # FAIL, NEUTRAL, INCOMPLETE, BLOCKED, NOT ASSESSED, or no verdict
+            # line are held. `|| true` keeps a file with no verdict from
+            # failing the step under pipefail, so only that plugin is held.
+            verdict=$(sed -nE 's/^>[^*]*\*\*(Overall verdict: *)?([A-Z][A-Z_ ]*[A-Z]).*/\2/p' "$dir/BENCHMARK.md" | head -n 1 | tr '_' ' ' || true)
+            case "$verdict" in
+              "PASS"|"PASS WITH WARNING"|"PASS WITH WARNINGS") ;;
+              *)
+                hold "$dir" "benchmark: BENCHMARK.md verdict '${verdict:-missing}' is not PASS or PASS WITH WARNINGS"
+                continue
+                ;;
+            esac
 
             # plugin.json must parse and its name must equal the catalog dir
             # (the install name).
