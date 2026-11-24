@@ -129,11 +129,10 @@ Always save into a timestamped folder:
 <experiment_result_dir>/rca_results/YYYY-MM-DD_HHMMSS/
 ├── RCA_Report.md          # The full report
 ├── rca_images/            # All thumbnails embedded in the report
-├── rca_config/            # Auto-copied by hook: skill, commands, hooks, settings
+├── rca_config/            # Auto-copied by hook: skill, commands, hooks
 │   ├── skills/
 │   ├── commands/
-│   ├── hooks/
-│   └── settings.local.json
+│   └── hooks/
 └── claude_session.jsonl   # Auto-copied by hook: conversation log
 ```
 

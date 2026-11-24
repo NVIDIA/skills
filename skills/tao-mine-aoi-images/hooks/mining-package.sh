@@ -41,10 +41,6 @@ if [[ "$CLAUDE_FILE_PATH" == *Mining_Report.md ]]; then
     fi
   done
 
-  for f in "$project_root/.claude/settings.json" "$project_root/.claude/settings.local.json"; do
-    [ -f "$f" ] && cp "$f" "$out_dir/mining_config/" 2>>"$log_file"
-  done
-
   if [ -n "$HOOK_TRANSCRIPT" ] && [ -f "$HOOK_TRANSCRIPT" ]; then
     cp "$HOOK_TRANSCRIPT" "$out_dir/claude_session.jsonl" 2>>"$log_file"
   else
