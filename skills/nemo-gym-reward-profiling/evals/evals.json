@@ -1,0 +1,259 @@
+{
+  "skill_name": "nemo-gym-reward-profiling",
+  "evals": [
+    {
+      "id": "choose-training-tasks-partial-run",
+      "prompt": "My math environment's collection job stopped early, so I profiled what was saved with `gym eval profile ... ++allow_partial_rollouts=True`. The rollouts, materialized inputs and profile outputs are in /workspace/input/math_run/. Which tasks should I keep for GRPO training? Give the task ids.",
+      "expected_output": "Reports coverage first: 98 of 128 planned rollouts were saved (76.6%). Keeps tasks 6, 7, 8, 9 and 10, whose reward varies across the 8 repeats, and task 11, which also varies but has only 3 of 8 repeats saved. Drops tasks 0, 1, 2 and 3, which pass on every repeat. Does not keep tasks 4, 5 and 15, which never pass (task 15 has only 6 of 8 repeats saved, so that call is tentative), and flags task 5 as a verifier or label problem rather than a hard task: the model answers \\frac{1}{6} on every repeat, which equals the expected answer 1/6. Says task 13 has a single saved rollout, so its spread is unknown, and that tasks 12 and 14 have no saved rollout (they are missing from the profile file) and must be rerun before deciding.",
+      "assertions": [
+        "Reports that 98 of the 128 planned rollouts were saved before recommending tasks",
+        "Recommends keeping tasks 6, 7, 8, 9 and 10",
+        "Recommends dropping tasks 0, 1, 2 and 3 because they pass on every repeat",
+        "Identifies tasks 12 and 14 as having no saved rollouts rather than as failing tasks",
+        "Flags task 5 as a verifier or label problem instead of only calling it too hard"
+      ],
+      "expected_skill": "nemo-gym-reward-profiling",
+      "expected_script": "scripts/summarize_profile.py",
+      "files": [
+        "evals/files/math_run/math_rollouts.jsonl",
+        "evals/files/math_run/math_rollouts_agent_metrics.json",
+        "evals/files/math_run/math_rollouts_materialized_inputs.jsonl",
+        "evals/files/math_run/math_rollouts_repeat_level_metrics.json",
+        "evals/files/math_run/math_rollouts_reward_profiling.jsonl"
+      ]
+    },
+    {
+      "id": "pass-rate-of-partial-run",
+      "prompt": "What pass rate did the run in /workspace/input/math_run/ get, and can I report that number as the pass rate of my math environment?",
+      "expected_output": "Gives the mean reward over saved rollouts, about 0.55 (54 passes in 98 saved rollouts), and says it covers only 98 of 128 planned rollouts (76.6%): tasks 12 and 14 have no saved rollout, and tasks 11, 13 and 15 are partial. Says the number should not be reported as the environment's pass rate until the missing rollouts are collected.",
+      "assertions": [
+        "States a mean reward of about 0.55 over the saved rollouts",
+        "States that only 98 of the 128 planned rollouts were saved",
+        "Names tasks 12 and 14 as having no saved rollouts",
+        "Advises against reporting the number as the environment's pass rate before the run is complete"
+      ],
+      "expected_skill": "nemo-gym-reward-profiling",
+      "expected_script": "scripts/summarize_profile.py",
+      "files": [
+        "evals/files/math_run/math_rollouts.jsonl",
+        "evals/files/math_run/math_rollouts_agent_metrics.json",
+        "evals/files/math_run/math_rollouts_materialized_inputs.jsonl",
+        "evals/files/math_run/math_rollouts_repeat_level_metrics.json",
+        "evals/files/math_run/math_rollouts_reward_profiling.jsonl"
+      ]
+    },
+    {
+      "id": "repeat-missing-count-blind-spot",
+      "prompt": "In /workspace/input/math_run/math_rollouts_repeat_level_metrics.json, repeat 0 shows missing_count 0. Does that mean repeat 0 covered every task?",
+      "expected_output": "No. Repeat 0 has sample_count 14, while the run planned 16 tasks. missing_count only counts tasks that were saved in some other repeat; tasks 12 and 14 have no saved rollout in any repeat, so they never appear in missing_count.",
+      "assertions": [
+        "Answers that repeat 0 did not cover every task",
+        "Compares repeat 0's sample_count of 14 with the 16 planned tasks",
+        "Explains that tasks missing from every repeat (12 and 14) are not counted in missing_count"
+      ],
+      "expected_skill": "nemo-gym-reward-profiling",
+      "files": [
+        "evals/files/math_run/math_rollouts.jsonl",
+        "evals/files/math_run/math_rollouts_agent_metrics.json",
+        "evals/files/math_run/math_rollouts_materialized_inputs.jsonl",
+        "evals/files/math_run/math_rollouts_repeat_level_metrics.json",
+        "evals/files/math_run/math_rollouts_reward_profiling.jsonl"
+      ]
+    },
+    {
+      "id": "same-mean-different-spread",
+      "prompt": "In my instruction-following profile in /workspace/input/if_run/, tasks 1 and 2 both have mean reward 0.5. Are they equally useful for RL training?",
+      "expected_output": "No. Task 1 scores 0.5 on every repeat (min and max are both 0.5, std 0), so it gives no learning signal to group-based RL such as GRPO. Task 2 alternates between 1 and 0 (std about 0.58), so it does. The mean alone cannot tell them apart.",
+      "assertions": [
+        "Says task 1 gets the same reward of 0.5 on every repeat",
+        "Says task 2's reward varies between repeats",
+        "Concludes that task 2 is useful for RL training and task 1 is not"
+      ],
+      "expected_skill": "nemo-gym-reward-profiling",
+      "files": [
+        "evals/files/if_run/if_rollouts.jsonl",
+        "evals/files/if_run/if_rollouts_agent_metrics.json",
+        "evals/files/if_run/if_rollouts_materialized_inputs.jsonl",
+        "evals/files/if_run/if_rollouts_repeat_level_metrics.json",
+        "evals/files/if_run/if_rollouts_reward_profiling.jsonl"
+      ]
+    },
+    {
+      "id": "single-rollout-zero-std",
+      "prompt": "The profile row for task 13 in /workspace/input/math_run/math_rollouts_reward_profiling.jsonl shows std/reward 0. Does that mean the task has no variance and gives no learning signal?",
+      "expected_output": "No conclusion is possible. Only 1 of the 8 planned rollouts was saved for task 13 (num_rollouts 1, expected_num_rollouts 8), and the standard deviation of a single value is 0, so its spread is unknown. Collect the missing repeats before deciding.",
+      "assertions": [
+        "Notes that task 13 has only one saved rollout out of 8 planned",
+        "Explains that a standard deviation over a single value is 0 and says nothing about spread",
+        "Recommends collecting more repeats before deciding"
+      ],
+      "expected_skill": "nemo-gym-reward-profiling",
+      "files": [
+        "evals/files/math_run/math_rollouts.jsonl",
+        "evals/files/math_run/math_rollouts_agent_metrics.json",
+        "evals/files/math_run/math_rollouts_materialized_inputs.jsonl",
+        "evals/files/math_run/math_rollouts_repeat_level_metrics.json",
+        "evals/files/math_run/math_rollouts_reward_profiling.jsonl"
+      ]
+    },
+    {
+      "id": "profile-command-and-outputs",
+      "prompt": "My `gym eval run --no-serve ... --output results/rollouts.jsonl --num-repeats 8` job for my NeMo Gym environment is still running. When it finishes, how do I get per-task pass rates and reward variance from it, and which files will I get?",
+      "expected_output": "Gives the command gym eval profile --inputs results/rollouts_materialized_inputs.jsonl --rollouts results/rollouts.jsonl, which uses the materialized inputs file that gym eval run writes next to the rollouts. Says it writes results/rollouts_reward_profiling.jsonl, with one row per task (mean/reward, std/reward, min/reward, max/reward, num_rollouts, expected_num_rollouts), plus results/rollouts_agent_metrics.json and results/rollouts_repeat_level_metrics.json, and that coverage (missing rollouts) should be checked before using the numbers.",
+      "assertions": [
+        "Gives a gym eval profile command that takes the rollouts file and the materialized inputs file written next to it",
+        "Names the per-task output file and its reward statistics",
+        "Mentions checking for missing rollouts or coverage before using the numbers"
+      ],
+      "expected_skill": "nemo-gym-reward-profiling",
+      "files": []
+    },
+    {
+      "id": "profile-missing-rollout-keys-error",
+      "prompt": "`gym eval profile` failed with: Materialized input rows and rollout results do not have matching rollout keys. Missing rollout results for 24 materialized input rows. What should I do?",
+      "expected_output": "Explains that 24 planned rollouts were never saved and offers two fixes: rerun the same gym eval run command with --resume to collect the missing rollouts, or add ++allow_partial_rollouts=True to profile the saved ones and report the coverage. The missing rollouts must not be counted as zero rewards.",
+      "assertions": [
+        "Explains that some planned rollouts were never saved",
+        "Suggests rerunning the collection with --resume to fill in the missing rollouts",
+        "Suggests ++allow_partial_rollouts=True to profile what was saved",
+        "Says to report coverage instead of counting missing rollouts as zeros"
+      ],
+      "expected_skill": "nemo-gym-reward-profiling",
+      "files": []
+    },
+    {
+      "id": "check-new-environment-before-rl",
+      "prompt": "I installed nemo-gym with pip and built a new environment with my own tasks file. Before I start GRPO training on it, how do I check that it gives a useful reward signal?",
+      "expected_output": "Gives a workflow that works from a pip install: put the model endpoint in env.yaml, start the servers with gym env start, wait until gym env status shows every server healthy, collect repeated rollouts with gym eval run --no-serve --agent <agent> --input <tasks.jsonl> --output results/rollouts.jsonl --num-repeats 8 (8 or more), then run gym eval profile on the rollouts and the materialized inputs. Keeps tasks whose reward varies across repeats, drops tasks with the same reward every time, and checks never-pass tasks for label or verifier problems before dropping them.",
+      "assertions": [
+        "Uses only commands available from a pip install (gym env start, gym eval run, gym eval profile), with no scripts that exist only in a source checkout",
+        "Collects several rollouts per task (8 or more)",
+        "Explains that tasks whose reward varies across repeats carry the learning signal"
+      ],
+      "expected_skill": "nemo-gym-reward-profiling",
+      "files": []
+    },
+    {
+      "id": "too-few-repeats-for-hard-tasks",
+      "prompt": "Most tasks in my NeMo Gym environment are hard. I ran 4 repeats per task and 60% of the tasks never passed. Can I drop all of them from my RL training set?",
+      "expected_output": "Not yet. With 4 repeats, a task the model solves 10% of the time gets 0 on every repeat about 66% of the time (0.9^4); at 8 repeats about 43%, and at 16 about 19%. Rerun the never-pass tasks with more repeats (16 or more for a hard set) before dropping them, and check a few of their rollouts for label or verifier problems.",
+      "assertions": [
+        "Explains that with only 4 repeats, tasks with a low but nonzero pass rate often score 0 on every repeat",
+        "Gives a probability estimate such as 0.9^4, about 66%, for a 10% pass rate, or an equivalent calculation",
+        "Recommends rerunning the never-pass tasks with more repeats before dropping them",
+        "Suggests checking some never-pass rollouts for label or verifier problems"
+      ],
+      "expected_skill": "nemo-gym-reward-profiling",
+      "files": []
+    },
+    {
+      "id": "never-pass-share-from-profile-only",
+      "prompt": "I profiled 8 repeats of my code environment with nemo-gym 0.7.0. The profile is /workspace/input/code_run/code_rollouts_reward_profiling.jsonl. What share of my environment's tasks never pass?",
+      "expected_output": "Says that 2 of the 10 tasks in this file never pass (tasks 3 and 4 score 0 on all 8 repeats), and that this is only the share among tasks with a saved rollout. Explains that gym eval profile in nemo-gym 0.7.0 leaves a task with no saved rollout out of the profile file entirely, and every row here looks complete, so the file alone cannot show whether such tasks exist and the share of all the environment's tasks is unknown from it. Tells the user to check the planned task count in the code_rollouts_materialized_inputs.jsonl written next to the rollouts before quoting the share.",
+      "assertions": [
+        "Names tasks 3 and 4 as the tasks in the file that never pass",
+        "Warns that a task with no saved rollout does not appear in the profile file, so the share of all tasks may differ",
+        "Tells the user to check how many tasks were planned, for example in the materialized inputs, before quoting the share"
+      ],
+      "expected_skill": "nemo-gym-reward-profiling",
+      "expected_script": "scripts/summarize_profile.py",
+      "files": [
+        "evals/files/code_run/code_rollouts_reward_profiling.jsonl"
+      ]
+    },
+    {
+      "id": "headline-mean-from-agent-metrics",
+      "prompt": "The agent metrics from my code environment's reward profile, /workspace/input/code_run/code_rollouts_agent_metrics.json, show mean/reward 0.6. Can I report 60% as the pass rate of my environment?",
+      "expected_output": "Says not from this file alone. Explains that mean/reward is the mean over the rollouts that were measured: rollouts that were never saved, including every rollout of a task with no saved rollout, are not in it, and this file does not say how many of the planned rollouts it covers. Tells the user to check coverage first by comparing the measured rollouts with the planned rollouts in code_rollouts_materialized_inputs.jsonl, and to report the number together with its coverage (measured out of planned rollouts) rather than as the environment's pass rate.",
+      "assertions": [
+        "Explains that mean/reward averages only the measured rollouts and leaves out rollouts that were never saved",
+        "Says that this file alone does not show how many of the planned rollouts were measured",
+        "Advises checking coverage against the planned rollouts before reporting 60% as the environment's pass rate"
+      ],
+      "expected_skill": "nemo-gym-reward-profiling",
+      "files": [
+        "evals/files/code_run/code_rollouts_agent_metrics.json"
+      ]
+    },
+    {
+      "id": "repeat-coverage-from-repeat-metrics",
+      "prompt": "gym eval profile wrote the per-repeat metrics of my code environment's run to /workspace/input/code_run/code_rollouts_repeat_level_metrics.json. Did every repeat cover all of my tasks?",
+      "expected_output": "Explains that this file cannot confirm it. missing_count is 0 in every repeat, but it counts only tasks that were measured in some other repeat, so a task with no saved rollout in any repeat is never counted. Notes that every repeat has sample_count 10, so all 8 repeats covered the same 10 tasks, and tells the user to compare that with the number of planned tasks in code_rollouts_materialized_inputs.jsonl: any planned task beyond those 10 was never measured in any repeat.",
+      "assertions": [
+        "Does not conclude from missing_count being 0 that every task was covered",
+        "Explains that missing_count does not count a task that is missing from every repeat",
+        "Notes that each repeat has sample_count 10 and tells the user to compare it with the number of planned tasks"
+      ],
+      "expected_skill": "nemo-gym-reward-profiling",
+      "files": [
+        "evals/files/code_run/code_rollouts_repeat_level_metrics.json"
+      ]
+    },
+    {
+      "id": "masked-rollouts-choose-tasks",
+      "prompt": "Collection for my sandboxed terminal environment finished, and gym eval profile printed 'Reward profile completion: 64/64 rollout rows (100.00%)'. The reward profile and the materialized inputs are in /workspace/input/tool_run/. Which tasks should I keep for GRPO training?",
+      "expected_output": "Reports coverage first: only 50 of the 64 planned rollouts were measured. Because the completion line counts all 64 as saved, the other 14 were saved but masked by the environment (for example sandbox failures), and gym eval profile leaves masked rollouts out of every statistic: task 5 has no measured rollout and is missing from the profile, task 2 has 4 of 8 measured and task 6 has 6 of 8. Keeps tasks 1, 4, 6 and 7, whose reward varies (task 6 tentatively). Drops task 0, which passes on every repeat; treats task 2, which passed all 4 measured repeats, as a tentative drop until its masked repeats are rerun; and says to check task 3, which never passes, for label or verifier problems before dropping it. Says to fix the cause of the masking and rerun task 5 before deciding on it.",
+      "assertions": [
+        "Reports that only 50 of the 64 planned rollouts were measured",
+        "Explains that the 14 unmeasured rollouts were saved but masked, not missing",
+        "Recommends keeping tasks 1, 4, 6 and 7",
+        "Identifies task 5 as not measured rather than as a failing task"
+      ],
+      "expected_skill": "nemo-gym-reward-profiling",
+      "expected_script": "scripts/summarize_profile.py",
+      "files": [
+        "evals/files/tool_run/tool_rollouts_materialized_inputs.jsonl",
+        "evals/files/tool_run/tool_rollouts_reward_profiling.jsonl"
+      ]
+    },
+    {
+      "id": "negative-score-gap-vs-model-card",
+      "prompt": "My AIME 2025 score in NeMo Gym is 6 points lower than the number in the model card. What should I check first?",
+      "expected_output": "Says to check whether the two numbers are comparable before treating the gap as real: benchmark version and data, prompt and answer extraction, sampling settings such as temperature and maximum output tokens, the grader or judge, the number of repeats and run-to-run noise, and how failed or missing rollouts were counted. This is a results-comparison question, not reward profiling for training.",
+      "assertions": [
+        "Lists comparability factors such as the prompt, sampling settings, grader or benchmark version",
+        "Mentions run-to-run noise or the number of repeats"
+      ],
+      "expected_skill": null,
+      "should_trigger": false,
+      "files": []
+    },
+    {
+      "id": "negative-crashed-run",
+      "prompt": "My gym eval run crashed with 'ray.exceptions.RayActorError: The actor died unexpectedly before finishing this task'. What usually causes this, and what should I check before I rerun it?",
+      "expected_output": "Explains that this is a crashed run, not a reward question: the actor usually died because its process ran out of memory or was killed. Tells the user to find the cause in the Ray or worker logs, check memory, resource limits and concurrency, fix the cause, then resume or rerun the collection.",
+      "assertions": [
+        "Suggests finding the cause in the Ray or worker logs",
+        "Mentions running out of memory or resource limits as a likely cause",
+        "Suggests resuming or rerunning after fixing the cause"
+      ],
+      "expected_skill": null,
+      "should_trigger": false,
+      "files": []
+    },
+    {
+      "id": "negative-repeats-to-compare-checkpoints",
+      "prompt": "How many repeats do I need in NeMo Gym to tell apart two checkpoints whose GPQA-Diamond scores differ by about one point?",
+      "expected_output": "Explains that the number of repeats depends on the run-to-run standard deviation of the benchmark score and on the size of the difference to detect, and shows how to estimate that variability from existing repeated runs before choosing a count. A one-point difference is small next to typical repeat-to-repeat noise on a benchmark of about 200 questions, so it needs many repeats.",
+      "assertions": [
+        "Ties the number of repeats to the run-to-run variability of the score and the size of the difference",
+        "Explains how to estimate that variability from existing repeated runs"
+      ],
+      "expected_skill": null,
+      "should_trigger": false,
+      "files": []
+    },
+    {
+      "id": "negative-server-latency-profiling",
+      "prompt": "How do I profile my NeMo Gym resources server to find which endpoint is slow? I want to measure its latency and throughput myself.",
+      "expected_output": "Explains how to profile the server's performance: measure request latency and throughput per endpoint, for example by timing requests, running a load test or using a Python profiler such as py-spy, then compare the endpoints to find the slowest. Reward profiling does not apply.",
+      "assertions": [
+        "Proposes measuring latency or throughput per endpoint",
+        "Suggests a concrete method such as timing requests, a load test or a profiler"
+      ],
+      "expected_skill": null,
+      "should_trigger": false,
+      "files": []
+    }
+  ]
+}
