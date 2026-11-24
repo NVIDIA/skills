@@ -901,6 +901,13 @@ def _audience_values(entry: dict) -> list[str]:
 
 
 PLUGIN_NAME_RE = re.compile(r"[a-z0-9][a-z0-9-]*")
+# A plugin name becomes a directory name and, for the plugins.d precedence
+# check, a filename with ".yml" appended. Without a bound, a long but
+# otherwise legal name makes that check raise OSError (ENAMETOOLONG) straight
+# out of the generator, which would stop regeneration of the whole catalog --
+# the one outcome the plugin passes exist to prevent. 200 is well under the
+# 255-byte limit every filesystem here enforces, and far above any real name.
+PLUGIN_NAME_MAX = 200
 
 
 
@@ -1004,11 +1011,13 @@ def load_plugin_specs(warnings: list[str], declared: set[str] | None = None) -> 
         if not name or not isinstance(name, str):
             warnings.append(f"{rel}: missing or non-string `name`; plugin skipped.")
             continue
-        if not PLUGIN_NAME_RE.fullmatch(name):
+        if not PLUGIN_NAME_RE.fullmatch(name) or len(name) > PLUGIN_NAME_MAX:
             warnings.append(
-                f"{rel}: plugin name `{name}` is not lowercase kebab-case; "
-                f"plugin skipped. build-plugins.py refuses to build it, so an "
-                f"entry here would describe a plugin that is never published."
+                f"{rel}: plugin name `{name[:PLUGIN_NAME_MAX]}` is not "
+                f"lowercase kebab-case of at most {PLUGIN_NAME_MAX} "
+                f"characters; plugin skipped. build-plugins.py refuses to "
+                f"build it, so an entry here would describe a plugin that is "
+                f"never published."
             )
             continue
         if name in seen:
@@ -1206,8 +1215,15 @@ def build_plugin_entries(
     warnings: list[str],
     validator: Draft202012Validator,
     declared: set[str] | None = None,
+    built_names: set[str] | None = None,
 ) -> list[dict]:
     """Build one metadata entry per plugin declared in plugins.d/.
+
+    `built_names`, when given, is filled with the name of every plugin this
+    directory declares, whether or not it builds. The mirrored pass uses it
+    for precedence, and it must include the failures: a plugins.d plugin that
+    fails to build still owns its directory under plugins/, and letting the
+    mirrored pass claim it would describe one plugin from two sources.
 
     Nothing here is fatal. A plugin problem degrades that plugin -- it is
     warned about and left out of the catalog -- and never stops the skills
@@ -1228,6 +1244,8 @@ def build_plugin_entries(
     for spec in load_plugin_specs(warnings, declared):
         name = spec["name"]
         src = spec["__source"]
+        if built_names is not None:
+            built_names.add(name)
 
         description = spec.get("description")
         if not description or not isinstance(description, str):
@@ -1356,7 +1374,10 @@ def build_plugin_entries(
             taxonomy=taxonomy,
             warnings=warnings,
             validator=validator,
-            no_skills_remedy="list catalog skills under `include_skills:`",
+            no_skills_remedy=(
+                "Either list catalog skills under `include_skills:`, or "
+                + plugin_taxonomy_help(taxonomy, src)
+            ),
         )
         if entry is not None:
             entries.append(entry)
@@ -1439,8 +1460,8 @@ def assemble_plugin_entry(
                 f"taxonomy cannot be derived and every field has to be "
                 f"declared. Missing: "
                 + ", ".join(undeclared)
-                + f".\nEither {no_skills_remedy}, or "
-                + plugin_taxonomy_help(taxonomy, src)
+                + ". "
+                + no_skills_remedy
             )
             return None
         metadata = {}
@@ -1493,7 +1514,9 @@ def assemble_plugin_entry(
 
 
 def load_mirrored_plugin_specs(
-    warnings: list[str], declared: set[str] | None = None
+    warnings: list[str],
+    built_names: set[str],
+    declared: set[str] | None = None,
 ) -> list[dict]:
     """Read every `plugins:` entry declared in components.d/<product>.yml.
 
@@ -1512,11 +1535,30 @@ def load_mirrored_plugin_specs(
     used to identify a bundled skill, and it is read here because it lives in
     the same registry file as the plugin declaration.
 
-    `declared`, when given, is filled with the identity of every plugin this
-    registry declares, including ones skipped below, so recovery can tell
-    "failed to build" from "no longer registered". A plugin registered but not
-    yet mirrored is still declared: the sync may simply not have run yet, and
-    delisting it on that basis would drop a live plugin from the catalog.
+    `built_names` is the set of names plugins.d declares, used for precedence.
+
+    `declared`, when given, is filled so recovery can tell "failed to build"
+    from "no longer registered". What goes in depends on whether the
+    declaration could be READ, and the distinction matters because one
+    registry file declares many plugins, where one plugins.d file declares
+    exactly one:
+
+    - A readable, validly named entry declares its NAME. Removing that entry
+      from the registry then correctly delists the plugin, which is how a team
+      retires one.
+    - A declaration that cannot be read -- an unparseable file, a `plugins:`
+      value that is not a list, an entry that is not a mapping, an entry with
+      no `catalog_dir` -- declares the FILE instead. We cannot tell which
+      published plugin it was meant to be, so every plugin published from that
+      registry is kept rather than delisted on the strength of a syntax error.
+
+    Declaring the file unconditionally, as an earlier version did, broke the
+    first case: a registry that still declared any plugin kept every plugin it
+    had ever published, so a retired plugin never left the catalog.
+
+    A plugin registered but not yet mirrored is still declared by name: the
+    sync may simply not have run yet, and delisting it on that basis would
+    drop a live plugin from the catalog.
     """
     if declared is None:
         declared = set()
@@ -1536,8 +1578,14 @@ def load_mirrored_plugin_specs(
                 f"{src}: could not be parsed, so any `plugins:` entry in it "
                 f"was not read: {exc}"
             )
+            # Declare the file, not any name: nothing in it can be read, so a
+            # plugin already published from it must be kept rather than
+            # delisted on the strength of a parse failure. See the note on
+            # unreadable declarations below.
+            declared.add(src)
             continue
         if not isinstance(data, dict):
+            declared.add(src)
             continue
 
         raw_plugins = data.get("plugins")
@@ -1548,6 +1596,7 @@ def load_mirrored_plugin_specs(
                 f"{src}: `plugins:` must be a list, got "
                 f"{type(raw_plugins).__name__}; no plugin read from this file."
             )
+            declared.add(src)
             continue
 
         # Source path -> catalog path for this product's standalone skills.
@@ -1574,6 +1623,10 @@ def load_mirrored_plugin_specs(
                     f"{src}: each `plugins:` entry must be a mapping, got "
                     f"{type(raw).__name__}; entry skipped."
                 )
+                # An unreadable entry names a plugin we cannot identify, so we
+                # cannot tell whether a published plugin from this registry is
+                # the one it meant. Declare the file so recovery keeps them.
+                declared.add(src)
                 continue
             name = raw.get("catalog_dir")
             if not isinstance(name, str) or not name.strip():
@@ -1582,36 +1635,52 @@ def load_mirrored_plugin_specs(
                     f"the directory under plugins/ and the install name, so "
                     f"the entry cannot be placed. Entry skipped."
                 )
+                declared.add(src)
                 continue
             name = name.strip().rstrip("/")
 
             # sync-plugins.yml refuses a catalog_dir that is not lowercase
             # kebab-case, so one is never mirrored and must not be described.
             # This also refuses a path separator, which would otherwise let an
-            # entry name ../ or another plugin's directory.
-            if not PLUGIN_NAME_RE.fullmatch(name):
+            # entry name ../ or another plugin's directory. The length bound
+            # keeps the precedence check below from raising ENAMETOOLONG.
+            #
+            # Deliberately NOT declared: the name is readable and the sync
+            # refuses it, so no such plugin is published and keeping an entry
+            # for one would describe something that does not exist. This
+            # matches how plugins.d treats a name it refuses.
+            if not PLUGIN_NAME_RE.fullmatch(name) or len(name) > PLUGIN_NAME_MAX:
                 warnings.append(
-                    f"{src}: `catalog_dir` `{name}` is not lowercase "
-                    f"kebab-case. The plugin sync refuses it, so it is never "
+                    f"{src}: `catalog_dir` `{name[:PLUGIN_NAME_MAX]}` is not "
+                    f"lowercase kebab-case of at most {PLUGIN_NAME_MAX} "
+                    f"characters. The plugin sync refuses it, so it is never "
                     f"mirrored. Entry skipped."
                 )
                 continue
 
-            if name in seen and seen[name] != src:
+            if name in seen:
+                # Same file or another one. Either way two declarations claim
+                # one directory under plugins/, and emitting both would put
+                # two entries with the same name and path in metadata.json.
                 warnings.append(
                     f"{src}: plugin `{name}` is already declared by "
-                    f"{seen[name]}. Two registries cannot own one plugin "
-                    f"directory. Entry skipped."
+                    f"{seen[name]}. One plugin directory cannot have two "
+                    f"declarations. Entry skipped."
                 )
                 continue
             seen[name] = src
 
             # Precedence: the catalog's own built plugins stay with plugins.d.
-            if (PLUGINS_D_DIR / f"{name}.yml").is_file():
+            # Keyed on the names plugins.d actually DECLARES, not on whether a
+            # file called <name>.yml exists. build-plugins.py builds from the
+            # `name` field inside the file, so plugins.d/bundle.yml declaring
+            # `name: nvidia-skills` owns that directory while no
+            # plugins.d/nvidia-skills.yml exists. A filename check misses it
+            # and both passes would emit the same plugin.
+            if name in built_names:
                 continue
 
             declared.add(name)
-            declared.add(src)
             specs.append(
                 {
                     "name": name,
@@ -1650,14 +1719,16 @@ def resolve_bundled_skills(
     so the bundled directory and the catalog directory do not share a name.
     Both keys above survive that rename; the directory name does not.
 
-    Returns (resolved entries, unidentified directory names).
+    Returns (resolved entries, unidentified directory names, conflicts) where
+    a conflict is a directory whose two keys resolve to different skills.
     """
     skills_dir = plugin_dir / "skills"
     if not skills_dir.is_dir():
-        return [], []
+        return [], [], []
 
     resolved: list[dict] = []
     unresolved: list[str] = []
+    conflicts: list[str] = []
     for child in sorted(p for p in skills_dir.iterdir() if p.is_dir()):
         skill_md = child / "SKILL.md"
         if not skill_md.is_file():
@@ -1665,26 +1736,45 @@ def resolve_bundled_skills(
             # byte-for-byte, so anything may sit here.
             continue
 
-        entry = None
         try:
             front = parse_frontmatter(skill_md.read_text(encoding="utf-8"))
         except Exception:  # noqa: BLE001 - unreadable or undecodable file
             front = {}
+
+        by_header = None
         declared_name = front.get("name")
         if isinstance(declared_name, str) and declared_name.strip():
-            entry = by_name.get(declared_name.strip())
+            by_header = by_name.get(declared_name.strip())
 
-        if entry is None:
-            catalog_path = source_skills.get(f"skills/{child.name}")
-            if catalog_path:
-                entry = by_path.get(catalog_path)
+        by_registry = None
+        catalog_path = source_skills.get(f"skills/{child.name}")
+        if catalog_path:
+            by_registry = by_path.get(catalog_path)
 
+        # Both keys resolving to DIFFERENT skills means the bundled copy and
+        # the registry disagree about what this directory holds. Taking either
+        # one silently would give the plugin a taxonomy rolled up from a skill
+        # it may not bundle. The usual cause is a stale SKILL.md header in the
+        # mirrored copy after the standalone skill was renamed, so the header
+        # is the side more likely to be wrong -- but it is also the stronger
+        # identity when it is right, so it still wins, loudly.
+        if (
+            by_header is not None
+            and by_registry is not None
+            and by_header["path"] != by_registry["path"]
+        ):
+            conflicts.append(
+                f"{child.name} (SKILL.md name -> {by_header['path']}, "
+                f"registry path -> {by_registry['path']})"
+            )
+
+        entry = by_header if by_header is not None else by_registry
         if entry is None:
             unresolved.append(child.name)
         else:
             resolved.append(entry)
 
-    return resolved, unresolved
+    return resolved, unresolved, conflicts
 
 
 def build_mirrored_plugin_entries(
@@ -1692,6 +1782,7 @@ def build_mirrored_plugin_entries(
     taxonomy: dict,
     warnings: list[str],
     validator: Draft202012Validator,
+    built_names: set[str] | None = None,
     declared: set[str] | None = None,
 ) -> list[dict]:
     """Build one metadata entry per plugin mirrored from a product repo.
@@ -1703,7 +1794,7 @@ def build_mirrored_plugin_entries(
     by_name = {e["name"]: e for e in skill_entries}
     entries: list[dict] = []
 
-    for spec in load_mirrored_plugin_specs(warnings, declared):
+    for spec in load_mirrored_plugin_specs(warnings, built_names or set(), declared):
         name = spec["name"]
         src = spec["__source"]
         plugin_dir = PLUGINS_DIR / name
@@ -1749,9 +1840,20 @@ def build_mirrored_plugin_entries(
             )
             continue
 
-        resolved, unidentified = resolve_bundled_skills(
+        resolved, unidentified, conflicts = resolve_bundled_skills(
             plugin_dir, by_name, by_path, spec["__source_skills"]
         )
+
+        if conflicts:
+            warnings.append(
+                f"{src}: plugin `{name}` has {len(conflicts)} bundled "
+                f"directory(ies) whose SKILL.md name and registry path "
+                f"identify DIFFERENT catalog skills: "
+                + "; ".join(sorted(conflicts))
+                + ". The SKILL.md name was used. Check whether the bundled "
+                "copy is stale, because the plugin's taxonomy is rolled up "
+                "from whichever skill wins."
+            )
 
         unresolved_notice = ""
         if unidentified:
@@ -1776,9 +1878,15 @@ def build_mirrored_plugin_entries(
             taxonomy=taxonomy,
             warnings=warnings,
             validator=validator,
+            # Single line, and no offer to declare taxonomy by hand. A
+            # mirrored plugin has no `taxonomy:` key to declare it in -- this
+            # path always passes override={} -- so the plugins.d remedy would
+            # send a maintainer looking for a field that does not exist.
             no_skills_remedy=(
-                f"check that plugins/{name}/skills/ holds skills that are "
-                f"published in the catalog"
+                f"No directory under plugins/{name}/skills/ matched a "
+                f"published catalog skill by SKILL.md name or by this "
+                f"registry's `skills:` paths. Check that the plugin bundles "
+                f"skills that are published standalone in the catalog."
             ),
         )
         if entry is not None:
@@ -1812,10 +1920,19 @@ def recover_plugin_entries(
     The deliberate case still works: a plugin whose plugins.d file is deleted
     is no longer declared, so it is not recovered and correctly disappears.
 
-    `declared` comes from load_plugin_specs, which is the only place plugin
-    identity is resolved. Recomputing it here is what previously let recovery
-    follow a name discovery had rejected, and miss one discovery had taken
-    from _defaults.yml.
+    `declared` is filled by the two discovery functions -- load_plugin_specs
+    for plugins.d, load_mirrored_plugin_specs for components.d registries --
+    and by nothing else. Recomputing identity here is what previously let
+    recovery follow a name discovery had rejected, and miss one discovery had
+    taken from _defaults.yml.
+
+    It holds plugin NAMES, and also SOURCE paths for declarations that could
+    not be read at all. A name means "this plugin is still declared". A source
+    means "something in this file is unreadable, so keep whatever it
+    published rather than delisting on a syntax error". The two registries
+    differ in how often the second applies: a plugins.d file declares one
+    plugin, so an unparseable one is ambiguous about exactly one entry, while
+    a components.d file declares many.
     """
     built = {e["name"] for e in entries}
 
@@ -2133,11 +2250,22 @@ def main(argv: list[str] | None = None) -> int:
     # recovery has to recognise a published plugin of either kind -- without
     # that, a mirrored plugin whose skills fail to resolve for one run would
     # be delisted instead of kept.
+    built_plugin_names: set[str] = set()
     plugin_entries = build_plugin_entries(
-        entries, taxonomy, plugin_warnings, metadata_validator, declared_plugins
+        entries,
+        taxonomy,
+        plugin_warnings,
+        metadata_validator,
+        declared_plugins,
+        built_plugin_names,
     )
     plugin_entries += build_mirrored_plugin_entries(
-        entries, taxonomy, plugin_warnings, metadata_validator, declared_plugins
+        entries,
+        taxonomy,
+        plugin_warnings,
+        metadata_validator,
+        built_plugin_names,
+        declared_plugins,
     )
     plugin_entries.sort(key=lambda e: e["name"])
     plugin_entries = recover_plugin_entries(

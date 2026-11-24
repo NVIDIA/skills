@@ -486,6 +486,359 @@ def check_mirrored_plugins_through_main(gen, r):
                 "nvidia-tao" not in plugins_of(out), f"{list(plugins_of(out))}")
 
 
+def check_mirrored_plugin_edge_cases(gen, r):
+    """Cases a review found the first version of the mirrored pass got wrong.
+
+    Each one is written so that reverting its fix makes it fail. Several
+    correspond to mutations that survived the first version of this suite.
+    """
+    import tempfile
+    from unittest.mock import patch
+
+    catalog = json.loads(gen.METADATA_PATH.read_text(encoding="utf-8"))
+    by_domain = {}
+    for s in catalog["skills"]:
+        d = s["metadata"].get("classification.category.primary")
+        if d:
+            by_domain.setdefault(d, []).append(s)
+    # Two skills from DIFFERENT domains, chosen so the alphabetically first
+    # domain is not the one that would win a rigged plurality. Used by the
+    # de-duplication case below.
+    domains = sorted(d for d, v in by_domain.items() if len(v) >= 2)
+    if len(domains) < 2:
+        r.check("edge: two domains available", False)
+        return
+    dom_lo, dom_hi = domains[0], domains[-1]
+    skill_hi = by_domain[dom_hi][0]
+    skill_lo = by_domain[dom_lo][0]
+
+    def md(skill):
+        return (f"---\nname: {skill['name']}\n"
+                f"description: {skill['description']}\n---\n\nBody.\n")
+
+    def layout(tmp, registries, trees):
+        """registries: {filename: text}. trees: {plugin: {dirname: md|None}}."""
+        comp = Path(tmp) / "components.d"
+        comp.mkdir(exist_ok=True)
+        for fname, text in registries.items():
+            comp.joinpath(fname).write_text(text, encoding="utf-8")
+        plugins = Path(tmp) / "plugins"
+        plugins.mkdir(exist_ok=True)
+        for pname, dirs in trees.items():
+            pdir = plugins / pname
+            (pdir / "skills").mkdir(parents=True, exist_ok=True)
+            pdir.joinpath("plugin.json").write_text(
+                json.dumps({"name": pname, "version": "1.0.0",
+                            "description": f"{pname} plugin."}),
+                encoding="utf-8")
+            for dirname, text in dirs.items():
+                d = pdir / "skills" / dirname
+                d.mkdir(exist_ok=True)
+                if text is not None:
+                    d.joinpath("SKILL.md").write_text(text, encoding="utf-8")
+        return comp, plugins
+
+    def run(tmp, comp, plugins, baseline=None, plugins_d=None):
+        meta = Path(tmp) / "metadata.json"
+        meta.write_text(
+            gen.dumps_canonical(baseline if baseline is not None
+                                else dict(catalog, plugins=[])),
+            encoding="utf-8")
+        captured = {}
+
+        def capture(path, content):
+            if path == meta:
+                captured["out"] = json.loads(content)
+            return False
+
+        patches = [
+            patch.object(gen, "COMPONENTS_DIR", comp),
+            patch.object(gen, "PLUGINS_DIR", plugins),
+            patch.object(gen, "METADATA_PATH", meta),
+            patch.object(gen, "write_if_changed", capture),
+        ]
+        if plugins_d is not None:
+            patches.append(patch.object(gen, "PLUGINS_D_DIR", plugins_d))
+        buf = io.StringIO()
+        with contextlib.ExitStack() as stack:
+            for p in patches:
+                stack.enter_context(p)
+            with contextlib.redirect_stdout(buf), \
+                 contextlib.redirect_stderr(buf):
+                rc = gen.main(["--no-ai"])
+        return rc, captured.get("out"), buf.getvalue()
+
+    def names_of(doc):
+        return [p["name"] for p in (doc or {}).get("plugins", [])]
+
+    def reg(entries, skills=""):
+        return ("name: R\nrepo: r\ndescription: d\n"
+                + (f"skills:\n{skills}" if skills else "")
+                + "plugins:\n"
+                + "".join(f"  - path: plugins/{e}/\n    catalog_dir: {e}\n"
+                          for e in entries))
+
+    # --- F1a: removing ONE plugin from a shared registry delists it. -------
+    with tempfile.TemporaryDirectory() as tmp:
+        comp, plugins = layout(
+            tmp, {"r.yml": reg(["keep-me", "retire-me"])},
+            {"keep-me": {"a": md(skill_hi)}, "retire-me": {"a": md(skill_hi)}})
+        rc, out, _ = run(tmp, comp, plugins)
+        published = dict(catalog, plugins=(out or {}).get("plugins", []))
+        r.check("edge: both plugins publish first",
+                sorted(names_of(out)) == ["keep-me", "nvidia-skills",
+                                          "retire-me"], f"{names_of(out)}")
+        comp.joinpath("r.yml").write_text(reg(["keep-me"]), encoding="utf-8")
+        rc, out, log = run(tmp, comp, plugins, baseline=published)
+        r.check("edge: a plugin removed from a shared registry is delisted",
+                rc == 0 and "retire-me" not in names_of(out)
+                and "keep-me" in names_of(out), f"rc={rc}; {names_of(out)}")
+
+    # --- F1b: an unreadable `plugins:` keeps what it published. ------------
+    with tempfile.TemporaryDirectory() as tmp:
+        comp, plugins = layout(tmp, {"r.yml": reg(["keep-me"])},
+                               {"keep-me": {"a": md(skill_hi)}})
+        rc, out, _ = run(tmp, comp, plugins)
+        published = dict(catalog, plugins=(out or {}).get("plugins", []))
+        comp.joinpath("r.yml").write_text(
+            "name: R\nrepo: r\ndescription: d\nplugins: nope\n",
+            encoding="utf-8")
+        rc, out, log = run(tmp, comp, plugins, baseline=published)
+        r.check("edge: an unreadable `plugins:` keeps its published plugins",
+                rc == 0 and "keep-me" in names_of(out) and "KEPT." in log,
+                f"rc={rc}; {names_of(out)}")
+
+    # --- F2a: one plugin declared twice emits once, with a warning. --------
+    with tempfile.TemporaryDirectory() as tmp:
+        comp, plugins = layout(tmp, {"r.yml": reg(["dup", "dup"])},
+                               {"dup": {"a": md(skill_hi)}})
+        rc, out, log = run(tmp, comp, plugins)
+        r.check("edge: a plugin declared twice in one registry emits once",
+                rc == 0 and names_of(out).count("dup") == 1
+                and "already declared" in log, f"rc={rc}; {names_of(out)}")
+
+    # --- M1: two registries claiming one name. -----------------------------
+    with tempfile.TemporaryDirectory() as tmp:
+        comp, plugins = layout(
+            tmp, {"a.yml": reg(["shared"]), "b.yml": reg(["shared"])},
+            {"shared": {"a": md(skill_hi)}})
+        rc, out, log = run(tmp, comp, plugins)
+        r.check("edge: two registries cannot both claim one plugin",
+                rc == 0 and names_of(out).count("shared") == 1
+                and "already declared" in log, f"rc={rc}; {names_of(out)}")
+
+    # --- F2b: precedence keyed on the DECLARED name, not the filename. -----
+    # plugins.d/bundle.yml declaring `name: owned` owns plugins/owned/ even
+    # though no plugins.d/owned.yml exists. A filename check misses it.
+    with tempfile.TemporaryDirectory() as tmp:
+        pd = Path(tmp) / "plugins.d"
+        pd.mkdir()
+        pd.joinpath("bundle.yml").write_text(
+            "name: owned\ndescription: Built by the catalog.\n"
+            f"include_skills:\n  - {skill_hi['path']}/\n", encoding="utf-8")
+        comp, plugins = layout(tmp, {"r.yml": reg(["owned"])},
+                               {"owned": {"a": md(skill_lo)}})
+        rc, out, log = run(tmp, comp, plugins, plugins_d=pd)
+        entries = [p for p in (out or {}).get("plugins", [])
+                   if p["name"] == "owned"]
+        r.check("edge: a plugins.d name owns its dir whatever the filename",
+                rc == 0 and len(entries) == 1
+                and entries[0]["source"] == "plugins.d/bundle.yml",
+                f"rc={rc}; {[e['source'] for e in entries]}")
+
+    # --- F3: the two keys resolving to different skills is reported. -------
+    with tempfile.TemporaryDirectory() as tmp:
+        comp, plugins = layout(
+            tmp,
+            {"r.yml": reg(["conflict"],
+                          skills=f"  - path: skills/a/\n"
+                                 f"    catalog_dir: "
+                                 f"{skill_lo['path'].split('/')[-1]}\n")},
+            {"conflict": {"a": md(skill_hi)}})
+        rc, out, log = run(tmp, comp, plugins)
+        entry = next((p for p in (out or {}).get("plugins", [])
+                      if p["name"] == "conflict"), None)
+        r.check("edge: conflicting skill identities are reported",
+                rc == 0 and "identify DIFFERENT catalog skills" in log,
+                f"rc={rc}")
+        r.check("edge: the SKILL.md name wins the conflict",
+                entry is not None and entry["skills"] == [skill_hi["path"]],
+                f"{entry and entry.get('skills')}")
+
+    # --- F4: a long catalog_dir must not raise out of the generator. -------
+    with tempfile.TemporaryDirectory() as tmp:
+        comp, plugins = layout(tmp, {"r.yml": reg(["ok"])},
+                               {"ok": {"a": md(skill_hi)}})
+        # Longer than the 255-byte filename limit. 252 would not do: the
+        # precedence check is a set lookup now, so the only remaining
+        # filesystem call on this name is plugins/<name>, which needs to
+        # exceed the limit on its own to raise.
+        comp.joinpath("long.yml").write_text(
+            "name: R\nrepo: r\ndescription: d\nplugins:\n"
+            f"  - catalog_dir: {'a' * 300}\n", encoding="utf-8")
+        try:
+            rc, out, log = run(tmp, comp, plugins)
+            raised = None
+        except Exception as exc:  # noqa: BLE001
+            rc, out, log, raised = None, None, "", exc
+        r.check("edge: an over-long catalog_dir does not stop the catalog",
+                raised is None and rc == 0 and "ok" in names_of(out),
+                f"raised={raised!r}; rc={rc}")
+
+    # --- M7: an invalid name is refused even when its tree exists. ---------
+    with tempfile.TemporaryDirectory() as tmp:
+        comp, plugins = layout(tmp, {"r.yml": reg(["ok"])},
+                               {"ok": {"a": md(skill_hi)},
+                                "Not_Kebab": {"a": md(skill_hi)}})
+        comp.joinpath("bad.yml").write_text(
+            "name: R\nrepo: r\ndescription: d\nplugins:\n"
+            "  - catalog_dir: Not_Kebab\n", encoding="utf-8")
+        rc, out, log = run(tmp, comp, plugins)
+        r.check("edge: an invalid name is refused even with a tree present",
+                rc == 0 and "Not_Kebab" not in names_of(out)
+                and "not lowercase kebab-case" in log,
+                f"rc={rc}; {names_of(out)}")
+
+    # --- M2: a description that cannot be encoded as UTF-8. ----------------
+    with tempfile.TemporaryDirectory() as tmp:
+        comp, plugins = layout(tmp, {"r.yml": reg(["bad-desc", "ok"])},
+                               {"bad-desc": {"a": md(skill_hi)},
+                                "ok": {"a": md(skill_hi)}})
+        (plugins / "bad-desc" / "plugin.json").write_text(
+            '{"name":"bad-desc","description":"\\ud800"}', encoding="utf-8")
+        rc, out, log = run(tmp, comp, plugins)
+        r.check("edge: an unencodable description skips only that plugin",
+                rc == 0 and "bad-desc" not in names_of(out)
+                and "ok" in names_of(out), f"rc={rc}; {names_of(out)}")
+
+    # --- M3: a malformed plugin.json must not propagate. -------------------
+    with tempfile.TemporaryDirectory() as tmp:
+        comp, plugins = layout(tmp, {"r.yml": reg(["broken", "ok"])},
+                               {"broken": {"a": md(skill_hi)},
+                                "ok": {"a": md(skill_hi)}})
+        (plugins / "broken" / "plugin.json").write_text(
+            "{not json at all", encoding="utf-8")
+        rc, out, log = run(tmp, comp, plugins)
+        r.check("edge: a malformed plugin.json skips only that plugin",
+                rc == 0 and "broken" not in names_of(out)
+                and "ok" in names_of(out), f"rc={rc}; {names_of(out)}")
+
+    # --- M5: a failed mirrored plugin must not stop the ones after it. -----
+    with tempfile.TemporaryDirectory() as tmp:
+        comp, plugins = layout(tmp, {"r.yml": reg(["aaa-fails", "zzz-ok"])},
+                               {"aaa-fails": {"a": md(skill_hi)},
+                                "zzz-ok": {"a": md(skill_hi)}})
+        (plugins / "aaa-fails" / "plugin.json").unlink()
+        rc, out, log = run(tmp, comp, plugins)
+        r.check("edge: a failed mirrored plugin does not stop later ones",
+                rc == 0 and "zzz-ok" in names_of(out)
+                and "aaa-fails" not in names_of(out),
+                f"rc={rc}; {names_of(out)}")
+
+    # --- M5b: an unmirrored plugin must not stop the ones after it. --------
+    # Separate from the case above: this one leaves the loop through the
+    # "registered but not mirrored" branch, not through a failed assembly.
+    with tempfile.TemporaryDirectory() as tmp:
+        comp, plugins = layout(tmp, {"r.yml": reg(["aaa-absent", "zzz-ok"])},
+                               {"zzz-ok": {"a": md(skill_hi)}})
+        rc, out, log = run(tmp, comp, plugins)
+        r.check("edge: an unmirrored plugin does not stop later ones",
+                rc == 0 and "zzz-ok" in names_of(out)
+                and "aaa-absent" not in names_of(out),
+                f"rc={rc}; {names_of(out)}")
+
+    # --- M5c: a plugin that fails AT ASSEMBLY must not stop later ones. ----
+    # Distinct from both cases above. The bad-description and malformed-
+    # manifest plugins are skipped earlier in the loop and never reach
+    # assemble_plugin_entry, so neither covers its failure return. A plugin
+    # whose bundled skills resolve to nothing does reach it and is refused
+    # there.
+    with tempfile.TemporaryDirectory() as tmp:
+        comp, plugins = layout(
+            tmp, {"r.yml": reg(["aaa-unresolvable", "zzz-ok"])},
+            {"aaa-unresolvable": {"x": md({"name": "no-such-skill-at-all",
+                                           "description": "d"})},
+             "zzz-ok": {"a": md(skill_hi)}})
+        rc, out, log = run(tmp, comp, plugins)
+        r.check("edge: assembly failure does not stop later mirrored plugins",
+                rc == 0 and "zzz-ok" in names_of(out)
+                and "aaa-unresolvable" not in names_of(out),
+                f"rc={rc}; {names_of(out)}")
+
+    # --- F1b (direct): the declared set on unreadable declarations. --------
+    # Driven against load_mirrored_plugin_specs rather than main(), because
+    # an unparseable registry file never reaches this function in a real run:
+    # the skills pass reads the same directory first and fails hard on it.
+    # Without a direct test that branch has no coverage at all.
+    with tempfile.TemporaryDirectory() as tmp:
+        comp = Path(tmp) / "components.d"
+        comp.mkdir()
+        cases = {
+            "unparseable.yml": "name: x\n  bad indent:\n",
+            "scalar.yml": "name: R\nplugins: nope\n",
+            "notmapping.yml": "name: R\nplugins:\n  - just-a-string\n",
+            "nocatalogdir.yml": "name: R\nplugins:\n  - path: plugins/x/\n",
+        }
+        for fname, text in cases.items():
+            comp.joinpath(fname).write_text(text, encoding="utf-8")
+        warns, decl = [], set()
+        with patch.object(gen, "COMPONENTS_DIR", comp):
+            gen.load_mirrored_plugin_specs(warns, set(), decl)
+        missing = [f"components.d/{f}" for f in cases
+                   if f"components.d/{f}" not in decl]
+        r.check("edge: every unreadable declaration declares its file",
+                not missing, f"not declared: {missing}")
+        r.check("edge: an unreadable declaration declares no plugin name",
+                all("/" in d for d in decl), f"{sorted(decl)}")
+
+    # --- F1c (direct): a refused name is deliberately NOT declared. --------
+    # The sync refuses it, so no such plugin is published and recovery must
+    # not keep an entry describing one.
+    with tempfile.TemporaryDirectory() as tmp:
+        comp = Path(tmp) / "components.d"
+        comp.mkdir()
+        comp.joinpath("r.yml").write_text(
+            "name: R\nplugins:\n  - catalog_dir: Not_Kebab\n", encoding="utf-8")
+        warns, decl = [], set()
+        with patch.object(gen, "COMPONENTS_DIR", comp):
+            gen.load_mirrored_plugin_specs(warns, set(), decl)
+        r.check("edge: a refused name is not declared for recovery",
+                decl == set(), f"{sorted(decl)}")
+
+    # --- M6: de-duplication before the roll-up changes the answer. ---------
+    # Two directories resolve to the SAME skill. Without de-duplication that
+    # skill votes twice and its domain wins the plurality; with it, the two
+    # domains tie and the alphabetically first wins instead.
+    with tempfile.TemporaryDirectory() as tmp:
+        comp, plugins = layout(tmp, {"r.yml": reg(["votes"])},
+                               {"votes": {"one": md(skill_hi),
+                                          "two": md(skill_hi),
+                                          "three": md(skill_lo)}})
+        rc, out, log = run(tmp, comp, plugins)
+        entry = next((p for p in (out or {}).get("plugins", [])
+                      if p["name"] == "votes"), None)
+        r.check("edge: a skill bundled twice votes once in the roll-up",
+                entry is not None
+                and entry["metadata"]["classification.category.primary"]
+                == dom_lo,
+                f"got {entry and entry['metadata'].get('classification.category.primary')}; "
+                f"expected {dom_lo}")
+
+    # --- F5: the no-skills message is one line and offers a real remedy. ---
+    with tempfile.TemporaryDirectory() as tmp:
+        comp, plugins = layout(tmp, {"r.yml": reg(["empty"])},
+                               {"empty": {"nothing-here": md(
+                                   {"name": "no-such-skill-anywhere",
+                                    "description": "d"})}})
+        rc, out, log = run(tmp, comp, plugins)
+        line = next((l for l in log.splitlines()
+                     if "bundles no catalog skill" in l), "")
+        r.check("edge: the no-skills warning is a single line",
+                bool(line) and "plugins/empty/skills/" in line, line[:120])
+        r.check("edge: the no-skills warning offers no taxonomy: remedy",
+                bool(line) and "taxonomy:" not in line, line[:120])
+
+
 def check_recovery_through_main(gen, r):
     """Prove through main() that a published plugin survives a failed rebuild.
 
@@ -1451,6 +1804,7 @@ def main() -> int:
     check_plugin_never_blocks_main(gen, r)
     check_recovery_through_main(gen, r)
     check_mirrored_plugins_through_main(gen, r)
+    check_mirrored_plugin_edge_cases(gen, r)
 
     return r.report()
 
