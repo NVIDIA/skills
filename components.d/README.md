@@ -45,13 +45,13 @@ A component may also publish one or more **plugins** — a directory in the prod
 | Field         | Type   | Description                                                                                     |
 |---------------|--------|-------------------------------------------------------------------------------------------------|
 | `plugins`     | list   | Plugin source locations — one entry per plugin.                                                 |
-| `plugins[].path`        | string | Directory in the source repo containing the plugin (`plugin.json` at its root).        |
+| `plugins[].path`        | string | Directory in the source repo containing the plugin (`plugin.json` at its root). Use `plugins/<name>/`: the product-repo NVSkills CI gate only watches `plugins/<name>/` folders that contain a `plugin.json`, so a plugin kept elsewhere can change without being re-signed. |
 | `plugins[].catalog_dir` | string | Directory name under `plugins/` in this catalog and the plugin's install name (must equal `name` in `plugin.json`, unique across components). |
 
 ```yaml
 plugins:
-  - path: plugins/your-product/   # recommended layout in the product repo
-    catalog_dir: your-product      # must equal `name` in plugin.json; not a plugins.d name
+  - path: plugins/nvidia-your-product/   # plugins/<name>/ in the product repo
+    catalog_dir: nvidia-your-product     # must equal `name` in plugin.json; not a plugins.d name
 ```
 
 Skills bundled inside a plugin are independent copies of the standalone `skills/` entries; the sync does not deduplicate them.
