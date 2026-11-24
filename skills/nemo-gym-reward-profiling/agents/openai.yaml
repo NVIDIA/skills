@@ -1,0 +1,4 @@
+interface:
+  display_name: "NeMo Gym Reward Profiling"
+  short_description: "Choose RL training tasks from reward profiles"
+  default_prompt: "Use $nemo-gym-reward-profiling to find which tasks in my NeMo Gym run give a useful reward signal for RL training."
