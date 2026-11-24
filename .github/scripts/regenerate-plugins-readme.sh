@@ -12,11 +12,13 @@
 #                                 its product (name, repo) for the Source column
 #   catalog-exceptions.yml      — `plugin_exceptions:` dirs are catalog-owned
 #                                 and link to this repo
-#   plugins.d/<name>.yml        — presence means the plugin is BUILT by
-#                                 build-plugins.py from catalog skills, not
-#                                 mirrored. The sync never touches it, but it
-#                                 is still listed here with Source = this repo
-#                                 (e.g. nvidia-skills)
+#   plugins.d/*.yml             — a plugin whose `name:` is declared here is
+#                                 BUILT by build-plugins.py from catalog
+#                                 skills, not mirrored. The sync never touches
+#                                 it, but it is still listed here with
+#                                 Source = this repo (e.g. nvidia-skills).
+#                                 Matched on the `name:` field, not the
+#                                 filename (see list-built-plugins.sh)
 #
 # Writes:
 #   README.md (in place) — content between this marker pair is replaced:
@@ -46,9 +48,15 @@ if [ -f catalog-exceptions.yml ]; then
   yq -r '(.plugin_exceptions // [])[] | .dir + "|" + (.component // "NVIDIA Skills") + "|"' catalog-exceptions.yml >> "$map" || true
 fi
 
-table=$(python3 - "$map" <<'PY'
+# Names of plugins built from plugins.d/ (the `name:` field, not filename)
+built=$(mktemp)
+"$(dirname "$0")/list-built-plugins.sh" > "$built"
+
+table=$(python3 - "$map" "$built" <<'PY'
 import json, sys
 from pathlib import Path
+
+built = {l.strip() for l in Path(sys.argv[2]).read_text().splitlines() if l.strip()}
 
 mapping = {}
 for line in Path(sys.argv[1]).read_text().splitlines():
@@ -62,7 +70,7 @@ for pdir in sorted(Path("plugins").glob("*/")):
     manifest = pdir / "plugin.json"
     if not manifest.is_file():
         continue
-    catalog_built = (Path("plugins.d") / f"{pdir.name}.yml").is_file()
+    catalog_built = pdir.name in built
     try:
         m = json.loads(manifest.read_text())
     except Exception:
@@ -100,5 +108,5 @@ awk -v start="$START" -v end="$END" -v tf="$table_file" '
   !skipping   { print }
 ' "$README" > "$tmp"
 mv "$tmp" "$README"
-rm -f "$table_file" "$map"
+rm -f "$table_file" "$map" "$built"
 echo "✓ README plugin table regenerated ($(echo "$table" | tail -n +3 | grep -c '^| `' || true) plugin(s))"

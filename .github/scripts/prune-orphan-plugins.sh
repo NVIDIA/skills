@@ -42,15 +42,11 @@ for f in components.d/*.yml; do
   yq -r '.plugins[]?.catalog_dir // ""' "$f" | grep -v '^$' >> "$expected" || true
 done
 
-# 1b. Catalog-built plugins — plugins.d/<name>.yml means build-plugins.py
-#     owns plugins/<name>/ (e.g. nvidia-skills). The plugin sync never
-#     mirrors, prunes or lists these; they stay on the existing approach.
-for f in plugins.d/*.yml; do
-  [ -f "$f" ] || continue
-  b=$(basename "$f" .yml)
-  case "$b" in _*) continue ;; esac
-  echo "$b" >> "$expected"
-done
+# 1b. Catalog-built plugins — build-plugins.py owns plugins/<name>/ for the
+#     `name:` declared in each plugins.d/*.yml (e.g. nvidia-skills). The
+#     plugin sync never mirrors or prunes these; they stay on the existing
+#     approach.
+"$(dirname "$0")/list-built-plugins.sh" >> "$expected"
 
 # 2. Exceptions — plugin dirs allowed to exist without a registration
 #    and without a plugins.d spec.
