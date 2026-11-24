@@ -1,11 +1,11 @@
 ---
-title: "Write Skill Cards People Can Trust"
-description: "A skill card records the owner, intended use, risks, outputs, and references for an AI agent skill."
+title: "Write Skill and Plugin Cards People Can Trust"
+description: "A skill or plugin card records the owner, intended use, risks, outputs, and references for an AI agent skill or plugin."
 ---
 
 A scan report tells reviewers what automated checks found. A signature tells users whether the artifact changed. A skill card tells humans what they are accepting.
 
-The **Skills Card** is the per-skill release record described below. Authors can generate one by running the `Skill Card.md` skill published at [NVIDIA/Trustworthy-AI](https://github.com/NVIDIA/Trustworthy-AI/blob/main/Skill%20Card.md), which walks through each section interactively. The card should be completed before a skill is broadly shared, especially when the skill can run tools, call APIs, write files, or influence production workflows.
+The **Skills Card** is the per-skill release record described below. Authors can generate one by running the `Skill Card.md` skill published at [NVIDIA/Trustworthy-AI](https://github.com/NVIDIA/Trustworthy-AI/blob/main/Skill%20Card.md), which walks through each section interactively. The card should be completed before a skill is broadly shared, especially when the skill can run tools, call APIs, write files, or influence production workflows. NVIDIA Verified Plugins ship a Plugin Card instead; see [Plugin Cards](#plugin-cards).
 
 ## What a Skill Card Should Answer
 
@@ -112,3 +112,17 @@ Avoid vague risks like "model may be wrong." Make risks actionable:
 
 A skill card is complete when a reviewer can understand the skill's purpose, owner, output, risks, and release evidence without opening the source code first.
 
+## Plugin Cards
+
+An NVIDIA Verified Plugin ships a Plugin Card (`plugin-card.md`) instead of a skill card. It covers the same core sections as a skill card, plus what is specific to a bundle:
+
+| Section | Question it answers |
+|---|---|
+| Compatible agents | Which agents does the plugin support? |
+| Plugin components | Which skills, MCP servers, hooks, and other resources does it bundle? |
+| Capability and permission summary | What can the plugin as a whole do? |
+| Data flow and security | Where does data go, and which credentials does it use? |
+| Disable and revoke | How do users turn the plugin off and revoke its access? |
+| Testing completed | What was validated and evaluated, with a link to the plugin's `BENCHMARK.md`? |
+
+Each bundled skill keeps its own skill card. Most of the Plugin Card is generated from the plugin's files, validation report, and evaluation results; information that only the owner can supply, such as intended use, is recorded as the owner's statement.

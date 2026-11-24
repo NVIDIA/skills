@@ -1,9 +1,11 @@
 ---
-title: "Verify Signed Agent Skills"
-description: "Use detached OMS signatures to verify the integrity and authenticity of published agent skills."
+title: "Verify Signed Agent Skills and Plugins"
+description: "Use detached OMS signatures to verify the integrity and authenticity of published agent skills and plugins."
 ---
 
 Cryptographic signing gives skill consumers a way to verify that a skill directory has not changed since it was signed. For agent skills, that matters because the review target is the whole directory: `SKILL.md`, scripts, references, assets, and any supporting files.
+
+NVIDIA Verified Plugins are signed the same way: one detached `plugin.oms.sig` covers the whole plugin directory, and each bundled skill keeps its own `skill.oms.sig`.
 
 NVIDIA has adopted the OpenSSF Model Signing format, also known as OMS, for detached skill signatures. OMS extends Sigstore-style bundles so verification can cover a directory tree instead of only a single file.
 
@@ -32,8 +34,8 @@ Verification needs three things:
 
 | Input | Purpose |
 |---|---|
-| Skill directory | The artifact being verified |
-| `skill.oms.sig` | Detached OMS signature |
+| Skill or plugin directory | The artifact being verified |
+| `skill.oms.sig` or `plugin.oms.sig` | Detached OMS signature |
 | NVIDIA agent capabilities certificate | Trust anchor for the signature |
 
 The signing source material names the certificate file `nv-agent-root-cert.pem`. Download the current trust anchor from this repo: [`nv-agent-root-cert.pem`](../nv-agent-root-cert.pem). From a shell:
@@ -48,8 +50,10 @@ curl -L -o nv-agent-root-cert.pem \
 Install an OMS-compatible verifier such as `model-signing`:
 
 ```bash
-pip install model-signing
+pip install model-signing pyopenssl certifi
 ```
+
+`model-signing` 1.1.1 needs `pyopenssl` and `certifi` but does not install them.
 
 ## Verify a Skill
 
@@ -58,16 +62,26 @@ Run verification against the installed or downloaded skill directory:
 ```bash
 model_signing verify certificate SKILL_DIR \
   --signature SKILL_DIR/skill.oms.sig \
-  --certificate-chain nv-agent-root-cert.pem
+  --certificate_chain nv-agent-root-cert.pem
 ```
 
 If your policy intentionally permits additional unsigned files, add:
 
 ```bash
---ignore-unsigned-files
+--ignore_unsigned_files
 ```
 
 For production release checks, prefer strict verification unless there is a documented reason to permit unsigned additions.
+
+## Verify a Signed Plugin
+
+Run the same command against the plugin directory with the plugin signature:
+
+```bash
+model_signing verify certificate PLUGIN_DIR \
+  --signature PLUGIN_DIR/plugin.oms.sig \
+  --certificate_chain nv-agent-root-cert.pem
+```
 
 ## Where Signing Fits
 
@@ -80,7 +94,7 @@ Signing should happen after scanning and review:
 5. Publish `skill.oms.sig` with the skill.
 6. Verify the signature during installation or CI.
 
-Signing does not prove a skill is safe. It proves the released skill is the one that was signed. Pair it with scanning and a complete skill card for a usable trust story.
+Signing does not prove a skill or plugin is safe. It proves the released artifact is the one that was signed. Pair it with scanning and a complete skill card for a usable trust story.
 
 ## Consumer Checklist
 
@@ -91,3 +105,5 @@ Before installing a signed skill:
 - Run the verification command against the final installed directory.
 - Review the skill card and scan report before enabling the skill.
 - Re-run verification after any local modification.
+
+For a Verified Plugin, also run the plugin verification command and review the Plugin Card before enabling it.

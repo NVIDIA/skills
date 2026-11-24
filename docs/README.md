@@ -12,7 +12,7 @@ Long-form documentation for the NVIDIA Agent Skills catalog. Pages are authored 
 - `agent-skill-trust-pipeline.mdx` — trust pipeline overview
 - `scanning-agent-skills.mdx` — pre-install scanning guide
 - `signing-agent-skills.mdx` — signature verification guide
-- `skill-cards.mdx` — Skill Card authoring guide
+- `skill-cards.mdx` — Skill Card and Plugin Card authoring guide
 - `release-checklist.mdx` — release process
 
 Navigation order and slugs are defined in [`../fern/docs.yml`](../fern/docs.yml).
