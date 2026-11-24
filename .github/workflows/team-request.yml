@@ -131,35 +131,76 @@ jobs:
             commit_title="$(printf '%s' "${commit_json}" | jq -r '.commit.message | split("\n")[0]')"
           fi
 
-          has_watched_change=false
+          base_sha="$(printf '%s' "${pr_json}" | jq -r '.base.sha // ""')"
+          pr_files_file="$(mktemp)"
+          printf '[]' > "${pr_files_file}"
           page=1
           while true; do
             files_json="$(curl -fsSL \
               -H "Authorization: Bearer ${GH_TOKEN}" \
               -H "Accept: application/vnd.github+json" \
               "https://api.github.com/repos/${owner}/${repo}/pulls/${pr_number}/files?per_page=100&page=${page}")"
-            if printf '%s' "${files_json}" | jq -e '
-              def watched:
-                (. // "") |
-                startswith("skills/") or
-                startswith("team-skills/") or
-                startswith("plugins/");
-              any(.[]; (.filename | watched) or (.previous_filename? | watched))
-            ' >/dev/null; then
-              has_watched_change=true
-              break
-            fi
-            if [ "$(printf '%s' "${files_json}" | jq 'length')" -lt 100 ]; then
+            printf '%s' "${files_json}" \
+              | jq -c '[.[] | {filename, previous_filename}]' > "${pr_files_file}.page"
+            jq -cs '.[0] + .[1]' "${pr_files_file}" "${pr_files_file}.page" > "${pr_files_file}.new"
+            mv "${pr_files_file}.new" "${pr_files_file}"
+            if [ "$(jq 'length' < "${pr_files_file}.page")" -lt 100 ]; then
               break
             fi
             page=$((page + 1))
           done
 
+          # Same rule as require-nvskills-status.yml: a path under plugins/
+          # is watched only when plugins/<name>/plugin.json exists at the PR
+          # head or base. Any answer other than 200 or 404 counts as a plugin.
+          is_plugin_dir_at() {
+            local encoded code
+            encoded="$(jq -rn --arg d "$1" '$d | split("/") | map(@uri) | join("/")')"
+            code="$(curl -sSL --retry 3 --retry-delay 2 -o /dev/null -w '%{http_code}' \
+              -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${owner}/${repo}/contents/${encoded}/plugin.json?ref=$2" || true)"
+            case "${code}" in
+              200) return 0 ;;
+              404) return 1 ;;
+              *)
+                echo "::warning::Could not check $1/plugin.json at $2 (HTTP ${code:-none}); treating $1 as a plugin." >&2
+                return 0
+                ;;
+            esac
+          }
+
+          plugin_dirs='[]'
+          while IFS= read -r plugin_dir; do
+            [ -n "${plugin_dir}" ] || continue
+            if is_plugin_dir_at "${plugin_dir}" "${head_sha}" ||
+              { [ -n "${base_sha}" ] && is_plugin_dir_at "${plugin_dir}" "${base_sha}"; }; then
+              plugin_dirs="$(jq -cn --argjson dirs "${plugin_dirs}" --arg d "${plugin_dir}" '$dirs + [$d]')"
+            fi
+          done < <(jq -r '
+            [.[] | (.filename, (.previous_filename // empty)) | capture("^(?<d>plugins/[^/]+)/").d]
+            | unique[]
+          ' "${pr_files_file}")
+
+          has_watched_change=false
+          if jq -e --argjson plugins "${plugin_dirs}" '
+            def watched($plugins):
+              (. // "") as $f |
+              ($f | startswith("skills/")) or
+              ($f | startswith("team-skills/")) or
+              ([$f | capture("^(?<d>plugins/[^/]+)/").d][0] as $d |
+                $d != null and any($plugins[]; . == $d));
+            any(.[]; (.filename | watched($plugins)) or (.previous_filename | watched($plugins)))
+          ' "${pr_files_file}" >/dev/null; then
+            has_watched_change=true
+          fi
+          rm -f "${pr_files_file}" "${pr_files_file}.page"
+
           if [ "${has_watched_change}" != "true" ]; then
             {
               echo "## NVSkills CI request"
               echo
-              echo "Skipped: no changes under \`skills/\`, \`team-skills/\`, or \`plugins/\`."
+              echo "Skipped: no changes under \`skills/\`, \`team-skills/\`, or a plugin folder (\`plugins/<name>/\` with a \`plugin.json\`)."
             } >> "${GITHUB_STEP_SUMMARY}"
             exit 0
           fi

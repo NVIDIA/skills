@@ -82,6 +82,47 @@ jobs:
               "$1"
           }
 
+          # A path under plugins/ is watched only when its top-level folder
+          # is a real plugin (listed in plugin_dirs, see below). Product repos
+          # also use plugins/ for unrelated code (DALI's plugins/video is C++),
+          # and those changes must not require /nvskills-ci.
+          plugin_dirs='[]'
+          watched_jq_def='
+            def watched($plugins):
+              (. // "") as $f |
+              ($f | startswith("skills/")) or
+              ($f | startswith("team-skills/")) or
+              ([$f | capture("^(?<d>plugins/[^/]+)/").d][0] as $d |
+                $d != null and any($plugins[]; . == $d));
+          '
+
+          # plugins/<name>/ is a plugin when plugin.json sits at its root at
+          # the given ref. Any answer other than 200 or 404 counts as a plugin,
+          # so an API failure can only make the check stricter.
+          is_plugin_dir_at() {
+            local dir="$1"
+            local ref="$2"
+            local encoded code
+            encoded="$(jq -rn --arg d "${dir}" '$d | split("/") | map(@uri) | join("/")')"
+            code="$(curl --silent --show-error --location \
+              --retry 3 \
+              --retry-delay 2 \
+              --output /dev/null \
+              --write-out '%{http_code}' \
+              -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "https://api.github.com/repos/${owner}/${repo}/contents/${encoded}/plugin.json?ref=${ref}" || true)"
+            case "${code}" in
+              200) return 0 ;;
+              404) return 1 ;;
+              *)
+                echo "::warning::Could not check ${dir}/plugin.json at ${ref} (HTTP ${code:-none}); treating ${dir} as a plugin." >&2
+                return 0
+                ;;
+            esac
+          }
+
           get_commit_json() {
             local commit_sha="$1"
             local page=1
@@ -135,16 +176,11 @@ jobs:
           }
 
           first_watched_path() {
-            printf '%s' "$1" | jq -r '
-              def watched:
-                (. // "") |
-                startswith("skills/") or
-                startswith("team-skills/") or
-                startswith("plugins/");
+            printf '%s' "$1" | jq -r --argjson plugins "${plugin_dirs}" "${watched_jq_def}"'
               [
                 .files[]? |
-                select((.filename | watched) or (.previous_filename? | watched)) |
-                if (.filename | watched) then .filename else .previous_filename end
+                select((.filename | watched($plugins)) or (.previous_filename? | watched($plugins))) |
+                if (.filename | watched($plugins)) then .filename else .previous_filename end
               ][0] // empty
             '
           }
@@ -231,26 +267,42 @@ jobs:
             esac
           fi
 
-          has_watched_change=false
+          base_sha="$(printf '%s' "${pr_json}" | jq -r '(.base.sha // "") | ascii_downcase')"
+          pr_files_file="$(mktemp)"
+          printf '[]' > "${pr_files_file}"
           page=1
           while true; do
             files_json="$(github_get "https://api.github.com/repos/${owner}/${repo}/pulls/${pr_number}/files?per_page=100&page=${page}")"
-            if printf '%s' "${files_json}" | jq -e '
-              def watched:
-                (. // "") |
-                startswith("skills/") or
-                startswith("team-skills/") or
-                startswith("plugins/");
-              any(.[]; (.filename | watched) or (.previous_filename? | watched))
-            ' >/dev/null; then
-              has_watched_change=true
-              break
-            fi
-            if [ "$(printf '%s' "${files_json}" | jq 'length')" -lt 100 ]; then
+            printf '%s' "${files_json}" \
+              | jq -c '[.[] | {filename, previous_filename}]' > "${pr_files_file}.page"
+            jq -cs '.[0] + .[1]' "${pr_files_file}" "${pr_files_file}.page" > "${pr_files_file}.new"
+            mv "${pr_files_file}.new" "${pr_files_file}"
+            if [ "$(jq 'length' < "${pr_files_file}.page")" -lt 100 ]; then
               break
             fi
             page=$((page + 1))
           done
+
+          # A plugin folder counts if plugin.json exists at the PR head (added
+          # or kept) or at its base (being removed or renamed away).
+          while IFS= read -r plugin_dir; do
+            [ -n "${plugin_dir}" ] || continue
+            if is_plugin_dir_at "${plugin_dir}" "${head_sha}" ||
+              { [ -n "${base_sha}" ] && is_plugin_dir_at "${plugin_dir}" "${base_sha}"; }; then
+              plugin_dirs="$(jq -cn --argjson dirs "${plugin_dirs}" --arg d "${plugin_dir}" '$dirs + [$d]')"
+            fi
+          done < <(jq -r '
+            [.[] | (.filename, (.previous_filename // empty)) | capture("^(?<d>plugins/[^/]+)/").d]
+            | unique[]
+          ' "${pr_files_file}")
+
+          has_watched_change=false
+          if jq -e --argjson plugins "${plugin_dirs}" "${watched_jq_def}"'
+            any(.[]; (.filename | watched($plugins)) or (.previous_filename | watched($plugins)))
+          ' "${pr_files_file}" >/dev/null; then
+            has_watched_change=true
+          fi
+          rm -f "${pr_files_file}" "${pr_files_file}.page"
 
           if [ "${has_watched_change}" != "true" ]; then
             append_summary \
@@ -410,7 +462,7 @@ jobs:
             "Latest watched-path change: \`${latest_watched_path}\`." \
             "" \
             "Comment \`/nvskills-ci\` on this PR after every commit that changes" \
-            "\`skills/\`, \`team-skills/\`, or \`plugins/\`."
+            "\`skills/\`, \`team-skills/\`, or a plugin folder (\`plugins/<name>/\` with a \`plugin.json\`)."
           if [ "${is_fork_pull_request}" = "true" ]; then
             append_summary \
               "" \
