@@ -71,40 +71,19 @@ The agent MUST read this section before generating any training or AutoML script
 
 **Required inputs before generating any training spec:**
 
-1. **Train dataset URI** — S3 path to COCO-format training data
-2. **Validation dataset URI** — S3 path to COCO-format val data (can be same as train)
+1. **Train dataset URI** — path or URI to COCO-format training data
+2. **Validation dataset URI** — path or URI to COCO-format val data (can be same as train)
 3. **`num_classes`** — How many object classes? Default 91 (COCO). Must be >= `max(category_id) + 1`. Too low causes `CUDA error: device-side assert triggered`.
 
-Resolve these from the user request or the default profile below. Prompt only
-for values that are still missing after applying the profile rules.
-
-**Bankable local default profile for DINO AutoML smoke runs:**
-
-Use this profile only when the user asks to run DINO AutoML and does not provide
-dataset or class-count inputs. This profile is intentionally small and local to
-this skill bank; it is for smoke/iteration runs, not a production benchmark.
-Do not search previous runners, logs, session state, shell history, or the home
-directory to recover these values.
-
-```python
-DINO_AUTOML_PROFILE = {
-    "train_dataset_uri": "s3://nvcf-storage-handling/data/tao_od_synthetic_subset_train_no_convert",
-    "validation_dataset_uri": "s3://nvcf-storage-handling/data/tao_od_synthetic_subset_val_no_convert",
-    "object_classes": 4,
-    "dataset_num_classes": 5,
-    "image_archive": "images.tar.gz",
-    "annotation_file": "annotations.json",
-    "max_recommendations": 10,
-    "train_num_epochs": 10,
-    "train_checkpoint_interval": 10,
-    "train_validation_interval": 1,
-    "train_num_gpus": 1,
-}
-```
-
-If the user supplies any dataset URI or class-count value, prefer the user value
-and ask for any remaining required DINO value. Do not partially mix a user's
-custom dataset with this profile's class count unless the user confirms it.
+Resolve these from the user request. This skill ships no default dataset and
+never substitutes a remote one. When the user gives no dataset, look in the
+working directory for a COCO-format dataset: per split, a COCO
+`annotations.json` with its images, as `images.tar.gz` (the standard TAO DINO
+artifact described below) or an image folder. Tell the user what was found and
+what a dataset has to look like, then ask for the train and validation paths
+or URIs and the class count that are still missing. Do not search previous
+runners, logs, session state, shell history, or the home directory to recover
+these values.
 
 **Do not prompt for image layout for the standard DINO dataset.** The standard
 TAO DINO dataset artifact is `images.tar.gz` plus `annotations.json`. Use
@@ -145,16 +124,16 @@ TRT data types, workspace 1024 MB), and hardware requirements.
 When increasing `train.num_gpus`, also set `train.gpu_ids` to the same visible
 device range, or distributed startup can be inconsistent.
 
-AutoML runs training — all **Training Requirements** above apply. For no-input
-local smoke runs, use `DINO_AUTOML_PROFILE`. For training-log-only scoring, use
+AutoML runs training — all **Training Requirements** above apply, including
+the rule that a dataset is never assumed. For training-log-only scoring, use
 `val_mAP50` (extracted from `Validation mAP50`) or `val_mAP`. When each
 recommendation is scored through the standalone evaluate action, use
 `test_mAP50` or `test_mAP` with `direction="maximize"`.
 
 See `references/dino-tuning-multigpu.md` for the full multi-GPU spec-consistency
 rule (8-GPU example, NCCL timeout note) and the full AutoML/HPO notes (metric
-selection, `metric_extractor`, recommended hyperparameters, `weight_decay`
-behavior, dense-dataset resume guidance, and parent-model inference mappings).
+selection, `metric_extractor`, recommended hyperparameters, dense-dataset
+resume guidance, and parent-model inference mappings).
 
 ## Error Patterns
 

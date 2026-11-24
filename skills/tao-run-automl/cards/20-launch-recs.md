@@ -18,7 +18,7 @@ Verified on this host (7.0.1): `INIT` has `sdk=, skill_dir=, action=`; `RUN` has
 
 2) Write the launch review — PRE-APPROVED for this budgeted run; write to disk, never wait for a human — ONE command:
 ```bash
-bash -c 'BL=$($VENV/bin/python3 -c "import json;print(json.load(open(\"$RD/state.json\")).get(\"baseline_val_loss\",\"MISSING\"))"); printf "# AutoML Launch Review — PRE-APPROVED (budgeted run)\n- Model: tao-train-visual-changenet (classify) | Platform: local docker | Image: $TRAIN_IMG (LOCAL ONLY)\n- Shape: 1 GPU, 1 node, 1 concurrent (bayesian is sequential)\n- Data: train=$WS/train/base/training_set.csv (210 rows) val=$WS/train/base/validation_set.csv (249 rows) images=$WS/kpi/images backbone=$WS/augmentation/backbone/model.safetensors\n- Algorithm: bayesian | Budget: EXACTLY 4 recommendations | Metric: val_loss minimize | 10 epochs, batch 8, no WandB\n- Search space: train.optim.lr [5e-6,5e-4] | train.optim.weight_decay [1e-4,0.05] | model.classify.train_margin_euclid [1.0,3.0] (all automl_enabled in the packaged schema)\n- Baseline eval: val_loss=$BL (lr=0 init snapshot, see baseline/)\n- final_eval_fn: supported by wheel 7.0.1 but intentionally omitted in this budgeted run — winner selected by val_loss; documented deviation\n- Estimated runtime: 5-15 min/rec sequential -> 30-60 min total\n" > $RD/review/launch_review.md && cat $RD/review/launch_review.md'
+bash -c 'BL=$($VENV/bin/python3 -c "import json;print(json.load(open(\"$RD/state.json\")).get(\"baseline_val_loss\",\"MISSING\"))"); printf "# AutoML Launch Review — PRE-APPROVED (budgeted run)\n- Model: tao-train-visual-changenet (classify) | Platform: local docker | Image: $TRAIN_IMG (LOCAL ONLY)\n- Shape: 1 GPU, 1 node, 1 concurrent (bayesian is sequential)\n- Data: train=$WS/train/base/training_set.csv (210 rows) val=$WS/train/base/validation_set.csv (249 rows) images=$WS/kpi/images backbone=$BACKBONE\n- Algorithm: bayesian | Budget: EXACTLY 4 recommendations | Metric: val_loss minimize | 10 epochs, batch 8, no WandB\n- Search space: train.optim.lr [5e-6,5e-4] | train.optim.weight_decay [1e-4,0.05] | model.classify.train_margin_euclid [1.0,3.0] (all automl_enabled in the packaged schema)\n- Baseline eval: val_loss=$BL (lr=0 init snapshot, see baseline/)\n- final_eval_fn: supported by wheel 7.0.1 but intentionally omitted in this budgeted run — winner selected by val_loss; documented deviation\n- Estimated runtime: 5-15 min/rec sequential -> 30-60 min total\n" > $RD/review/launch_review.md && cat $RD/review/launch_review.md'
 ```
 
 3) Write the runner driver — ONE command. MACHINE FACT (cost a dead run in the study): DockerSDK does NOT route spec file paths into the container — the explicit `mounts=` list below is MANDATORY:
@@ -33,6 +33,8 @@ RD = Path(os.environ["AUTOML_RD"])
 WS = os.environ["WS"]
 SKILL_DIR = os.environ["SB"] + "/skills/models/tao-train-visual-changenet"
 IMAGE = os.environ["TRAIN_IMG"]  # local only - never pull
+BACKBONE = os.path.realpath(os.environ["BACKBONE"])
+BACKBONE_IN_CONTAINER = "/data/pretrained_models/C-RADIOv2_B.safetensors"
 
 # Resume must point at the ORIGINAL run_<ts> workspace (runner only appends
 # run_<ts> on fresh runs) and pin session_id so controller/brain state is found.
@@ -63,7 +65,7 @@ spec_overrides = {
     "dataset.classify.train_dataset.images_dir": f"{WS}/kpi/images",
     "dataset.classify.validation_dataset.csv_path": f"{WS}/train/base/validation_set.csv",
     "dataset.classify.validation_dataset.images_dir": f"{WS}/kpi/images",
-    "model.backbone.pretrained_backbone_path": f"{WS}/augmentation/backbone/model.safetensors",
+    "model.backbone.pretrained_backbone_path": BACKBONE_IN_CONTAINER,
 }
 custom_param_ranges = {
     "train.optim.lr": {"valid_min": 5e-6, "valid_max": 5e-4},
@@ -88,6 +90,7 @@ try:
         resume=RESUME,
         gpu_count=1,
         mounts=[{"host_path": WS, "container_path": WS, "read_only": True},
+                {"host_path": BACKBONE, "container_path": BACKBONE_IN_CONTAINER, "read_only": True},
                 {"host_path": str(RD / "automl_workspace" / "job_results"), "container_path": "/results"}],
     )
     (RD / "automl_result.json").write_text(json.dumps(result, indent=2, default=str))

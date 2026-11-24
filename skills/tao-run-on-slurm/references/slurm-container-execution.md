@@ -45,12 +45,16 @@ manifest of source, destination, SHA256, and size. Reuse only a byte-identical
 manifest; never overwrite a different bundle. These are orchestration inputs,
 not permission to shadow packages in the image or add a startup source patch.
 
-### CS-OCI-ORD SQSH conversion profile
+### Packaged SQSH conversion profile
 
-Use partition `cpu_long`, not `cpu`; the latter's roughly 30-minute wall can
+Run the conversion on a CPU partition of the user's cluster, named in
+`SLURM_CONVERSION_PARTITION`; this skill ships no partition name. Do not use
+a partition with a short wall-time limit: a wall of roughly 30 minutes can
 kill TAO conversion and leave a truncated file. Request 4 CPUs, 7200M memory,
 no exclusive node, and a timeout of at least 120 minutes. This profile is
-preserved from successful conversion job `32370651` (21m28s elapsed).
+preserved from a successful conversion job (21m28s elapsed). When the user
+has not named the partition, show `sinfo -h -o '%P %l %c %m %G'` from
+the login node (partition, time limit, CPUs, memory, GPUs) and ask.
 
 Set `TMPDIR=/tmp` and both `ENROOT_TEMP_PATH` and
 `SLURM_ENROOT_TEMP_PATH` to job-unique
@@ -59,7 +63,7 @@ variables; node-local unique paths avoid cleanup races and unsupported shared
 overlay whiteouts.
 
 Do not inherit a training job's CPU count: omitted memory is charged per CPU on
-this cluster, so oversized requests can remain pending with `QOSGrpMemLimit`.
+some clusters, so oversized requests can remain pending with `QOSGrpMemLimit`.
 Inspect `ReqCPUS` and `ReqMem` with `scontrol`/`sacct`, cancel the pending job,
 and retry with a new job record and the explicit profile above. Do not wait for
 the QOS condition to clear or move conversion into a GPU allocation.

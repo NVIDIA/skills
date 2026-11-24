@@ -11,11 +11,11 @@ Twice per phase boundary:
 
 ## No pre-KPI label filtering
 
-The reference pipeline optionally filtered inference labels before scoring — exclude-ROI (masking out a region of the frame) and exclude-PIC (dropping person-inside-car detections) — and its `exp7` configuration ran with PIC enabled.
+The reference pipeline optionally filtered inference labels before scoring in two ways: masking out a region of the frame, and dropping person-inside-car detections.
 
 **This loop applies neither.** Both are dataset-specific label cleanups for one intersection deployment, not general OD loop mechanics, so `kpi_analyze` scores the raw inference labels as written.
 
-The practical consequence: **mAP here will not match `exp7`'s numbers**, because exp7's persons-inside-cars were removed from ground truth before scoring. The trend across iterations is still valid — it's a consistent measurement — but do not compare the absolute values against the reference experiment's.
+The practical consequence: **mAP here will not match numbers produced with such filtering**, because the filtered objects (for example persons inside cars) were removed from ground truth before scoring. The trend across iterations is still valid — it's a consistent measurement — but do not compare the absolute values against a filtered evaluation's.
 
 ## mAP is reported, not gated
 

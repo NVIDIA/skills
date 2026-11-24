@@ -1,8 +1,8 @@
 ---
 name: tao-token-efficient-execution
-description: Token-efficient execution kit for repeated TAO agentic workflows. Compiles a skill into stage cards once (with a strong model), then executes them forever in fresh, small headless sessions coordinated by a bash driver — measured 67-91% token reduction and 3-5x lower peak context vs one long conversation. Use when a TAO workflow will be run repeatedly, when token cost matters, when the target model has a small context window, or on trigger phrases like "token efficient", "reduce token cost", "card pack", "stage cards", "run this workflow on a small model", "compile this skill into cards".
+description: Token-efficient execution kit for repeated TAO agentic workflows. Compiles a skill into stage cards once (with a strong model), then executes them forever in fresh, small headless sessions coordinated by a bash driver — measured 74-91% token reduction and 4-5x lower peak context vs one long conversation. Use when a TAO workflow will be run repeatedly, when token cost matters, when the target model has a small context window, or on trigger phrases like "token efficient", "reduce token cost", "card pack", "stage cards", "run this workflow on a small model", "compile this skill into cards".
 license: Apache-2.0
-compatibility: Requires bash, jq, Python 3.10+, and a headless agent harness with tool interception (see adapters/ for supported versions). The shipped card packs additionally need docker and the prerequisites of their application skill.
+compatibility: Requires bash, jq, Python 3.10+, and a headless agent harness with tool interception (see adapters/ for supported versions). The shipped card packs additionally need the Pi harness (their drivers call `pi`), docker, and the prerequisites of their application skill.
 metadata:
   author: NVIDIA Corporation
   version: "0.1.0"
@@ -20,13 +20,13 @@ Run a staged TAO workflow as a series of **fresh headless agent sessions** —
 one stage card per session — instead of one long conversation. State lives on
 disk, never in chat history, so no session ever rereads the run's past.
 
-Measured on real workflows (same tasks, same outcomes, billed tokens):
+Historical measurements of the shipped packs (billed tokens; provenance,
+reproduction protocol, and pass thresholds in `references/MEASUREMENT.md`):
 
 | Workflow | One long conversation | Card execution | Peak context |
 |---|---|---|---|
 | DEFT AOI loop | 9.6M | 2.5M (-74%) | 242k → 59k |
 | AutoML (VCN classify) | 5.8M | 0.5M (-91%) | 198k → 42k |
-| HuggingFace finetune | 1.7M | 0.5M (-67%) | 119k → 42k |
 
 The mechanism: an agent API is stateless, so a long conversation resends its
 entire history with every message — by mid-run that is ~100k+ tokens of skill
@@ -63,10 +63,16 @@ the driver or a helper script.
 export TAO_SKILL_BANK_PATH=/path/to/tao-skill-bank
 
 # one-time: scaffold ~/.tao-kit/kit.env and check harness prerequisites
+# (the shipped pack drivers run on Pi; claude alone only supports templates/driver.template.sh)
 bash "$TAO_SKILL_BANK_PATH/skills/core/tao-token-efficient-execution/scripts/install.sh"
 
-# edit ~/.tao-kit/kit.env: set WS (and VENV for the AutoML pack) and MODEL;
-# export your provider's API key in your shell — never put it in kit.env.
+# edit ~/.tao-kit/kit.env: set WS and MODEL (plus VENV for the AutoML pack and
+# DS_IMG for the DEFT AOI pack); export your provider's API key in your shell —
+# never put it in kit.env. MODEL has no default: use Pi's built-in
+# build.nvidia.com provider (MODEL=nvidia/<model-id>, export NVIDIA_API_KEY),
+# the kit's nim/ provider for your own OpenAI-compatible endpoint
+# (MODEL=nim/<model-id>:off with PI_KIT_NIM_BASE_URL; it has no default
+# endpoint), or a local vLLM/NIM/Ollama provider in ~/.pi/agent/models.json.
 # then launch a pack driver detached (leave stderr attached: config errors print immediately):
 nohup bash "$TAO_SKILL_BANK_PATH/skills/applications/tao-run-automl/cards/driver.sh" > /dev/null &
 
@@ -76,8 +82,8 @@ tail -f ~/.tao-kit/automl/driver.log
 
 The driver waits while jobs run (activity-based, not process-based), fires one
 fresh session per stage, halts on committed errors (no auto-retry — an
-operator decides), and exits 0 only after verified completion. DEFT prepares
-its inference handoff and passes the completion audit; AutoML requires its
+operator decides), and exits 0 only after verified completion. DEFT requires
+`finalize_run.py` to record `status == "complete"`; AutoML requires its
 DONE marker with no trailing failure. Round-cap exhaustion exits nonzero.
 
 Starting a pack driver is side-effecting work: complete the
@@ -132,6 +138,7 @@ fixed, explicitly.
 | Path | What |
 |---|---|
 | `references/CONTRACTS.md` | progress log, STAGE_DONE, commands.log, env contract |
+| `references/MEASUREMENT.md` | long-conversation vs card measurement protocol, thresholds, provenance |
 | `references/authoring_prompt.md` / `_v2.md` | card compilation prompts |
 | `references/CARD_AUTHORING.md` | a real authoring session, annotated |
 | `templates/driver.template.sh` | driver skeleton (three config points) |
@@ -139,4 +146,5 @@ fixed, explicitly.
 | `adapters/pi/`, `adapters/claude-code/` | guard + recorder per harness |
 | `scripts/install.sh` | prerequisite check + kit.env scaffold |
 | `scripts/analyze_usage.py` | per-session token accounting from session JSONL |
-| `scripts/smoke_test.sh` | no-GPU adapter test (guard, recorder, accounting) |
+| `scripts/smoke_test.sh` | no-GPU adapter test (guard, recorder, accounting); needs `SMOKE_MODEL=<provider>/<model-id>`, no default |
+| `scripts/model_preflight.sh` | MODEL provider → credential-variable check and `nim/` id registration, sourced by pack drivers and the smoke test |

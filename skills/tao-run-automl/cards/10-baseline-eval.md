@@ -25,7 +25,7 @@ bash -c 'cp $WS/specs/baseline_spec.yaml $RD/baseline/baseline_lr0_spec.yaml && 
 
 2) Launch the baseline job DETACHED (train lr=0 → marker), then stop:
 ```bash
-bash -c 'printf "#!/bin/bash\ndocker run --rm --gpus all --shm-size=8g -v $WS:/data/workspace -v $RD/baseline:/results -v $WS/kpi/images:/data/datasets/NV_PCB_Siamese/images -v $WS/train/base:/data/datasets/NV_PCB_Siamese/csv -v $WS/kpi:/data/datasets/NV_PCB_Siamese/kpi -v $WS/augmentation/backbone/model.safetensors:/data/pretrained_models/C-RADIOv2_B.safetensors $TRAIN_IMG visual_changenet train -e /results/baseline_lr0_spec.yaml > $RD/baseline/train.log 2>&1\ntouch $RD/baseline/BASELINE_JOB_DONE\n" > $RD/baseline/run_baseline.sh && chmod +x $RD/baseline/run_baseline.sh && { nohup $RD/baseline/run_baseline.sh > /dev/null 2>&1 & echo $! > $RD/baseline/job.pid; } && echo LAUNCHED'
+bash -c 'printf "#!/bin/bash\ndocker run --rm --gpus all --shm-size=8g -v $WS:/data/workspace -v $RD/baseline:/results -v $WS/kpi/images:/data/datasets/NV_PCB_Siamese/images -v $WS/train/base:/data/datasets/NV_PCB_Siamese/csv -v $WS/kpi:/data/datasets/NV_PCB_Siamese/kpi -v $BACKBONE:/data/pretrained_models/C-RADIOv2_B.safetensors:ro $TRAIN_IMG visual_changenet train -e /results/baseline_lr0_spec.yaml > $RD/baseline/train.log 2>&1\ntouch $RD/baseline/BASELINE_JOB_DONE\n" > $RD/baseline/run_baseline.sh && chmod +x $RD/baseline/run_baseline.sh && { nohup $RD/baseline/run_baseline.sh > /dev/null 2>&1 & echo $! > $RD/baseline/job.pid; } && echo LAUNCHED'
 ```
 After `LAUNCHED`: final message exactly `STAGE_DONE A10` and stop.
 

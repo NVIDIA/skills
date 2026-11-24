@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-"""Regression tests for Cosmos3 Omni baseline preparation (NVBug 6630303)."""
+"""Regression tests for Cosmos3 Omni baseline preparation."""
 
 from __future__ import annotations
 
@@ -389,7 +389,7 @@ class ModelPreparationTests(unittest.TestCase):
 
 class WorkflowIntegrationTests(unittest.TestCase):
     def test_packaged_patch_projection_survives_baseline_and_iteration_preparation(self) -> None:
-        """NVBug 6920383: native evaluation must not fall back to H100-unsafe auto."""
+        """Native evaluation must not fall back to H100-unsafe auto."""
         with tempfile.TemporaryDirectory() as temporary:
             workspace = pathlib.Path(temporary)
             baseline = write_qwen_checkpoint(workspace / "model/baseline")

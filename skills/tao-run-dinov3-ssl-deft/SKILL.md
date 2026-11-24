@@ -39,8 +39,7 @@ prepares and approves its inputs; it does not implement orchestration.
    build that contains tao-data-services#59: the first DS 7.3.0 RC after
    rc-90. DS rc-90 and older accept the placeholder at `validate`, fail in
    round 1 with `Missing configured inputs: [... 'score_implementation_0']`,
-   and exit 0 after a cancel. The `release/7.3.0` cherry-pick of this skill
-   must bump `images.tao_toolkit.data_services` in `versions.yaml` to that RC.
+   and exit 0 after a cancel.
    The executable profile is
    one allocated DS container; no external runner ships with this application.
    For release QA, the repository script `scripts/deft_container_handoff.py`

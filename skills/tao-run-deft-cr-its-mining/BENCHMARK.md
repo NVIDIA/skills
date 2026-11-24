@@ -9,9 +9,10 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `tao-run-deft-cr-its-mining`
-- Evaluation date: 2026-10-16
-- Evaluator version: `1.5.6`
-- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
+- Validation status: `passed`
+- Evaluation date: 2026-11-20
+- Evaluator version: `1.6.10`
+- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 4 evaluation tasks (4 positive)
 - Dataset digest: `sha256:e2415bd85ab17e2af8a9afff1301e63b0145eceba60a95906283869558f70186` (skill-evaluator-dataset-snapshot/1)
 - Attempts per task: 1
@@ -20,6 +21,20 @@ Recommended for publication based on the completed evaluation evidence in this r
 - Tier 3 evidence: required for publication
 
 Each task attempt ran in its own isolated sandbox pod.
+
+## Tier 1 LLM Provenance
+
+SkillSpector provider, model, analyzer revision, and determinism evidence retained for this scan.
+
+| Skill | Provider | Adapter | Analyzer | Model | Revision | Determinism |
+| --- | --- | --- | --- | --- | --- | --- |
+| tao-run-deft-cr-its-mining | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| tao-run-deft-cr-its-mining | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| tao-run-deft-cr-its-mining | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| tao-run-deft-cr-its-mining | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| tao-run-deft-cr-its-mining | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+
+- Controls for `tao-run-deft-cr-its-mining`: temperature=not set (source=provider_default, forwarded=no); seed=not set (source=unset, forwarded=no); reasoning_effort=not set (source=provider_default, forwarded=no)
 
 ## What This Report Answers
 
@@ -35,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.9% — baseline ran, but no comparable score was available; uplift unavailable | 61.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 88.5% — baseline ran, but no comparable score was available; uplift unavailable | 46.7% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 0.0% → 100.0% (+100.0 points) | 15.0% → 60.0% (+45.0 points) |
+| Correctness | 0.0% → 90.0% (+90.0 points) | 30.0% → 25.0% (-5.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 0.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 7.3% → 96.3% (+89.0 points) | 22.1% → 47.7% (+25.6 points) |
-| Efficiency | 78.0% — baseline ran, but no comparable score was available; uplift unavailable | 99.6% → 98.9% (-0.7 points) |
+| Effectiveness | 11.5% → 71.9% (+60.4 points) | 24.0% → 14.6% (-9.4 points) |
+| Efficiency | 80.7% — baseline ran, but no comparable score was available; uplift unavailable | 92.1% → 93.6% (+1.5 points) |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -48,32 +63,42 @@ Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92
 
 A partial dimension was calculated from only the available configured signals; review the detailed report before relying on it.
 
+### Comparison details
+
+Shared-source comparisons use the same signals and weights on both conditions. They do not replace the full dimension scores above or change the publication verdict.
+
+| Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
+| --- | --- | --- | --- | --- |
+| claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| claude-code | Efficiency | Token-only comparison | 98.7% → 89.0% (-9.7 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+
 ## Token Usage
 
 Actual Tier 3 execution usage is reported for every observed agent/case pair and both conditions.
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 1,455,519 | 895,270 | +560,249 | +62.58% | skill 4/4; base 4/4 |
-| claude-code | tao-run-deft-cr-its-mining-basic | 72,574 | 30,141 | +42,433 | +140.78% | skill 1/1; base 1/1 |
-| claude-code | tao-run-deft-cr-its-mining-multi-question | 513,393 | 183,958 | +329,435 | +179.08% | skill 1/1; base 1/1 |
-| claude-code | tao-run-deft-cr-its-mining-plugin-paths | 657,055 | 372,511 | +284,544 | +76.39% | skill 1/1; base 1/1 |
-| claude-code | tao-run-deft-cr-its-mining-resume | 212,497 | 308,660 | -96,163 | -31.15% | skill 1/1; base 1/1 |
-| codex | All cases | 56,439 | 54,935 | +1,504 | +2.74% | skill 4/4; base 4/4 |
-| codex | tao-run-deft-cr-its-mining-basic | 13,893 | 13,466 | +427 | +3.17% | skill 1/1; base 1/1 |
-| codex | tao-run-deft-cr-its-mining-multi-question | 14,094 | 13,571 | +523 | +3.85% | skill 1/1; base 1/1 |
-| codex | tao-run-deft-cr-its-mining-plugin-paths | 14,231 | 13,891 | +340 | +2.45% | skill 1/1; base 1/1 |
-| codex | tao-run-deft-cr-its-mining-resume | 14,221 | 14,007 | +214 | +1.53% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,511,958 | 950,205 | +561,753 | +59.12% | skill 8/8; base 8/8 |
+| claude-code | All cases | 982,109 | 461,747 | +520,362 | +112.69% | skill 4/4; base 4/4 |
+| claude-code | tao-run-deft-cr-its-mining-basic | 80,335 | 35,489 | +44,846 | +126.37% | skill 1/1; base 1/1 |
+| claude-code | tao-run-deft-cr-its-mining-multi-question | 357,870 | 106,489 | +251,381 | +236.06% | skill 1/1; base 1/1 |
+| claude-code | tao-run-deft-cr-its-mining-plugin-paths | 415,938 | 212,915 | +203,023 | +95.35% | skill 1/1; base 1/1 |
+| claude-code | tao-run-deft-cr-its-mining-resume | 127,966 | 106,854 | +21,112 | +19.76% | skill 1/1; base 1/1 |
+| codex | All cases | 54,370 | 68,991 | -14,621 | -21.19% | skill 4/4; base 4/4 |
+| codex | tao-run-deft-cr-its-mining-basic | 13,548 | 13,320 | +228 | +1.71% | skill 1/1; base 1/1 |
+| codex | tao-run-deft-cr-its-mining-multi-question | 13,535 | 13,400 | +135 | +1.01% | skill 1/1; base 1/1 |
+| codex | tao-run-deft-cr-its-mining-plugin-paths | 13,548 | 28,777 | -15,229 | -52.92% | skill 1/1; base 1/1 |
+| codex | tao-run-deft-cr-its-mining-resume | 13,739 | 13,494 | +245 | +1.82% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,036,479 | 530,738 | +505,741 | +95.29% | skill 8/8; base 8/8 |
 
-Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
+Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
 ## Tier Status
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 75 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 3 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 59 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 7 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
 ## Findings and Observations
@@ -85,17 +110,22 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
   "absolute_path()" in scripts/restore_docker_mount_permissions.py (lines 17-19)
   vs "absolute_path()" in scripts/workflow_common.py (lines 35-37) (`scripts/restore_docker_mount_permissions.py:17`)
 - **HIGH** DUPLICATE/duplicate: Duplicate content found across SKILL.md and references/mining-loop.md:
+  "## Initialize Mining Embeddings" in SKILL.md (lines 144-149)
+  vs "## Mining Embeddings" in references/mining-loop.md (lines 168-173)
+  vs "## Iteration Loop" in references/mining-loop.md (lines 315-321)
+  vs "## Iteration Loop" in references/mining-loop.md (lines 332-338) (`SKILL.md:144`)
+- **HIGH** DUPLICATE/duplicate: Duplicate content found across SKILL.md and references/mining-loop.md:
   "## Completion Criteria" in SKILL.md (lines 177-197)
-  vs "## Completion Criteria" in references/mining-loop.md (lines 403-422) (`SKILL.md:177`)
-- **HIGH** DUPLICATE/duplicate: Duplicate content found across scripts/prepare_gap_analysis_predictions.py and scripts/validate_cosmos_embed_output.py and scripts/workflow_common.py:
-  "load_json_array()" in scripts/prepare_gap_analysis_predictions.py (lines 16-25)
-  vs "load_json_object()" in scripts/validate_cosmos_embed_output.py (lines 84-90)
-  vs "load_json_array()" in scripts/workflow_common.py (lines 48-57)
-  vs "load_json_object()" in scripts/workflow_common.py (lines 60-66)
-  vs "read_jsonl()" in scripts/workflow_common.py (lines 110-125) (`scripts/prepare_gap_analysis_predictions.py:16`)
-- **MEDIUM** QUALITY/quality_correctness: No documented scripts in table format (`skills/applications/tao-run-deft-cr-its-mining/SKILL.md`)
-- **MEDIUM** QUALITY/quality_correctness: Instructions don't mention 'run_script' (`skills/applications/tao-run-deft-cr-its-mining/SKILL.md`)
-- 73 additional finding(s) are available in the full evaluation artifacts.
+  vs "## Completion Criteria" in references/mining-loop.md (lines 404-423) (`SKILL.md:177`)
+- **HIGH** DUPLICATE/duplicate: Duplicate content found across scripts/cosmos_embed_outputs_to_parquet.py and scripts/validate_cosmos_embed_output.py:
+  "npy_path()" in scripts/cosmos_embed_outputs_to_parquet.py (lines 30-38)
+  vs "referenced_npy_path()" in scripts/validate_cosmos_embed_output.py (lines 93-97) (`scripts/cosmos_embed_outputs_to_parquet.py:30`)
+- **HIGH** DUPLICATE/duplicate: Duplicate content found across scripts/prepare_cosmos_embed_inference.py and scripts/prepare_gap_analysis_predictions.py and scripts/verify_workflow_yaml.py:
+  "llava_video_path()" in scripts/prepare_cosmos_embed_inference.py (lines 107-112)
+  vs "resolve_media_path()" in scripts/prepare_cosmos_embed_inference.py (lines 150-154)
+  vs "resolve_media_path()" in scripts/prepare_gap_analysis_predictions.py (lines 28-33)
+  vs "resolve_llava_media_path()" in scripts/verify_workflow_yaml.py (lines 94-98) (`scripts/prepare_cosmos_embed_inference.py:107`)
+- 61 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

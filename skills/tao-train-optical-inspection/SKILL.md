@@ -219,11 +219,6 @@ The PyT container exposes `optical_inspection dataset_convert`, but this model s
 
 When using preconverted transfer archives locally, verify the extracted directory before writing specs. The archives may unpack an `images/` wrapper directory; point `dataset.*.images_dir` at the inner directory that contains `golden/` and the board/image folders referenced by `dataset.csv`, for example `.../<split>/images/images`, not the outer wrapper.
 
-Product-side follow-ups remain: publish a licensed, trainable sample dataset and
-package the existing container `dataset_convert` entrypoint as a skill action
-with its own schema/template. Neither is implemented by this documentation and
-preflight change.
-
 ## Eval Dataset
 
 Optional. Eval dataset uses same format (images + CSV).

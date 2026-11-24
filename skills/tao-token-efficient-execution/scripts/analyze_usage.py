@@ -3,8 +3,8 @@
 # SPDX-License-Identifier: Apache-2.0
 """Tokenomics accounting for Pi agent session JSONL files.
 
-Implements docs/MEASURE_FIRST.md from the tokenomics repo against Pi's session
-format (~/.pi/agent/sessions/... or the kit's --session-dir):
+Accounting for the kit's measurement protocol (references/MEASUREMENT.md),
+over Pi's session format (~/.pi/agent/sessions/... or the kit's --session-dir):
 
   entry:   {"type": "message", "message": {"role": "assistant", "usage": {...}}}
   usage:   {"input", "output", "cacheRead", "cacheWrite", "totalTokens",

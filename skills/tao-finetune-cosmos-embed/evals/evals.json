@@ -1,13 +1,40 @@
 [
   {
     "id": "tao-finetune-cosmos-embed-basic",
-    "question": "A user request: \"Use the tao-finetune-cosmos-embed skill.\" Identify which TAO skill applies and, reading only that skill's documentation, outline the steps it prescribes. Do NOT run any commands, scripts, web searches, or other tools \u2014 describe the plan only.",
+    "question": "A user request: \"Use the tao-finetune-cosmos-embed skill.\" Identify which TAO skill applies and, reading only that skill's documentation, outline the steps it prescribes. Do NOT run any commands, scripts, web searches, or other tools — describe the plan only.",
     "expected_skill": "tao-finetune-cosmos-embed",
     "expected_script": null,
     "ground_truth": "Identify tao-finetune-cosmos-embed as the applicable skill and summarize its documented workflow from SKILL.md without executing anything.",
     "expected_behavior": [
       "Identifies tao-finetune-cosmos-embed as the relevant skill",
       "Outlines the documented workflow steps from SKILL.md",
+      "Does not run commands, scripts, or web searches"
+    ]
+  },
+  {
+    "id": "tao-finetune-cosmos-embed-lora-physicalai",
+    "question": "A user request: \"LoRA fine-tune Cosmos-Embed1-448p on the PhysicalAI-Event-Videos chunk labels and pick the best checkpoint.\" Identify which TAO skill applies and, reading only that skill's documentation, outline the steps it prescribes, including which spec template to start from, how captions become training samples, and how the best checkpoint is selected. Do NOT run any commands, scripts, web searches, or other tools — describe the plan only.",
+    "expected_skill": "tao-finetune-cosmos-embed",
+    "expected_script": null,
+    "ground_truth": "Identify tao-finetune-cosmos-embed as the applicable skill; start from references/spec_template_train_lora.yaml with dataset_type vad_r1_chunks, list-valued caption_field with caption_mode all and label_mode caption, explicit model.lora.target_modules, and select the checkpoint from train/selection.json written by the retrieval_benchmark callback (or the per-iteration checkpoints when no benchmark is configured), without executing anything.",
+    "expected_behavior": [
+      "Identifies tao-finetune-cosmos-embed as the relevant skill",
+      "Names references/spec_template_train_lora.yaml and references/lora-finetune-physicalai.md as the starting points",
+      "Explains caption_field, caption_mode, label_mode and path_prefix_mapping for the vad_r1_chunks dataset",
+      "Explains checkpoint selection via train/selection.json and the retrieval_benchmark callback",
+      "Does not run commands, scripts, or web searches"
+    ]
+  },
+  {
+    "id": "tao-finetune-cosmos-embed-onnx-two-tower-export",
+    "question": "A user request: \"Export my LoRA fine-tuned Cosmos-Embed1 checkpoint to ONNX so I can build TensorRT engines for the video and text towers.\" Identify which TAO skill applies and, reading only that skill's documentation, outline the steps it prescribes, including the export modes, batch-size setting, and what the export spec must match from the training spec. Do NOT run any commands, scripts, web searches, or other tools — describe the plan only.",
+    "expected_skill": "tao-finetune-cosmos-embed",
+    "expected_script": null,
+    "ground_truth": "Identify tao-finetune-cosmos-embed as the applicable skill; run cosmos-embed1 export twice with export.mode video and text, export.batch_size -1 for a dynamic batch axis and export.on_cpu true, with the export spec's model.lora block (enabled plus the exact target_modules) copied from the training spec so the adapters are merged, and check the ONNX files by path, without executing anything.",
+    "expected_behavior": [
+      "Identifies tao-finetune-cosmos-embed as the relevant skill",
+      "Describes separate video and text exports with export.batch_size -1",
+      "States that model.lora.target_modules in the export spec must match the trained checkpoint",
       "Does not run commands, scripts, or web searches"
     ]
   }

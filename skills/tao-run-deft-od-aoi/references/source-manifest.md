@@ -77,7 +77,7 @@ retains canonical per-source files under
 and post-validates each merged COCO. Existing output directories are never
 overwritten. The output includes the frozen input manifest, merge evidence,
 normalized COCO files and image views, a provenance report, and `sources.json`
-ready for initialization or the SLURM acceptance driver.
+ready for initialization.
 
 ## Handoff shape
 

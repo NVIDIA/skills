@@ -4,7 +4,7 @@ This stage has no leaf skill. It turns the miner's flat list of filepaths into a
 
 ## Why this is glue and not a skill
 
-The reference pipeline performed these steps inside internal container images (`smart_data_augmentation`, `data_utils`, `mining:v2`) whose scripts are not published. Each is pure file manipulation — pandas, `shutil`, `json` — so the loop owns them directly rather than depending on images it cannot pull or audit.
+Each step is pure file manipulation — pandas, `shutil`, `json` — so the loop owns them directly as bundled host scripts rather than depending on a container image.
 
 ## Step 1 — Stage mined images into an ODVG source
 

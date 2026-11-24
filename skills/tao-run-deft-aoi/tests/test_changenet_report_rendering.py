@@ -588,7 +588,7 @@ class ReportRenderingTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             results = pathlib.Path(temporary)
             state = self._state(results)
-            # build85 copied a completed run into a different CI artifact directory.
+            # A completed run may be copied into a different CI artifact directory.
             # The state must stay portable instead of rejecting its original path.
             state["results_dir"] = "/original/run/location"
             state["status"] = "in_progress"

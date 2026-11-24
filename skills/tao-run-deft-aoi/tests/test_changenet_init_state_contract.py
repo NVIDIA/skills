@@ -6,6 +6,8 @@ from __future__ import annotations
 
 import json
 import pathlib
+import shlex
+import string
 import sys
 import tempfile
 import unittest
@@ -69,6 +71,27 @@ class ChangeNetInitStateContractTests(unittest.TestCase):
                 str(venv_python),
             )
             self.assertNotEqual(str(venv_python), str(venv_python.resolve()))
+
+    def test_card_00_init_command_matches_argparse(self) -> None:
+        card = (SKILL_ROOT / "cards/00-init-baseline-train.md").read_text()
+        line = next(l for l in card.splitlines() if "init_deft_state.py" in l and l.startswith("$DPY"))
+        with tempfile.TemporaryDirectory() as temporary:
+            root = pathlib.Path(temporary)
+            env = {
+                "RD": str(root / "results"),
+                "WS": str(root / "workspace"),
+                "GPU_MODEL": "NVIDIA RTX PRO 6000 Blackwell, 97887 MiB",
+                "TRAIN_IMG": "example/train:1",
+                "DS_IMG": "example/anomalygen:1",
+            }
+            argv = [string.Template(a).substitute(env)
+                    for a in shlex.split(line.split("init_deft_state.py", 1)[1])]
+
+            rc = init_deft_state.main(argv)
+
+            self.assertEqual(rc, 0)
+            state = json.loads((root / "results/deft_state.json").read_text())
+            self.assertEqual(state["config"]["gpu_model"], env["GPU_MODEL"])
 
 
 if __name__ == "__main__":

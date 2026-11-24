@@ -14,7 +14,6 @@
     "hpo.seq_len",
     "hpo.ckpt",
     "hpo.standardizer_pkl",
-    "hpo.use_cross_channel",
     "hpo.context_stride",
     "train.output_dir"
   ],
@@ -35,7 +34,8 @@
       "seq_len": 512,
       "ckpt": "",
       "standardizer_pkl": "",
-      "use_cross_channel": false
+      "use_cross_channel": false,
+      "cross_channel_heads": 8
     },
     "train": {
       "output_dir": "artifacts/inference_hpo"
@@ -145,7 +145,7 @@
         "seq_len": {
           "automl_enabled": false,
           "default": 512,
-          "description": "Input context window length in timesteps.",
+          "description": "Input context window length in timesteps. Fixed at 512 for the published checkpoints: the forecast head is sized for it, so other values fail with a state_dict size mismatch.",
           "maximum": 512,
           "minimum": 64,
           "title": "sequence length",
@@ -166,11 +166,21 @@
           "type": "string"
         },
         "use_cross_channel": {
-          "automl_enabled": false,
+          "automl_enabled": true,
           "default": false,
           "description": "Use cross-channel attention model (run8_best_model_cr.pt).",
           "title": "use cross channel",
           "type": "bool"
+        },
+        "cross_channel_heads": {
+          "automl_enabled": true,
+          "default": 8,
+          "description": "Attention heads in the cross-channel block (basic mode; only used when use_cross_channel is true, and only changes predictions for multivariate input). Must divide the model embedding size, so the search is restricted to [4, 8, 16].",
+          "enum": [4, 8, 16],
+          "maximum": 16,
+          "minimum": 4,
+          "title": "cross-channel heads",
+          "type": "int"
         },
         "context_stride": {
           "automl_enabled": false,

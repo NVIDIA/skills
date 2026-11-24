@@ -9,14 +9,14 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers who fine-tune NVIDIA Cosmos3 vision-language models (Nano and Edge) on video conversation and task-aware video reasoning datasets using Docker or SLURM compute platforms. <br>
+Developers and ML engineers use this skill to fine-tune, evaluate, export, and run inference on Cosmos3 (Nano and Edge) vision-language models over video datasets with the Cosmos Framework or Cosmos-RL backends, on Docker or SLURM platforms. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
 **Requires API Key or External Credential:** [Yes] <br>
-**Credential Type(s):** [API key, Other [SSH key]] <br>
+**Credential Type(s):** [API key] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -25,58 +25,97 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Detailed Guide](references/detailed-guide.md) <br>
-- [Cosmos Reason Evaluate](references/cosmos-reason-evaluate.md) <br>
-- [Cosmos Reproducibility Gates](references/cosmos-reproducibility-gates.md) <br>
-- [Cosmos Backend Operations](references/cosmos-backend-operations.md) <br>
-- [Cosmos Reason Parameters](references/cosmos-reason-parameters.md) <br>
-- [Skill Info](references/skill_info.yaml) <br>
-- [NVIDIA TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
+- [detailed-guide.md](references/detailed-guide.md) <br>
+- [cosmos-reason-launch.md](references/cosmos-reason-launch.md) <br>
+- [cosmos-reason-evaluate.md](references/cosmos-reason-evaluate.md) <br>
+- [cosmos-reason-parameters.md](references/cosmos-reason-parameters.md) <br>
+- [cosmos-actions-parameters.md](references/cosmos-actions-parameters.md) <br>
+- [cosmos-backend-operations.md](references/cosmos-backend-operations.md) <br>
+- [cosmos-data-specs.md](references/cosmos-data-specs.md) <br>
+- [cosmos-reproducibility-gates.md](references/cosmos-reproducibility-gates.md) <br>
+- [cosmos-reason-single-gpu-video.md](references/cosmos-reason-single-gpu-video.md) <br>
+- [cosmos-reason-automl.md](references/cosmos-reason-automl.md) <br>
+- [cosmos-automl-deft.md](references/cosmos-automl-deft.md) <br>
+- [skill_info.yaml](references/skill_info.yaml) <br>
+- [TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions, Analysis] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Type(s):** [Shell commands, Configuration instructions, Files, Analysis] <br>
+**Output Format:** [Markdown with inline bash code blocks, backend-native TOML/YAML specs, and JSON plan/metric artifacts] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [None] <br>
+**Other Properties Related to Output:** [Training/evaluation metrics extracted from job outputs; job state tracked in job records] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
-- Codex (`openai/openai/gpt-5.5`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`) <br>
+- Codex (`openai/openai/gpt-6.1-sol`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-7 evaluation tasks (7 positive), each with 1 attempt per task in isolated sandbox pods. <br>
+7 evaluation tasks (7 positive), 1 attempt per task, run in the `k8s-sandbox` environment with each task attempt in its own isolated sandbox pod; each task was also attempted without the skill as a baseline. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Whether the skill avoids unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Final-answer correctness against the reference answer. <br>
-- Discoverability: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
-- Effectiveness: Goal completion (50%) combined with expected workflow adherence (50%). <br>
-- Efficiency: Tool-call productivity (50%) combined with token efficiency (50%). <br>
+- Security: Is it safe to use? Scored from `security` (100%). <br>
+- Correctness: Is the answer correct? Scored from `accuracy` (100%). <br>
+- Discoverability: Was the right skill loaded when needed? Scored from `skill_execution` (100%). <br>
+- Effectiveness: Did the skill help complete the task? Scored from `goal_accuracy` (50%) + `behavior_check` (50%). <br>
+- Efficiency: Did it avoid wasted tool calls and token usage? Scored from `skill_efficiency` (50%) + `token_efficiency` (50%). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `accuracy`: Final-answer correctness against the reference answer. <br>
-- `skill_execution`: Whether the expected skill was selected and the workflow executed. <br>
-- `goal_accuracy`: Whether the user's goal was achieved. <br>
-- `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Tool-call productivity (legacy wire id; routing scored under Discoverability). <br>
-- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
+- `security`: Security: unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Skill Execution: whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool Productivity: tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
+- `accuracy`: Accuracy: final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Goal Accuracy: whether the user's goal was achieved. <br>
+- `behavior_check`: Behavior Check: whether the expected workflow behavior was followed. <br>
+- `token_efficiency`: Token Efficiency: actual uncached prompt plus completion usage (50% of Efficiency). <br>
 
 
 
 ## Evaluation Results: <br>
+> ✅ **Overall verdict: PASS — Recommended for publication**
+
+### Publication Recommendation
+
+Recommended for publication based on the completed evaluation evidence in this report.
+
+### Results at a Glance
+
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 90.1% | 81.2% |
-| Security | 100.0% → 100.0% (±0.0 pts) | 100.0% → 100.0% (±0.0 pts) |
-| Correctness | 40.0% → 85.7% (+45.7 pts) | 54.3% → 85.7% (+31.4 pts) |
-| Discoverability | 97.1% | 61.4% |
-| Effectiveness | 30.3% → 80.3% (+50.0 pts) | 33.8% → 61.0% (+27.2 pts) |
-| Efficiency | 87.1% | 98.0% |
+| Overall | 86.4% — baseline ran, but no comparable score was available; uplift unavailable | 75.9% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 42.9% → 91.4% (+48.5 points) | 57.1% → 82.9% (+25.8 points) |
+| Discoverability | 90.0% — baseline ran, but no comparable score was available; uplift unavailable | 62.1% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 19.1% → 62.0% (+42.9 points) | 17.1% → 39.0% (+21.9 points) |
+| Efficiency | 88.7% — baseline ran, but no comparable score was available; uplift unavailable | 95.4% — baseline ran, but no comparable score was available; uplift unavailable |
+
+**How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
+
+Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92.0%, 45.0 percentage points above its 47.0% no-skill baseline.
+
+A partial dimension was calculated from only the available configured signals; review the detailed report before relying on it.
+
+#### Comparison details
+
+Shared-source comparisons use the same signals and weights on both conditions. They do not replace the full dimension scores above or change the publication verdict.
+
+| Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
+| --- | --- | --- | --- | --- |
+| claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| claude-code | Efficiency | Token-only comparison | 97.8% → 92.8% (-5.0 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| codex | Efficiency | Token-only comparison | 86.8% → 90.7% (+3.9 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+
+### Tier Status
+
+| Tier | Purpose | Status | Evidence |
+|---|---|---|---|
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 95 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 31 finding(s) |
+| Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 7 task(s) |
 
 ## Skill Version(s): <br>
 0.3.6 (source: frontmatter) <br>

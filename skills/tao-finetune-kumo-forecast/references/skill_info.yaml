@@ -26,7 +26,7 @@ actions:
     metric_file: metrics.json
 
   inference_hpo:
-    command: python inference_hpo_trial.py --run-config {config_path}
+    command: python scripts/inference_hpo_trial.py --run-config {config_path}
     config_format: yaml
     mode: config
     inputs:

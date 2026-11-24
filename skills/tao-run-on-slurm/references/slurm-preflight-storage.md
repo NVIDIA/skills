@@ -65,8 +65,9 @@ The enroot-credentials step (#2) only needs to run **once per (cluster, user)** 
 subsequent SLURM sessions inherit the file. Use the `printf | ssh` heredoc
 pattern above so the `NGC_KEY` value never lands in shell history, intermediate
 files, or chat output. Do not `cat` or `echo` the value at any step. After the
-file is in place, both the SQSH pre-conversion job (which runs on
-`sqsh_conversion_partition`) and the actual training job's Pyxis pull will
+file is in place, both the SQSH pre-conversion job (which runs on the
+partition named in `SLURM_CONVERSION_PARTITION`) and the actual training
+job's Pyxis pull will
 authenticate as `$oauthtoken` against `nvcr.io`.
 
 # SLURM
@@ -152,8 +153,12 @@ handler via `SSH_AUTH_SOCK`.
   Microservices schema stores this as the list field
   `cloud_specific_details.slurm_hostname`.
 - **SLURM_PARTITION** (required): Partition list for GPU job submission. Ask
-  for this in the mandatory SLURM intake list. The packaged default is
-  `polar,polar3,polar4,grizzly`, which are treated as 4-hour queues.
+  for this in the mandatory SLURM intake list. There is no packaged default:
+  the names belong to the user's cluster, and `sinfo -h -o '%P %l %c %m %G'`
+  on the login node lists them.
+- **SLURM_CONVERSION_PARTITION** (required when an image must be converted to
+  SQSH): a CPU partition of the user's cluster that allows 4 CPUs, 7200M
+  memory, and 120 minutes of wall time. There is no packaged default.
 - **SSH_KEY_PATH** (preferred and expected before launch): private key path for
   non-interactive public-key auth to the login node. If passwordless SSH fails,
   ask the user for `SSH_KEY_PATH=/path/to/private_key` and show the setup steps
@@ -177,7 +182,7 @@ platform. Supported backend details from the microservices schema:
 ```json
 {
   "backend_type": "slurm",
-  "partition": "polar,polar3,polar4,grizzly",
+  "partition": "<partition-list>",
   "cluster_name": "optional-name"
 }
 ```

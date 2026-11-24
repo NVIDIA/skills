@@ -9,9 +9,10 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `tao-run-deft-od-aoi`
-- Evaluation date: 2026-10-16
-- Evaluator version: `1.5.6`
-- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
+- Validation status: `passed`
+- Evaluation date: 2026-11-20
+- Evaluator version: `1.6.10`
+- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 1 evaluation tasks (1 positive)
 - Dataset digest: `sha256:b99e1e3ff2bffdfd231860bb6af0662e43650359a05baf1323f79367499ce338` (skill-evaluator-dataset-snapshot/1)
 - Attempts per task: 1
@@ -20,6 +21,20 @@ Recommended for publication based on the completed evaluation evidence in this r
 - Tier 3 evidence: required for publication
 
 Each task attempt ran in its own isolated sandbox pod.
+
+## Tier 1 LLM Provenance
+
+SkillSpector provider, model, analyzer revision, and determinism evidence retained for this scan.
+
+| Skill | Provider | Adapter | Analyzer | Model | Revision | Determinism |
+| --- | --- | --- | --- | --- | --- | --- |
+| tao-run-deft-od-aoi | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| tao-run-deft-od-aoi | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| tao-run-deft-od-aoi | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| tao-run-deft-od-aoi | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| tao-run-deft-od-aoi | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+
+- Controls for `tao-run-deft-od-aoi`: temperature=not set (source=provider_default, forwarded=no); seed=not set (source=unset, forwarded=no); reasoning_effort=not set (source=provider_default, forwarded=no)
 
 ## What This Report Answers
 
@@ -35,16 +50,27 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 92.9% — baseline ran, but no comparable score was available; uplift unavailable | 92.1% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 76.8% — baseline ran, but no comparable score was available; uplift unavailable | 94.6% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 60.0% → 100.0% (+40.0 points) | 40.0% → 100.0% (+60.0 points) |
-| Discoverability | 80.0% — baseline ran, but no comparable score was available; uplift unavailable | 90.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 10.0% → 100.0% (+90.0 points) | 10.0% → 87.5% (+77.5 points) |
-| Efficiency | 84.6% — baseline ran, but no comparable score was available; uplift unavailable | 83.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 20.0% → 100.0% (+80.0 points) | 0.0% → 100.0% (+100.0 points) |
+| Discoverability | 70.0% — baseline ran, but no comparable score was available; uplift unavailable | 90.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 0.0% → 25.0% (+25.0 points) | 0.0% → 87.5% (+87.5 points) |
+| Efficiency | 89.1% — baseline ran, but no comparable score was available; uplift unavailable | 95.6% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
 Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92.0%, 45.0 percentage points above its 47.0% no-skill baseline.
+
+### Comparison details
+
+Shared-source comparisons use the same signals and weights on both conditions. They do not replace the full dimension scores above or change the publication verdict.
+
+| Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
+| --- | --- | --- | --- | --- |
+| claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| claude-code | Efficiency | Token-only comparison | 97.9% → 90.7% (-7.2 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| codex | Efficiency | Token-only comparison | 93.8% → 91.2% (-2.6 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -52,20 +78,20 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 1,027,256 | 348,017 | +679,239 | +195.17% | skill 1/1; base 1/1 |
-| claude-code | route-binary-deft-od-aoi | 1,027,256 | 348,017 | +679,239 | +195.17% | skill 1/1; base 1/1 |
-| codex | All cases | 181,353 | 102,085 | +79,268 | +77.65% | skill 1/1; base 1/1 |
-| codex | route-binary-deft-od-aoi | 181,353 | 102,085 | +79,268 | +77.65% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,208,609 | 450,102 | +758,507 | +168.52% | skill 2/2; base 2/2 |
+| claude-code | All cases | 327,104 | 144,315 | +182,789 | +126.66% | skill 1/1; base 1/1 |
+| claude-code | route-binary-deft-od-aoi | 327,104 | 144,315 | +182,789 | +126.66% | skill 1/1; base 1/1 |
+| codex | All cases | 48,485 | 13,247 | +35,238 | +266.01% | skill 1/1; base 1/1 |
+| codex | route-binary-deft-od-aoi | 48,485 | 13,247 | +35,238 | +266.01% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 375,589 | 157,562 | +218,027 | +138.38% | skill 2/2; base 2/2 |
 
-Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
+Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
 ## Tier Status
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 102 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 75 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 4 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 1 task(s) |
 
 ## Findings and Observations
@@ -73,12 +99,24 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
+- **HIGH** DUPLICATE/duplicate: Duplicate content found across SKILL.md and references/anomalygen-pool.md and references/data-contract.md and references/pipeline.md:
+  "## Admission and cumulative COCO" in SKILL.md (lines 148-173)
+  vs "## Optional synthesis with existing task weights" in SKILL.md (lines 290-312)
+  vs "## Iteration handoff" in references/anomalygen-pool.md (lines 82-111)
+  vs "## Cumulative admission" in references/data-contract.md (lines 86-124)
+  vs "## 4. Admit real and clean data" in references/pipeline.md (lines 71-88)
+  vs "## 5. Optional synthesis" in references/pipeline.md (lines 95-114) (`SKILL.md:148`)
+- **HIGH** DUPLICATE/duplicate: Duplicate content found across SKILL.md and references/pipeline.md:
+  "## Measurement specs" in SKILL.md (lines 174-205)
+  vs "## 2. Baseline measurement and gaps" in references/pipeline.md (lines 32-42) (`SKILL.md:174`)
+- **HIGH** DUPLICATE/duplicate: Duplicate content found across SKILL.md and references/pipeline.md:
+  "## Optional synthesis with existing task weights" in SKILL.md (lines 313-324)
+  vs "## 5. Optional synthesis" in references/pipeline.md (lines 123-131) (`SKILL.md:313`)
+- **MEDIUM** DUPLICATE/duplicate: Duplicate content found across scripts/admit_deft_od_aoi_coco.py and scripts/deft_od_aoi_round_robin_selection.py:
+  "_source_index()" in scripts/admit_deft_od_aoi_coco.py (lines 103-123)
+  vs "_source_records()" in scripts/deft_od_aoi_round_robin_selection.py (lines 301-317) (`scripts/admit_deft_od_aoi_coco.py:103`)
 - **MEDIUM** QUALITY/quality_correctness: No documented scripts in table format (`skills/applications/tao-run-deft-od-aoi/SKILL.md`)
-- **MEDIUM** QUALITY/quality_correctness: Instructions don't mention 'run_script' (`skills/applications/tao-run-deft-od-aoi/SKILL.md`)
-- **MEDIUM** QUALITY/quality_correctness: SKILL_SPEC recommended field missing: 'metadata.tags' (`skills/applications/tao-run-deft-od-aoi/SKILL.md`)
-- **MEDIUM** SCHEMA/frontmatter_field_placement: Root field 'tags' is ignored; use 'metadata.tags' (`skills/applications/tao-run-deft-od-aoi/SKILL.md`)
-- **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/applications/tao-run-deft-od-aoi`)
-- 97 additional finding(s) are available in the full evaluation artifacts.
+- 74 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

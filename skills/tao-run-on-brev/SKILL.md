@@ -33,17 +33,51 @@ contract**, deferring the container-how to `tao-run-on-docker` over `brev exec`.
 
 NVIDIA Brev publishes an agent skill that manages instances in natural language
 ("create an A100 instance", "search for GPUs under $3/hr", "stop all my
-instances"). Install it once — it self-registers into your agent's skills dir and
-is discovered at runtime:
+instances"). It is optional, and installing it writes outside the working
+directory, into the agent skill folders of the user's home. Brev documents two
+install routes. Both download the skill files from Brev's GitHub repository,
+from its `main` branch unless a release tag is named as below, and both pass a
+GitHub token from `GITHUB_TOKEN` or `gh auth token`, when there is one, to the
+GitHub API to record the commit. Tell the user this, name the folders, and
+install only after the user approves. The agent discovers the installed skill
+at runtime.
+
+Use the first route, the `brev` CLI that is already installed. It writes
+`~/.claude/skills/brev-cli/`, `~/.agents/skills/brev-cli/`, and
+`~/.codex/skills/brev-cli/`:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/brevdev/brev-cli/main/scripts/install-agent-skill.sh | bash
-# installs to ~/.claude/skills/brev-cli/ , ~/.codex/skills/brev-cli/ , ~/.agents/skills/brev-cli/
+TAG=v0.6.337   # a brev-cli release tag; see https://github.com/brevdev/brev-cli/releases
+BREV_SKILL_BRANCH="$TAG" brev agent-skill install   # after approval; `brev agent-skill uninstall` removes it
+```
+
+An older CLI has no `agent-skill` command: update the CLI, or use the MCP
+server below. The second route is Brev's standalone installer. Never pipe it
+from the network into a shell. Download it from the same release tag to a file
+in the working directory, show the user the URL and the file so that they can
+read it, and run it only after they approve. It writes only the first two
+folders:
+
+```bash
+# TAG as set above.
+curl -fsSL -o install-agent-skill.sh "https://raw.githubusercontent.com/brevdev/brev-cli/$TAG/scripts/install-agent-skill.sh"
+# The user reads install-agent-skill.sh and approves. Then, and only then:
+bash install-agent-skill.sh --branch "$TAG"   # takes the skill files from the same tag
 ```
 
 Or connect the **Brev MCP server** (`https://docs.nvidia.com/brev/_mcp/server`).
 Either one owns login/auth quirks, placement IDs, GPU search, and teardown flags.
 It does **not** cover container execution on the instance — that is this skill.
+
+**When the `brev` CLI is missing**, this skill does not install it on its own.
+Give the user Brev's routes and what they write, and run one only after the
+user approves: Homebrew (`brew install brevdev/homebrew-brev/brev`), or the
+archive `brev-cli_<version>_<os>_<arch>.tar.gz` from the releases page named
+above, checked against `brev-cli_<version>_checksums.txt` of the same release,
+with `brev` extracted to a directory on `PATH` (Brev's installer uses
+`~/.local/bin/`). Both write outside the working directory, and the CLI keeps
+its login and settings in `~/.brev/`. Read the asset names from the release;
+never guess a download URL.
 
 **Preflight for this skill:** the `brev` CLI is on `PATH` and logged in (headless:
 `brev login --token "$BREV_API_TOKEN"` before any other call), and you can reach a
@@ -120,7 +154,11 @@ an error that reads like an instance or SSH fault but is a syntax fault. Quote
 every remote command as a single string, exactly as `brev exec --help` shows.
 
 NGC auth once per instance — **never put `NGC_KEY` on argv** (it lands in the
-remote process table); pipe it to `--password-stdin`:
+remote process table); pipe it to `--password-stdin`. The login stores an
+nvcr.io token on the instance, in the Docker client config file of the
+instance user's home directory: say so and get the user's approval first.
+Deleting the instance deletes the token; on an instance that is kept,
+`docker logout nvcr.io` removes it:
 
 ```bash
 IMG=nvcr.io/nvidia/tao/tao-toolkit:7.3.0-pyt  # versions-key: images.tao_toolkit.pyt

@@ -38,7 +38,7 @@ export function supportsSafeBash(version: string): boolean {
 }
 
 const SECRET_REFERENCE = /\b(?:[A-Z0-9_]*(?:API_KEY|ACCESS_TOKEN|SECRET|PASSWORD)|NGC_KEY|HF_TOKEN)\b/;
-const SECRET_PATH = /(?:^|[/\\\s("'\x60])(?:\.env(?:\.[^/\\\s"'\x60;|<>]*)?|secrets?\.[^/\\\s"'\x60;|<>]+|\.ssh|\.aws|\.azure|\.gnupg|\.netrc|\.npmrc|\.pypirc|auth\.json|credentials(?:\.json)?)(?:[/\\\s"'\x60;|<>]|$)|(?:^|[/\\\s("'\x60])\.config[/\\](?:gcloud|tao)(?:[/\\]|$)|(?:^|[/\\\s("'\x60])\.docker[/\\]config\.json\b|[/\\]proc[/\\][^/\\]+[/\\](?:environ|mem)\b|\.(?:pem|key)(?:[\s"'\x60;|<>]|$)/i;
+const SECRET_PATH = /(?:^|[/\\\s("'\x60])(?:\.env(?:\.[^/\\\s"'\x60;|<>]*)?|secrets?\.[^/\\\s"'\x60;|<>]+|\.ssh|\.aws|\.ngc|\.azure|\.gnupg|\.netrc|\.npmrc|\.pypirc|auth\.json|credentials(?:\.json)?)(?:[/\\\s"'\x60;|<>]|$)|(?:^|[/\\\s("'\x60])\.config[/\\](?:gcloud|tao)(?:[/\\]|$)|(?:^|[/\\\s("'\x60])\.docker[/\\]config\.json\b|[/\\]proc[/\\][^/\\]+[/\\](?:environ|mem)\b|\.(?:pem|key)(?:[\s"'\x60;|<>]|$)/i;
 
 function credentialPath(value: string, cwd: string): boolean {
 	const expanded = value.replace(/^~(?=\/|$)/, process.env.HOME ?? "");
@@ -53,6 +53,19 @@ function credentialPath(value: string, cwd: string): boolean {
 	} catch {
 		return true; // fail closed if the target cannot be inspected
 	}
+}
+
+// Path-like words of a raw command, with ~ and $VAR expanded from Pi's
+// environment, so a symlink (e.g. under $RD) to a credential file is caught by
+// the same realpath check the file tools use. Paths built at runtime
+// ($(...), eval, globs) are out of scope for this diagnostic check.
+export function commandReferencesCredentialPath(cmd: string, cwd: string): boolean {
+	return cmd
+		.split(/[\s;&|<>()`'"=:]+/)
+		.map((word) => word.replace(/\$\{?([A-Za-z_]\w*)\}?/g, (_, name) => process.env[name] ?? ""))
+		.filter((word) => /^[~./]|\//.test(word))
+		.slice(0, 64)
+		.some((word) => credentialPath(word, cwd));
 }
 
 export default function (pi: ExtensionAPI) {
@@ -104,7 +117,7 @@ export default function (pi: ExtensionAPI) {
 		// Catch dumps inside compound commands and nested shells as well as
 		// simple invocations. This is a diagnostic guard, not a shell parser;
 		// the environment allowlist above is the subprocess credential boundary.
-		if (SECRET_REFERENCE.test(cmd) || SECRET_PATH.test(cmd) ||
+		if (SECRET_REFERENCE.test(cmd) || SECRET_PATH.test(cmd) || commandReferencesCredentialPath(cmd, ctx.cwd) ||
 			/(?:^|[\s;&|("'\x60])(?:\/usr\/bin\/|\/bin\/)?(?:env|printenv)\b/.test(cmd) ||
 			/(?:^|[\s;&|("'\x60])(?:export|declare)\s+-[a-zA-Z]*p\b/.test(cmd) ||
 			/(?:^|[\s;&|("'\x60])set\s*(?:$|[;&|)"'\x60])/.test(cmd)) {
@@ -191,12 +204,12 @@ export default function (pi: ExtensionAPI) {
 			}
 		}
 
-		// Guard 3 — the ds:aoi container rejects '-e <spec>' for gap_analysis (pure Hydra CLI).
+		// Guard 3 — the DEFT AOI pack's data-services image (DS_IMG) rejects '-e <spec>' for gap_analysis (pure Hydra CLI).
 		if (cmd.includes("gap_analysis vcn_aoi") && /\s-e\s+\S+\.ya?ml/.test(cmd)) {
 			return {
 				block: true,
 				reason:
-					"GUARD(ds-aoi-cli): the nvcr.io/nvidian/iva/tao-toolkit-ds:aoi image rejects '-e <spec>' for gap_analysis (exits on argparse). Pass pure Hydra overrides (key=value) instead — see your stage card's exact invocation.",
+					"GUARD(ds-aoi-cli): the data-services image this pack is compiled for (DS_IMG) rejects '-e <spec>' for gap_analysis (exits on argparse). Pass pure Hydra overrides (key=value) instead — see your stage card's exact invocation.",
 			};
 		}
 

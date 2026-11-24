@@ -9,9 +9,10 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `tao-train-dino`
-- Evaluation date: 2026-10-16
-- Evaluator version: `1.5.6`
-- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
+- Validation status: `passed`
+- Evaluation date: 2026-11-24
+- Evaluator version: `1.6.10`
+- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 1 evaluation tasks (1 positive)
 - Dataset digest: `sha256:a0a4e58efb79400761614702ba482a9d245b9f3b5fd462ee547295fa15ec910e` (skill-evaluator-dataset-snapshot/1)
 - Attempts per task: 1
@@ -20,6 +21,20 @@ Recommended for publication based on the completed evaluation evidence in this r
 - Tier 3 evidence: required for publication
 
 Each task attempt ran in its own isolated sandbox pod.
+
+## Tier 1 LLM Provenance
+
+SkillSpector provider, model, analyzer revision, and determinism evidence retained for this scan.
+
+| Skill | Provider | Adapter | Analyzer | Model | Revision | Determinism |
+| --- | --- | --- | --- | --- | --- | --- |
+| tao-train-dino | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| tao-train-dino | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| tao-train-dino | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| tao-train-dino | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| tao-train-dino | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+
+- Controls for `tao-train-dino`: temperature=not set (source=provider_default, forwarded=no); seed=not set (source=unset, forwarded=no); reasoning_effort=not set (source=provider_default, forwarded=no)
 
 ## What This Report Answers
 
@@ -35,16 +50,28 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 99.6% — baseline ran, but no comparable score was available; uplift unavailable | 95.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 99.7% — baseline ran, but no comparable score was available; uplift unavailable | 53.4% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 0.0% → 100.0% (+100.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 0.0% → 100.0% (+100.0 points) | 48.3% → 83.3% (+35.0 points) |
-| Efficiency | 98.0% — baseline ran, but no comparable score was available; uplift unavailable | 98.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 20.0% → 100.0% (+80.0 points) | 0.0% → 40.0% (+40.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 0.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 16.7% → 100.0% (+83.3 points) | 16.7% → 33.3% (+16.6 points) |
+| Efficiency | 98.2% — baseline ran, but no comparable score was available; uplift unavailable | 93.7% → 93.7% (±0.0 points) |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
 Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92.0%, 45.0 percentage points above its 47.0% no-skill baseline.
+
+A partial dimension was calculated from only the available configured signals; review the detailed report before relying on it.
+
+### Comparison details
+
+Shared-source comparisons use the same signals and weights on both conditions. They do not replace the full dimension scores above or change the publication verdict.
+
+| Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
+| --- | --- | --- | --- | --- |
+| claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| claude-code | Efficiency | Token-only comparison | 98.9% → 96.5% (-2.4 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
 
 ## Token Usage
 
@@ -52,20 +79,20 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 65,816 | 380,435 | -314,619 | -82.70% | skill 1/1; base 1/1 |
-| claude-code | tao-train-dino-basic | 65,816 | 380,435 | -314,619 | -82.70% | skill 1/1; base 1/1 |
-| codex | All cases | 30,858 | 13,902 | +16,956 | +121.97% | skill 1/1; base 1/1 |
-| codex | tao-train-dino-basic | 30,858 | 13,902 | +16,956 | +121.97% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 96,674 | 394,337 | -297,663 | -75.48% | skill 2/2; base 2/2 |
+| claude-code | All cases | 76,071 | 35,933 | +40,138 | +111.70% | skill 1/1; base 1/1 |
+| claude-code | tao-train-dino-basic | 76,071 | 35,933 | +40,138 | +111.70% | skill 1/1; base 1/1 |
+| codex | All cases | 13,542 | 13,416 | +126 | +0.94% | skill 1/1; base 1/1 |
+| codex | tao-train-dino-basic | 13,542 | 13,416 | +126 | +0.94% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 89,613 | 49,349 | +40,264 | +81.59% | skill 2/2; base 2/2 |
 
-Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
+Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
 ## Tier Status
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 36 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 19 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 2 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 1 task(s) |
 
 ## Findings and Observations
@@ -76,11 +103,18 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 - **HIGH** DUPLICATE/duplicate: Duplicate content found across SKILL.md and references/detailed-guide.md:
   "## Reference Map" in SKILL.md (lines 18-25)
   vs "## Reference Map" in references/detailed-guide.md (lines 7-11) (`SKILL.md:18`)
+- **HIGH** DUPLICATE/duplicate: Duplicate content found across SKILL.md and references/dino-data-specs.md and references/dino-tuning-multigpu.md:
+  "## Training Requirements" in SKILL.md (lines 36-76)
+  vs "## Core Workflow" in SKILL.md (lines 77-90)
+  vs "## Contents" in references/dino-data-specs.md (lines 7-22)
+  vs "# DINO Data Specs" in references/dino-data-specs.md (lines 35-74)
+  vs "### Per-Action Dataset Requirements" in references/dino-data-specs.md (lines 75-92)
+  vs "## Dataset" in references/dino-data-specs.md (lines 264-279)
+  vs "## AutoML / HPO Notes" in references/dino-tuning-multigpu.md (lines 14-54) (`SKILL.md:36`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/models/tao-train-dino`)
 - **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/models/tao-train-dino/SKILL.md`)
 - **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/models/tao-train-dino/SKILL.md`)
-- **MEDIUM** SECURITY/Autonomous Decision Making (EA2): Excessive Agency: Do not ask the user (`BENCHMARK.md:79`)
-- 32 additional finding(s) are available in the full evaluation artifacts.
+- 16 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

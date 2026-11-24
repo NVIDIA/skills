@@ -9,7 +9,7 @@ description: Run container-backed AutoML / hyperparameter optimization (HPO) for
   SLURM, Kubernetes, Docker). Do not use generic "keep improving" language alone to override a matching domain-specific
   DEFT workflow; attribute-labelled CLIP / SigLIP image-retrieval loops belong to tao-run-deft-pas unless HPO is explicit.
 license: Apache-2.0
-compatibility: Requires docker + nvidia-container-toolkit. Workflows declare additional requirements.
+compatibility: Requires docker + nvidia-container-toolkit (not for venv-based models). Workflows declare additional requirements.
 metadata:
   author: NVIDIA Corporation
   version: "0.1.1"
@@ -45,7 +45,7 @@ final evaluation runs in the selected model action's resolved
 training-environment setup. A local checkpoint or Hugging Face model ID does not
 change this rule.
 
-Use venv-based **model execution** only when explicitly requested. Never infer
+Use venv-based **model execution** only when explicitly requested or the model skill sets `container_image: null`. Never infer
 venv mode from `local-docker`, local GPUs, Python, or `pyproject.toml`. If
 absent, execution is container-backed. A host/controller venv for `tao_automl`,
 TAO SDK, or a platform adapter is

@@ -9,9 +9,6 @@ Copies the previous iteration's spec, appends one
 list, and sets ``train.num_epochs`` and ``train.optim.lr``. Dataset growth is by
 list-append: earlier sources are never removed, so iteration N trains on every
 source accumulated so far.
-
-This replaces the reference pipeline's ``reformat_train_spec.py``, which exists
-only inside an internal container image and cannot be called from a skill.
 """
 
 from __future__ import annotations

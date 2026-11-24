@@ -111,7 +111,7 @@ docker run --rm --gpus all \
     pytest tests/cv_unit_test/<model_name>/ -v --color=yes -m 'cv_unit'"
 ```
 
-For the full functional suite (used before merging, much slower — equivalent to what NVIDIA's internal `ci/run_functional_tests.py` wrapper would invoke under the hood):
+For the full functional suite (used before merging, much slower):
 ```bash
 docker run --rm --gpus all \
   --shm-size=16G \

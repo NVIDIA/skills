@@ -18,11 +18,13 @@ Two equivalent conventions; a pack uses exactly one:
   `<stage> ok` (failures append `<stage> FAIL`). The driver routes on the last
   `ok` line only — error lines never advance routing, and a trailing `FAIL`
   halts the driver (no auto-retry; an operator decides).
-- **Skill-tooling packs** (`loop_log.jsonl`): when the application skill ships
-  its own commit machinery (e.g. DEFT's `commit_stage.py`, which validates
-  evidence before writing), ALL state writes go through it and the driver
-  routes on the last `status=="ok"` entry. Cards never hand-roll state writes
-  that the skill's tooling owns.
+- **Skill-tooling packs** (the skill's own state file): when the application
+  skill ships its own commit machinery (e.g. DEFT AOI's `commit_stage.py`,
+  which validates evidence before writing `deft_state.json`), ALL state writes
+  go through it and the driver routes on the skill's own next-stage decision
+  (DEFT AOI: `deft_context.py`). Cards never hand-roll state writes that the
+  skill's tooling owns, and the driver never re-derives routing the skill
+  already computes.
 
 ## `STAGE_DONE <card-id>` — explicit termination
 
@@ -54,8 +56,10 @@ measured failures:
 
 Per-host values (workspace, venv, model, images) come from
 `~/.tao-kit/kit.env`, sourced by every pack driver. Credentials are never
-written anywhere — drivers check presence of the API key variable and abort
-with the export instruction if missing. Pi keeps provider credentials in the
+written anywhere — drivers check presence of the selected provider's API key
+variable (`scripts/model_preflight.sh`) and abort with the export instruction
+if missing; providers the helper does not know (e.g. `~/.pi/agent/models.json`
+entries) are skipped with an explicit message. Pi keeps provider credentials in the
 harness process but strips them and arbitrary startup hooks from bash tool
 subprocesses. See the adapter README for the isolated-worker requirement.
 

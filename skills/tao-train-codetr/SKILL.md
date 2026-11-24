@@ -25,7 +25,7 @@ Co-DETR trains a DETR detector alongside auxiliary one-to-many assignment heads 
 ## Availability — probe, then fall back to the module
 
 The `codetr` **console script is not registered** in the TAO PyTorch images checked so far
-(`7.0.1-pyt` and the `2026.7.31-rc-12-multiarch` nightly), even though the module itself
+(including `7.0.1-pyt`), even though the module itself
 ships. So a bare `codetr` invocation fails while the network is perfectly usable.
 
 Probe in two steps and use whichever works:

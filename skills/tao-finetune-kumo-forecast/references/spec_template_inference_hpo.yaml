@@ -28,6 +28,8 @@ hpo:
   standardizer_pkl: ""
   # Enable cross-channel attention for multivariate forecasting.
   use_cross_channel: false
+  # Cross-channel attention heads (basic mode; used when use_cross_channel is true; multivariate input only).
+  cross_channel_heads: 8
 train:
   # Directory where inference HPO trial metrics and artifacts are written.
   output_dir: artifacts/inference_hpo

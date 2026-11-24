@@ -202,7 +202,8 @@ universal default:
 Through the selected platform, stage this workflow's `scripts/` directory
 read-only as `CONTAINER_DEFT_SCRIPTS`, keep the original absolute spec/workspace
 paths visible, and submit the following command **inside the same approved
-Cosmos Embed image**, with the model skill's startup preamble and GPU count:
+Cosmos Embed image**, with the `DOCKER_COMMON` options from
+`tao-finetune-cosmos-embed/SKILL.md` and the spec's GPU count:
 
 ```bash
 python "$CONTAINER_DEFT_SCRIPTS/batch_cosmos_embed_text.py" run \

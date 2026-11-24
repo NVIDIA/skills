@@ -1062,7 +1062,7 @@ run "$PY" "$AUDIT" --results-dir "$RUN_F" --require-complete
 assert_rc 1 "--require-complete fails on the finalized failure"
 
 # ═══════════════════════════════════════════════════════════════════════════
-# RUN G — one section per defect an adversarial review found in these three
+# RUN G — one section per defect that was once possible in these three
 #         scripts. Each asserts the behaviour that replaced the defect, so the
 #         defect cannot come back quietly.
 # ═══════════════════════════════════════════════════════════════════════════
@@ -1102,7 +1102,7 @@ print(json.dumps(value) if not isinstance(value, str) else value)
 
 section "G1. a baseline abandoned at inference can never be reported complete"
 
-# The reviewer's run: baseline stops at inference, every iteration finishes, and
+# The shape under test: baseline stops at inference, every iteration finishes, and
 # loop_stop lands. Committing it is now impossible (C1), so the shape is built by
 # hand to prove the audit rejects it on the way back in too — the completion gate
 # is what the agent's final claim rests on.
@@ -1116,7 +1116,7 @@ run "$PY" "$AUDIT" --results-dir "$G_RUN" --require-complete
 assert_rc 0 "[G1] the honest run is complete"
 
 run "$PY" - "$G_RUN" <<'PYEOF'
-"""Delete the baseline kpi_analyze the reviewer's agent skipped, and renumber."""
+"""Delete the baseline kpi_analyze, as if the agent had skipped it, and renumber."""
 import json
 import sys
 from pathlib import Path

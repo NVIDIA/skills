@@ -118,7 +118,7 @@
         "nova_carter"
       ],
       "data_root": "???",
-      "eval_dist_fcn": "center_distance",
+      "eval_dist_fcn": "iou_3d",
       "eval_hota": false,
       "fps_drop_prob": 0.0,
       "lazy_load": false,
@@ -718,7 +718,7 @@
           "nova_carter"
         ],
         "data_root": "???",
-        "eval_dist_fcn": "center_distance",
+        "eval_dist_fcn": "iou_3d",
         "eval_hota": false,
         "fps_drop_prob": 0.0,
         "lazy_load": false,
@@ -945,7 +945,7 @@
           "type": "string"
         },
         "eval_dist_fcn": {
-          "default": "center_distance",
+          "default": "iou_3d",
           "description": "Evaluation distance function",
           "enum": [
             "center_distance",

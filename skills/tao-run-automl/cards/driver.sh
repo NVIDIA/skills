@@ -9,13 +9,14 @@
 # progress.log; the driver owns run-dir selection (no cross-run pointer file).
 # See skills/core/tao-token-efficient-execution/SKILL.md for the framework.
 #
-# Config comes from the environment or ~/.tao-kit/kit.env. Required: WS, VENV.
-# Common overrides: MODEL, TRAIN_IMG, PI_KIT_TURN_BUDGET.
+# Config comes from the environment or ~/.tao-kit/kit.env. Required, no
+# default: WS, VENV, MODEL. Common overrides: TRAIN_IMG, PI_KIT_TURN_BUDGET.
 # ============================================================================
 set -u
 KIT_ENV=${KIT_ENV:-$HOME/.tao-kit/kit.env}
 [ -f "$KIT_ENV" ] && . "$KIT_ENV"
 [ -d "$HOME/.local/share/pi-node/current/bin" ] && export PATH="$HOME/.local/share/pi-node/current/bin:$PATH"
+command -v pi >/dev/null 2>&1 || { echo "[a-driver] ABORT: pi not on PATH (this pack runs on the Pi harness; run the kit's install.sh)" >&2; exit 1; }
 
 PACK=$(cd "$(dirname "$0")" && pwd)                 # this cards/ directory
 BANK=$(cd "$PACK/../../../.." && pwd)               # skill-bank root
@@ -35,10 +36,18 @@ VENV=${VENV:?export VENV (venv with the nvidia-tao-automl wheel; see tao-run-aut
 if [ -z "${TRAIN_IMG:-}" ]; then
   TRAIN_IMG=$("$VENV/bin/python" "$SB/scripts/resolve_versions_key.py" images.tao_toolkit.pyt --skill-bank "$SB") || exit 1
 fi
+# C-RADIOv2-B backbone on the host; default is what tao-run-deft-aoi/scripts/stage_backbone.py writes.
+STAGE_BACKBONE="$BANK/skills/applications/tao-run-deft-aoi/scripts/stage_backbone.py"
+if [ -z "${BACKBONE:-}" ]; then
+  BACKBONE=$WS/augmentation/backbone/c_radio_v2_b.safetensors
+  [ ! -s "$BACKBONE" ] && [ -s "$WS/augmentation/backbone/model.safetensors" ] && BACKBONE=$WS/augmentation/backbone/model.safetensors
+fi
+case "$BACKBONE" in *[[:space:]]*) echo "[a-driver] ABORT: BACKBONE must not contain whitespace: $BACKBONE" >&2; exit 1 ;; esac
+[ -s "$BACKBONE" ] || { echo "[a-driver] ABORT: backbone not staged at $BACKBONE; run: $VENV/bin/python $STAGE_BACKBONE --workspace $WS (or set BACKBONE)" >&2; exit 1; }
 SYSPROMPT="You are a precise task executor operating in a bash environment on a GPU workstation. You MUST perform every action by calling your tools (bash, read, edit, write) — never describe, simulate, or invent a result or command output. Follow the stage card exactly; work alone; never ask questions; end your turn the moment the card says to."
 
-MODEL=${MODEL:-nim/nvidia/qwen/qwen3.6-35b-a3b:off}
-export WS SB VENV TRAIN_IMG
+MODEL=${MODEL:-}                                    # required, no default; checked by kit_check_model_key
+export WS SB VENV TRAIN_IMG BACKBONE
 export PI_KIT_WS="$WS"
 export PI_KIT_RUN_PREFIX="automl2_"
 # 120 clears every legitimately-completed session measured in the study
@@ -50,10 +59,9 @@ PI_FLAGS=(-p -na --system-prompt "$SYSPROMPT"
   -e "$ADAPTER/nvidia-provider.ts" -e "$ADAPTER/guard.ts" -e "$ADAPTER/recorder.ts"
   --session-dir "$SESSION_DIR")
 
-case "$MODEL" in
-  nim/*) [ -n "${NVIDIA_INFERENCE_API_KEY:-}" ] || { echo "[a-driver] ABORT: export NVIDIA_INFERENCE_API_KEY" >&2; exit 1; } ;;
-  anthropic/*) [ -n "${ANTHROPIC_API_KEY:-}" ] || { echo "[a-driver] ABORT: export ANTHROPIC_API_KEY" >&2; exit 1; } ;;
-esac
+. "$BANK/skills/core/tao-token-efficient-execution/scripts/model_preflight.sh"
+kit_prepare_model_env
+kit_check_model_key "[a-driver]" || exit 1
 mkdir -p "$SESSION_DIR"
 [ -f "$MARKER" ] || touch "$MARKER"
 cd "$RUN_HOME"

@@ -9,8 +9,7 @@ instead of minutes into a GPU container with a cryptic traceback (or, worse,
 after a checkpoint is written and it looks like partial success).
 
 Ported from the DEFT-AOI loop's `validate_training_csv.py` and extended with
-the three failure modes reported against the standalone NemoClaw VCN workflow
-(NVBugs 6470188):
+the three failure modes reported against the standalone NemoClaw VCN workflow:
 
   1. Absolute host paths in the CSV. `input_path` / `golden_path` are resolved
      RELATIVE to `images_dir`, which is mounted at the container's `/data`. An

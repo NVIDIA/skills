@@ -1,7 +1,7 @@
 name: tao-train-sparse4d
 network_arch: sparse4d
 automl_enabled: true
-container_image: nvcr.io/nvidia/tao/tao-toolkit:7.3.0-pyt  # versions-key: images.tao_toolkit.pyt
+container_image: nvcr.io/nvidia/tao/tao-toolkit:7.3.0-pyt  # versions-key: images.tao_toolkit.sparse4d_pyt
 data_format: ovpkl
 gpu_spec_key: train.num_gpus
 schema_excluded_fields:
@@ -15,7 +15,7 @@ schema_excluded_fields:
   - dataset.canonical_2d_width
 actions:
   dataset_convert:
-    container_image: nvcr.io/nvidia/tao/tao-toolkit:7.3.0-data-services  # versions-key: images.tao_toolkit.data_services
+    container_image: nvcr.io/nvidia/tao/tao-toolkit:7.3.0-data-services  # versions-key: images.tao_toolkit.sparse4d_data_services
     command: annotations convert -e {config_path}
     config_format: yaml
     mode: config

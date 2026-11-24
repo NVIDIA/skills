@@ -143,8 +143,8 @@ network_arch_constraints:
         VLM/diffusion model types. Pass-through to the model's expectations.
       reason: |
         BaseInferenceMicroserviceServer.chat_completions (tao-core
-        nvidia_tao_core/microservices/handlers/base_inference_microservice_server.py,
-        added on the `inference` branch in commit 33bff58) collects media_uris and
+        nvidia_tao_core/microservices/handlers/base_inference_microservice_server.py)
+        collects media_uris and
         prompt then calls self.run_inference(media=media, prompt=prompt, ...). The
         HuggingFace subclass auto-detects model type from model_path — VLMs require
         media, LLMs do not, diffusion models generate from prompt alone.

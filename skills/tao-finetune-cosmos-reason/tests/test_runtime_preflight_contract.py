@@ -896,7 +896,7 @@ def test_framework_validation_cache_preflight_attests_inherited_and_new_modules(
 
 
 def test_framework_validation_feature_cache_is_gated_on_supported_model_type() -> None:
-    """NVBUG 6669758: Cosmos Framework supports the cache only for qwen3_vl.
+    """Cosmos Framework supports the cache only for qwen3_vl.
 
     Enabling it for cosmos3_edge aborts at model construction, so the planner
     must not seal a nonzero size for unsupported families.
@@ -950,7 +950,7 @@ def test_framework_explicit_feature_cache_rejected_for_unsupported_model_type() 
 
     Silently zeroing a user's explicit size would hide the incompatibility;
     raising here replaces a post-distributed-init ChildFailedError with an
-    actionable planner error. NVBUG 6669758.
+    actionable planner error.
     """
     args = SimpleNamespace(
         dataset_family="video_conversation",
