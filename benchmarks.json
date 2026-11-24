@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 485,
-  "result_row_count": 4564,
+  "skill_count": 487,
+  "result_row_count": 4584,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -1034,6 +1034,27 @@
       "average_uplift_pct": 1.32
     },
     {
+      "skill": "cccl",
+      "evaluation_date": "2026-11-16",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.9",
+      "dataset_digest": "sha256:13b0c7c74d5a022291120e62bdcc02ede526857f54b91e50df67e7be31e422d0",
+      "validation_status": "passed",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "cccl",
+      "component": "CCCL",
+      "has_results": true,
+      "average_uplift_pct": 11.72
+    },
+    {
       "skill": "cdf-anomalygen",
       "evaluation_date": "2026-10-20",
       "environment": "k8s-sandbox",
@@ -1473,6 +1494,27 @@
       "component": "Nsight",
       "has_results": true,
       "average_uplift_pct": 6.12
+    },
+    {
+      "skill": "cuda-python",
+      "evaluation_date": "2026-11-17",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.9",
+      "dataset_digest": "sha256:019be8a7baa74a5b59a3b1eefde1bc48ea803066854740ed47a1be25fbd83a0f",
+      "validation_status": "passed",
+      "tasks": 20,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "cuda-python",
+      "component": "CUDA Python",
+      "has_results": true,
+      "average_uplift_pct": 9.53
     },
     {
       "skill": "cudaq-guide",
@@ -5183,7 +5225,7 @@
       "catalog_dir": "kumo-data-science",
       "component": "Kumo Engine",
       "has_results": true,
-      "average_uplift_pct": 34.6
+      "average_uplift_pct": 37.2
     },
     {
       "skill": "kumo-graph-visualization",
@@ -5225,7 +5267,7 @@
       "catalog_dir": "kumo-model-explanations",
       "component": "Kumo Engine",
       "has_results": true,
-      "average_uplift_pct": 23.85
+      "average_uplift_pct": 22.3
     },
     {
       "skill": "kumo-model-persistence",
@@ -14431,6 +14473,96 @@
       "uplift_pct": null
     },
     {
+      "catalog_dir": "cccl",
+      "component": "CCCL",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "cccl",
+      "component": "CCCL",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "cccl",
+      "component": "CCCL",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 22.5
+    },
+    {
+      "catalog_dir": "cccl",
+      "component": "CCCL",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 5.0
+    },
+    {
+      "catalog_dir": "cccl",
+      "component": "CCCL",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "cccl",
+      "component": "CCCL",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "cccl",
+      "component": "CCCL",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 96.4,
+      "uplift_pct": 32.9
+    },
+    {
+      "catalog_dir": "cccl",
+      "component": "CCCL",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 81.3,
+      "uplift_pct": 9.9
+    },
+    {
+      "catalog_dir": "cccl",
+      "component": "CCCL",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 86.1,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "cccl",
+      "component": "CCCL",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 52.3,
+      "uplift_pct": null
+    },
+    {
       "catalog_dir": "cdf-anomalygen",
       "component": "CDF AnomalyGen",
       "dimension": "Security",
@@ -16273,6 +16405,96 @@
       "num": null,
       "agent": "codex",
       "score_pct": 90.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "cuda-python",
+      "component": "CUDA Python",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 90.0,
+      "uplift_pct": 10.0
+    },
+    {
+      "catalog_dir": "cuda-python",
+      "component": "CUDA Python",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 67.5,
+      "uplift_pct": -15.0
+    },
+    {
+      "catalog_dir": "cuda-python",
+      "component": "CUDA Python",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 94.0,
+      "uplift_pct": 24.0
+    },
+    {
+      "catalog_dir": "cuda-python",
+      "component": "CUDA Python",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 92.0,
+      "uplift_pct": 14.0
+    },
+    {
+      "catalog_dir": "cuda-python",
+      "component": "CUDA Python",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 83.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "cuda-python",
+      "component": "CUDA Python",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 83.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "cuda-python",
+      "component": "CUDA Python",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 68.0,
+      "uplift_pct": 12.0
+    },
+    {
+      "catalog_dir": "cuda-python",
+      "component": "CUDA Python",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 62.5,
+      "uplift_pct": 12.2
+    },
+    {
+      "catalog_dir": "cuda-python",
+      "component": "CUDA Python",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 84.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "cuda-python",
+      "component": "CUDA Python",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 67.7,
       "uplift_pct": null
     },
     {
@@ -31141,7 +31363,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 18.7
+      "uplift_pct": 6.2
     },
     {
       "catalog_dir": "kumo-data-science",
@@ -31150,7 +31372,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 45.0
+      "uplift_pct": 50.0
     },
     {
       "catalog_dir": "kumo-data-science",
@@ -31158,8 +31380,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 95.0,
-      "uplift_pct": 47.5
+      "score_pct": 97.5,
+      "uplift_pct": 52.5
     },
     {
       "catalog_dir": "kumo-data-science",
@@ -31176,7 +31398,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 92.1,
+      "score_pct": 90.7,
       "uplift_pct": null
     },
     {
@@ -31185,17 +31407,17 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 57.6
+    },
+    {
+      "catalog_dir": "kumo-data-science",
+      "component": "Kumo Engine",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
       "score_pct": 93.8,
-      "uplift_pct": 50.2
-    },
-    {
-      "catalog_dir": "kumo-data-science",
-      "component": "Kumo Engine",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 85.9,
-      "uplift_pct": 46.2
+      "uplift_pct": 56.9
     },
     {
       "catalog_dir": "kumo-data-science",
@@ -31203,7 +31425,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 94.0,
+      "score_pct": 95.9,
       "uplift_pct": null
     },
     {
@@ -31330,7 +31552,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 60.0
+      "uplift_pct": 53.3
     },
     {
       "catalog_dir": "kumo-model-explanations",
@@ -31338,8 +31560,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 96.7,
-      "uplift_pct": 23.4
+      "score_pct": 90.0,
+      "uplift_pct": 33.3
     },
     {
       "catalog_dir": "kumo-model-explanations",
@@ -31356,7 +31578,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 95.0,
+      "score_pct": 93.0,
       "uplift_pct": null
     },
     {
@@ -31365,8 +31587,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 60.4,
-      "uplift_pct": 35.4
+      "score_pct": 67.4,
+      "uplift_pct": 39.6
     },
     {
       "catalog_dir": "kumo-model-explanations",
@@ -31374,8 +31596,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 57.6,
-      "uplift_pct": 24.3
+      "score_pct": 49.3,
+      "uplift_pct": 7.6
     },
     {
       "catalog_dir": "kumo-model-explanations",
@@ -31392,7 +31614,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 96.0,
+      "score_pct": 95.8,
       "uplift_pct": null
     },
     {

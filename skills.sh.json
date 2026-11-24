@@ -444,6 +444,7 @@
       "title": "GPU Development",
       "description": "Develop, tune, profile, and integrate GPU kernels and accelerated code, including CUDA-adjacent workflows, autotuning, low-level performance work, and framework integration.",
       "skills": [
+        "cccl",
         "compileiq-author-objective",
         "compileiq-booster-pack",
         "compileiq-bootstrap",
@@ -452,6 +453,7 @@
         "compileiq-search-space",
         "compileiq-validate-result",
         "compute-sanitizer-diagnose-cuda-bugs",
+        "cuda-python",
         "cudf-query-engine-builder",
         "cudnn-compile-and-serialize",
         "cudnn-install",
