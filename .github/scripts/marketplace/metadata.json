@@ -577,6 +577,18 @@
       }
     },
     {
+      "path": "skills/cccl",
+      "name": "cccl",
+      "description": "Use for CUDA C++ work. Use when asked to \"write a kernel that ...\". Use before hand-writing a CUDA kernel for something CCCL provides or can be composed of: sum/min/max/argmax reductions, prefix sums, sorting, top-k, histograms, stream compaction, per-segment or per-key reductions, search, merge, or an elementwise transform. Use for anything that touches NVIDIA CCCL (Thrust, CUB, libcu++ / cuda::std): writing, porting, reviewing, optimizing, debugging, fusing passes, streams, deterministic float results, cuda::std parallel algorithms, and the libcu++ runtime API (cuda::stream, cuda::launch). Use when Thrust/CUB code returns wrong results, is slow, or stops compiling or building after a CUDA 13 / CCCL 3.x upgrade. Not for Python (CuPy, PyTorch, cuda.compute) or for other CUDA libraries such as cuBLAS or cuDNN.",
+      "metadata": {
+        "product.primary": "CCCL-CUDA Core Compute Library",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "gpu-development",
+        "audience": "developer,application_developer,hpc_developer,platform_engineer,hands_on_builder",
+        "discovery.activity_tags": "generate,optimize,debug,migrate,integrate"
+      }
+    },
+    {
       "path": "skills/cdf-anomalygen",
       "name": "cdf-anomalygen",
       "description": "Use when running the CDF AnomalyGen pipeline over a defect dataset — mask placement, fine-tuning, synthetic defect-image generation (SDG), evaluation, quality refinement, and pseudo-labeling — even when the user names only one stage.",
@@ -826,6 +838,18 @@
         "catalog.subdomain": "gpu-development",
         "audience": "developer,application_developer,hpc_developer",
         "discovery.activity_tags": "debug,troubleshoot,inspect,test,validate"
+      }
+    },
+    {
+      "path": "skills/cuda-python",
+      "name": "cuda-python",
+      "description": "Use for any task or question involving CUDA Python Core libraries: cuda-core, cuda-bindings and cuda-pathfinder. Use when asked to write, port, review, debug Python code that compiles and launches its own CUDA kernels (Program, launch, LaunchConfig, Device, Stream, Buffer, Linker, CUDA graphs). When porting PyCUDA or old CUDA bindings APIs to cuda.core and cuda.bindings. When interacting with passing CuPy, PyTorch or Numba arrays and streams to a custom kernel. When locating CUDA headers or libraries from Python, and for install questions about cuda-python, cuda-core or conda. Use before hand-rolling cuda.bindings driver / nvrtc / nvml calls for something cuda.core provides. Not for plain CuPy, Numba or PyTorch array code, or for cuda.compute (CCCL).",
+      "metadata": {
+        "product.primary": "CUDA Python",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "gpu-development",
+        "audience": "application_developer,hpc_developer,developer,ml_engineer,platform_engineer",
+        "discovery.activity_tags": "generate,debug,migrate,integrate,configure"
       }
     },
     {

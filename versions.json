@@ -338,6 +338,13 @@
       "last_modified": "2026-10-01"
     },
     {
+      "name": "cccl",
+      "path": "skills/cccl",
+      "content_digest": "sha256:bd846f9a43616141161ba256da9a3496f84dacd51a54849bc0316cf3c0fec9ec",
+      "last_commit": "71e61c7209cb4ca64cba247a7d20a5438b30aef5",
+      "last_modified": "2026-11-24"
+    },
+    {
       "name": "cdf-anomalygen",
       "path": "skills/cdf-anomalygen",
       "content_digest": "sha256:fc4b97ef691f743201f95e6e5b80c1b67dbc961ff4a201f836b6275eba1c53cd",
@@ -483,6 +490,13 @@
       "content_digest": "sha256:f60e527e8be3030f85cde7bdf40e8ebad093cc7462542e307839867f2f3e912a",
       "last_commit": "8a7430653e0d7c26e17642b03cc9297213fc16ac",
       "last_modified": "2026-10-19"
+    },
+    {
+      "name": "cuda-python",
+      "path": "skills/cuda-python",
+      "content_digest": "sha256:24d5f6a3402d1bafcad6f6013f222de19688eb0e2d1974f7b3e94c97d3a39d2b",
+      "last_commit": "71e61c7209cb4ca64cba247a7d20a5438b30aef5",
+      "last_modified": "2026-11-24"
     },
     {
       "name": "cudaq-guide",
@@ -1726,9 +1740,9 @@
     {
       "name": "kumo-data-science",
       "path": "skills/kumo-data-science",
-      "content_digest": "sha256:dc3fc7255b4c971ba12c33d8a624f185c9db6b6ca3b21f841bb43ce37de2ba58",
-      "last_commit": "7059d0f946f1ca521e04e812debf8899907e1898",
-      "last_modified": "2026-11-20"
+      "content_digest": "sha256:7f26399e01300b26ddcf00e5016d7919dd0988255bf941834c07e241da5540fe",
+      "last_commit": "71e61c7209cb4ca64cba247a7d20a5438b30aef5",
+      "last_modified": "2026-11-24"
     },
     {
       "name": "kumo-graph-visualization",
@@ -1740,9 +1754,9 @@
     {
       "name": "kumo-model-explanations",
       "path": "skills/kumo-model-explanations",
-      "content_digest": "sha256:79dedc64b13109c87d72fbd813c7a17efcd4e26d750c8d41bfe0d85567c9e67f",
-      "last_commit": "7059d0f946f1ca521e04e812debf8899907e1898",
-      "last_modified": "2026-11-20"
+      "content_digest": "sha256:762fccb58c7475f14745ebcb0c83498069f611f1a42d347b813e18afdd632838",
+      "last_commit": "71e61c7209cb4ca64cba247a7d20a5438b30aef5",
+      "last_modified": "2026-11-24"
     },
     {
       "name": "kumo-model-persistence",
