@@ -4719,7 +4719,7 @@
     {
       "path": "skills/tao-finetune-cosmos-embed",
       "name": "tao-finetune-cosmos-embed",
-      "description": "Cosmos-Embed1 video-text embedding for text-to-video retrieval, video-to-video search, semantic deduplication, and fine-tuning. Use when the user asks to \"fine-tune Cosmos-Embed1\", \"run cosmos-embed inference\", \"export Cosmos-Embed1\", \"embed videos\", or \"search videos with text\".",
+      "description": "Cosmos-Embed1 video-text embedding for text-to-video retrieval, video-to-video search, semantic deduplication, and LoRA fine-tuning. Use when the user asks to \"fine-tune Cosmos-Embed1\", \"LoRA fine-tune Cosmos-Embed1 on PhysicalAI-Event-Videos\", \"train Cosmos-Embed1 on vad_r1_chunks manifests\", \"score the text-to-video retrieval benchmark during training\", \"run cosmos-embed inference\", \"export Cosmos-Embed1 to ONNX\", \"embed videos\", or \"search videos with text\".",
       "metadata": {
         "product.primary": "TAO Toolkit",
         "classification.category.primary": "ai_and_machine_learning",
@@ -5163,7 +5163,7 @@
     {
       "path": "skills/tao-token-efficient-execution",
       "name": "tao-token-efficient-execution",
-      "description": "Token-efficient execution kit for repeated TAO agentic workflows. Compiles a skill into stage cards once (with a strong model), then executes them forever in fresh, small headless sessions coordinated by a bash driver — measured 67-91% token reduction and 3-5x lower peak context vs one long conversation. Use when a TAO workflow will be run repeatedly, when token cost matters, when the target model has a small context window, or on trigger phrases like \"token efficient\", \"reduce token cost\", \"card pack\", \"stage cards\", \"run this workflow on a small model\", \"compile this skill into cards\".",
+      "description": "Token-efficient execution kit for repeated TAO agentic workflows. Compiles a skill into stage cards once (with a strong model), then executes them forever in fresh, small headless sessions coordinated by a bash driver — measured 74-91% token reduction and 4-5x lower peak context vs one long conversation. Use when a TAO workflow will be run repeatedly, when token cost matters, when the target model has a small context window, or on trigger phrases like \"token efficient\", \"reduce token cost\", \"card pack\", \"stage cards\", \"run this workflow on a small model\", \"compile this skill into cards\".",
       "metadata": {
         "product.primary": "TAO Toolkit",
         "classification.category.primary": "developer_tools",
