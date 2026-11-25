@@ -113,5 +113,8 @@ skills:
     catalog_dir: doca-telemetry-traceback-application
   - path: skills/tools/doca-telemetry-utils/
     catalog_dir: doca-telemetry-utils
+plugins:
+  - path: plugins/nvidia-doca-plugin/
+    catalog_dir: nvidia-doca-plugin
 links:
   discussions: false
