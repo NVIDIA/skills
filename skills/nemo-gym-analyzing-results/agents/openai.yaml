@@ -1,0 +1,4 @@
+interface:
+  display_name: "NeMo Gym Analyzing Results"
+  short_description: "Tell whether a score change is real and why tasks fail"
+  default_prompt: "Use $nemo-gym-analyzing-results to check whether the difference between my two NeMo Gym runs is real and explain which tasks fail and why."

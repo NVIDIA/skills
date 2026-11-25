@@ -1,0 +1,432 @@
+{
+  "run": {
+    "ignored_checks": [],
+    "artifacts": {
+      "records": 176,
+      "captures": 0,
+      "coverage": {
+        "check_execution_error": {
+          "evaluated": 176,
+          "unobserved": 0,
+          "ignored": 0
+        },
+        "record_unreadable": {
+          "evaluated": 176,
+          "unobserved": 0,
+          "ignored": 0
+        },
+        "rollout_duplicate_identity": {
+          "evaluated": 176,
+          "unobserved": 0,
+          "ignored": 0
+        },
+        "rollout_missing_agent_turns": {
+          "evaluated": 0,
+          "unobserved": 176,
+          "ignored": 0
+        },
+        "rollout_ended_on_failed_model_call": {
+          "evaluated": 0,
+          "unobserved": 176,
+          "ignored": 0
+        },
+        "agent_turn_hollow": {
+          "evaluated": 0,
+          "unobserved": 176,
+          "ignored": 0
+        },
+        "model_call_zero_completion_tokens": {
+          "evaluated": 0,
+          "unobserved": 176,
+          "ignored": 0
+        },
+        "model_call_missing_token_counts": {
+          "evaluated": 0,
+          "unobserved": 176,
+          "ignored": 0
+        },
+        "trajectory_capture_mismatch": {
+          "evaluated": 0,
+          "unobserved": 176,
+          "ignored": 0
+        },
+        "rollout_token_count_mismatch": {
+          "evaluated": 0,
+          "unobserved": 176,
+          "ignored": 0
+        },
+        "model_call_runaway_generation": {
+          "evaluated": 0,
+          "unobserved": 176,
+          "ignored": 0
+        },
+        "rollout_tool_call_failed": {
+          "evaluated": 0,
+          "unobserved": 176,
+          "ignored": 0
+        },
+        "task_consistently_unhealthy": {
+          "evaluated": 0,
+          "unobserved": 24,
+          "ignored": 0
+        },
+        "task_no_successful_model_calls": {
+          "evaluated": 0,
+          "unobserved": 24,
+          "ignored": 0
+        },
+        "run_excessive_failures": {
+          "evaluated": 0,
+          "unobserved": 1,
+          "ignored": 0
+        }
+      },
+      "state": "observed",
+      "expected": 192,
+      "completed": 176,
+      "scored": 176,
+      "failed": {
+        "total": 16,
+        "final": 0,
+        "not_final": 16,
+        "by_class": {
+          "model_request_error": 16
+        }
+      },
+      "missing": 0,
+      "not_started": 0,
+      "omitted": 0,
+      "healthy": true,
+      "unhealthy_reasons": [],
+      "limits": {
+        "max_not_final_failure_fraction": null,
+        "max_final_failure_fraction": null,
+        "source": {
+          "max_not_final_failure_fraction": "config",
+          "max_final_failure_fraction": "config"
+        }
+      }
+    },
+    "verdicts": {
+      "healthy": 0,
+      "unhealthy": 0,
+      "unobserved": 176
+    },
+    "issues": {
+      "check_execution_error": 0,
+      "record_unreadable": 0,
+      "rollout_duplicate_identity": 0,
+      "rollout_missing_agent_turns": 0,
+      "rollout_ended_on_failed_model_call": 0,
+      "agent_turn_hollow": 0,
+      "model_call_zero_completion_tokens": 0,
+      "model_call_missing_token_counts": 0,
+      "trajectory_capture_mismatch": 0,
+      "rollout_token_count_mismatch": 0,
+      "model_call_runaway_generation": 0,
+      "rollout_tool_call_failed": 0,
+      "task_consistently_unhealthy": 0,
+      "task_no_successful_model_calls": 0,
+      "run_excessive_failures": 0
+    },
+    "stats": {
+      "observed_upstream_recovery": null,
+      "model_call_errors": {
+        "total": 0,
+        "by_status": {},
+        "rollouts_affected": 0,
+        "ended_on_error": 0,
+        "context_window_exceeded": {
+          "true": 0,
+          "false": 0,
+          "absent": 176
+        },
+        "verification_skipped": {
+          "true": 0,
+          "false": 0,
+          "absent": 176
+        },
+        "usage_unknown": 0
+      },
+      "responses": {
+        "rollouts": 176,
+        "unknown": 176,
+        "selected": 0,
+        "faulted": 0,
+        "duplicated": 0
+      },
+      "duplicated_calls": {
+        "replayed": 0,
+        "rollouts": 0
+      },
+      "tokens": {
+        "prompt": 8517,
+        "completion": 1760,
+        "capture_prompt": 0,
+        "capture_completion": 0
+      },
+      "timeouts": {
+        "rollouts": 192,
+        "timed_out": 0,
+        "by_evidence": {
+          "typed": 0,
+          "legacy": 0
+        },
+        "by_limit": {},
+        "by_enforcer": {},
+        "events": 0,
+        "invalid_events": 0,
+        "failed_without_signal": 16,
+        "elapsed_s": {
+          "p50": null,
+          "p95": null
+        },
+        "time_split": {
+          "rollouts_with_captures": 0,
+          "policy_model": null,
+          "other_model": null,
+          "tool": null,
+          "untracked": null,
+          "policy_output_tokens_per_s": {
+            "p50": null,
+            "p5": null
+          },
+          "policy_calls_per_rollout": {
+            "p50": null,
+            "p95": null
+          }
+        }
+      },
+      "observed_runtime": {
+        "invocation_observations": 0,
+        "in_session": {
+          "true": 0,
+          "false": 0,
+          "absent": 0
+        },
+        "verification_skipped": {
+          "true": 0,
+          "false": 0,
+          "absent": 0
+        },
+        "row_elapsed_s": {
+          "sum_observed": 100.15009609796107,
+          "absent": 0
+        }
+      },
+      "observed_request_effort": {
+        "http_attempts": {
+          "sum_observed": null,
+          "operations_observed": 0,
+          "operations_unknown": 0
+        },
+        "transport_failures": {
+          "sum_observed": null,
+          "operations_observed": 0,
+          "operations_unknown": 0
+        },
+        "retry_wait_s": {
+          "sum_observed": null,
+          "operations_observed": 0,
+          "operations_unknown": 0
+        },
+        "request_elapsed_ms": {
+          "sum_observed": null,
+          "operations_observed": 0,
+          "operations_unknown": 0
+        }
+      }
+    },
+    "findings": [],
+    "provenance": {
+      "resolved_config": "read",
+      "route_failures_to_sidecar": true,
+      "servers": {},
+      "mlflow": {
+        "configured": false,
+        "tracking_required": null
+      },
+      "rollout_artifact_digests": [
+        {
+          "rollouts_jsonl_fpath": "f195a7d75c7ac5c24f29b46ac9cc4783e6f0d9788d35b96def34bd443412333e",
+          "failures_jsonl_fpath": "742ca229406f7a30cdeef12935239da6f2074202f8e3cd8b1be3c8d9a18ecea5",
+          "materialized_inputs_jsonl_fpath": "8a664800a7c224edb6840a77e546aa0fcdfb49a280ab6dfd11a27a70c120b4ee",
+          "resolved_config_yaml_fpath": "731e017914c4500d51c2b6fe40b809da63378b5e26cba9e76eec8b0bdcd28435"
+        }
+      ]
+    },
+    "rollouts": [
+      "rollouts.jsonl"
+    ]
+  },
+  "tasks": {
+    "0": {
+      "repeats": 2,
+      "healthy": 0,
+      "unhealthy": 0,
+      "unobserved": 2,
+      "flags": []
+    },
+    "1": {
+      "repeats": 5,
+      "healthy": 0,
+      "unhealthy": 0,
+      "unobserved": 5,
+      "flags": []
+    },
+    "10": {
+      "repeats": 8,
+      "healthy": 0,
+      "unhealthy": 0,
+      "unobserved": 8,
+      "flags": []
+    },
+    "11": {
+      "repeats": 8,
+      "healthy": 0,
+      "unhealthy": 0,
+      "unobserved": 8,
+      "flags": []
+    },
+    "12": {
+      "repeats": 8,
+      "healthy": 0,
+      "unhealthy": 0,
+      "unobserved": 8,
+      "flags": []
+    },
+    "13": {
+      "repeats": 8,
+      "healthy": 0,
+      "unhealthy": 0,
+      "unobserved": 8,
+      "flags": []
+    },
+    "14": {
+      "repeats": 8,
+      "healthy": 0,
+      "unhealthy": 0,
+      "unobserved": 8,
+      "flags": []
+    },
+    "15": {
+      "repeats": 8,
+      "healthy": 0,
+      "unhealthy": 0,
+      "unobserved": 8,
+      "flags": []
+    },
+    "16": {
+      "repeats": 8,
+      "healthy": 0,
+      "unhealthy": 0,
+      "unobserved": 8,
+      "flags": []
+    },
+    "17": {
+      "repeats": 8,
+      "healthy": 0,
+      "unhealthy": 0,
+      "unobserved": 8,
+      "flags": []
+    },
+    "18": {
+      "repeats": 8,
+      "healthy": 0,
+      "unhealthy": 0,
+      "unobserved": 8,
+      "flags": []
+    },
+    "19": {
+      "repeats": 8,
+      "healthy": 0,
+      "unhealthy": 0,
+      "unobserved": 8,
+      "flags": []
+    },
+    "2": {
+      "repeats": 5,
+      "healthy": 0,
+      "unhealthy": 0,
+      "unobserved": 5,
+      "flags": []
+    },
+    "20": {
+      "repeats": 8,
+      "healthy": 0,
+      "unhealthy": 0,
+      "unobserved": 8,
+      "flags": []
+    },
+    "21": {
+      "repeats": 8,
+      "healthy": 0,
+      "unhealthy": 0,
+      "unobserved": 8,
+      "flags": []
+    },
+    "22": {
+      "repeats": 8,
+      "healthy": 0,
+      "unhealthy": 0,
+      "unobserved": 8,
+      "flags": []
+    },
+    "23": {
+      "repeats": 8,
+      "healthy": 0,
+      "unhealthy": 0,
+      "unobserved": 8,
+      "flags": []
+    },
+    "3": {
+      "repeats": 4,
+      "healthy": 0,
+      "unhealthy": 0,
+      "unobserved": 4,
+      "flags": []
+    },
+    "4": {
+      "repeats": 8,
+      "healthy": 0,
+      "unhealthy": 0,
+      "unobserved": 8,
+      "flags": []
+    },
+    "5": {
+      "repeats": 8,
+      "healthy": 0,
+      "unhealthy": 0,
+      "unobserved": 8,
+      "flags": []
+    },
+    "6": {
+      "repeats": 8,
+      "healthy": 0,
+      "unhealthy": 0,
+      "unobserved": 8,
+      "flags": []
+    },
+    "7": {
+      "repeats": 8,
+      "healthy": 0,
+      "unhealthy": 0,
+      "unobserved": 8,
+      "flags": []
+    },
+    "8": {
+      "repeats": 8,
+      "healthy": 0,
+      "unhealthy": 0,
+      "unobserved": 8,
+      "flags": []
+    },
+    "9": {
+      "repeats": 8,
+      "healthy": 0,
+      "unhealthy": 0,
+      "unobserved": 8,
+      "flags": []
+    }
+  }
+}

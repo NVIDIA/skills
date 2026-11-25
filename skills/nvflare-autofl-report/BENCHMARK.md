@@ -25,10 +25,7 @@ Each task attempt ran in its own isolated sandbox pod.
 - Validation status: `passed`
 - Report generation: `complete`
 - Evaluator version: `1.3.2`
-- Git commit: `64be1471c5fd4364d27cf503eb8218cb86f36ee2`
 - Content type: requested `auto`, detected `skill`
-- Container image: `gitlab-master.nvidia.com:5005/nvcarps/ci-group/nvcarps-ci/skillevaluator-ci:sha-64be1471c5fd4364d27cf503eb8218cb86f36ee2`
-- Container image digest: `not recorded`
 - Tier 3: requested `true`, executed `true`, status `succeeded`
 
 ## What This Report Answers
