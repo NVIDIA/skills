@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+name: NIM
+repo: NVIDIA/nim-skills
+description: Deploy NVIDIA NIM LLMs with Docker, Helm or the NIM Operator, smoke-check which features work, tune runtime settings on measured evidence, and benchmark speed and accuracy.
+links:
+  discussions: false
+skills:
+  - path: skills/nim-deploy/
+    catalog_dir: nim-deploy
+  - path: skills/nim-smoke-check/
+    catalog_dir: nim-smoke-check
+  - path: skills/nim-tune/
+    catalog_dir: nim-tune
+  - path: skills/nim-benchmark/
+    catalog_dir: nim-benchmark
