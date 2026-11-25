@@ -2,6 +2,11 @@ name: Team Request NVSkills CI
 
 on:
   workflow_call:
+    inputs:
+      prepare-only:
+        description: Upload the validated dispatch inputs for a separate publishing workflow.
+        type: boolean
+        default: false
     secrets:
       NVSKILLS_CI_DISPATCH_TOKEN:
         required: false
@@ -36,12 +41,13 @@ jobs:
       - name: Check dispatch availability
         id: dispatch
         env:
-          DISPATCH_TOKEN: ${{ secrets.NVSKILLS_CI_DISPATCH_TOKEN }}
+          DISPATCH_TOKEN: ${{ !inputs.prepare-only && secrets.NVSKILLS_CI_DISPATCH_TOKEN || '' }}
           EVENT_NAME: ${{ github.event_name }}
+          PREPARE_ONLY: ${{ inputs.prepare-only }}
         run: |
           set -euo pipefail
-          if [ -n "${DISPATCH_TOKEN}" ]; then
-            echo "enabled=true" >> "${GITHUB_OUTPUT}"
+          if [ "${PREPARE_ONLY}" = "true" ] || [ -n "${DISPATCH_TOKEN}" ]; then
+            echo "enabled=true" | tee -a "${GITHUB_OUTPUT}"
             exit 0
           fi
           if [ "${EVENT_NAME}" = "push" ]; then
@@ -78,6 +84,7 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           REPO: ${{ github.repository }}
           ISSUE_PR_NUMBER: ${{ github.event.issue.number || '' }}
+          REQUEST_COMMENT_ID: ${{ github.event.comment.id || '' }}
           HEAD_SHA: ${{ github.sha }}
           HEAD_COMMIT_MESSAGE: ${{ github.event.head_commit.message || '' }}
           SIGNATURE_COMMIT_TITLE: ${{ vars.NVSKILLS_SIGNATURE_COMMIT_TITLE || 'Attach NVSkills validation signatures' }}
@@ -205,45 +212,30 @@ jobs:
             exit 0
           fi
 
-          {
-            echo "should_dispatch=true"
-            echo "pr_number=${pr_number}"
-            echo "head_sha=${head_sha}"
-            echo "base_ref=${base_ref}"
-            echo "commit_title=${commit_title}"
-          } >> "${GITHUB_OUTPUT}"
+          jq -n --arg source_owner "$owner" --arg source_repo "$repo" \
+            --arg pr_number "$pr_number" --arg request_run_id "$GITHUB_RUN_ID" \
+            --arg request_head_sha "$head_sha" --arg request_base_ref "$base_ref" \
+            --arg request_commit_title "$commit_title" --arg request_comment_id "$REQUEST_COMMENT_ID" \
+            --arg requested_by "$ACTOR" \
+            '{ref: "main", inputs: {$source_owner, $source_repo, $pr_number, $request_run_id,
+                                    $request_head_sha, $request_base_ref, $request_commit_title,
+                                    $request_comment_id, $requested_by}}' > "$RUNNER_TEMP/request.json"
+          echo "should_dispatch=true" | tee -a "$GITHUB_OUTPUT"
+
+      - name: Upload validated request
+        if: inputs.prepare-only && steps.context.outputs.should_dispatch == 'true'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: nvskills-request-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/request.json
+          retention-days: 1
+          if-no-files-found: error
 
       - name: Dispatch NVSkills CI
-        if: steps.dispatch.outputs.enabled == 'true' && steps.context.outputs.should_dispatch == 'true'
+        if: ${{ !inputs.prepare-only && steps.context.outputs.should_dispatch == 'true' }}
         env:
           GH_TOKEN: ${{ secrets.NVSKILLS_CI_DISPATCH_TOKEN }}
-          REPO: ${{ github.repository }}
-          PR_NUMBER: ${{ steps.context.outputs.pr_number }}
-          REQUEST_HEAD_SHA: ${{ steps.context.outputs.head_sha }}
-          REQUEST_BASE_REF: ${{ steps.context.outputs.base_ref }}
-          REQUEST_COMMIT_TITLE: ${{ steps.context.outputs.commit_title }}
-          REQUEST_COMMENT_ID: ${{ github.event.comment.id || '' }}
-          REQUEST_RUN_ID: ${{ github.run_id }}
-          REQUESTED_BY: ${{ github.actor }}
         run: |
           set -euo pipefail
-          if [ -z "${GH_TOKEN}" ]; then
-            echo "Missing NVSKILLS_CI_DISPATCH_TOKEN secret."
-            exit 1
-          fi
-
-          owner="${REPO%%/*}"
-          repo="${REPO#*/}"
-
-          gh workflow run nvskills-ci.yml \
-            -R NVIDIA/nvskills-ci \
-            --ref main \
-            -f source_owner="${owner}" \
-            -f source_repo="${repo}" \
-            -f pr_number="${PR_NUMBER}" \
-            -f request_run_id="${REQUEST_RUN_ID}" \
-            -f request_head_sha="${REQUEST_HEAD_SHA}" \
-            -f request_base_ref="${REQUEST_BASE_REF}" \
-            -f request_commit_title="${REQUEST_COMMIT_TITLE}" \
-            -f request_comment_id="${REQUEST_COMMENT_ID}" \
-            -f requested_by="${REQUESTED_BY}"
+          gh api --method POST repos/NVIDIA/nvskills-ci/actions/workflows/nvskills-ci.yml/dispatches \
+            --input "$RUNNER_TEMP/request.json"
