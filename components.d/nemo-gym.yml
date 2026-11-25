@@ -10,3 +10,5 @@ skills:
     catalog_dir: nemo-gym-reward-profiling
   - path: skills/nemo-gym-run-and-babysit-eval/
     catalog_dir: nemo-gym-run-and-babysit-eval
+  - path: skills/nemo-gym-analyzing-results/
+    catalog_dir: nemo-gym-analyzing-results
