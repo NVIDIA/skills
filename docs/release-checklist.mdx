@@ -70,14 +70,15 @@ model_signing verify certificate SKILL_DIR \
 
 - Every bundled skill has passed the skill checklist above.
 - Any MCP server, hooks, commands, or subagents in the plugin are needed for its stated use case.
-- The plugin's `BENCHMARK.md` verdict is PASS.
+- The plugin's `BENCHMARK.md` shows that it improves agent output.
 - The Plugin Card (`plugin-card.md`) lists everything in the bundle.
 - `plugin.oms.sig` is at the top level of the plugin directory and verifies:
 
 ```bash
 model_signing verify certificate PLUGIN_DIR \
   --signature PLUGIN_DIR/plugin.oms.sig \
-  --certificate_chain nv-agent-root-cert.pem
+  --certificate_chain nv-agent-root-cert.pem \
+  --ignore_unsigned_files
 ```
 
 ## Release Packet

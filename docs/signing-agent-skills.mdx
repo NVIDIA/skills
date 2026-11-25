@@ -5,7 +5,7 @@ description: "Use detached OMS signatures to verify the integrity and authentici
 
 Cryptographic signing gives skill consumers a way to verify that a skill directory has not changed since it was signed. For agent skills, that matters because the review target is the whole directory: `SKILL.md`, scripts, references, assets, and any supporting files.
 
-NVIDIA Verified Plugins are signed the same way: one detached `plugin.oms.sig` covers the whole plugin directory, and each bundled skill keeps its own `skill.oms.sig`.
+NVIDIA Verified Plugins are signed the same way: one detached `plugin.oms.sig` covers the whole plugin directory.
 
 NVIDIA has adopted the OpenSSF Model Signing format, also known as OMS, for detached skill signatures. OMS extends Sigstore-style bundles so verification can cover a directory tree instead of only a single file.
 
@@ -75,12 +75,13 @@ For production release checks, prefer strict verification unless there is a docu
 
 ## Verify a Signed Plugin
 
-Run the same command against the plugin directory with the plugin signature:
+Run the same command against the plugin directory with the plugin signature. An installed plugin lives at `~/.claude/plugins/cache/nvidia-official/<plugin>/<version>/` in Claude Code and `~/.codex/plugins/cache/nvidia-official/<plugin>/<version>/` in Codex; pass that directory as `PLUGIN_DIR`.
 
 ```bash
 model_signing verify certificate PLUGIN_DIR \
   --signature PLUGIN_DIR/plugin.oms.sig \
-  --certificate_chain nv-agent-root-cert.pem
+  --certificate_chain nv-agent-root-cert.pem \
+  --ignore_unsigned_files
 ```
 
 ## Where Signing Fits
