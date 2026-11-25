@@ -52,6 +52,11 @@ env:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    # A healthy run finishes in under a minute; the skills sync with 40+
+    # products takes 2-4 minutes. 30 minutes bounds a hung runner (run
+    # 45686565187 sat 45 minutes in checkout after the runner lost
+    # contact with GitHub) without risking a legitimately long run.
+    timeout-minutes: 30
     steps:
       - name: Checkout skills catalog
         uses: actions/checkout@v4
