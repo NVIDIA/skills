@@ -92,6 +92,8 @@ SCHEMA_PATH = ".github/scripts/marketplace/metadata.schema.json"
 RE_REPO = re.compile(r"^repo:\s*(\S+)\s*$")
 RE_REF = re.compile(r"^ref:\s*(\S+)\s*$")
 RE_PATH = re.compile(r"^-?\s*path:\s*(\S+)\s*$")
+# An unindented key opens a top-level section (skills:, plugins:, links:...).
+RE_TOP_KEY = re.compile(r"^([A-Za-z_][\w-]*):")
 # Top-level scalars only: matched against the unindented line, so a skill
 # entry's nested keys can never be read as the component's name or product.
 
@@ -126,11 +128,20 @@ def parse_component(text: str) -> dict:
     written — ``skills/write-dag/`` and ``skills/write-dag`` are the same
     directory, and treating them as different would report a path as newly
     added when a PR only reformatted it.
+
+    Paths under a top-level ``plugins:`` key are not skills and are skipped.
+    A plugin folder has no ``SKILL.md`` or ``skill.oms.sig`` at its root, so
+    checking it as a skill always fails; ``sync-plugins.yml`` checks plugins
+    against their own ``plugin.oms.sig`` instead.
     """
     repo = None
     ref = None
     paths: list[str] = []
+    section = None
     for line in text.splitlines():
+        top = RE_TOP_KEY.match(line)
+        if top:
+            section = top.group(1)
         stripped = line.strip()
         if repo is None:
             m = RE_REPO.match(stripped)
@@ -143,7 +154,7 @@ def parse_component(text: str) -> dict:
                 ref = m.group(1)
                 continue
         m = RE_PATH.match(stripped)
-        if m:
+        if m and section != "plugins":
             paths.append(m.group(1).rstrip("/"))
     # An absent ref means the component tracks the default branch. Several
     # components (AIQ, VSS) track develop instead; verifying those against
