@@ -290,6 +290,7 @@
         "nvflare-fed-stats",
         "nvidia-ontology-management",
         "parabricks",
+        "sdm-tabular-prediction",
         "tao-mine-nearest-neighbors"
       ]
     },
