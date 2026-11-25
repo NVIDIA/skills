@@ -61,7 +61,6 @@ Average lift follows the saved producer's comparable Security, Correctness and E
 | Evaluated agents | Claude Code and Codex |
 | Plugin version | 0.1.19 |
 | Evaluated source revision | Not recorded in the evaluation export. |
-| Quality / lift policy | `nvcarps-five-dimensions-v6` / `nvcarps-best-agent-baseline-lift-v2` |
 | Evaluation result (SHA-256) | `04ee285e7025dbfdec33499941c39c47ca3589490d8f27bda2eec1affa08802f` |
 
 </details>
