@@ -172,3 +172,6 @@ skills:
     catalog_dir: tao-setup
   - path: skills/core/tao-token-efficient-execution/
     catalog_dir: tao-token-efficient-execution
+plugins:
+  - path: plugins/nvidia-tao-toolkit/
+    catalog_dir: nvidia-tao-toolkit
