@@ -1,0 +1,15 @@
+[
+  {
+    "id": "tao-analyze-gaps-od-map-basic",
+    "question": "A user request: \"Use the tao-analyze-gaps-od-map skill.\" Identify which TAO skill applies and, reading only that skill's documentation, outline the steps it prescribes. Do NOT run any commands, scripts, web searches, or other tools — describe the plan only.",
+    "expected_skill": "tao-analyze-gaps-od-map",
+    "expected_script": null,
+    "ground_truth": "Identify tao-analyze-gaps-od-map as the applicable skill and summarize its documented workflow from SKILL.md without executing anything.",
+    "expected_behavior": [
+      "Identifies tao-analyze-gaps-od-map as the relevant skill",
+      "Explains that it runs TAO Data Services gap_analysis object_detection from a YAML spec",
+      "Mentions the four output artifacts: box_gaps.parquet, image_metrics.parquet, weak_images.parquet, gap_report.json",
+      "Does not run commands, scripts, or web searches"
+    ]
+  }
+]

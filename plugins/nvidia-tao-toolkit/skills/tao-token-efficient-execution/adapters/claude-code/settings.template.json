@@ -1,0 +1,15 @@
+{
+  "_comment": "Place as .claude/settings.json in the kit directory (the driver's cwd), and copy hooks/guard.template.sh -> <kit dir>/hooks/guard.sh and hooks/record.template.sh -> <kit dir>/hooks/record.sh (chmod +x). $CLAUDE_PROJECT_DIR is expanded by Claude Code to the kit dir. Disable every plugin the workflow does not need — in our study this cut the fixed per-session startup context roughly in half (~37k -> ~20k tokens). List your installed plugins with `claude plugin list`.",
+  "enabledPlugins": {
+    "some-heavy-plugin@its-marketplace": false,
+    "another-unused-plugin@its-marketplace": false
+  },
+  "hooks": {
+    "PreToolUse": [
+      {"matcher": "Bash", "hooks": [{"type": "command", "command": "$CLAUDE_PROJECT_DIR/hooks/guard.sh"}]}
+    ],
+    "PostToolUse": [
+      {"matcher": "Bash", "hooks": [{"type": "command", "command": "$CLAUDE_PROJECT_DIR/hooks/record.sh"}]}
+    ]
+  }
+}

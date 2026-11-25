@@ -1,0 +1,19 @@
+results_dir: /results/inference
+model:
+  type: internvideo2-clip-l14
+  image_size: 224
+  canonicalize_text: false
+dataset:
+  val:
+    gt_queries: ''
+    metadata: ''
+    video_root: null
+    path_prefix_mapping: {}
+    batch_size: 8
+    num_workers: 8
+inference:
+  trt_engine: /models/video_clip.engine
+  batch_size: 8
+  text_file: /data/prompts.txt
+  num_gpus: 1
+  gpu_ids: [0]

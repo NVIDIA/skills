@@ -1,0 +1,52 @@
+type: platform
+required_credentials:
+- name: SLURM_USER
+  source: env_var
+- name: SLURM_HOSTNAME
+  source: env_var
+- name: SLURM_PARTITION
+  source: env_var
+credential_groups:
+- name: ssh_identity
+  require_one_of:
+  - SSH_KEY_PATH
+  - SSH_AUTH_SOCK
+  preferred: SSH_KEY_PATH
+optional_credentials:
+- name: SLURM_BASE_RESULTS_DIR
+  source: env_var
+  only_when: user wants a custom results/staging root instead of the platform default
+- name: SLURM_ACCOUNT
+  source: env_var
+  only_when: the cluster site requires #SBATCH --account
+- name: SLURM_CONVERSION_PARTITION
+  source: env_var
+  only_when: an image still has to be converted to SQSH; a CPU partition of the user's cluster that allows the sqsh_conversion_* resources below
+- name: SLURM_MAX_TIME_HOURS
+  source: env_var
+  only_when: preflight should reject a wall time above the limit of the user's partition
+- name: SLURM_CONTAINER_MOUNTS
+  source: env_var
+  only_when: cluster requires container mounts different from the platform default
+- name: NGC_KEY
+  source: env_var
+  only_when: private nvcr.io image pulls require NGC auth
+- name: HF_TOKEN
+  source: env_var
+  only_when: selected model requires HuggingFace access
+resource_defaults:
+  num_nodes: 1
+  num_gpus: 4
+  max_num_gpus_per_node: 8
+  cpus_per_task: 16
+  time_hours: 4
+  timeout_hours: 3.8
+  container_mounts: runtime-supplied
+  use_sqsh: true
+  sqsh_conversion_timeout_minutes: 120
+  sqsh_conversion_cpus_per_task: 4
+  sqsh_conversion_memory_mb: 7200
+cloud_storage:
+  protocol: lustre
+  uri_format: lustre:///{absolute_path}
+  metadata_key: slurm

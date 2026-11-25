@@ -1,0 +1,15 @@
+[
+  {
+    "id": "route-binary-deft-od-aoi",
+    "question": "Run an iterative RT-DETR workflow to improve binary AOI defect detection. Do not launch yet.",
+    "expected_skill": "tao-run-deft-od-aoi",
+    "ground_truth": "Use the real-only RT-DETR AOI loop, keep KPI/test isolated, mine real and verified-clean roles through SigLIP, accumulate COCO data, and select on KPI AP50.",
+    "expected_behavior": [
+      "Select tao-run-deft-od-aoi",
+      "Invoke tao-launch-workflow before side effects",
+      "Require four disjoint normalized COCO roles",
+      "Keep one frozen RT-DETR base checkpoint and binary defect class"
+    ],
+    "expected_script": "scripts/init_deft_od_aoi.py"
+  }
+]

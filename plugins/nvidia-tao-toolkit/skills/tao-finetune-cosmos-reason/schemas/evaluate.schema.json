@@ -1,0 +1,415 @@
+{
+  "automl_default_parameters": [
+    "dataset.system_prompt",
+    "vision.num_frames",
+    "generation.max_tokens",
+    "generation.temperature",
+    "generation.repetition_penalty",
+    "generation.presence_penalty",
+    "generation.frequency_penalty"
+  ],
+  "automl_disabled_parameters": [
+    "dataset",
+    "evaluation",
+    "generation",
+    "metrics",
+    "model",
+    "results",
+    "task",
+    "vision"
+  ],
+  "default": {
+    "dataset": {
+      "annotation_path": "",
+      "media_dir": "",
+      "system_prompt": ""
+    },
+    "evaluation": {
+      "answer_type": "",
+      "barrier_timeout_seconds": 14400,
+      "batch_size": 0,
+      "limit": -1,
+      "num_processes": 1,
+      "seed": 0,
+      "shard_strategy": "stride",
+      "shard_id": 0,
+      "skip_saved": false,
+      "soft_accuracy": {
+        "enabled": true,
+        "f1_threshold": 0.8
+      }
+    },
+    "generation": {
+      "frequency_penalty": 0.0,
+      "max_retries": 10,
+      "max_tokens": 0,
+      "presence_penalty": 0.0,
+      "repetition_penalty": 1.0,
+      "temperature": 0.0
+    },
+    "metrics": {
+      "names": []
+    },
+    "model": {
+      "base_model_path": "",
+      "config_file": "",
+      "dtype": "",
+      "max_length": 0,
+      "tp_size": 1,
+      "enable_lora": false,
+      "export_dir": "",
+      "model_name": "",
+      "vit_checkpoint_path": ""
+    },
+    "num_gpus": 0,
+    "results": {
+      "save_confusion_matrix": true,
+      "save_individual_results": true,
+      "save_metrics_summary": true
+    },
+    "results_dir": "",
+    "task": {
+      "type": ""
+    },
+    "vision": {
+      "max_pixels": 0,
+      "min_pixels": 0,
+      "num_frames": 0,
+      "decoder_device": "cuda",
+      "decoder_cache_size": 4,
+      "decoder_threads": 1,
+      "dataloader_multiprocessing_context": "spawn",
+      "dataloader_num_workers": 1,
+      "dataloader_persistent_workers": true,
+      "dataloader_prefetch_factor": 2,
+      "frame_transfer": "host_rgb",
+      "process_threads": 8,
+      "video_cache_size": 0,
+      "video_decoder": "pynvvideocodec"
+    }
+  },
+  "evaluate_automl_disabled_parameters": [
+    "evaluate.dataset",
+    "evaluate.evaluation",
+    "evaluate.generation",
+    "evaluate.metrics",
+    "evaluate.model",
+    "evaluate.results",
+    "evaluate.task",
+    "evaluate.vision"
+  ],
+  "evaluate_automl_enabled": false,
+  "properties": {
+    "dataset": {
+      "automl_enabled": false,
+      "default": {
+        "annotation_path": "",
+        "media_dir": "",
+        "system_prompt": ""
+      },
+      "description": "Exact evaluation dataset inputs. Resolve from the selected training validation split or explicit current-run intake.",
+      "properties": {
+        "annotation_path": {
+          "default": "",
+          "description": "Exact annotation manifest; never inferred from directory history.",
+          "title": "Annotation path",
+          "type": "string"
+        },
+        "media_dir": {
+          "default": "",
+          "description": "Exact media root paired with the annotation manifest.",
+          "title": "Media directory",
+          "type": "string"
+        },
+        "system_prompt": {
+          "automl_enabled": true,
+          "default": "",
+          "description": "Inherit the exact fine-tuning prompt when evaluating its validation split; otherwise require explicit intake. Empty is a valid explicit value.",
+          "title": "System prompt",
+          "type": "string"
+        }
+      },
+      "type": "collection"
+    },
+    "evaluation": {
+      "automl_enabled": false,
+      "default": {
+        "answer_type": "",
+        "barrier_timeout_seconds": 14400,
+        "batch_size": 0,
+        "limit": -1,
+        "num_processes": 1,
+        "seed": 0,
+        "shard_strategy": "stride",
+        "shard_id": 0,
+        "skip_saved": false,
+        "soft_accuracy": {
+          "enabled": true,
+          "f1_threshold": 0.8
+        }
+      },
+      "description": "Evaluation execution and answer parsing.",
+      "properties": {
+        "answer_type": {
+          "default": "",
+          "enum": ["letter", "reasoning", "freeform", "naive"],
+          "title": "Answer type",
+          "type": "categorical"
+        },
+        "barrier_timeout_seconds": {
+          "default": 14400,
+          "minimum": 1,
+          "title": "Rank barrier timeout",
+          "type": "int"
+        },
+        "batch_size": {
+          "default": 0,
+          "minimum": 1,
+          "title": "Inference batch size",
+          "type": "int"
+        },
+        "limit": {
+          "default": -1,
+          "minimum": -1,
+          "title": "Evaluation limit",
+          "type": "int"
+        },
+        "num_processes": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Input preparation processes",
+          "type": "int"
+        },
+        "seed": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Seed",
+          "type": "int"
+        },
+        "shard_strategy": {
+          "default": "stride",
+          "enum": ["stride", "media_balanced"],
+          "title": "Data-parallel shard strategy",
+          "type": "categorical"
+        },
+        "shard_id": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Shard ID",
+          "type": "int"
+        },
+        "skip_saved": {
+          "default": false,
+          "title": "Skip saved outputs",
+          "type": "bool"
+        },
+        "soft_accuracy": {
+          "automl_enabled": false,
+          "default": {
+            "enabled": true,
+            "f1_threshold": 0.8
+          },
+          "properties": {
+            "enabled": {"default": true, "type": "bool"},
+            "f1_threshold": {"default": 0.8, "maximum": 1.0, "minimum": 0.0, "type": "float"}
+          },
+          "type": "collection"
+        }
+      },
+      "type": "collection"
+    },
+    "generation": {
+      "automl_enabled": false,
+      "default": {
+        "frequency_penalty": 0.0,
+        "max_retries": 10,
+        "max_tokens": 0,
+        "presence_penalty": 0.0,
+        "repetition_penalty": 1.0,
+        "temperature": 0.0
+      },
+      "properties": {
+        "frequency_penalty": {"automl_enabled": true, "default": 0.0, "type": "float"},
+        "max_retries": {"default": 10, "minimum": 0, "type": "int"},
+        "max_tokens": {"automl_enabled": true, "default": 0, "minimum": 1, "type": "int"},
+        "presence_penalty": {"automl_enabled": true, "default": 0.0, "type": "float"},
+        "repetition_penalty": {"automl_enabled": true, "default": 1.0, "type": "float"},
+        "temperature": {"automl_enabled": true, "default": 0.0, "minimum": 0.0, "type": "float"}
+      },
+      "type": "collection"
+    },
+    "metrics": {
+      "automl_enabled": false,
+      "default": {"names": []},
+      "description": "Task-declared metrics. Accuracy tasks use the shared task-aware scorer and need no text metric download.",
+      "properties": {
+        "names": {"automl_enabled": false, "default": [], "type": "list"}
+      },
+      "type": "collection"
+    },
+    "model": {
+      "automl_enabled": false,
+      "default": {
+        "base_model_path": "",
+        "config_file": "",
+        "dtype": "",
+        "max_length": 0,
+        "tp_size": 1,
+        "enable_lora": false,
+        "export_dir": "",
+        "model_name": "",
+        "vit_checkpoint_path": ""
+      },
+      "properties": {
+        "base_model_path": {"default": "", "type": "string"},
+        "config_file": {"default": "", "type": "string"},
+        "dtype": {"default": "", "type": "string"},
+        "max_length": {"default": 0, "minimum": 1, "type": "int"},
+        "tp_size": {"default": 1, "minimum": 1, "type": "int"},
+        "enable_lora": {"default": false, "type": "bool"},
+        "export_dir": {"default": "", "type": "string"},
+        "model_name": {"default": "", "type": "string"},
+        "vit_checkpoint_path": {"default": "", "type": "string"}
+      },
+      "type": "collection"
+    },
+    "num_gpus": {
+      "default": 0,
+      "maximum": 8,
+      "minimum": 1,
+      "type": "int"
+    },
+    "results": {
+      "automl_enabled": false,
+      "default": {
+        "save_confusion_matrix": true,
+        "save_individual_results": true,
+        "save_metrics_summary": true
+      },
+      "properties": {
+        "save_confusion_matrix": {"default": true, "type": "bool"},
+        "save_individual_results": {"default": true, "type": "bool"},
+        "save_metrics_summary": {"default": true, "type": "bool"}
+      },
+      "type": "collection"
+    },
+    "results_dir": {
+      "default": "",
+      "description": "New user-owned evaluation results directory.",
+      "type": "string"
+    },
+    "task": {
+      "automl_enabled": false,
+      "default": {"type": ""},
+      "properties": {
+        "type": {
+          "default": "",
+          "enum": ["", "binary", "mcq", "text", "its_directionality", "metropolis_sgd"],
+          "type": "categorical"
+        }
+      },
+      "type": "collection"
+    },
+    "vision": {
+      "automl_enabled": false,
+      "default": {
+        "max_pixels": 0,
+        "min_pixels": 0,
+        "num_frames": 0,
+        "decoder_device": "cuda",
+        "decoder_cache_size": 4,
+        "decoder_threads": 1,
+        "dataloader_multiprocessing_context": "spawn",
+        "dataloader_num_workers": 1,
+        "dataloader_persistent_workers": true,
+        "dataloader_prefetch_factor": 2,
+        "process_threads": 8,
+        "frame_transfer": "host_rgb",
+        "video_cache_size": 0,
+        "video_decoder": "pynvvideocodec"
+      },
+      "properties": {
+        "decoder_device": {"default": "cuda", "enum": ["cuda"], "type": "categorical"},
+        "decoder_cache_size": {"default": 4, "minimum": 1, "type": "int"},
+        "decoder_threads": {"default": 1, "minimum": 1, "type": "int"},
+        "dataloader_multiprocessing_context": {"default": "spawn", "enum": ["spawn"], "type": "categorical"},
+        "dataloader_num_workers": {"default": 1, "minimum": 1, "type": "int"},
+        "dataloader_persistent_workers": {"default": true, "type": "bool"},
+        "dataloader_prefetch_factor": {"default": 2, "minimum": 1, "type": "int"},
+        "fps": {"automl_enabled": false, "exclusiveMinimum": 0, "type": "float"},
+        "max_frames": {"automl_enabled": false, "minimum": 1, "type": "int"},
+        "max_pixels": {"default": 0, "minimum": 1, "type": "int"},
+        "min_frames": {"automl_enabled": false, "minimum": 1, "type": "int"},
+        "min_pixels": {"default": 0, "minimum": 1, "type": "int"},
+        "num_frames": {"automl_enabled": true, "default": 0, "minimum": 1, "type": "int"},
+        "process_threads": {"default": 8, "minimum": 1, "type": "int"},
+        "frame_transfer": {"default": "host_rgb", "enum": ["host_rgb", "device_rgbp"], "type": "categorical"},
+        "resized_height": {"automl_enabled": false, "minimum": 1, "type": "int"},
+        "resized_width": {"automl_enabled": false, "minimum": 1, "type": "int"},
+        "total_pixels": {"automl_enabled": false, "minimum": 1, "type": "int"},
+        "video_cache_size": {"default": 0, "minimum": 0, "type": "int"},
+        "video_decoder": {"default": "pynvvideocodec", "enum": ["pynvvideocodec", "torchcodec-cuda-on-demand"], "type": "categorical"},
+        "video_end": {"automl_enabled": false, "exclusiveMinimum": 0, "type": "float"},
+        "video_override_map": {"type": "string"},
+        "video_start": {"automl_enabled": false, "minimum": 0, "type": "float"}
+      },
+      "type": "collection"
+    }
+  },
+  "type": "object",
+  "x_tao_resolution": {
+    "infer_from_training_plan": [
+      "dataset.annotation_path",
+      "dataset.media_dir",
+      "dataset.system_prompt",
+      "evaluation.answer_type",
+      "evaluation.batch_size",
+      "evaluation.seed",
+      "metrics.names",
+      "model.base_model_path",
+      "model.dtype",
+      "model.enable_lora",
+      "num_gpus",
+      "task.type",
+      "vision.max_pixels",
+      "vision.num_frames",
+      "vision.fps",
+      "vision.min_frames",
+      "vision.max_frames",
+      "vision.video_start",
+      "vision.video_end",
+      "vision.resized_height",
+      "vision.resized_width",
+      "vision.min_pixels",
+      "vision.total_pixels"
+    ],
+    "materializer": "scripts/evaluation_workflow.py",
+    "never_infer_from_history": [
+      "checkpoint_selection",
+      "dataset.annotation_path",
+      "dataset.media_dir",
+      "results_dir"
+    ],
+    "required_current_run_intake_when_not_recorded": [
+      "checkpoint_selection",
+      "dataset.annotation_path",
+      "dataset.media_dir",
+      "dataset.system_prompt",
+      "evaluation.answer_type",
+      "generation.max_tokens",
+      "metrics.names",
+      "results_dir",
+      "task.type"
+    ],
+    "template_launchable": false
+  },
+  "x_tao_schema": {
+    "action": "evaluate",
+    "core_module": "cosmos-rl",
+    "model": "cosmos-reason",
+    "network_arch": "cosmos-reason",
+    "schema_action": "evaluate",
+    "schema_version": 2,
+    "source": "dataset-neutral skill contract over repository evaluator"
+  }
+}

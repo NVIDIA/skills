@@ -1,0 +1,45 @@
+[
+  {
+    "id": "tao-finetune-video-clip-basic",
+    "question": "A user request: \"I have a JSON metadata file of annotated video chunks with text queries and want to fine-tune InternVideo2-CLIP L14 with TAO video_clip, then evaluate it and pull embeddings out for retrieval.\" Identify which TAO skill applies and, reading only that skill's documentation, outline the steps it prescribes. Do NOT run any commands, scripts, web searches, or other tools — describe the plan only.",
+    "expected_skill": "tao-finetune-video-clip",
+    "expected_script": null,
+    "ground_truth": "Identify tao-finetune-video-clip as the applicable skill and summarize its documented workflow: export the virtualenv environment so PATH prefers the venv bin and PYTHONPATH includes the tao-pytorch and tao-core roots, run the preflight checks for the video_clip CLI and MobileCLIP weights, copy a spec from references/spec_template_*.yaml and fill in results_dir plus the vadr1_chunks-shaped metadata and checkpoint paths, then run the video_clip train, evaluate, inference, and optional export actions against those specs.",
+    "expected_behavior": [
+      "Identifies tao-finetune-video-clip as the relevant skill",
+      "Outlines the documented workflow steps from SKILL.md including virtualenv environment setup, preflight checks, spec templates, and the train/evaluate/inference/export actions",
+      "Invokes the actions through the video_clip CLI with a spec file rather than calling task scripts directly",
+      "Notes that metadata is a vadr1_chunks-shaped JSON list of video records with absolute video_path entries",
+      "Does not run commands, scripts, or web searches"
+    ]
+  },
+  {
+    "id": "tao-finetune-video-clip-evaluate-metrics-mode",
+    "question": "A user request: \"My TAO video_clip evaluate run is not behaving as expected — I pointed it at a held-out test split and set the metrics mode to retrieval, and the normal clips look mislabeled.\" Identify which TAO skill applies and, reading only that skill's documentation, explain what it recommends. Do NOT run any commands, scripts, web searches, or other tools — describe the plan only.",
+    "expected_skill": "tao-finetune-video-clip",
+    "expected_script": null,
+    "ground_truth": "Identify tao-finetune-video-clip and correct three documented behaviors: the evaluate action reads dataset.val rather than a separate test split even though the underlying stage is named test, retrieval metrics mode requires a relevance_file on the val dataset and otherwise classification mode should be used, and empty action_queries on normal chunks become literal Normal positives so Normal and Abnormal belong in the metrics exclude_categories list for classification eval.",
+    "expected_behavior": [
+      "Identifies tao-finetune-video-clip as the relevant skill",
+      "States that the evaluate action loads dataset.val instead of a separate test split",
+      "States that retrieval metrics mode requires a relevance_file on the val dataset and that classification mode is the fallback",
+      "Explains that empty action_queries become literal Normal positives and should be excluded via the metrics exclude_categories list",
+      "Does not run commands, scripts, or web searches"
+    ]
+  },
+  {
+    "id": "tao-finetune-video-clip-tensorrt-deploy",
+    "question": "A user request: \"I exported a combined TAO Video-CLIP ONNX and want to build a TensorRT engine, evaluate retrieval, and extract embeddings. Which image, specs, inputs, and artifacts should I use?\" Identify which TAO skill applies and, reading only that skill's documentation, explain the deploy workflow. Do NOT run any commands, scripts, web searches, or other tools — describe the plan only.",
+    "expected_skill": "tao-finetune-video-clip",
+    "expected_script": null,
+    "ground_truth": "Identify tao-finetune-video-clip and use its independently pinned TAO Deploy workflow: preserve the combined ONNX with its matching *_config.yaml and *_tokenizer/ sidecars; use the deploy gen_trt_engine template to create the TensorRT engine; use explicit-relevance gt_queries plus vadr1_chunks metadata for TensorRT evaluate; and use a text file and/or the gallery query JSON plus metadata for TensorRT inference, which writes text_embeddings.h5 and/or video_embeddings.h5.",
+    "expected_behavior": [
+      "Identifies tao-finetune-video-clip as the relevant skill",
+      "Uses the independently pinned TAO Deploy image for gen_trt_engine and TensorRT evaluate/inference",
+      "Preserves the exported ONNX, *_config.yaml, and *_tokenizer/ sidecars",
+      "States that evaluate requires dataset.val.gt_queries and dataset.val.metadata",
+      "States that inference requires inference.text_file and/or both gallery inputs and names the HDF5 outputs",
+      "Does not run commands, scripts, or web searches"
+    ]
+  }
+]

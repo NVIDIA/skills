@@ -1,0 +1,96 @@
+results_dir: ???
+
+train:
+  num_epochs: 1
+  checkpoint_interval: 1
+  validation_interval: 1
+  resume_training_checkpoint_path: null
+  grad_checkpointing: false
+  grad_clip_norm: null
+  precision: fp16
+  distributed_strategy: "ddp"
+  pretrained_model_path: null
+  loss_type: siglip  # siglip or clip
+  siglip_loss_dist_impl: "gather"
+  siglip_loss_mask_mode: none  # none or attribute_match_ignore
+  triplet_loss_weight: 0.5  # set > 0 to enable triplet loss
+  triplet_margin: 0.2
+  # prepare_deft_config.py materializes the one approved GPU shape into each
+  # action that the workflow uses; this template carries no competing default.
+  # Per-GPU batch_size is fixed, so world size multiplies the effective batch.
+  num_gpus: ???
+  num_nodes: 1
+  gpu_ids: ???
+  optim:
+    optimizer_type: adamw  # adamw, lamb, or sgd
+    vision_lr: 1.0e-7
+    text_lr: 1.0e-7
+    weight_decay: 1.0e-4
+    betas: [0.9, 0.95]
+    eps: 1.0e-6
+    warmup_steps: 5
+    scheduler: "cosine"
+  validation_interval: 1  # Run validation every N epochs
+  val_check_interval: null  # Or run validation every N steps (takes precedence if set)
+  # validate_before_training: false  # run full validation before the first training step
+  # profiler: none  # none, simple, advanced, or pytorch
+  # profiler_dir: null  # Defaults to train.results_dir/profiler
+  # profiler_filename: null  # Rank suffix is appended automatically
+  # profiler_wait: 1  # PyTorch profiler schedule wait steps
+  # profiler_warmup: 1  # PyTorch profiler schedule warmup steps
+  # profiler_active: 3  # PyTorch profiler schedule active steps
+  # profiler_repeat: 1  # Set 0 to repeat indefinitely
+  # profiler_record_shapes: false
+  # profiler_profile_memory: false
+  # profiler_with_stack: false
+
+dataset:
+  seed: 42
+  train:
+    type: custom  # custom or wds
+    balance_query_types: false  # true + per-dataset train_pairs.json balances query types
+    unique_caption_per_batch: false  # enforce unique captions when balance_query_types is true
+    include_attribute_metadata: false  # include optional image/text attribute tensors in batches
+    datasets:
+    - image_dir: ???
+      caption_dir: ???
+      caption_file_suffix: .txt
+      image_list_file: null  # Optional: text file listing image filenames
+      train_pairs_file: null  # Optional per dataset block; required for that block when balance_query_types is true
+    batch_size: 32
+    num_workers: 16
+  val:
+    datasets: []  # Same format as train.datasets
+    metadata_match_eval: false  # use attribute metadata for text-to-image validation positives
+    batch_size: 64
+    num_workers: 4
+
+model:
+  type: "siglip2-so400m-patch16-256"  # siglip2-so400m-patch16-256, c-radio_v3-h, etc.
+
+evaluate:
+  checkpoint: google/siglip2-so400m-patch16-256
+  batch_size: 32
+  num_workers: 8
+  num_gpus: ???
+  gpu_ids: ???
+
+inference:
+  checkpoint: siglip2-so400m-patch16-256
+  batch_size: 32
+  num_workers: 8
+  num_gpus: ???
+  gpu_ids: ???
+
+export:
+  checkpoint: ???
+  onnx_file: ???
+  encoder_type: combined  # combined or separate
+  input_height: 256
+  input_width: 256
+  batch_size: 1
+  opset_version: 17
+  # NOTE: NaFlex models (e.g. siglip2-so400m-patch16-naflex) are not supported
+  # for ONNX/TRT export due to dynamic patch embeddings that cannot be traced
+  # to a static graph. Use a fixed-resolution SigLIP2 variant instead
+  # (e.g. siglip2-so400m-patch16-384).

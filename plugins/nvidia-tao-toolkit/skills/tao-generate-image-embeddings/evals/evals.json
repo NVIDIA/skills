@@ -1,0 +1,16 @@
+[
+  {
+    "id": "tao-generate-image-embeddings-basic",
+    "question": "A user request: \"Use the tao-generate-image-embeddings skill.\" Identify which TAO skill applies and, reading only that skill's documentation, outline the steps it prescribes. Do NOT run any commands, scripts, web searches, or other tools — describe the plan only.",
+    "expected_skill": "tao-generate-image-embeddings",
+    "expected_script": null,
+    "ground_truth": "Identify tao-generate-image-embeddings as the applicable skill and summarize its documented workflow from SKILL.md without executing anything.",
+    "expected_behavior": [
+      "Identifies tao-generate-image-embeddings as the relevant skill",
+      "Explains that it runs TAO Data Services embedding image_embeddings from a YAML spec",
+      "Mentions the output embedding parquet with filepath and embedding columns",
+      "Notes the encoder-consistency requirement when embeddings feed a mining step",
+      "Does not run commands, scripts, or web searches"
+    ]
+  }
+]

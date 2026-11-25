@@ -1,0 +1,62 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# TAO single-node Kubernetes Job template. tao-run-on-kubernetes renders this by
+# substituting every @@<NAME>@@; the command must use single quotes only (it is
+# embedded as a JSON string). Multi-node is a superset that adds a multi-pod
+# job, a headless Service, and the rank/master rendezvous env.
+#
+# SECURITY: credentials are NEVER inline in this manifest (a manifest lands on
+# disk and is readable via `kubectl get job -o yaml`). They come from a per-job
+# Secret referenced by envFrom.secretRef — the agent creates that Secret from an
+# env-file on stdin so no value ever appears on a command line. Only the Secret
+# NAME appears here, so `redact_secrets lint` on the rendered manifest passes.
+#
+# STORAGE: tier A (pre-positioned) — the dataset already lives on a bound PVC that
+# is mounted read-through; the spec references those mount paths, so no in-pod
+# fetch. results_dir is a path on a (writable) mounted volume, bound at submit,
+# so outputs survive ttlSecondsAfterFinished deleting the Job. Tier C (S3 fetch)
+# adds an initContainer + emptyDir instead — see the skill.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "@@JOB_NAME@@"
+  labels:
+    tao-job: "@@JOB_NAME@@"
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: @@TTL_SECONDS@@
+  template:
+    metadata:
+      labels:
+        tao-job: "@@JOB_NAME@@"
+    spec:
+      restartPolicy: Never
+      imagePullSecrets:
+        - name: "@@IMAGE_PULL_SECRET@@"
+      containers:
+        - name: tao
+          image: "@@IMAGE@@"
+          command: ["/bin/sh", "-c", "@@COMMAND@@"]
+          resources:
+            limits:
+              "nvidia.com/gpu": "@@NUM_GPUS@@"
+          envFrom:
+            - secretRef:
+                name: "@@CRED_SECRET@@"
+          env:
+            - name: TAO_RESULTS_ROOT
+              value: "@@RESULTS_DIR@@"
+          volumeMounts:
+            - name: dshm
+              mountPath: /dev/shm
+            - name: data
+              mountPath: "@@MOUNT_PATH@@"
+      volumes:
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: "@@SHM_SIZE@@"
+        - name: data
+          persistentVolumeClaim:
+            claimName: "@@PVC_CLAIM@@"

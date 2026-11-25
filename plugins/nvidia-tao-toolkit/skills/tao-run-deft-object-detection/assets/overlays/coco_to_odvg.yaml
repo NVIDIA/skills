@@ -1,0 +1,8 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# `annotations convert` COCO -> ODVG, the settings that do not vary per run.
+# coco.ann_file and results_dir are run-specific and stay as --set.
+
+data.input_format: COCO
+data.output_format: ODVG

@@ -1,0 +1,4171 @@
+{
+  "action_filter": "",
+  "schema_version": 1,
+  "source": [
+    "skills/<network>/references/skill_info.yaml",
+    "skills/<network>/schemas/manifest.json",
+    "skills/<network>/schemas/<action>.schema.json"
+  ],
+  "support_rule": "AutoML is enabled at model level; runnable AutoML for an action also requires skills/<network>/schemas/<action>.schema.json to be packaged and valid.",
+  "supported": [
+    {
+      "actions": [
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "train"
+      ],
+      "automl_default_parameters": [
+        "train.optim.text_lr",
+        "train.optim.vision_lr"
+      ],
+      "automl_enabled": true,
+      "model": "tao-finetune-clip",
+      "network_arch": "clip",
+      "supported_actions": [
+        {
+          "action": "evaluate",
+          "automl_default_parameters": [],
+          "schema": "schemas/evaluate.schema.json",
+          "schema_status": "schemas/evaluate.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_evaluate.yaml"
+        },
+        {
+          "action": "export",
+          "automl_default_parameters": [],
+          "schema": "schemas/export.schema.json",
+          "schema_status": "schemas/export.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_export.yaml"
+        },
+        {
+          "action": "train",
+          "automl_default_parameters": [
+            "train.optim.text_lr",
+            "train.optim.vision_lr"
+          ],
+          "schema": "schemas/train.schema.json",
+          "schema_status": "schemas/train.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_train.yaml"
+        }
+      ],
+      "train_schema": "schemas/train.schema.json",
+      "train_schema_status": "schemas/train.schema.json is packaged and valid",
+      "train_spec_template": "references/spec_template_train.yaml",
+      "unsupported_actions": [
+        {
+          "action": "gen_trt_engine",
+          "reason": "schemas/gen_trt_engine.schema.json is not packaged"
+        },
+        {
+          "action": "inference",
+          "reason": "schemas/inference.schema.json is not packaged"
+        }
+      ]
+    },
+    {
+      "actions": [
+        "evaluate",
+        "inference",
+        "quantize",
+        "train"
+      ],
+      "automl_default_parameters": [
+        "train.optm_weight_decay",
+        "train.optm_decay_type",
+        "train.optm_lr",
+        "train.train_batch_per_replica"
+      ],
+      "automl_enabled": true,
+      "model": "tao-finetune-cosmos-reason",
+      "network_arch": "cosmos-reason",
+      "supported_actions": [
+        {
+          "action": "evaluate",
+          "automl_default_parameters": [
+            "dataset.system_prompt",
+            "vision.num_frames",
+            "generation.max_tokens",
+            "generation.temperature",
+            "generation.repetition_penalty",
+            "generation.presence_penalty",
+            "generation.frequency_penalty"
+          ],
+          "schema": "schemas/evaluate.schema.json",
+          "schema_status": "schemas/evaluate.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_evaluate.yaml"
+        },
+        {
+          "action": "inference",
+          "automl_default_parameters": [],
+          "schema": "schemas/inference.schema.json",
+          "schema_status": "schemas/inference.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_inference.yaml"
+        },
+        {
+          "action": "quantize",
+          "automl_default_parameters": [],
+          "schema": "schemas/quantize.schema.json",
+          "schema_status": "schemas/quantize.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_quantize.yaml"
+        },
+        {
+          "action": "train",
+          "automl_default_parameters": [
+            "train.optm_weight_decay",
+            "train.optm_decay_type",
+            "train.optm_lr",
+            "train.train_batch_per_replica"
+          ],
+          "schema": "schemas/train.schema.json",
+          "schema_status": "schemas/train.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_train.yaml"
+        }
+      ],
+      "train_schema": "schemas/train.schema.json",
+      "train_schema_status": "schemas/train.schema.json is packaged and valid",
+      "train_spec_template": "references/spec_template_train.yaml",
+      "unsupported_actions": []
+    },
+    {
+      "actions": [
+        "evaluate",
+        "export",
+        "inference",
+        "train"
+      ],
+      "automl_default_parameters": [
+        "model.dropout_ratio",
+        "train.optim.lr"
+      ],
+      "automl_enabled": true,
+      "model": "tao-train-action-recognition",
+      "network_arch": "action_recognition",
+      "supported_actions": [
+        {
+          "action": "evaluate",
+          "automl_default_parameters": [
+            "model.dropout_ratio",
+            "train.optim.lr"
+          ],
+          "schema": "schemas/evaluate.schema.json",
+          "schema_status": "schemas/evaluate.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_evaluate.yaml"
+        },
+        {
+          "action": "export",
+          "automl_default_parameters": [
+            "model.dropout_ratio",
+            "train.optim.lr"
+          ],
+          "schema": "schemas/export.schema.json",
+          "schema_status": "schemas/export.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_export.yaml"
+        },
+        {
+          "action": "inference",
+          "automl_default_parameters": [
+            "model.dropout_ratio",
+            "train.optim.lr"
+          ],
+          "schema": "schemas/inference.schema.json",
+          "schema_status": "schemas/inference.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_inference.yaml"
+        },
+        {
+          "action": "train",
+          "automl_default_parameters": [
+            "model.dropout_ratio",
+            "train.optim.lr"
+          ],
+          "schema": "schemas/train.schema.json",
+          "schema_status": "schemas/train.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_train.yaml"
+        }
+      ],
+      "train_schema": "schemas/train.schema.json",
+      "train_schema_status": "schemas/train.schema.json is packaged and valid",
+      "train_spec_template": "references/spec_template_train.yaml",
+      "unsupported_actions": []
+    },
+    {
+      "actions": [
+        "dataset_convert",
+        "evaluate",
+        "inference",
+        "train"
+      ],
+      "automl_default_parameters": [
+        "dataset.test_dataset.batch_size",
+        "dataset.test_dataset.num_workers",
+        "dataset.train_dataset.batch_size",
+        "dataset.train_dataset.num_workers",
+        "dataset.val_dataset.batch_size",
+        "dataset.val_dataset.num_workers"
+      ],
+      "automl_enabled": true,
+      "model": "tao-train-bevfusion",
+      "network_arch": "bevfusion",
+      "supported_actions": [
+        {
+          "action": "dataset_convert",
+          "automl_default_parameters": [],
+          "schema": "schemas/dataset_convert.schema.json",
+          "schema_status": "schemas/dataset_convert.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_dataset_convert.yaml"
+        },
+        {
+          "action": "evaluate",
+          "automl_default_parameters": [
+            "dataset.test_dataset.batch_size",
+            "dataset.test_dataset.num_workers",
+            "dataset.train_dataset.batch_size",
+            "dataset.train_dataset.num_workers",
+            "dataset.val_dataset.batch_size",
+            "dataset.val_dataset.num_workers"
+          ],
+          "schema": "schemas/evaluate.schema.json",
+          "schema_status": "schemas/evaluate.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_evaluate.yaml"
+        },
+        {
+          "action": "inference",
+          "automl_default_parameters": [
+            "dataset.test_dataset.batch_size",
+            "dataset.test_dataset.num_workers",
+            "dataset.train_dataset.batch_size",
+            "dataset.train_dataset.num_workers",
+            "dataset.val_dataset.batch_size",
+            "dataset.val_dataset.num_workers"
+          ],
+          "schema": "schemas/inference.schema.json",
+          "schema_status": "schemas/inference.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_inference.yaml"
+        },
+        {
+          "action": "train",
+          "automl_default_parameters": [
+            "dataset.test_dataset.batch_size",
+            "dataset.test_dataset.num_workers",
+            "dataset.train_dataset.batch_size",
+            "dataset.train_dataset.num_workers",
+            "dataset.val_dataset.batch_size",
+            "dataset.val_dataset.num_workers"
+          ],
+          "schema": "schemas/train.schema.json",
+          "schema_status": "schemas/train.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_train.yaml"
+        }
+      ],
+      "train_schema": "schemas/train.schema.json",
+      "train_schema_status": "schemas/train.schema.json is packaged and valid",
+      "train_spec_template": "references/spec_template_train.yaml",
+      "unsupported_actions": []
+    },
+    {
+      "actions": [
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "train"
+      ],
+      "automl_default_parameters": [
+        "train.optim.lr",
+        "train.optim.lr_decay"
+      ],
+      "automl_enabled": true,
+      "model": "tao-train-centerpose",
+      "network_arch": "centerpose",
+      "supported_actions": [
+        {
+          "action": "evaluate",
+          "automl_default_parameters": [
+            "train.optim.lr",
+            "train.optim.lr_decay"
+          ],
+          "schema": "schemas/evaluate.schema.json",
+          "schema_status": "schemas/evaluate.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_evaluate.yaml"
+        },
+        {
+          "action": "export",
+          "automl_default_parameters": [
+            "train.optim.lr",
+            "train.optim.lr_decay"
+          ],
+          "schema": "schemas/export.schema.json",
+          "schema_status": "schemas/export.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_export.yaml"
+        },
+        {
+          "action": "gen_trt_engine",
+          "automl_default_parameters": [
+            "train.optim.lr",
+            "train.optim.lr_decay"
+          ],
+          "schema": "schemas/gen_trt_engine.schema.json",
+          "schema_status": "schemas/gen_trt_engine.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_gen_trt_engine.yaml"
+        },
+        {
+          "action": "inference",
+          "automl_default_parameters": [
+            "train.optim.lr",
+            "train.optim.lr_decay"
+          ],
+          "schema": "schemas/inference.schema.json",
+          "schema_status": "schemas/inference.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_inference.yaml"
+        },
+        {
+          "action": "train",
+          "automl_default_parameters": [
+            "train.optim.lr",
+            "train.optim.lr_decay"
+          ],
+          "schema": "schemas/train.schema.json",
+          "schema_status": "schemas/train.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_train.yaml"
+        }
+      ],
+      "train_schema": "schemas/train.schema.json",
+      "train_schema_status": "schemas/train.schema.json is packaged and valid",
+      "train_spec_template": "references/spec_template_train.yaml",
+      "unsupported_actions": []
+    },
+    {
+      "actions": [
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "quantize",
+        "train"
+      ],
+      "automl_default_parameters": [
+        "dataset.augmentation.horizontal_flip_prob",
+        "dataset.augmentation.train_random_crop_max",
+        "dataset.augmentation.train_random_crop_min",
+        "dataset.batch_size",
+        "dataset.workers",
+        "model.dec_layers",
+        "model.enc_layers",
+        "model.num_queries",
+        "model.num_select",
+        "train.optim.lr",
+        "train.optim.lr_backbone",
+        "train.optim.lr_decay",
+        "train.optim.lr_linear_proj_mult",
+        "train.optim.lr_step_size",
+        "train.optim.momentum",
+        "train.optim.weight_decay"
+      ],
+      "automl_enabled": true,
+      "model": "tao-train-deformable-detr",
+      "network_arch": "deformable_detr",
+      "supported_actions": [
+        {
+          "action": "evaluate",
+          "automl_default_parameters": [
+            "dataset.augmentation.horizontal_flip_prob",
+            "dataset.augmentation.train_random_crop_max",
+            "dataset.augmentation.train_random_crop_min",
+            "dataset.batch_size",
+            "dataset.workers",
+            "model.dec_layers",
+            "model.enc_layers",
+            "model.num_queries",
+            "model.num_select",
+            "train.optim.lr",
+            "train.optim.lr_backbone",
+            "train.optim.lr_decay",
+            "train.optim.lr_linear_proj_mult",
+            "train.optim.lr_step_size",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/evaluate.schema.json",
+          "schema_status": "schemas/evaluate.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_evaluate.yaml"
+        },
+        {
+          "action": "export",
+          "automl_default_parameters": [
+            "dataset.augmentation.horizontal_flip_prob",
+            "dataset.augmentation.train_random_crop_max",
+            "dataset.augmentation.train_random_crop_min",
+            "dataset.batch_size",
+            "dataset.workers",
+            "model.dec_layers",
+            "model.enc_layers",
+            "model.num_queries",
+            "model.num_select",
+            "train.optim.lr",
+            "train.optim.lr_backbone",
+            "train.optim.lr_decay",
+            "train.optim.lr_linear_proj_mult",
+            "train.optim.lr_step_size",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/export.schema.json",
+          "schema_status": "schemas/export.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_export.yaml"
+        },
+        {
+          "action": "gen_trt_engine",
+          "automl_default_parameters": [
+            "train.optim.lr_step_size",
+            "model.enc_layers",
+            "dataset.augmentation.train_random_crop_min",
+            "model.dec_layers",
+            "dataset.batch_size",
+            "train.optim.lr_linear_proj_mult",
+            "train.optim.weight_decay",
+            "train.optim.lr_decay",
+            "dataset.workers",
+            "train.optim.lr_backbone",
+            "train.optim.momentum",
+            "dataset.augmentation.train_random_crop_max",
+            "model.num_queries",
+            "train.optim.lr",
+            "dataset.augmentation.horizontal_flip_prob",
+            "model.num_select"
+          ],
+          "schema": "schemas/gen_trt_engine.schema.json",
+          "schema_status": "schemas/gen_trt_engine.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_gen_trt_engine.yaml"
+        },
+        {
+          "action": "inference",
+          "automl_default_parameters": [
+            "dataset.augmentation.horizontal_flip_prob",
+            "dataset.augmentation.train_random_crop_max",
+            "dataset.augmentation.train_random_crop_min",
+            "dataset.batch_size",
+            "dataset.workers",
+            "model.dec_layers",
+            "model.enc_layers",
+            "model.num_queries",
+            "model.num_select",
+            "train.optim.lr",
+            "train.optim.lr_backbone",
+            "train.optim.lr_decay",
+            "train.optim.lr_linear_proj_mult",
+            "train.optim.lr_step_size",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/inference.schema.json",
+          "schema_status": "schemas/inference.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_inference.yaml"
+        },
+        {
+          "action": "quantize",
+          "automl_default_parameters": [
+            "dataset.augmentation.horizontal_flip_prob",
+            "dataset.augmentation.train_random_crop_max",
+            "dataset.augmentation.train_random_crop_min",
+            "dataset.batch_size",
+            "dataset.workers",
+            "model.dec_layers",
+            "model.enc_layers",
+            "model.num_queries",
+            "model.num_select",
+            "train.optim.lr",
+            "train.optim.lr_backbone",
+            "train.optim.lr_decay",
+            "train.optim.lr_linear_proj_mult",
+            "train.optim.lr_step_size",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/quantize.schema.json",
+          "schema_status": "schemas/quantize.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_quantize.yaml"
+        },
+        {
+          "action": "train",
+          "automl_default_parameters": [
+            "dataset.augmentation.horizontal_flip_prob",
+            "dataset.augmentation.train_random_crop_max",
+            "dataset.augmentation.train_random_crop_min",
+            "dataset.batch_size",
+            "dataset.workers",
+            "model.dec_layers",
+            "model.enc_layers",
+            "model.num_queries",
+            "model.num_select",
+            "train.optim.lr",
+            "train.optim.lr_backbone",
+            "train.optim.lr_decay",
+            "train.optim.lr_linear_proj_mult",
+            "train.optim.lr_step_size",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/train.schema.json",
+          "schema_status": "schemas/train.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_train.yaml"
+        }
+      ],
+      "train_schema": "schemas/train.schema.json",
+      "train_schema_status": "schemas/train.schema.json is packaged and valid",
+      "train_spec_template": "references/spec_template_train.yaml",
+      "unsupported_actions": []
+    },
+    {
+      "actions": [
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "quantize",
+        "train"
+      ],
+      "automl_default_parameters": [
+        "train.optim.lr",
+        "train.optim.weight_decay"
+      ],
+      "automl_enabled": true,
+      "model": "tao-train-depth-anything-v2",
+      "network_arch": "depth_net_mono",
+      "supported_actions": [
+        {
+          "action": "evaluate",
+          "automl_default_parameters": [
+            "dataset.infer_dataset.augmentation.color_aug_prob",
+            "dataset.infer_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.infer_dataset.augmentation.eraser_aug_prob",
+            "dataset.infer_dataset.augmentation.h_flip_prob",
+            "dataset.infer_dataset.augmentation.hshift_prob",
+            "dataset.infer_dataset.augmentation.spatial_aug_prob",
+            "dataset.infer_dataset.augmentation.stretch_prob",
+            "dataset.infer_dataset.augmentation.v_flip_prob",
+            "dataset.infer_dataset.augmentation.yjitter_prob",
+            "dataset.test_dataset.augmentation.color_aug_prob",
+            "dataset.test_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.test_dataset.augmentation.eraser_aug_prob",
+            "dataset.test_dataset.augmentation.h_flip_prob",
+            "dataset.test_dataset.augmentation.hshift_prob",
+            "dataset.test_dataset.augmentation.spatial_aug_prob",
+            "dataset.test_dataset.augmentation.stretch_prob",
+            "dataset.test_dataset.augmentation.v_flip_prob",
+            "dataset.test_dataset.augmentation.yjitter_prob",
+            "dataset.train_dataset.augmentation.color_aug_prob",
+            "dataset.train_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.train_dataset.augmentation.eraser_aug_prob",
+            "dataset.train_dataset.augmentation.h_flip_prob",
+            "dataset.train_dataset.augmentation.hshift_prob",
+            "dataset.train_dataset.augmentation.spatial_aug_prob",
+            "dataset.train_dataset.augmentation.stretch_prob",
+            "dataset.train_dataset.augmentation.v_flip_prob",
+            "dataset.train_dataset.augmentation.yjitter_prob",
+            "dataset.val_dataset.augmentation.color_aug_prob",
+            "dataset.val_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.val_dataset.augmentation.eraser_aug_prob",
+            "dataset.val_dataset.augmentation.h_flip_prob",
+            "dataset.val_dataset.augmentation.hshift_prob",
+            "dataset.val_dataset.augmentation.spatial_aug_prob",
+            "dataset.val_dataset.augmentation.stretch_prob",
+            "dataset.val_dataset.augmentation.v_flip_prob",
+            "dataset.val_dataset.augmentation.yjitter_prob",
+            "model.corr_radius",
+            "model.cv_group",
+            "model.volume_dim",
+            "train.optim.lr",
+            "train.optim.lr_decay",
+            "train.optim.lr_step_size",
+            "train.optim.min_lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/evaluate.schema.json",
+          "schema_status": "schemas/evaluate.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_evaluate.yaml"
+        },
+        {
+          "action": "export",
+          "automl_default_parameters": [
+            "dataset.infer_dataset.augmentation.color_aug_prob",
+            "dataset.infer_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.infer_dataset.augmentation.eraser_aug_prob",
+            "dataset.infer_dataset.augmentation.h_flip_prob",
+            "dataset.infer_dataset.augmentation.hshift_prob",
+            "dataset.infer_dataset.augmentation.spatial_aug_prob",
+            "dataset.infer_dataset.augmentation.stretch_prob",
+            "dataset.infer_dataset.augmentation.v_flip_prob",
+            "dataset.infer_dataset.augmentation.yjitter_prob",
+            "dataset.test_dataset.augmentation.color_aug_prob",
+            "dataset.test_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.test_dataset.augmentation.eraser_aug_prob",
+            "dataset.test_dataset.augmentation.h_flip_prob",
+            "dataset.test_dataset.augmentation.hshift_prob",
+            "dataset.test_dataset.augmentation.spatial_aug_prob",
+            "dataset.test_dataset.augmentation.stretch_prob",
+            "dataset.test_dataset.augmentation.v_flip_prob",
+            "dataset.test_dataset.augmentation.yjitter_prob",
+            "dataset.train_dataset.augmentation.color_aug_prob",
+            "dataset.train_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.train_dataset.augmentation.eraser_aug_prob",
+            "dataset.train_dataset.augmentation.h_flip_prob",
+            "dataset.train_dataset.augmentation.hshift_prob",
+            "dataset.train_dataset.augmentation.spatial_aug_prob",
+            "dataset.train_dataset.augmentation.stretch_prob",
+            "dataset.train_dataset.augmentation.v_flip_prob",
+            "dataset.train_dataset.augmentation.yjitter_prob",
+            "dataset.val_dataset.augmentation.color_aug_prob",
+            "dataset.val_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.val_dataset.augmentation.eraser_aug_prob",
+            "dataset.val_dataset.augmentation.h_flip_prob",
+            "dataset.val_dataset.augmentation.hshift_prob",
+            "dataset.val_dataset.augmentation.spatial_aug_prob",
+            "dataset.val_dataset.augmentation.stretch_prob",
+            "dataset.val_dataset.augmentation.v_flip_prob",
+            "dataset.val_dataset.augmentation.yjitter_prob",
+            "model.corr_radius",
+            "model.cv_group",
+            "model.volume_dim",
+            "train.optim.lr",
+            "train.optim.lr_decay",
+            "train.optim.lr_step_size",
+            "train.optim.min_lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/export.schema.json",
+          "schema_status": "schemas/export.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_export.yaml"
+        },
+        {
+          "action": "gen_trt_engine",
+          "automl_default_parameters": [
+            "train.optim.lr_step_size",
+            "dataset.infer_dataset.augmentation.yjitter_prob",
+            "dataset.test_dataset.augmentation.crop_min_valid_disp_ratio",
+            "model.corr_radius",
+            "train.optim.weight_decay",
+            "train.optim.lr_decay",
+            "dataset.infer_dataset.augmentation.hshift_prob",
+            "dataset.infer_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.train_dataset.augmentation.eraser_aug_prob",
+            "dataset.val_dataset.augmentation.color_aug_prob",
+            "dataset.val_dataset.augmentation.yjitter_prob",
+            "dataset.train_dataset.augmentation.stretch_prob",
+            "dataset.train_dataset.augmentation.yjitter_prob",
+            "model.volume_dim",
+            "dataset.train_dataset.augmentation.spatial_aug_prob",
+            "dataset.infer_dataset.augmentation.spatial_aug_prob",
+            "dataset.val_dataset.augmentation.h_flip_prob",
+            "dataset.train_dataset.augmentation.color_aug_prob",
+            "dataset.test_dataset.augmentation.h_flip_prob",
+            "dataset.train_dataset.augmentation.hshift_prob",
+            "train.optim.momentum",
+            "dataset.val_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.test_dataset.augmentation.hshift_prob",
+            "dataset.val_dataset.augmentation.v_flip_prob",
+            "dataset.infer_dataset.augmentation.h_flip_prob",
+            "dataset.val_dataset.augmentation.hshift_prob",
+            "dataset.test_dataset.augmentation.stretch_prob",
+            "dataset.val_dataset.augmentation.stretch_prob",
+            "dataset.infer_dataset.augmentation.eraser_aug_prob",
+            "train.optim.min_lr",
+            "model.cv_group",
+            "dataset.infer_dataset.augmentation.stretch_prob",
+            "dataset.train_dataset.augmentation.h_flip_prob",
+            "dataset.test_dataset.augmentation.eraser_aug_prob",
+            "dataset.infer_dataset.augmentation.color_aug_prob",
+            "train.optim.lr",
+            "dataset.test_dataset.augmentation.spatial_aug_prob",
+            "dataset.test_dataset.augmentation.yjitter_prob",
+            "dataset.test_dataset.augmentation.v_flip_prob",
+            "dataset.train_dataset.augmentation.v_flip_prob",
+            "dataset.val_dataset.augmentation.spatial_aug_prob",
+            "dataset.train_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.test_dataset.augmentation.color_aug_prob",
+            "dataset.infer_dataset.augmentation.v_flip_prob",
+            "dataset.val_dataset.augmentation.eraser_aug_prob"
+          ],
+          "schema": "schemas/gen_trt_engine.schema.json",
+          "schema_status": "schemas/gen_trt_engine.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_gen_trt_engine.yaml"
+        },
+        {
+          "action": "inference",
+          "automl_default_parameters": [
+            "dataset.infer_dataset.augmentation.color_aug_prob",
+            "dataset.infer_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.infer_dataset.augmentation.eraser_aug_prob",
+            "dataset.infer_dataset.augmentation.h_flip_prob",
+            "dataset.infer_dataset.augmentation.hshift_prob",
+            "dataset.infer_dataset.augmentation.spatial_aug_prob",
+            "dataset.infer_dataset.augmentation.stretch_prob",
+            "dataset.infer_dataset.augmentation.v_flip_prob",
+            "dataset.infer_dataset.augmentation.yjitter_prob",
+            "dataset.test_dataset.augmentation.color_aug_prob",
+            "dataset.test_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.test_dataset.augmentation.eraser_aug_prob",
+            "dataset.test_dataset.augmentation.h_flip_prob",
+            "dataset.test_dataset.augmentation.hshift_prob",
+            "dataset.test_dataset.augmentation.spatial_aug_prob",
+            "dataset.test_dataset.augmentation.stretch_prob",
+            "dataset.test_dataset.augmentation.v_flip_prob",
+            "dataset.test_dataset.augmentation.yjitter_prob",
+            "dataset.train_dataset.augmentation.color_aug_prob",
+            "dataset.train_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.train_dataset.augmentation.eraser_aug_prob",
+            "dataset.train_dataset.augmentation.h_flip_prob",
+            "dataset.train_dataset.augmentation.hshift_prob",
+            "dataset.train_dataset.augmentation.spatial_aug_prob",
+            "dataset.train_dataset.augmentation.stretch_prob",
+            "dataset.train_dataset.augmentation.v_flip_prob",
+            "dataset.train_dataset.augmentation.yjitter_prob",
+            "dataset.val_dataset.augmentation.color_aug_prob",
+            "dataset.val_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.val_dataset.augmentation.eraser_aug_prob",
+            "dataset.val_dataset.augmentation.h_flip_prob",
+            "dataset.val_dataset.augmentation.hshift_prob",
+            "dataset.val_dataset.augmentation.spatial_aug_prob",
+            "dataset.val_dataset.augmentation.stretch_prob",
+            "dataset.val_dataset.augmentation.v_flip_prob",
+            "dataset.val_dataset.augmentation.yjitter_prob",
+            "model.corr_radius",
+            "model.cv_group",
+            "model.volume_dim",
+            "train.optim.lr",
+            "train.optim.lr_decay",
+            "train.optim.lr_step_size",
+            "train.optim.min_lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/inference.schema.json",
+          "schema_status": "schemas/inference.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_inference.yaml"
+        },
+        {
+          "action": "quantize",
+          "automl_default_parameters": [
+            "dataset.infer_dataset.augmentation.color_aug_prob",
+            "dataset.infer_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.infer_dataset.augmentation.eraser_aug_prob",
+            "dataset.infer_dataset.augmentation.h_flip_prob",
+            "dataset.infer_dataset.augmentation.hshift_prob",
+            "dataset.infer_dataset.augmentation.spatial_aug_prob",
+            "dataset.infer_dataset.augmentation.stretch_prob",
+            "dataset.infer_dataset.augmentation.v_flip_prob",
+            "dataset.infer_dataset.augmentation.yjitter_prob",
+            "dataset.test_dataset.augmentation.color_aug_prob",
+            "dataset.test_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.test_dataset.augmentation.eraser_aug_prob",
+            "dataset.test_dataset.augmentation.h_flip_prob",
+            "dataset.test_dataset.augmentation.hshift_prob",
+            "dataset.test_dataset.augmentation.spatial_aug_prob",
+            "dataset.test_dataset.augmentation.stretch_prob",
+            "dataset.test_dataset.augmentation.v_flip_prob",
+            "dataset.test_dataset.augmentation.yjitter_prob",
+            "dataset.train_dataset.augmentation.color_aug_prob",
+            "dataset.train_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.train_dataset.augmentation.eraser_aug_prob",
+            "dataset.train_dataset.augmentation.h_flip_prob",
+            "dataset.train_dataset.augmentation.hshift_prob",
+            "dataset.train_dataset.augmentation.spatial_aug_prob",
+            "dataset.train_dataset.augmentation.stretch_prob",
+            "dataset.train_dataset.augmentation.v_flip_prob",
+            "dataset.train_dataset.augmentation.yjitter_prob",
+            "dataset.val_dataset.augmentation.color_aug_prob",
+            "dataset.val_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.val_dataset.augmentation.eraser_aug_prob",
+            "dataset.val_dataset.augmentation.h_flip_prob",
+            "dataset.val_dataset.augmentation.hshift_prob",
+            "dataset.val_dataset.augmentation.spatial_aug_prob",
+            "dataset.val_dataset.augmentation.stretch_prob",
+            "dataset.val_dataset.augmentation.v_flip_prob",
+            "dataset.val_dataset.augmentation.yjitter_prob",
+            "model.corr_radius",
+            "model.cv_group",
+            "model.volume_dim",
+            "train.optim.lr",
+            "train.optim.lr_decay",
+            "train.optim.lr_step_size",
+            "train.optim.min_lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/quantize.schema.json",
+          "schema_status": "schemas/quantize.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_quantize.yaml"
+        },
+        {
+          "action": "train",
+          "automl_default_parameters": [
+            "dataset.infer_dataset.augmentation.color_aug_prob",
+            "dataset.infer_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.infer_dataset.augmentation.eraser_aug_prob",
+            "dataset.infer_dataset.augmentation.h_flip_prob",
+            "dataset.infer_dataset.augmentation.hshift_prob",
+            "dataset.infer_dataset.augmentation.spatial_aug_prob",
+            "dataset.infer_dataset.augmentation.stretch_prob",
+            "dataset.infer_dataset.augmentation.v_flip_prob",
+            "dataset.infer_dataset.augmentation.yjitter_prob",
+            "dataset.test_dataset.augmentation.color_aug_prob",
+            "dataset.test_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.test_dataset.augmentation.eraser_aug_prob",
+            "dataset.test_dataset.augmentation.h_flip_prob",
+            "dataset.test_dataset.augmentation.hshift_prob",
+            "dataset.test_dataset.augmentation.spatial_aug_prob",
+            "dataset.test_dataset.augmentation.stretch_prob",
+            "dataset.test_dataset.augmentation.v_flip_prob",
+            "dataset.test_dataset.augmentation.yjitter_prob",
+            "dataset.train_dataset.augmentation.color_aug_prob",
+            "dataset.train_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.train_dataset.augmentation.eraser_aug_prob",
+            "dataset.train_dataset.augmentation.h_flip_prob",
+            "dataset.train_dataset.augmentation.hshift_prob",
+            "dataset.train_dataset.augmentation.spatial_aug_prob",
+            "dataset.train_dataset.augmentation.stretch_prob",
+            "dataset.train_dataset.augmentation.v_flip_prob",
+            "dataset.train_dataset.augmentation.yjitter_prob",
+            "dataset.val_dataset.augmentation.color_aug_prob",
+            "dataset.val_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.val_dataset.augmentation.eraser_aug_prob",
+            "dataset.val_dataset.augmentation.h_flip_prob",
+            "dataset.val_dataset.augmentation.hshift_prob",
+            "dataset.val_dataset.augmentation.spatial_aug_prob",
+            "dataset.val_dataset.augmentation.stretch_prob",
+            "dataset.val_dataset.augmentation.v_flip_prob",
+            "dataset.val_dataset.augmentation.yjitter_prob",
+            "model.corr_radius",
+            "model.cv_group",
+            "model.volume_dim",
+            "train.optim.lr",
+            "train.optim.lr_decay",
+            "train.optim.lr_step_size",
+            "train.optim.min_lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/train.schema.json",
+          "schema_status": "schemas/train.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_train.yaml"
+        }
+      ],
+      "train_schema": "schemas/train.schema.json",
+      "train_schema_status": "schemas/train.schema.json is packaged and valid",
+      "train_spec_template": "references/spec_template_train.yaml",
+      "unsupported_actions": []
+    },
+    {
+      "actions": [
+        "distill",
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "quantize",
+        "train"
+      ],
+      "automl_default_parameters": [
+        "dataset.augmentation.horizontal_flip_prob",
+        "dataset.augmentation.train_random_crop_max",
+        "dataset.augmentation.train_random_crop_min",
+        "dataset.batch_size",
+        "dataset.workers",
+        "model.dec_layers",
+        "model.enc_layers",
+        "model.num_queries",
+        "model.num_select",
+        "train.optim.layer_decay_rate",
+        "train.optim.lr",
+        "train.optim.lr_backbone",
+        "train.optim.lr_decay",
+        "train.optim.lr_linear_proj_mult",
+        "train.optim.lr_step_size",
+        "train.optim.momentum",
+        "train.optim.weight_decay"
+      ],
+      "automl_enabled": true,
+      "model": "tao-train-dino",
+      "network_arch": "dino",
+      "supported_actions": [
+        {
+          "action": "distill",
+          "automl_default_parameters": [
+            "dataset.augmentation.horizontal_flip_prob",
+            "dataset.augmentation.train_random_crop_max",
+            "dataset.augmentation.train_random_crop_min",
+            "dataset.batch_size",
+            "dataset.workers",
+            "model.dec_layers",
+            "model.enc_layers",
+            "model.num_queries",
+            "model.num_select",
+            "train.optim.layer_decay_rate",
+            "train.optim.lr",
+            "train.optim.lr_backbone",
+            "train.optim.lr_decay",
+            "train.optim.lr_linear_proj_mult",
+            "train.optim.lr_step_size",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/distill.schema.json",
+          "schema_status": "schemas/distill.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_distill.yaml"
+        },
+        {
+          "action": "evaluate",
+          "automl_default_parameters": [
+            "dataset.augmentation.horizontal_flip_prob",
+            "dataset.augmentation.train_random_crop_max",
+            "dataset.augmentation.train_random_crop_min",
+            "dataset.batch_size",
+            "dataset.workers",
+            "model.dec_layers",
+            "model.enc_layers",
+            "model.num_queries",
+            "model.num_select",
+            "train.optim.layer_decay_rate",
+            "train.optim.lr",
+            "train.optim.lr_backbone",
+            "train.optim.lr_decay",
+            "train.optim.lr_linear_proj_mult",
+            "train.optim.lr_step_size",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/evaluate.schema.json",
+          "schema_status": "schemas/evaluate.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_evaluate.yaml"
+        },
+        {
+          "action": "export",
+          "automl_default_parameters": [
+            "dataset.augmentation.horizontal_flip_prob",
+            "dataset.augmentation.train_random_crop_max",
+            "dataset.augmentation.train_random_crop_min",
+            "dataset.batch_size",
+            "dataset.workers",
+            "model.dec_layers",
+            "model.enc_layers",
+            "model.num_queries",
+            "model.num_select",
+            "train.optim.layer_decay_rate",
+            "train.optim.lr",
+            "train.optim.lr_backbone",
+            "train.optim.lr_decay",
+            "train.optim.lr_linear_proj_mult",
+            "train.optim.lr_step_size",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/export.schema.json",
+          "schema_status": "schemas/export.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_export.yaml"
+        },
+        {
+          "action": "gen_trt_engine",
+          "automl_default_parameters": [
+            "train.optim.lr_step_size",
+            "model.enc_layers",
+            "dataset.augmentation.train_random_crop_min",
+            "model.dec_layers",
+            "dataset.batch_size",
+            "train.optim.lr_linear_proj_mult",
+            "train.optim.weight_decay",
+            "train.optim.lr_decay",
+            "dataset.workers",
+            "train.optim.layer_decay_rate",
+            "train.optim.lr_backbone",
+            "train.optim.momentum",
+            "dataset.augmentation.train_random_crop_max",
+            "model.num_queries",
+            "train.optim.lr",
+            "dataset.augmentation.horizontal_flip_prob",
+            "model.num_select"
+          ],
+          "schema": "schemas/gen_trt_engine.schema.json",
+          "schema_status": "schemas/gen_trt_engine.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_gen_trt_engine.yaml"
+        },
+        {
+          "action": "inference",
+          "automl_default_parameters": [
+            "dataset.augmentation.horizontal_flip_prob",
+            "dataset.augmentation.train_random_crop_max",
+            "dataset.augmentation.train_random_crop_min",
+            "dataset.batch_size",
+            "dataset.workers",
+            "model.dec_layers",
+            "model.enc_layers",
+            "model.num_queries",
+            "model.num_select",
+            "train.optim.layer_decay_rate",
+            "train.optim.lr",
+            "train.optim.lr_backbone",
+            "train.optim.lr_decay",
+            "train.optim.lr_linear_proj_mult",
+            "train.optim.lr_step_size",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/inference.schema.json",
+          "schema_status": "schemas/inference.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_inference.yaml"
+        },
+        {
+          "action": "quantize",
+          "automl_default_parameters": [
+            "dataset.augmentation.horizontal_flip_prob",
+            "dataset.augmentation.train_random_crop_max",
+            "dataset.augmentation.train_random_crop_min",
+            "dataset.batch_size",
+            "dataset.workers",
+            "model.dec_layers",
+            "model.enc_layers",
+            "model.num_queries",
+            "model.num_select",
+            "train.optim.layer_decay_rate",
+            "train.optim.lr",
+            "train.optim.lr_backbone",
+            "train.optim.lr_decay",
+            "train.optim.lr_linear_proj_mult",
+            "train.optim.lr_step_size",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/quantize.schema.json",
+          "schema_status": "schemas/quantize.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_quantize.yaml"
+        },
+        {
+          "action": "train",
+          "automl_default_parameters": [
+            "dataset.augmentation.horizontal_flip_prob",
+            "dataset.augmentation.train_random_crop_max",
+            "dataset.augmentation.train_random_crop_min",
+            "dataset.batch_size",
+            "dataset.workers",
+            "model.dec_layers",
+            "model.enc_layers",
+            "model.num_queries",
+            "model.num_select",
+            "train.optim.layer_decay_rate",
+            "train.optim.lr",
+            "train.optim.lr_backbone",
+            "train.optim.lr_decay",
+            "train.optim.lr_linear_proj_mult",
+            "train.optim.lr_step_size",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/train.schema.json",
+          "schema_status": "schemas/train.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_train.yaml"
+        }
+      ],
+      "train_schema": "schemas/train.schema.json",
+      "train_schema_status": "schemas/train.schema.json is packaged and valid",
+      "train_spec_template": "references/spec_template_train.yaml",
+      "unsupported_actions": []
+    },
+    {
+      "actions": [
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "quantize",
+        "train"
+      ],
+      "automl_default_parameters": [
+        "dataset.infer_dataset.augmentation.color_aug_prob",
+        "dataset.infer_dataset.augmentation.crop_min_valid_disp_ratio",
+        "dataset.infer_dataset.augmentation.eraser_aug_prob",
+        "dataset.infer_dataset.augmentation.h_flip_prob",
+        "dataset.infer_dataset.augmentation.hshift_prob",
+        "dataset.infer_dataset.augmentation.spatial_aug_prob",
+        "dataset.infer_dataset.augmentation.stretch_prob",
+        "dataset.infer_dataset.augmentation.v_flip_prob",
+        "dataset.infer_dataset.augmentation.yjitter_prob",
+        "dataset.test_dataset.augmentation.color_aug_prob",
+        "dataset.test_dataset.augmentation.crop_min_valid_disp_ratio",
+        "dataset.test_dataset.augmentation.eraser_aug_prob",
+        "dataset.test_dataset.augmentation.h_flip_prob",
+        "dataset.test_dataset.augmentation.hshift_prob",
+        "dataset.test_dataset.augmentation.spatial_aug_prob",
+        "dataset.test_dataset.augmentation.stretch_prob",
+        "dataset.test_dataset.augmentation.v_flip_prob",
+        "dataset.test_dataset.augmentation.yjitter_prob",
+        "dataset.train_dataset.augmentation.color_aug_prob",
+        "dataset.train_dataset.augmentation.crop_min_valid_disp_ratio",
+        "dataset.train_dataset.augmentation.eraser_aug_prob",
+        "dataset.train_dataset.augmentation.h_flip_prob",
+        "dataset.train_dataset.augmentation.hshift_prob",
+        "dataset.train_dataset.augmentation.spatial_aug_prob",
+        "dataset.train_dataset.augmentation.stretch_prob",
+        "dataset.train_dataset.augmentation.v_flip_prob",
+        "dataset.train_dataset.augmentation.yjitter_prob",
+        "dataset.val_dataset.augmentation.color_aug_prob",
+        "dataset.val_dataset.augmentation.crop_min_valid_disp_ratio",
+        "dataset.val_dataset.augmentation.eraser_aug_prob",
+        "dataset.val_dataset.augmentation.h_flip_prob",
+        "dataset.val_dataset.augmentation.hshift_prob",
+        "dataset.val_dataset.augmentation.spatial_aug_prob",
+        "dataset.val_dataset.augmentation.stretch_prob",
+        "dataset.val_dataset.augmentation.v_flip_prob",
+        "dataset.val_dataset.augmentation.yjitter_prob",
+        "model.corr_radius",
+        "model.cv_group",
+        "model.volume_dim",
+        "train.optim.lr",
+        "train.optim.lr_decay",
+        "train.optim.lr_step_size",
+        "train.optim.min_lr",
+        "train.optim.momentum",
+        "train.optim.weight_decay"
+      ],
+      "automl_enabled": true,
+      "model": "tao-train-foundation-stereo",
+      "network_arch": "depth_net_stereo",
+      "supported_actions": [
+        {
+          "action": "evaluate",
+          "automl_default_parameters": [
+            "dataset.infer_dataset.augmentation.color_aug_prob",
+            "dataset.infer_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.infer_dataset.augmentation.eraser_aug_prob",
+            "dataset.infer_dataset.augmentation.h_flip_prob",
+            "dataset.infer_dataset.augmentation.hshift_prob",
+            "dataset.infer_dataset.augmentation.spatial_aug_prob",
+            "dataset.infer_dataset.augmentation.stretch_prob",
+            "dataset.infer_dataset.augmentation.v_flip_prob",
+            "dataset.infer_dataset.augmentation.yjitter_prob",
+            "dataset.test_dataset.augmentation.color_aug_prob",
+            "dataset.test_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.test_dataset.augmentation.eraser_aug_prob",
+            "dataset.test_dataset.augmentation.h_flip_prob",
+            "dataset.test_dataset.augmentation.hshift_prob",
+            "dataset.test_dataset.augmentation.spatial_aug_prob",
+            "dataset.test_dataset.augmentation.stretch_prob",
+            "dataset.test_dataset.augmentation.v_flip_prob",
+            "dataset.test_dataset.augmentation.yjitter_prob",
+            "dataset.train_dataset.augmentation.color_aug_prob",
+            "dataset.train_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.train_dataset.augmentation.eraser_aug_prob",
+            "dataset.train_dataset.augmentation.h_flip_prob",
+            "dataset.train_dataset.augmentation.hshift_prob",
+            "dataset.train_dataset.augmentation.spatial_aug_prob",
+            "dataset.train_dataset.augmentation.stretch_prob",
+            "dataset.train_dataset.augmentation.v_flip_prob",
+            "dataset.train_dataset.augmentation.yjitter_prob",
+            "dataset.val_dataset.augmentation.color_aug_prob",
+            "dataset.val_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.val_dataset.augmentation.eraser_aug_prob",
+            "dataset.val_dataset.augmentation.h_flip_prob",
+            "dataset.val_dataset.augmentation.hshift_prob",
+            "dataset.val_dataset.augmentation.spatial_aug_prob",
+            "dataset.val_dataset.augmentation.stretch_prob",
+            "dataset.val_dataset.augmentation.v_flip_prob",
+            "dataset.val_dataset.augmentation.yjitter_prob",
+            "model.corr_radius",
+            "model.cv_group",
+            "model.volume_dim",
+            "train.optim.lr",
+            "train.optim.lr_decay",
+            "train.optim.lr_step_size",
+            "train.optim.min_lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/evaluate.schema.json",
+          "schema_status": "schemas/evaluate.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_evaluate.yaml"
+        },
+        {
+          "action": "export",
+          "automl_default_parameters": [
+            "dataset.infer_dataset.augmentation.color_aug_prob",
+            "dataset.infer_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.infer_dataset.augmentation.eraser_aug_prob",
+            "dataset.infer_dataset.augmentation.h_flip_prob",
+            "dataset.infer_dataset.augmentation.hshift_prob",
+            "dataset.infer_dataset.augmentation.spatial_aug_prob",
+            "dataset.infer_dataset.augmentation.stretch_prob",
+            "dataset.infer_dataset.augmentation.v_flip_prob",
+            "dataset.infer_dataset.augmentation.yjitter_prob",
+            "dataset.test_dataset.augmentation.color_aug_prob",
+            "dataset.test_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.test_dataset.augmentation.eraser_aug_prob",
+            "dataset.test_dataset.augmentation.h_flip_prob",
+            "dataset.test_dataset.augmentation.hshift_prob",
+            "dataset.test_dataset.augmentation.spatial_aug_prob",
+            "dataset.test_dataset.augmentation.stretch_prob",
+            "dataset.test_dataset.augmentation.v_flip_prob",
+            "dataset.test_dataset.augmentation.yjitter_prob",
+            "dataset.train_dataset.augmentation.color_aug_prob",
+            "dataset.train_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.train_dataset.augmentation.eraser_aug_prob",
+            "dataset.train_dataset.augmentation.h_flip_prob",
+            "dataset.train_dataset.augmentation.hshift_prob",
+            "dataset.train_dataset.augmentation.spatial_aug_prob",
+            "dataset.train_dataset.augmentation.stretch_prob",
+            "dataset.train_dataset.augmentation.v_flip_prob",
+            "dataset.train_dataset.augmentation.yjitter_prob",
+            "dataset.val_dataset.augmentation.color_aug_prob",
+            "dataset.val_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.val_dataset.augmentation.eraser_aug_prob",
+            "dataset.val_dataset.augmentation.h_flip_prob",
+            "dataset.val_dataset.augmentation.hshift_prob",
+            "dataset.val_dataset.augmentation.spatial_aug_prob",
+            "dataset.val_dataset.augmentation.stretch_prob",
+            "dataset.val_dataset.augmentation.v_flip_prob",
+            "dataset.val_dataset.augmentation.yjitter_prob",
+            "model.corr_radius",
+            "model.cv_group",
+            "model.volume_dim",
+            "train.optim.lr",
+            "train.optim.lr_decay",
+            "train.optim.lr_step_size",
+            "train.optim.min_lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/export.schema.json",
+          "schema_status": "schemas/export.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_export.yaml"
+        },
+        {
+          "action": "gen_trt_engine",
+          "automl_default_parameters": [
+            "train.optim.lr_step_size",
+            "dataset.infer_dataset.augmentation.yjitter_prob",
+            "dataset.test_dataset.augmentation.crop_min_valid_disp_ratio",
+            "model.corr_radius",
+            "train.optim.weight_decay",
+            "train.optim.lr_decay",
+            "dataset.infer_dataset.augmentation.hshift_prob",
+            "dataset.infer_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.train_dataset.augmentation.eraser_aug_prob",
+            "dataset.val_dataset.augmentation.color_aug_prob",
+            "dataset.val_dataset.augmentation.yjitter_prob",
+            "dataset.train_dataset.augmentation.stretch_prob",
+            "dataset.train_dataset.augmentation.yjitter_prob",
+            "model.volume_dim",
+            "dataset.train_dataset.augmentation.spatial_aug_prob",
+            "dataset.infer_dataset.augmentation.spatial_aug_prob",
+            "dataset.val_dataset.augmentation.h_flip_prob",
+            "dataset.train_dataset.augmentation.color_aug_prob",
+            "dataset.test_dataset.augmentation.h_flip_prob",
+            "dataset.train_dataset.augmentation.hshift_prob",
+            "train.optim.momentum",
+            "dataset.val_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.test_dataset.augmentation.hshift_prob",
+            "dataset.val_dataset.augmentation.v_flip_prob",
+            "dataset.infer_dataset.augmentation.h_flip_prob",
+            "dataset.val_dataset.augmentation.hshift_prob",
+            "dataset.test_dataset.augmentation.stretch_prob",
+            "dataset.val_dataset.augmentation.stretch_prob",
+            "dataset.infer_dataset.augmentation.eraser_aug_prob",
+            "train.optim.min_lr",
+            "model.cv_group",
+            "dataset.infer_dataset.augmentation.stretch_prob",
+            "dataset.train_dataset.augmentation.h_flip_prob",
+            "dataset.test_dataset.augmentation.eraser_aug_prob",
+            "dataset.infer_dataset.augmentation.color_aug_prob",
+            "train.optim.lr",
+            "dataset.test_dataset.augmentation.spatial_aug_prob",
+            "dataset.test_dataset.augmentation.yjitter_prob",
+            "dataset.test_dataset.augmentation.v_flip_prob",
+            "dataset.train_dataset.augmentation.v_flip_prob",
+            "dataset.val_dataset.augmentation.spatial_aug_prob",
+            "dataset.train_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.test_dataset.augmentation.color_aug_prob",
+            "dataset.infer_dataset.augmentation.v_flip_prob",
+            "dataset.val_dataset.augmentation.eraser_aug_prob"
+          ],
+          "schema": "schemas/gen_trt_engine.schema.json",
+          "schema_status": "schemas/gen_trt_engine.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_gen_trt_engine.yaml"
+        },
+        {
+          "action": "inference",
+          "automl_default_parameters": [
+            "dataset.infer_dataset.augmentation.color_aug_prob",
+            "dataset.infer_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.infer_dataset.augmentation.eraser_aug_prob",
+            "dataset.infer_dataset.augmentation.h_flip_prob",
+            "dataset.infer_dataset.augmentation.hshift_prob",
+            "dataset.infer_dataset.augmentation.spatial_aug_prob",
+            "dataset.infer_dataset.augmentation.stretch_prob",
+            "dataset.infer_dataset.augmentation.v_flip_prob",
+            "dataset.infer_dataset.augmentation.yjitter_prob",
+            "dataset.test_dataset.augmentation.color_aug_prob",
+            "dataset.test_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.test_dataset.augmentation.eraser_aug_prob",
+            "dataset.test_dataset.augmentation.h_flip_prob",
+            "dataset.test_dataset.augmentation.hshift_prob",
+            "dataset.test_dataset.augmentation.spatial_aug_prob",
+            "dataset.test_dataset.augmentation.stretch_prob",
+            "dataset.test_dataset.augmentation.v_flip_prob",
+            "dataset.test_dataset.augmentation.yjitter_prob",
+            "dataset.train_dataset.augmentation.color_aug_prob",
+            "dataset.train_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.train_dataset.augmentation.eraser_aug_prob",
+            "dataset.train_dataset.augmentation.h_flip_prob",
+            "dataset.train_dataset.augmentation.hshift_prob",
+            "dataset.train_dataset.augmentation.spatial_aug_prob",
+            "dataset.train_dataset.augmentation.stretch_prob",
+            "dataset.train_dataset.augmentation.v_flip_prob",
+            "dataset.train_dataset.augmentation.yjitter_prob",
+            "dataset.val_dataset.augmentation.color_aug_prob",
+            "dataset.val_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.val_dataset.augmentation.eraser_aug_prob",
+            "dataset.val_dataset.augmentation.h_flip_prob",
+            "dataset.val_dataset.augmentation.hshift_prob",
+            "dataset.val_dataset.augmentation.spatial_aug_prob",
+            "dataset.val_dataset.augmentation.stretch_prob",
+            "dataset.val_dataset.augmentation.v_flip_prob",
+            "dataset.val_dataset.augmentation.yjitter_prob",
+            "model.corr_radius",
+            "model.cv_group",
+            "model.volume_dim",
+            "train.optim.lr",
+            "train.optim.lr_decay",
+            "train.optim.lr_step_size",
+            "train.optim.min_lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/inference.schema.json",
+          "schema_status": "schemas/inference.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_inference.yaml"
+        },
+        {
+          "action": "quantize",
+          "automl_default_parameters": [
+            "dataset.infer_dataset.augmentation.color_aug_prob",
+            "dataset.infer_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.infer_dataset.augmentation.eraser_aug_prob",
+            "dataset.infer_dataset.augmentation.h_flip_prob",
+            "dataset.infer_dataset.augmentation.hshift_prob",
+            "dataset.infer_dataset.augmentation.spatial_aug_prob",
+            "dataset.infer_dataset.augmentation.stretch_prob",
+            "dataset.infer_dataset.augmentation.v_flip_prob",
+            "dataset.infer_dataset.augmentation.yjitter_prob",
+            "dataset.test_dataset.augmentation.color_aug_prob",
+            "dataset.test_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.test_dataset.augmentation.eraser_aug_prob",
+            "dataset.test_dataset.augmentation.h_flip_prob",
+            "dataset.test_dataset.augmentation.hshift_prob",
+            "dataset.test_dataset.augmentation.spatial_aug_prob",
+            "dataset.test_dataset.augmentation.stretch_prob",
+            "dataset.test_dataset.augmentation.v_flip_prob",
+            "dataset.test_dataset.augmentation.yjitter_prob",
+            "dataset.train_dataset.augmentation.color_aug_prob",
+            "dataset.train_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.train_dataset.augmentation.eraser_aug_prob",
+            "dataset.train_dataset.augmentation.h_flip_prob",
+            "dataset.train_dataset.augmentation.hshift_prob",
+            "dataset.train_dataset.augmentation.spatial_aug_prob",
+            "dataset.train_dataset.augmentation.stretch_prob",
+            "dataset.train_dataset.augmentation.v_flip_prob",
+            "dataset.train_dataset.augmentation.yjitter_prob",
+            "dataset.val_dataset.augmentation.color_aug_prob",
+            "dataset.val_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.val_dataset.augmentation.eraser_aug_prob",
+            "dataset.val_dataset.augmentation.h_flip_prob",
+            "dataset.val_dataset.augmentation.hshift_prob",
+            "dataset.val_dataset.augmentation.spatial_aug_prob",
+            "dataset.val_dataset.augmentation.stretch_prob",
+            "dataset.val_dataset.augmentation.v_flip_prob",
+            "dataset.val_dataset.augmentation.yjitter_prob",
+            "model.corr_radius",
+            "model.cv_group",
+            "model.volume_dim",
+            "train.optim.lr",
+            "train.optim.lr_decay",
+            "train.optim.lr_step_size",
+            "train.optim.min_lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/quantize.schema.json",
+          "schema_status": "schemas/quantize.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_quantize.yaml"
+        },
+        {
+          "action": "train",
+          "automl_default_parameters": [
+            "dataset.infer_dataset.augmentation.color_aug_prob",
+            "dataset.infer_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.infer_dataset.augmentation.eraser_aug_prob",
+            "dataset.infer_dataset.augmentation.h_flip_prob",
+            "dataset.infer_dataset.augmentation.hshift_prob",
+            "dataset.infer_dataset.augmentation.spatial_aug_prob",
+            "dataset.infer_dataset.augmentation.stretch_prob",
+            "dataset.infer_dataset.augmentation.v_flip_prob",
+            "dataset.infer_dataset.augmentation.yjitter_prob",
+            "dataset.test_dataset.augmentation.color_aug_prob",
+            "dataset.test_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.test_dataset.augmentation.eraser_aug_prob",
+            "dataset.test_dataset.augmentation.h_flip_prob",
+            "dataset.test_dataset.augmentation.hshift_prob",
+            "dataset.test_dataset.augmentation.spatial_aug_prob",
+            "dataset.test_dataset.augmentation.stretch_prob",
+            "dataset.test_dataset.augmentation.v_flip_prob",
+            "dataset.test_dataset.augmentation.yjitter_prob",
+            "dataset.train_dataset.augmentation.color_aug_prob",
+            "dataset.train_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.train_dataset.augmentation.eraser_aug_prob",
+            "dataset.train_dataset.augmentation.h_flip_prob",
+            "dataset.train_dataset.augmentation.hshift_prob",
+            "dataset.train_dataset.augmentation.spatial_aug_prob",
+            "dataset.train_dataset.augmentation.stretch_prob",
+            "dataset.train_dataset.augmentation.v_flip_prob",
+            "dataset.train_dataset.augmentation.yjitter_prob",
+            "dataset.val_dataset.augmentation.color_aug_prob",
+            "dataset.val_dataset.augmentation.crop_min_valid_disp_ratio",
+            "dataset.val_dataset.augmentation.eraser_aug_prob",
+            "dataset.val_dataset.augmentation.h_flip_prob",
+            "dataset.val_dataset.augmentation.hshift_prob",
+            "dataset.val_dataset.augmentation.spatial_aug_prob",
+            "dataset.val_dataset.augmentation.stretch_prob",
+            "dataset.val_dataset.augmentation.v_flip_prob",
+            "dataset.val_dataset.augmentation.yjitter_prob",
+            "model.corr_radius",
+            "model.cv_group",
+            "model.volume_dim",
+            "train.optim.lr",
+            "train.optim.lr_decay",
+            "train.optim.lr_step_size",
+            "train.optim.min_lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/train.schema.json",
+          "schema_status": "schemas/train.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_train.yaml"
+        }
+      ],
+      "train_schema": "schemas/train.schema.json",
+      "train_schema_status": "schemas/train.schema.json is packaged and valid",
+      "train_spec_template": "references/spec_template_train.yaml",
+      "unsupported_actions": []
+    },
+    {
+      "actions": [
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "quantize",
+        "train"
+      ],
+      "automl_default_parameters": [
+        "dataset.augmentation.horizontal_flip_prob",
+        "dataset.augmentation.train_random_crop_max",
+        "dataset.augmentation.train_random_crop_min",
+        "model.dec_layers",
+        "model.enc_layers",
+        "model.num_select",
+        "train.optim.lr",
+        "train.optim.lr_backbone",
+        "train.optim.lr_decay",
+        "train.optim.lr_linear_proj_mult",
+        "train.optim.lr_step_size",
+        "train.optim.momentum",
+        "train.optim.weight_decay"
+      ],
+      "automl_enabled": true,
+      "model": "tao-train-grounding-dino",
+      "network_arch": "grounding_dino",
+      "supported_actions": [
+        {
+          "action": "evaluate",
+          "automl_default_parameters": [
+            "dataset.augmentation.horizontal_flip_prob",
+            "dataset.augmentation.train_random_crop_max",
+            "dataset.augmentation.train_random_crop_min",
+            "model.dec_layers",
+            "model.enc_layers",
+            "model.num_select",
+            "train.optim.lr",
+            "train.optim.lr_backbone",
+            "train.optim.lr_decay",
+            "train.optim.lr_linear_proj_mult",
+            "train.optim.lr_step_size",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/evaluate.schema.json",
+          "schema_status": "schemas/evaluate.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_evaluate.yaml"
+        },
+        {
+          "action": "export",
+          "automl_default_parameters": [
+            "dataset.augmentation.horizontal_flip_prob",
+            "dataset.augmentation.train_random_crop_max",
+            "dataset.augmentation.train_random_crop_min",
+            "model.dec_layers",
+            "model.enc_layers",
+            "model.num_select",
+            "train.optim.lr",
+            "train.optim.lr_backbone",
+            "train.optim.lr_decay",
+            "train.optim.lr_linear_proj_mult",
+            "train.optim.lr_step_size",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/export.schema.json",
+          "schema_status": "schemas/export.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_export.yaml"
+        },
+        {
+          "action": "gen_trt_engine",
+          "automl_default_parameters": [
+            "train.optim.lr_step_size",
+            "model.enc_layers",
+            "dataset.augmentation.train_random_crop_min",
+            "model.dec_layers",
+            "train.optim.weight_decay",
+            "train.optim.lr_linear_proj_mult",
+            "train.optim.lr_decay",
+            "train.optim.lr_backbone",
+            "train.optim.momentum",
+            "dataset.augmentation.train_random_crop_max",
+            "train.optim.lr",
+            "dataset.augmentation.horizontal_flip_prob",
+            "model.num_select"
+          ],
+          "schema": "schemas/gen_trt_engine.schema.json",
+          "schema_status": "schemas/gen_trt_engine.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_gen_trt_engine.yaml"
+        },
+        {
+          "action": "inference",
+          "automl_default_parameters": [
+            "dataset.augmentation.horizontal_flip_prob",
+            "dataset.augmentation.train_random_crop_max",
+            "dataset.augmentation.train_random_crop_min",
+            "model.dec_layers",
+            "model.enc_layers",
+            "model.num_select",
+            "train.optim.lr",
+            "train.optim.lr_backbone",
+            "train.optim.lr_decay",
+            "train.optim.lr_linear_proj_mult",
+            "train.optim.lr_step_size",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/inference.schema.json",
+          "schema_status": "schemas/inference.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_inference.yaml"
+        },
+        {
+          "action": "quantize",
+          "automl_default_parameters": [
+            "dataset.augmentation.horizontal_flip_prob",
+            "dataset.augmentation.train_random_crop_max",
+            "dataset.augmentation.train_random_crop_min",
+            "model.dec_layers",
+            "model.enc_layers",
+            "model.num_select",
+            "train.optim.lr",
+            "train.optim.lr_backbone",
+            "train.optim.lr_decay",
+            "train.optim.lr_linear_proj_mult",
+            "train.optim.lr_step_size",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/quantize.schema.json",
+          "schema_status": "schemas/quantize.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_quantize.yaml"
+        },
+        {
+          "action": "train",
+          "automl_default_parameters": [
+            "dataset.augmentation.horizontal_flip_prob",
+            "dataset.augmentation.train_random_crop_max",
+            "dataset.augmentation.train_random_crop_min",
+            "model.dec_layers",
+            "model.enc_layers",
+            "model.num_select",
+            "train.optim.lr",
+            "train.optim.lr_backbone",
+            "train.optim.lr_decay",
+            "train.optim.lr_linear_proj_mult",
+            "train.optim.lr_step_size",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/train.schema.json",
+          "schema_status": "schemas/train.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_train.yaml"
+        }
+      ],
+      "train_schema": "schemas/train.schema.json",
+      "train_schema_status": "schemas/train.schema.json is packaged and valid",
+      "train_spec_template": "references/spec_template_train.yaml",
+      "unsupported_actions": []
+    },
+    {
+      "actions": [
+        "distill",
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "quantize",
+        "train"
+      ],
+      "automl_default_parameters": [
+        "dataset.augmentation.random_aug.enable",
+        "dataset.augmentation.random_color.brightness",
+        "dataset.augmentation.random_color.color_probability",
+        "dataset.augmentation.random_color.contrast",
+        "dataset.augmentation.random_color.enable",
+        "dataset.augmentation.random_color.hue",
+        "dataset.augmentation.random_color.saturation",
+        "dataset.augmentation.random_erase.enable",
+        "dataset.augmentation.random_erase.erase_probability",
+        "dataset.augmentation.random_flip.enable",
+        "dataset.augmentation.random_flip.hflip_probability",
+        "dataset.augmentation.random_flip.vflip_probability",
+        "dataset.augmentation.random_rotate.enable",
+        "dataset.augmentation.random_rotate.rotate_probability",
+        "dataset.augmentation.with_scale_random_crop.enable",
+        "dataset.batch_size",
+        "dataset.workers",
+        "distill.teacher.backbone.freeze_backbone",
+        "distill.teacher.backbone.freeze_norm",
+        "model.backbone.freeze_backbone",
+        "model.backbone.freeze_norm",
+        "train.optim.betas",
+        "train.optim.lr",
+        "train.optim.momentum",
+        "train.optim.weight_decay"
+      ],
+      "automl_enabled": true,
+      "model": "tao-train-image-classification",
+      "network_arch": "classification_pyt",
+      "supported_actions": [
+        {
+          "action": "distill",
+          "automl_default_parameters": [
+            "dataset.augmentation.random_aug.enable",
+            "dataset.augmentation.random_color.brightness",
+            "dataset.augmentation.random_color.color_probability",
+            "dataset.augmentation.random_color.contrast",
+            "dataset.augmentation.random_color.enable",
+            "dataset.augmentation.random_color.hue",
+            "dataset.augmentation.random_color.saturation",
+            "dataset.augmentation.random_erase.enable",
+            "dataset.augmentation.random_erase.erase_probability",
+            "dataset.augmentation.random_flip.enable",
+            "dataset.augmentation.random_flip.hflip_probability",
+            "dataset.augmentation.random_flip.vflip_probability",
+            "dataset.augmentation.random_rotate.enable",
+            "dataset.augmentation.random_rotate.rotate_probability",
+            "dataset.augmentation.with_scale_random_crop.enable",
+            "dataset.batch_size",
+            "dataset.workers",
+            "distill.teacher.backbone.freeze_backbone",
+            "distill.teacher.backbone.freeze_norm",
+            "model.backbone.freeze_backbone",
+            "model.backbone.freeze_norm",
+            "train.optim.betas",
+            "train.optim.lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/distill.schema.json",
+          "schema_status": "schemas/distill.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_distill.yaml"
+        },
+        {
+          "action": "evaluate",
+          "automl_default_parameters": [
+            "dataset.augmentation.random_aug.enable",
+            "dataset.augmentation.random_color.brightness",
+            "dataset.augmentation.random_color.color_probability",
+            "dataset.augmentation.random_color.contrast",
+            "dataset.augmentation.random_color.enable",
+            "dataset.augmentation.random_color.hue",
+            "dataset.augmentation.random_color.saturation",
+            "dataset.augmentation.random_erase.enable",
+            "dataset.augmentation.random_erase.erase_probability",
+            "dataset.augmentation.random_flip.enable",
+            "dataset.augmentation.random_flip.hflip_probability",
+            "dataset.augmentation.random_flip.vflip_probability",
+            "dataset.augmentation.random_rotate.enable",
+            "dataset.augmentation.random_rotate.rotate_probability",
+            "dataset.augmentation.with_scale_random_crop.enable",
+            "dataset.batch_size",
+            "dataset.workers",
+            "distill.teacher.backbone.freeze_backbone",
+            "distill.teacher.backbone.freeze_norm",
+            "model.backbone.freeze_backbone",
+            "model.backbone.freeze_norm",
+            "train.optim.betas",
+            "train.optim.lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/evaluate.schema.json",
+          "schema_status": "schemas/evaluate.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_evaluate.yaml"
+        },
+        {
+          "action": "export",
+          "automl_default_parameters": [
+            "dataset.augmentation.random_aug.enable",
+            "dataset.augmentation.random_color.brightness",
+            "dataset.augmentation.random_color.color_probability",
+            "dataset.augmentation.random_color.contrast",
+            "dataset.augmentation.random_color.enable",
+            "dataset.augmentation.random_color.hue",
+            "dataset.augmentation.random_color.saturation",
+            "dataset.augmentation.random_erase.enable",
+            "dataset.augmentation.random_erase.erase_probability",
+            "dataset.augmentation.random_flip.enable",
+            "dataset.augmentation.random_flip.hflip_probability",
+            "dataset.augmentation.random_flip.vflip_probability",
+            "dataset.augmentation.random_rotate.enable",
+            "dataset.augmentation.random_rotate.rotate_probability",
+            "dataset.augmentation.with_scale_random_crop.enable",
+            "dataset.batch_size",
+            "dataset.workers",
+            "distill.teacher.backbone.freeze_backbone",
+            "distill.teacher.backbone.freeze_norm",
+            "model.backbone.freeze_backbone",
+            "model.backbone.freeze_norm",
+            "train.optim.betas",
+            "train.optim.lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/export.schema.json",
+          "schema_status": "schemas/export.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_export.yaml"
+        },
+        {
+          "action": "gen_trt_engine",
+          "automl_default_parameters": [
+            "dataset.augmentation.random_aug.enable",
+            "dataset.augmentation.random_color.brightness",
+            "dataset.augmentation.random_color.color_probability",
+            "dataset.augmentation.random_color.contrast",
+            "dataset.augmentation.random_color.enable",
+            "dataset.augmentation.random_color.hue",
+            "dataset.augmentation.random_color.saturation",
+            "dataset.augmentation.random_erase.enable",
+            "dataset.augmentation.random_erase.erase_probability",
+            "dataset.augmentation.random_flip.enable",
+            "dataset.augmentation.random_flip.hflip_probability",
+            "dataset.augmentation.random_flip.vflip_probability",
+            "dataset.augmentation.random_rotate.enable",
+            "dataset.augmentation.random_rotate.rotate_probability",
+            "dataset.augmentation.with_scale_random_crop.enable",
+            "dataset.batch_size",
+            "dataset.workers",
+            "distill.teacher.backbone.freeze_backbone",
+            "distill.teacher.backbone.freeze_norm",
+            "model.backbone.freeze_backbone",
+            "model.backbone.freeze_norm",
+            "train.optim.betas",
+            "train.optim.lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/gen_trt_engine.schema.json",
+          "schema_status": "schemas/gen_trt_engine.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_gen_trt_engine.yaml"
+        },
+        {
+          "action": "inference",
+          "automl_default_parameters": [
+            "dataset.augmentation.random_aug.enable",
+            "dataset.augmentation.random_color.brightness",
+            "dataset.augmentation.random_color.color_probability",
+            "dataset.augmentation.random_color.contrast",
+            "dataset.augmentation.random_color.enable",
+            "dataset.augmentation.random_color.hue",
+            "dataset.augmentation.random_color.saturation",
+            "dataset.augmentation.random_erase.enable",
+            "dataset.augmentation.random_erase.erase_probability",
+            "dataset.augmentation.random_flip.enable",
+            "dataset.augmentation.random_flip.hflip_probability",
+            "dataset.augmentation.random_flip.vflip_probability",
+            "dataset.augmentation.random_rotate.enable",
+            "dataset.augmentation.random_rotate.rotate_probability",
+            "dataset.augmentation.with_scale_random_crop.enable",
+            "dataset.batch_size",
+            "dataset.workers",
+            "distill.teacher.backbone.freeze_backbone",
+            "distill.teacher.backbone.freeze_norm",
+            "model.backbone.freeze_backbone",
+            "model.backbone.freeze_norm",
+            "train.optim.betas",
+            "train.optim.lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/inference.schema.json",
+          "schema_status": "schemas/inference.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_inference.yaml"
+        },
+        {
+          "action": "quantize",
+          "automl_default_parameters": [
+            "dataset.augmentation.random_aug.enable",
+            "dataset.augmentation.random_color.brightness",
+            "dataset.augmentation.random_color.color_probability",
+            "dataset.augmentation.random_color.contrast",
+            "dataset.augmentation.random_color.enable",
+            "dataset.augmentation.random_color.hue",
+            "dataset.augmentation.random_color.saturation",
+            "dataset.augmentation.random_erase.enable",
+            "dataset.augmentation.random_erase.erase_probability",
+            "dataset.augmentation.random_flip.enable",
+            "dataset.augmentation.random_flip.hflip_probability",
+            "dataset.augmentation.random_flip.vflip_probability",
+            "dataset.augmentation.random_rotate.enable",
+            "dataset.augmentation.random_rotate.rotate_probability",
+            "dataset.augmentation.with_scale_random_crop.enable",
+            "dataset.batch_size",
+            "dataset.workers",
+            "distill.teacher.backbone.freeze_backbone",
+            "distill.teacher.backbone.freeze_norm",
+            "model.backbone.freeze_backbone",
+            "model.backbone.freeze_norm",
+            "train.optim.betas",
+            "train.optim.lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/quantize.schema.json",
+          "schema_status": "schemas/quantize.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_quantize.yaml"
+        },
+        {
+          "action": "train",
+          "automl_default_parameters": [
+            "dataset.augmentation.random_aug.enable",
+            "dataset.augmentation.random_color.brightness",
+            "dataset.augmentation.random_color.color_probability",
+            "dataset.augmentation.random_color.contrast",
+            "dataset.augmentation.random_color.enable",
+            "dataset.augmentation.random_color.hue",
+            "dataset.augmentation.random_color.saturation",
+            "dataset.augmentation.random_erase.enable",
+            "dataset.augmentation.random_erase.erase_probability",
+            "dataset.augmentation.random_flip.enable",
+            "dataset.augmentation.random_flip.hflip_probability",
+            "dataset.augmentation.random_flip.vflip_probability",
+            "dataset.augmentation.random_rotate.enable",
+            "dataset.augmentation.random_rotate.rotate_probability",
+            "dataset.augmentation.with_scale_random_crop.enable",
+            "dataset.batch_size",
+            "dataset.workers",
+            "distill.teacher.backbone.freeze_backbone",
+            "distill.teacher.backbone.freeze_norm",
+            "model.backbone.freeze_backbone",
+            "model.backbone.freeze_norm",
+            "train.optim.betas",
+            "train.optim.lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/train.schema.json",
+          "schema_status": "schemas/train.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_train.yaml"
+        }
+      ],
+      "train_schema": "schemas/train.schema.json",
+      "train_schema_status": "schemas/train.schema.json is packaged and valid",
+      "train_spec_template": "references/spec_template_train.yaml",
+      "unsupported_actions": []
+    },
+    {
+      "actions": [
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "train"
+      ],
+      "automl_default_parameters": [
+        "train.optim.backbone_multiplier",
+        "train.optim.lr",
+        "train.optim.momentum",
+        "train.optim.warmup_epochs",
+        "train.optim.weight_decay"
+      ],
+      "automl_enabled": true,
+      "model": "tao-train-mask-auto-encoder",
+      "network_arch": "mae",
+      "supported_actions": [
+        {
+          "action": "evaluate",
+          "automl_default_parameters": [
+            "train.optim.backbone_multiplier",
+            "train.optim.lr",
+            "train.optim.momentum",
+            "train.optim.warmup_epochs",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/evaluate.schema.json",
+          "schema_status": "schemas/evaluate.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_evaluate.yaml"
+        },
+        {
+          "action": "export",
+          "automl_default_parameters": [
+            "train.optim.backbone_multiplier",
+            "train.optim.lr",
+            "train.optim.momentum",
+            "train.optim.warmup_epochs",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/export.schema.json",
+          "schema_status": "schemas/export.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_export.yaml"
+        },
+        {
+          "action": "gen_trt_engine",
+          "automl_default_parameters": [
+            "train.optim.weight_decay",
+            "train.optim.backbone_multiplier",
+            "train.optim.momentum",
+            "train.optim.lr",
+            "train.optim.warmup_epochs"
+          ],
+          "schema": "schemas/gen_trt_engine.schema.json",
+          "schema_status": "schemas/gen_trt_engine.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_gen_trt_engine.yaml"
+        },
+        {
+          "action": "inference",
+          "automl_default_parameters": [
+            "train.optim.backbone_multiplier",
+            "train.optim.lr",
+            "train.optim.momentum",
+            "train.optim.warmup_epochs",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/inference.schema.json",
+          "schema_status": "schemas/inference.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_inference.yaml"
+        },
+        {
+          "action": "train",
+          "automl_default_parameters": [
+            "train.optim.backbone_multiplier",
+            "train.optim.lr",
+            "train.optim.momentum",
+            "train.optim.warmup_epochs",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/train.schema.json",
+          "schema_status": "schemas/train.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_train.yaml"
+        }
+      ],
+      "train_schema": "schemas/train.schema.json",
+      "train_schema_status": "schemas/train.schema.json is packaged and valid",
+      "train_spec_template": "references/spec_template_train.yaml",
+      "unsupported_actions": []
+    },
+    {
+      "actions": [
+        "evaluate",
+        "inference",
+        "train"
+      ],
+      "automl_default_parameters": [
+        "train.lr",
+        "train.wd"
+      ],
+      "automl_enabled": true,
+      "model": "tao-train-mask-auto-label",
+      "network_arch": "mal",
+      "supported_actions": [
+        {
+          "action": "evaluate",
+          "automl_default_parameters": [],
+          "schema": "schemas/evaluate.schema.json",
+          "schema_status": "schemas/evaluate.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_evaluate.yaml"
+        },
+        {
+          "action": "inference",
+          "automl_default_parameters": [],
+          "schema": "schemas/inference.schema.json",
+          "schema_status": "schemas/inference.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_inference.yaml"
+        },
+        {
+          "action": "train",
+          "automl_default_parameters": [
+            "train.lr",
+            "train.wd"
+          ],
+          "schema": "schemas/train.schema.json",
+          "schema_status": "schemas/train.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_train.yaml"
+        }
+      ],
+      "train_schema": "schemas/train.schema.json",
+      "train_schema_status": "schemas/train.schema.json is packaged and valid",
+      "train_spec_template": "references/spec_template_train.yaml",
+      "unsupported_actions": []
+    },
+    {
+      "actions": [
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "quantize",
+        "train"
+      ],
+      "automl_default_parameters": [
+        "dataset.augmentation.horizontal_flip_prob",
+        "dataset.augmentation.train_random_crop_max",
+        "dataset.augmentation.train_random_crop_min",
+        "model.num_select",
+        "train.optim.lr",
+        "train.optim.lr_backbone",
+        "train.optim.lr_decay",
+        "train.optim.lr_linear_proj_mult",
+        "train.optim.lr_step_size",
+        "train.optim.momentum",
+        "train.optim.weight_decay"
+      ],
+      "automl_enabled": true,
+      "model": "tao-train-mask-grounding-dino",
+      "network_arch": "mask_grounding_dino",
+      "supported_actions": [
+        {
+          "action": "evaluate",
+          "automl_default_parameters": [
+            "dataset.augmentation.horizontal_flip_prob",
+            "dataset.augmentation.train_random_crop_max",
+            "dataset.augmentation.train_random_crop_min",
+            "model.num_select",
+            "train.optim.lr",
+            "train.optim.lr_backbone",
+            "train.optim.lr_decay",
+            "train.optim.lr_linear_proj_mult",
+            "train.optim.lr_step_size",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/evaluate.schema.json",
+          "schema_status": "schemas/evaluate.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_evaluate.yaml"
+        },
+        {
+          "action": "export",
+          "automl_default_parameters": [
+            "dataset.augmentation.horizontal_flip_prob",
+            "dataset.augmentation.train_random_crop_max",
+            "dataset.augmentation.train_random_crop_min",
+            "model.num_select",
+            "train.optim.lr",
+            "train.optim.lr_backbone",
+            "train.optim.lr_decay",
+            "train.optim.lr_linear_proj_mult",
+            "train.optim.lr_step_size",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/export.schema.json",
+          "schema_status": "schemas/export.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_export.yaml"
+        },
+        {
+          "action": "gen_trt_engine",
+          "automl_default_parameters": [
+            "train.optim.lr_step_size",
+            "dataset.augmentation.train_random_crop_min",
+            "train.optim.weight_decay",
+            "train.optim.lr_decay",
+            "train.optim.lr_linear_proj_mult",
+            "train.optim.lr_backbone",
+            "train.optim.momentum",
+            "dataset.augmentation.train_random_crop_max",
+            "train.optim.lr",
+            "dataset.augmentation.horizontal_flip_prob",
+            "model.num_select"
+          ],
+          "schema": "schemas/gen_trt_engine.schema.json",
+          "schema_status": "schemas/gen_trt_engine.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_gen_trt_engine.yaml"
+        },
+        {
+          "action": "inference",
+          "automl_default_parameters": [
+            "dataset.augmentation.horizontal_flip_prob",
+            "dataset.augmentation.train_random_crop_max",
+            "dataset.augmentation.train_random_crop_min",
+            "model.num_select",
+            "train.optim.lr",
+            "train.optim.lr_backbone",
+            "train.optim.lr_decay",
+            "train.optim.lr_linear_proj_mult",
+            "train.optim.lr_step_size",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/inference.schema.json",
+          "schema_status": "schemas/inference.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_inference.yaml"
+        },
+        {
+          "action": "quantize",
+          "automl_default_parameters": [
+            "dataset.augmentation.horizontal_flip_prob",
+            "dataset.augmentation.train_random_crop_max",
+            "dataset.augmentation.train_random_crop_min",
+            "model.num_select",
+            "train.optim.lr",
+            "train.optim.lr_backbone",
+            "train.optim.lr_decay",
+            "train.optim.lr_linear_proj_mult",
+            "train.optim.lr_step_size",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/quantize.schema.json",
+          "schema_status": "schemas/quantize.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_quantize.yaml"
+        },
+        {
+          "action": "train",
+          "automl_default_parameters": [
+            "dataset.augmentation.horizontal_flip_prob",
+            "dataset.augmentation.train_random_crop_max",
+            "dataset.augmentation.train_random_crop_min",
+            "model.num_select",
+            "train.optim.lr",
+            "train.optim.lr_backbone",
+            "train.optim.lr_decay",
+            "train.optim.lr_linear_proj_mult",
+            "train.optim.lr_step_size",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/train.schema.json",
+          "schema_status": "schemas/train.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_train.yaml"
+        }
+      ],
+      "train_schema": "schemas/train.schema.json",
+      "train_schema_status": "schemas/train.schema.json is packaged and valid",
+      "train_spec_template": "references/spec_template_train.yaml",
+      "unsupported_actions": []
+    },
+    {
+      "actions": [
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "quantize",
+        "train"
+      ],
+      "automl_default_parameters": [
+        "dataset.augmentation.test_max_size",
+        "dataset.augmentation.test_min_size",
+        "dataset.augmentation.train_max_size",
+        "model.mask_former.dec_layers",
+        "model.mask_former.hidden_dim",
+        "model.mask_former.num_object_queries",
+        "train.optim.backbone_multiplier",
+        "train.optim.lr",
+        "train.optim.momentum",
+        "train.optim.weight_decay"
+      ],
+      "automl_enabled": true,
+      "model": "tao-train-mask2former",
+      "network_arch": "mask2former",
+      "supported_actions": [
+        {
+          "action": "evaluate",
+          "automl_default_parameters": [
+            "dataset.augmentation.test_max_size",
+            "dataset.augmentation.test_min_size",
+            "dataset.augmentation.train_max_size",
+            "model.mask_former.dec_layers",
+            "model.mask_former.hidden_dim",
+            "model.mask_former.num_object_queries",
+            "train.optim.backbone_multiplier",
+            "train.optim.lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/evaluate.schema.json",
+          "schema_status": "schemas/evaluate.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_evaluate.yaml"
+        },
+        {
+          "action": "export",
+          "automl_default_parameters": [
+            "dataset.augmentation.test_max_size",
+            "dataset.augmentation.test_min_size",
+            "dataset.augmentation.train_max_size",
+            "model.mask_former.dec_layers",
+            "model.mask_former.hidden_dim",
+            "model.mask_former.num_object_queries",
+            "train.optim.backbone_multiplier",
+            "train.optim.lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/export.schema.json",
+          "schema_status": "schemas/export.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_export.yaml"
+        },
+        {
+          "action": "gen_trt_engine",
+          "automl_default_parameters": [
+            "dataset.augmentation.test_min_size",
+            "model.mask_former.hidden_dim",
+            "dataset.augmentation.test_max_size",
+            "model.mask_former.num_object_queries",
+            "train.optim.weight_decay",
+            "train.optim.backbone_multiplier",
+            "model.mask_former.dec_layers",
+            "dataset.augmentation.train_max_size",
+            "train.optim.momentum",
+            "train.optim.lr"
+          ],
+          "schema": "schemas/gen_trt_engine.schema.json",
+          "schema_status": "schemas/gen_trt_engine.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_gen_trt_engine.yaml"
+        },
+        {
+          "action": "inference",
+          "automl_default_parameters": [
+            "dataset.augmentation.test_max_size",
+            "dataset.augmentation.test_min_size",
+            "dataset.augmentation.train_max_size",
+            "model.mask_former.dec_layers",
+            "model.mask_former.hidden_dim",
+            "model.mask_former.num_object_queries",
+            "train.optim.backbone_multiplier",
+            "train.optim.lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/inference.schema.json",
+          "schema_status": "schemas/inference.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_inference.yaml"
+        },
+        {
+          "action": "quantize",
+          "automl_default_parameters": [
+            "dataset.augmentation.test_max_size",
+            "dataset.augmentation.test_min_size",
+            "dataset.augmentation.train_max_size",
+            "model.mask_former.dec_layers",
+            "model.mask_former.hidden_dim",
+            "model.mask_former.num_object_queries",
+            "train.optim.backbone_multiplier",
+            "train.optim.lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/quantize.schema.json",
+          "schema_status": "schemas/quantize.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_quantize.yaml"
+        },
+        {
+          "action": "train",
+          "automl_default_parameters": [
+            "dataset.augmentation.test_max_size",
+            "dataset.augmentation.test_min_size",
+            "dataset.augmentation.train_max_size",
+            "model.mask_former.dec_layers",
+            "model.mask_former.hidden_dim",
+            "model.mask_former.num_object_queries",
+            "train.optim.backbone_multiplier",
+            "train.optim.lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/train.schema.json",
+          "schema_status": "schemas/train.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_train.yaml"
+        }
+      ],
+      "train_schema": "schemas/train.schema.json",
+      "train_schema_status": "schemas/train.schema.json is packaged and valid",
+      "train_spec_template": "references/spec_template_train.yaml",
+      "unsupported_actions": []
+    },
+    {
+      "actions": [
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "train"
+      ],
+      "automl_default_parameters": [
+        "train.optim.embedder.base_lr",
+        "train.optim.embedder.bias_lr_factor",
+        "train.optim.embedder.momentum",
+        "train.optim.embedder.weight_decay",
+        "train.optim.embedder.weight_decay_bias",
+        "train.optim.gamma",
+        "train.optim.miner_function_margin",
+        "train.optim.triplet_loss_margin",
+        "train.optim.trunk.base_lr",
+        "train.optim.trunk.bias_lr_factor",
+        "train.optim.trunk.momentum",
+        "train.optim.trunk.weight_decay",
+        "train.optim.trunk.weight_decay_bias",
+        "train.optim.warmup_factor",
+        "train.optim.warmup_iters"
+      ],
+      "automl_enabled": true,
+      "model": "tao-train-metric-learning-recognition",
+      "network_arch": "ml_recog",
+      "supported_actions": [
+        {
+          "action": "evaluate",
+          "automl_default_parameters": [
+            "train.optim.embedder.base_lr",
+            "train.optim.embedder.bias_lr_factor",
+            "train.optim.embedder.momentum",
+            "train.optim.embedder.weight_decay",
+            "train.optim.embedder.weight_decay_bias",
+            "train.optim.gamma",
+            "train.optim.miner_function_margin",
+            "train.optim.triplet_loss_margin",
+            "train.optim.trunk.base_lr",
+            "train.optim.trunk.bias_lr_factor",
+            "train.optim.trunk.momentum",
+            "train.optim.trunk.weight_decay",
+            "train.optim.trunk.weight_decay_bias",
+            "train.optim.warmup_factor",
+            "train.optim.warmup_iters"
+          ],
+          "schema": "schemas/evaluate.schema.json",
+          "schema_status": "schemas/evaluate.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_evaluate.yaml"
+        },
+        {
+          "action": "export",
+          "automl_default_parameters": [
+            "train.optim.embedder.base_lr",
+            "train.optim.embedder.bias_lr_factor",
+            "train.optim.embedder.momentum",
+            "train.optim.embedder.weight_decay",
+            "train.optim.embedder.weight_decay_bias",
+            "train.optim.gamma",
+            "train.optim.miner_function_margin",
+            "train.optim.triplet_loss_margin",
+            "train.optim.trunk.base_lr",
+            "train.optim.trunk.bias_lr_factor",
+            "train.optim.trunk.momentum",
+            "train.optim.trunk.weight_decay",
+            "train.optim.trunk.weight_decay_bias",
+            "train.optim.warmup_factor",
+            "train.optim.warmup_iters"
+          ],
+          "schema": "schemas/export.schema.json",
+          "schema_status": "schemas/export.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_export.yaml"
+        },
+        {
+          "action": "gen_trt_engine",
+          "automl_default_parameters": [
+            "train.optim.gamma",
+            "train.optim.trunk.base_lr",
+            "train.optim.warmup_factor",
+            "train.optim.embedder.bias_lr_factor",
+            "train.optim.trunk.weight_decay",
+            "train.optim.embedder.weight_decay",
+            "train.optim.embedder.momentum",
+            "train.optim.embedder.weight_decay_bias",
+            "train.optim.trunk.momentum",
+            "train.optim.trunk.bias_lr_factor",
+            "train.optim.embedder.base_lr",
+            "train.optim.trunk.weight_decay_bias",
+            "train.optim.warmup_iters",
+            "train.optim.miner_function_margin",
+            "train.optim.triplet_loss_margin"
+          ],
+          "schema": "schemas/gen_trt_engine.schema.json",
+          "schema_status": "schemas/gen_trt_engine.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_gen_trt_engine.yaml"
+        },
+        {
+          "action": "inference",
+          "automl_default_parameters": [
+            "train.optim.embedder.base_lr",
+            "train.optim.embedder.bias_lr_factor",
+            "train.optim.embedder.momentum",
+            "train.optim.embedder.weight_decay",
+            "train.optim.embedder.weight_decay_bias",
+            "train.optim.gamma",
+            "train.optim.miner_function_margin",
+            "train.optim.triplet_loss_margin",
+            "train.optim.trunk.base_lr",
+            "train.optim.trunk.bias_lr_factor",
+            "train.optim.trunk.momentum",
+            "train.optim.trunk.weight_decay",
+            "train.optim.trunk.weight_decay_bias",
+            "train.optim.warmup_factor",
+            "train.optim.warmup_iters"
+          ],
+          "schema": "schemas/inference.schema.json",
+          "schema_status": "schemas/inference.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_inference.yaml"
+        },
+        {
+          "action": "train",
+          "automl_default_parameters": [
+            "train.optim.embedder.base_lr",
+            "train.optim.embedder.bias_lr_factor",
+            "train.optim.embedder.momentum",
+            "train.optim.embedder.weight_decay",
+            "train.optim.embedder.weight_decay_bias",
+            "train.optim.gamma",
+            "train.optim.miner_function_margin",
+            "train.optim.triplet_loss_margin",
+            "train.optim.trunk.base_lr",
+            "train.optim.trunk.bias_lr_factor",
+            "train.optim.trunk.momentum",
+            "train.optim.trunk.weight_decay",
+            "train.optim.trunk.weight_decay_bias",
+            "train.optim.warmup_factor",
+            "train.optim.warmup_iters"
+          ],
+          "schema": "schemas/train.schema.json",
+          "schema_status": "schemas/train.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_train.yaml"
+        }
+      ],
+      "train_schema": "schemas/train.schema.json",
+      "train_schema_status": "schemas/train.schema.json is packaged and valid",
+      "train_spec_template": "references/spec_template_train.yaml",
+      "unsupported_actions": []
+    },
+    {
+      "actions": [
+        "distill",
+        "export",
+        "inference",
+        "train"
+      ],
+      "automl_default_parameters": [
+        "dataset.batch_size",
+        "dataset.workers"
+      ],
+      "automl_enabled": true,
+      "model": "tao-train-nvdinov2",
+      "network_arch": "nvdinov2",
+      "supported_actions": [
+        {
+          "action": "distill",
+          "automl_default_parameters": [
+            "dataset.workers",
+            "dataset.batch_size"
+          ],
+          "schema": "schemas/distill.schema.json",
+          "schema_status": "schemas/distill.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_distill.yaml"
+        },
+        {
+          "action": "export",
+          "automl_default_parameters": [
+            "dataset.batch_size",
+            "dataset.workers"
+          ],
+          "schema": "schemas/export.schema.json",
+          "schema_status": "schemas/export.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_export.yaml"
+        },
+        {
+          "action": "inference",
+          "automl_default_parameters": [
+            "dataset.batch_size",
+            "dataset.workers"
+          ],
+          "schema": "schemas/inference.schema.json",
+          "schema_status": "schemas/inference.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_inference.yaml"
+        },
+        {
+          "action": "train",
+          "automl_default_parameters": [
+            "dataset.batch_size",
+            "dataset.workers"
+          ],
+          "schema": "schemas/train.schema.json",
+          "schema_status": "schemas/train.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_train.yaml"
+        }
+      ],
+      "train_schema": "schemas/train.schema.json",
+      "train_schema_status": "schemas/train.schema.json is packaged and valid",
+      "train_spec_template": "references/spec_template_train.yaml",
+      "unsupported_actions": []
+    },
+    {
+      "actions": [
+        "evaluate",
+        "export",
+        "inference",
+        "train"
+      ],
+      "automl_default_parameters": [
+        "train.optim.lr"
+      ],
+      "automl_enabled": true,
+      "model": "tao-train-nvpanoptix3d",
+      "network_arch": "nvpanoptix3d",
+      "supported_actions": [
+        {
+          "action": "evaluate",
+          "automl_default_parameters": [
+            "train.optim.lr"
+          ],
+          "schema": "schemas/evaluate.schema.json",
+          "schema_status": "schemas/evaluate.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_evaluate.yaml"
+        },
+        {
+          "action": "export",
+          "automl_default_parameters": [
+            "train.optim.lr"
+          ],
+          "schema": "schemas/export.schema.json",
+          "schema_status": "schemas/export.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_export.yaml"
+        },
+        {
+          "action": "inference",
+          "automl_default_parameters": [
+            "train.optim.lr"
+          ],
+          "schema": "schemas/inference.schema.json",
+          "schema_status": "schemas/inference.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_inference.yaml"
+        },
+        {
+          "action": "train",
+          "automl_default_parameters": [
+            "train.optim.lr"
+          ],
+          "schema": "schemas/train.schema.json",
+          "schema_status": "schemas/train.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_train.yaml"
+        }
+      ],
+      "train_schema": "schemas/train.schema.json",
+      "train_schema_status": "schemas/train.schema.json is packaged and valid",
+      "train_spec_template": "references/spec_template_train.yaml",
+      "unsupported_actions": []
+    },
+    {
+      "actions": [
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "prune",
+        "quantize",
+        "retrain",
+        "train"
+      ],
+      "automl_default_parameters": [
+        "train.optimizer.args.lr",
+        "train.optimizer.args.weight_decay"
+      ],
+      "automl_enabled": true,
+      "model": "tao-train-ocdnet",
+      "network_arch": "ocdnet",
+      "supported_actions": [
+        {
+          "action": "evaluate",
+          "automl_default_parameters": [
+            "train.optimizer.args.lr",
+            "train.optimizer.args.weight_decay"
+          ],
+          "schema": "schemas/evaluate.schema.json",
+          "schema_status": "schemas/evaluate.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_evaluate.yaml"
+        },
+        {
+          "action": "export",
+          "automl_default_parameters": [
+            "train.optimizer.args.lr",
+            "train.optimizer.args.weight_decay"
+          ],
+          "schema": "schemas/export.schema.json",
+          "schema_status": "schemas/export.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_export.yaml"
+        },
+        {
+          "action": "gen_trt_engine",
+          "automl_default_parameters": [
+            "train.optimizer.args.weight_decay",
+            "train.optimizer.args.lr"
+          ],
+          "schema": "schemas/gen_trt_engine.schema.json",
+          "schema_status": "schemas/gen_trt_engine.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_gen_trt_engine.yaml"
+        },
+        {
+          "action": "inference",
+          "automl_default_parameters": [
+            "train.optimizer.args.lr",
+            "train.optimizer.args.weight_decay"
+          ],
+          "schema": "schemas/inference.schema.json",
+          "schema_status": "schemas/inference.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_inference.yaml"
+        },
+        {
+          "action": "prune",
+          "automl_default_parameters": [
+            "train.optimizer.args.lr",
+            "train.optimizer.args.weight_decay"
+          ],
+          "schema": "schemas/prune.schema.json",
+          "schema_status": "schemas/prune.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_prune.yaml"
+        },
+        {
+          "action": "quantize",
+          "automl_default_parameters": [
+            "train.optimizer.args.lr",
+            "train.optimizer.args.weight_decay"
+          ],
+          "schema": "schemas/quantize.schema.json",
+          "schema_status": "schemas/quantize.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_quantize.yaml"
+        },
+        {
+          "action": "retrain",
+          "automl_default_parameters": [
+            "train.optimizer.args.weight_decay",
+            "train.optimizer.args.lr"
+          ],
+          "schema": "schemas/retrain.schema.json",
+          "schema_status": "schemas/retrain.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_retrain.yaml"
+        },
+        {
+          "action": "train",
+          "automl_default_parameters": [
+            "train.optimizer.args.lr",
+            "train.optimizer.args.weight_decay"
+          ],
+          "schema": "schemas/train.schema.json",
+          "schema_status": "schemas/train.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_train.yaml"
+        }
+      ],
+      "train_schema": "schemas/train.schema.json",
+      "train_schema_status": "schemas/train.schema.json is packaged and valid",
+      "train_spec_template": "references/spec_template_train.yaml",
+      "unsupported_actions": []
+    },
+    {
+      "actions": [
+        "dataset_convert",
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "prune",
+        "quantize",
+        "retrain",
+        "train"
+      ],
+      "automl_default_parameters": [
+        "dataset.augmentation.aug_prob",
+        "dataset.augmentation.blur_prob",
+        "dataset.augmentation.reverse_color_prob",
+        "dataset.augmentation.rotate_prob",
+        "train.optim.lr"
+      ],
+      "automl_enabled": true,
+      "model": "tao-train-ocrnet",
+      "network_arch": "ocrnet",
+      "supported_actions": [
+        {
+          "action": "dataset_convert",
+          "automl_default_parameters": [
+            "dataset.augmentation.aug_prob",
+            "dataset.augmentation.blur_prob",
+            "dataset.augmentation.reverse_color_prob",
+            "dataset.augmentation.rotate_prob",
+            "train.optim.lr"
+          ],
+          "schema": "schemas/dataset_convert.schema.json",
+          "schema_status": "schemas/dataset_convert.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_dataset_convert.yaml"
+        },
+        {
+          "action": "evaluate",
+          "automl_default_parameters": [
+            "dataset.augmentation.aug_prob",
+            "dataset.augmentation.blur_prob",
+            "dataset.augmentation.reverse_color_prob",
+            "dataset.augmentation.rotate_prob",
+            "train.optim.lr"
+          ],
+          "schema": "schemas/evaluate.schema.json",
+          "schema_status": "schemas/evaluate.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_evaluate.yaml"
+        },
+        {
+          "action": "export",
+          "automl_default_parameters": [
+            "dataset.augmentation.aug_prob",
+            "dataset.augmentation.blur_prob",
+            "dataset.augmentation.reverse_color_prob",
+            "dataset.augmentation.rotate_prob",
+            "train.optim.lr"
+          ],
+          "schema": "schemas/export.schema.json",
+          "schema_status": "schemas/export.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_export.yaml"
+        },
+        {
+          "action": "gen_trt_engine",
+          "automl_default_parameters": [
+            "dataset.augmentation.aug_prob",
+            "dataset.augmentation.blur_prob",
+            "dataset.augmentation.reverse_color_prob",
+            "dataset.augmentation.rotate_prob",
+            "train.optim.lr"
+          ],
+          "schema": "schemas/gen_trt_engine.schema.json",
+          "schema_status": "schemas/gen_trt_engine.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_gen_trt_engine.yaml"
+        },
+        {
+          "action": "inference",
+          "automl_default_parameters": [
+            "dataset.augmentation.aug_prob",
+            "dataset.augmentation.blur_prob",
+            "dataset.augmentation.reverse_color_prob",
+            "dataset.augmentation.rotate_prob",
+            "train.optim.lr"
+          ],
+          "schema": "schemas/inference.schema.json",
+          "schema_status": "schemas/inference.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_inference.yaml"
+        },
+        {
+          "action": "prune",
+          "automl_default_parameters": [
+            "dataset.augmentation.aug_prob",
+            "dataset.augmentation.blur_prob",
+            "dataset.augmentation.reverse_color_prob",
+            "dataset.augmentation.rotate_prob",
+            "train.optim.lr"
+          ],
+          "schema": "schemas/prune.schema.json",
+          "schema_status": "schemas/prune.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_prune.yaml"
+        },
+        {
+          "action": "quantize",
+          "automl_default_parameters": [
+            "dataset.augmentation.aug_prob",
+            "dataset.augmentation.blur_prob",
+            "dataset.augmentation.reverse_color_prob",
+            "dataset.augmentation.rotate_prob",
+            "train.optim.lr"
+          ],
+          "schema": "schemas/quantize.schema.json",
+          "schema_status": "schemas/quantize.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_quantize.yaml"
+        },
+        {
+          "action": "retrain",
+          "automl_default_parameters": [
+            "dataset.augmentation.aug_prob",
+            "dataset.augmentation.blur_prob",
+            "dataset.augmentation.reverse_color_prob",
+            "dataset.augmentation.rotate_prob",
+            "train.optim.lr"
+          ],
+          "schema": "schemas/retrain.schema.json",
+          "schema_status": "schemas/retrain.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_retrain.yaml"
+        },
+        {
+          "action": "train",
+          "automl_default_parameters": [
+            "dataset.augmentation.aug_prob",
+            "dataset.augmentation.blur_prob",
+            "dataset.augmentation.reverse_color_prob",
+            "dataset.augmentation.rotate_prob",
+            "train.optim.lr"
+          ],
+          "schema": "schemas/train.schema.json",
+          "schema_status": "schemas/train.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_train.yaml"
+        }
+      ],
+      "train_schema": "schemas/train.schema.json",
+      "train_schema_status": "schemas/train.schema.json is packaged and valid",
+      "train_spec_template": "references/spec_template_train.yaml",
+      "unsupported_actions": []
+    },
+    {
+      "actions": [
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "quantize",
+        "train"
+      ],
+      "automl_default_parameters": [
+        "dataset.augmentation.test_max_size",
+        "dataset.augmentation.test_min_size",
+        "dataset.augmentation.train_max_size",
+        "train.optim.backbone_multiplier",
+        "train.optim.lr",
+        "train.optim.momentum",
+        "train.optim.weight_decay"
+      ],
+      "automl_enabled": true,
+      "model": "tao-train-oneformer",
+      "network_arch": "oneformer",
+      "supported_actions": [
+        {
+          "action": "evaluate",
+          "automl_default_parameters": [
+            "dataset.augmentation.test_max_size",
+            "dataset.augmentation.test_min_size",
+            "dataset.augmentation.train_max_size",
+            "train.optim.backbone_multiplier",
+            "train.optim.lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/evaluate.schema.json",
+          "schema_status": "schemas/evaluate.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_evaluate.yaml"
+        },
+        {
+          "action": "export",
+          "automl_default_parameters": [
+            "dataset.augmentation.test_max_size",
+            "dataset.augmentation.test_min_size",
+            "dataset.augmentation.train_max_size",
+            "train.optim.backbone_multiplier",
+            "train.optim.lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/export.schema.json",
+          "schema_status": "schemas/export.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_export.yaml"
+        },
+        {
+          "action": "gen_trt_engine",
+          "automl_default_parameters": [
+            "dataset.augmentation.test_max_size",
+            "dataset.augmentation.test_min_size",
+            "dataset.augmentation.train_max_size",
+            "train.optim.backbone_multiplier",
+            "train.optim.lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/gen_trt_engine.schema.json",
+          "schema_status": "schemas/gen_trt_engine.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_gen_trt_engine.yaml"
+        },
+        {
+          "action": "inference",
+          "automl_default_parameters": [
+            "dataset.augmentation.test_max_size",
+            "dataset.augmentation.test_min_size",
+            "dataset.augmentation.train_max_size",
+            "train.optim.backbone_multiplier",
+            "train.optim.lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/inference.schema.json",
+          "schema_status": "schemas/inference.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_inference.yaml"
+        },
+        {
+          "action": "quantize",
+          "automl_default_parameters": [
+            "dataset.augmentation.test_max_size",
+            "dataset.augmentation.test_min_size",
+            "dataset.augmentation.train_max_size",
+            "train.optim.backbone_multiplier",
+            "train.optim.lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/quantize.schema.json",
+          "schema_status": "schemas/quantize.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_quantize.yaml"
+        },
+        {
+          "action": "train",
+          "automl_default_parameters": [
+            "dataset.augmentation.test_max_size",
+            "dataset.augmentation.test_min_size",
+            "dataset.augmentation.train_max_size",
+            "train.optim.backbone_multiplier",
+            "train.optim.lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/train.schema.json",
+          "schema_status": "schemas/train.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_train.yaml"
+        }
+      ],
+      "train_schema": "schemas/train.schema.json",
+      "train_schema_status": "schemas/train.schema.json is packaged and valid",
+      "train_spec_template": "references/spec_template_train.yaml",
+      "unsupported_actions": []
+    },
+    {
+      "actions": [
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "train"
+      ],
+      "automl_default_parameters": [
+        "dataset.augmentation_config.augment",
+        "dataset.augmentation_config.random_color.brightness",
+        "dataset.augmentation_config.random_color.color_probability",
+        "dataset.augmentation_config.random_color.contrast",
+        "dataset.augmentation_config.random_color.enable",
+        "dataset.augmentation_config.random_color.hue",
+        "dataset.augmentation_config.random_color.saturation",
+        "dataset.augmentation_config.random_flip.enable",
+        "dataset.augmentation_config.random_flip.hflip_probability",
+        "dataset.augmentation_config.random_flip.vflip_probability",
+        "dataset.augmentation_config.random_rotate.enable",
+        "dataset.augmentation_config.random_rotate.rotate_probability",
+        "dataset.fpratio_sampling",
+        "model.margin",
+        "train.optim.lr",
+        "train.optim.momentum"
+      ],
+      "automl_enabled": true,
+      "model": "tao-train-optical-inspection",
+      "network_arch": "optical_inspection",
+      "supported_actions": [
+        {
+          "action": "evaluate",
+          "automl_default_parameters": [
+            "dataset.augmentation_config.augment",
+            "dataset.augmentation_config.random_color.brightness",
+            "dataset.augmentation_config.random_color.color_probability",
+            "dataset.augmentation_config.random_color.contrast",
+            "dataset.augmentation_config.random_color.enable",
+            "dataset.augmentation_config.random_color.hue",
+            "dataset.augmentation_config.random_color.saturation",
+            "dataset.augmentation_config.random_flip.enable",
+            "dataset.augmentation_config.random_flip.hflip_probability",
+            "dataset.augmentation_config.random_flip.vflip_probability",
+            "dataset.augmentation_config.random_rotate.enable",
+            "dataset.augmentation_config.random_rotate.rotate_probability",
+            "dataset.fpratio_sampling",
+            "model.margin",
+            "train.optim.lr",
+            "train.optim.momentum"
+          ],
+          "schema": "schemas/evaluate.schema.json",
+          "schema_status": "schemas/evaluate.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_evaluate.yaml"
+        },
+        {
+          "action": "export",
+          "automl_default_parameters": [
+            "dataset.augmentation_config.augment",
+            "dataset.augmentation_config.random_color.brightness",
+            "dataset.augmentation_config.random_color.color_probability",
+            "dataset.augmentation_config.random_color.contrast",
+            "dataset.augmentation_config.random_color.enable",
+            "dataset.augmentation_config.random_color.hue",
+            "dataset.augmentation_config.random_color.saturation",
+            "dataset.augmentation_config.random_flip.enable",
+            "dataset.augmentation_config.random_flip.hflip_probability",
+            "dataset.augmentation_config.random_flip.vflip_probability",
+            "dataset.augmentation_config.random_rotate.enable",
+            "dataset.augmentation_config.random_rotate.rotate_probability",
+            "dataset.fpratio_sampling",
+            "model.margin",
+            "train.optim.lr",
+            "train.optim.momentum"
+          ],
+          "schema": "schemas/export.schema.json",
+          "schema_status": "schemas/export.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_export.yaml"
+        },
+        {
+          "action": "gen_trt_engine",
+          "automl_default_parameters": [
+            "dataset.augmentation_config.augment",
+            "dataset.augmentation_config.random_color.brightness",
+            "dataset.augmentation_config.random_color.color_probability",
+            "dataset.augmentation_config.random_color.contrast",
+            "dataset.augmentation_config.random_color.enable",
+            "dataset.augmentation_config.random_color.hue",
+            "dataset.augmentation_config.random_color.saturation",
+            "dataset.augmentation_config.random_flip.enable",
+            "dataset.augmentation_config.random_flip.hflip_probability",
+            "dataset.augmentation_config.random_flip.vflip_probability",
+            "dataset.augmentation_config.random_rotate.enable",
+            "dataset.augmentation_config.random_rotate.rotate_probability",
+            "dataset.fpratio_sampling",
+            "model.margin",
+            "train.optim.lr",
+            "train.optim.momentum"
+          ],
+          "schema": "schemas/gen_trt_engine.schema.json",
+          "schema_status": "schemas/gen_trt_engine.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_gen_trt_engine.yaml"
+        },
+        {
+          "action": "inference",
+          "automl_default_parameters": [
+            "dataset.augmentation_config.augment",
+            "dataset.augmentation_config.random_color.brightness",
+            "dataset.augmentation_config.random_color.color_probability",
+            "dataset.augmentation_config.random_color.contrast",
+            "dataset.augmentation_config.random_color.enable",
+            "dataset.augmentation_config.random_color.hue",
+            "dataset.augmentation_config.random_color.saturation",
+            "dataset.augmentation_config.random_flip.enable",
+            "dataset.augmentation_config.random_flip.hflip_probability",
+            "dataset.augmentation_config.random_flip.vflip_probability",
+            "dataset.augmentation_config.random_rotate.enable",
+            "dataset.augmentation_config.random_rotate.rotate_probability",
+            "dataset.fpratio_sampling",
+            "model.margin",
+            "train.optim.lr",
+            "train.optim.momentum"
+          ],
+          "schema": "schemas/inference.schema.json",
+          "schema_status": "schemas/inference.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_inference.yaml"
+        },
+        {
+          "action": "train",
+          "automl_default_parameters": [
+            "dataset.augmentation_config.augment",
+            "dataset.augmentation_config.random_color.brightness",
+            "dataset.augmentation_config.random_color.color_probability",
+            "dataset.augmentation_config.random_color.contrast",
+            "dataset.augmentation_config.random_color.enable",
+            "dataset.augmentation_config.random_color.hue",
+            "dataset.augmentation_config.random_color.saturation",
+            "dataset.augmentation_config.random_flip.enable",
+            "dataset.augmentation_config.random_flip.hflip_probability",
+            "dataset.augmentation_config.random_flip.vflip_probability",
+            "dataset.augmentation_config.random_rotate.enable",
+            "dataset.augmentation_config.random_rotate.rotate_probability",
+            "dataset.fpratio_sampling",
+            "model.margin",
+            "train.optim.lr",
+            "train.optim.momentum"
+          ],
+          "schema": "schemas/train.schema.json",
+          "schema_status": "schemas/train.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_train.yaml"
+        }
+      ],
+      "train_schema": "schemas/train.schema.json",
+      "train_schema_status": "schemas/train.schema.json is packaged and valid",
+      "train_spec_template": "references/spec_template_train.yaml",
+      "unsupported_actions": []
+    },
+    {
+      "actions": [
+        "dataset_convert",
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "prune",
+        "retrain",
+        "train"
+      ],
+      "automl_default_parameters": [
+        "train.decay_step_list",
+        "train.lr",
+        "train.lr_clip",
+        "train.lr_decay",
+        "train.lr_warmup",
+        "train.momentum",
+        "train.weight_decay"
+      ],
+      "automl_enabled": true,
+      "model": "tao-train-pointpillars",
+      "network_arch": "pointpillars",
+      "supported_actions": [
+        {
+          "action": "dataset_convert",
+          "automl_default_parameters": [
+            "train.decay_step_list",
+            "train.lr",
+            "train.lr_clip",
+            "train.lr_decay",
+            "train.lr_warmup",
+            "train.momentum",
+            "train.weight_decay"
+          ],
+          "schema": "schemas/dataset_convert.schema.json",
+          "schema_status": "schemas/dataset_convert.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_dataset_convert.yaml"
+        },
+        {
+          "action": "evaluate",
+          "automl_default_parameters": [
+            "train.decay_step_list",
+            "train.lr",
+            "train.lr_clip",
+            "train.lr_decay",
+            "train.lr_warmup",
+            "train.momentum",
+            "train.weight_decay"
+          ],
+          "schema": "schemas/evaluate.schema.json",
+          "schema_status": "schemas/evaluate.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_evaluate.yaml"
+        },
+        {
+          "action": "export",
+          "automl_default_parameters": [
+            "train.decay_step_list",
+            "train.lr",
+            "train.lr_clip",
+            "train.lr_decay",
+            "train.lr_warmup",
+            "train.momentum",
+            "train.weight_decay"
+          ],
+          "schema": "schemas/export.schema.json",
+          "schema_status": "schemas/export.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_export.yaml"
+        },
+        {
+          "action": "gen_trt_engine",
+          "automl_default_parameters": [
+            "train.decay_step_list",
+            "train.lr",
+            "train.lr_clip",
+            "train.lr_decay",
+            "train.lr_warmup",
+            "train.momentum",
+            "train.weight_decay"
+          ],
+          "schema": "schemas/gen_trt_engine.schema.json",
+          "schema_status": "schemas/gen_trt_engine.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_gen_trt_engine.yaml"
+        },
+        {
+          "action": "inference",
+          "automl_default_parameters": [
+            "train.decay_step_list",
+            "train.lr",
+            "train.lr_clip",
+            "train.lr_decay",
+            "train.lr_warmup",
+            "train.momentum",
+            "train.weight_decay"
+          ],
+          "schema": "schemas/inference.schema.json",
+          "schema_status": "schemas/inference.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_inference.yaml"
+        },
+        {
+          "action": "prune",
+          "automl_default_parameters": [
+            "train.decay_step_list",
+            "train.lr",
+            "train.lr_clip",
+            "train.lr_decay",
+            "train.lr_warmup",
+            "train.momentum",
+            "train.weight_decay"
+          ],
+          "schema": "schemas/prune.schema.json",
+          "schema_status": "schemas/prune.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_prune.yaml"
+        },
+        {
+          "action": "retrain",
+          "automl_default_parameters": [
+            "train.decay_step_list",
+            "train.lr",
+            "train.lr_clip",
+            "train.lr_decay",
+            "train.lr_warmup",
+            "train.momentum",
+            "train.weight_decay"
+          ],
+          "schema": "schemas/retrain.schema.json",
+          "schema_status": "schemas/retrain.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_retrain.yaml"
+        },
+        {
+          "action": "train",
+          "automl_default_parameters": [
+            "train.decay_step_list",
+            "train.lr",
+            "train.lr_clip",
+            "train.lr_decay",
+            "train.lr_warmup",
+            "train.momentum",
+            "train.weight_decay"
+          ],
+          "schema": "schemas/train.schema.json",
+          "schema_status": "schemas/train.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_train.yaml"
+        }
+      ],
+      "train_schema": "schemas/train.schema.json",
+      "train_schema_status": "schemas/train.schema.json is packaged and valid",
+      "train_spec_template": "references/spec_template_train.yaml",
+      "unsupported_actions": []
+    },
+    {
+      "actions": [
+        "dataset_convert",
+        "evaluate",
+        "export",
+        "inference",
+        "train"
+      ],
+      "automl_default_parameters": [
+        "dataset.window_size",
+        "model.dropout",
+        "train.grad_clip",
+        "train.optim.lr",
+        "train.optim.lr_decay",
+        "train.optim.momentum",
+        "train.optim.patience",
+        "train.optim.weight_decay"
+      ],
+      "automl_enabled": true,
+      "model": "tao-train-pose-classification",
+      "network_arch": "pose_classification",
+      "supported_actions": [
+        {
+          "action": "evaluate",
+          "automl_default_parameters": [
+            "dataset.window_size",
+            "model.dropout",
+            "train.grad_clip",
+            "train.optim.lr",
+            "train.optim.lr_decay",
+            "train.optim.momentum",
+            "train.optim.patience",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/evaluate.schema.json",
+          "schema_status": "schemas/evaluate.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_evaluate.yaml"
+        },
+        {
+          "action": "export",
+          "automl_default_parameters": [
+            "dataset.window_size",
+            "model.dropout",
+            "train.grad_clip",
+            "train.optim.lr",
+            "train.optim.lr_decay",
+            "train.optim.momentum",
+            "train.optim.patience",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/export.schema.json",
+          "schema_status": "schemas/export.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_export.yaml"
+        },
+        {
+          "action": "inference",
+          "automl_default_parameters": [
+            "dataset.window_size",
+            "model.dropout",
+            "train.grad_clip",
+            "train.optim.lr",
+            "train.optim.lr_decay",
+            "train.optim.momentum",
+            "train.optim.patience",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/inference.schema.json",
+          "schema_status": "schemas/inference.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_inference.yaml"
+        },
+        {
+          "action": "train",
+          "automl_default_parameters": [
+            "dataset.window_size",
+            "model.dropout",
+            "train.grad_clip",
+            "train.optim.lr",
+            "train.optim.lr_decay",
+            "train.optim.momentum",
+            "train.optim.patience",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/train.schema.json",
+          "schema_status": "schemas/train.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_train.yaml"
+        }
+      ],
+      "train_schema": "schemas/train.schema.json",
+      "train_schema_status": "schemas/train.schema.json is packaged and valid",
+      "train_spec_template": "references/spec_template_train.yaml",
+      "unsupported_actions": [
+        {
+          "action": "dataset_convert",
+          "reason": "schemas/dataset_convert.schema.json is not packaged"
+        }
+      ]
+    },
+    {
+      "actions": [
+        "evaluate",
+        "export",
+        "inference",
+        "train"
+      ],
+      "automl_default_parameters": [
+        "train.optim.lr_steps"
+      ],
+      "automl_enabled": true,
+      "model": "tao-train-reid",
+      "network_arch": "re_identification",
+      "supported_actions": [
+        {
+          "action": "evaluate",
+          "automl_default_parameters": [
+            "train.optim.lr_steps"
+          ],
+          "schema": "schemas/evaluate.schema.json",
+          "schema_status": "schemas/evaluate.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_evaluate.yaml"
+        },
+        {
+          "action": "export",
+          "automl_default_parameters": [
+            "train.optim.lr_steps"
+          ],
+          "schema": "schemas/export.schema.json",
+          "schema_status": "schemas/export.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_export.yaml"
+        },
+        {
+          "action": "inference",
+          "automl_default_parameters": [
+            "train.optim.lr_steps"
+          ],
+          "schema": "schemas/inference.schema.json",
+          "schema_status": "schemas/inference.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_inference.yaml"
+        },
+        {
+          "action": "train",
+          "automl_default_parameters": [
+            "train.optim.lr_steps"
+          ],
+          "schema": "schemas/train.schema.json",
+          "schema_status": "schemas/train.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_train.yaml"
+        }
+      ],
+      "train_schema": "schemas/train.schema.json",
+      "train_schema_status": "schemas/train.schema.json is packaged and valid",
+      "train_spec_template": "references/spec_template_train.yaml",
+      "unsupported_actions": []
+    },
+    {
+      "actions": [
+        "distill",
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "quantize",
+        "train"
+      ],
+      "automl_default_parameters": [
+        "dataset.augmentation.distortion_prob",
+        "dataset.augmentation.iou_crop_prob",
+        "dataset.batch_size",
+        "dataset.workers",
+        "model.dec_layers",
+        "model.enc_layers",
+        "model.num_queries",
+        "model.num_select",
+        "train.ema.decay",
+        "train.optim.lr",
+        "train.optim.lr_backbone",
+        "train.optim.lr_decay",
+        "train.optim.lr_step_size",
+        "train.optim.momentum",
+        "train.optim.weight_decay"
+      ],
+      "automl_enabled": true,
+      "model": "tao-train-rtdetr",
+      "network_arch": "rtdetr",
+      "supported_actions": [
+        {
+          "action": "distill",
+          "automl_default_parameters": [
+            "dataset.augmentation.distortion_prob",
+            "dataset.augmentation.iou_crop_prob",
+            "dataset.batch_size",
+            "dataset.workers",
+            "model.dec_layers",
+            "model.enc_layers",
+            "model.num_queries",
+            "model.num_select",
+            "train.ema.decay",
+            "train.optim.lr",
+            "train.optim.lr_backbone",
+            "train.optim.lr_decay",
+            "train.optim.lr_step_size",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/distill.schema.json",
+          "schema_status": "schemas/distill.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_distill.yaml"
+        },
+        {
+          "action": "evaluate",
+          "automl_default_parameters": [
+            "dataset.augmentation.distortion_prob",
+            "dataset.augmentation.iou_crop_prob",
+            "dataset.batch_size",
+            "dataset.workers",
+            "model.dec_layers",
+            "model.enc_layers",
+            "model.num_queries",
+            "model.num_select",
+            "train.ema.decay",
+            "train.optim.lr",
+            "train.optim.lr_backbone",
+            "train.optim.lr_decay",
+            "train.optim.lr_step_size",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/evaluate.schema.json",
+          "schema_status": "schemas/evaluate.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_evaluate.yaml"
+        },
+        {
+          "action": "export",
+          "automl_default_parameters": [
+            "dataset.augmentation.distortion_prob",
+            "dataset.augmentation.iou_crop_prob",
+            "dataset.batch_size",
+            "dataset.workers",
+            "model.dec_layers",
+            "model.enc_layers",
+            "model.num_queries",
+            "model.num_select",
+            "train.ema.decay",
+            "train.optim.lr",
+            "train.optim.lr_backbone",
+            "train.optim.lr_decay",
+            "train.optim.lr_step_size",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/export.schema.json",
+          "schema_status": "schemas/export.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_export.yaml"
+        },
+        {
+          "action": "inference",
+          "automl_default_parameters": [
+            "dataset.augmentation.distortion_prob",
+            "dataset.augmentation.iou_crop_prob",
+            "dataset.batch_size",
+            "dataset.workers",
+            "model.dec_layers",
+            "model.enc_layers",
+            "model.num_queries",
+            "model.num_select",
+            "train.ema.decay",
+            "train.optim.lr",
+            "train.optim.lr_backbone",
+            "train.optim.lr_decay",
+            "train.optim.lr_step_size",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/inference.schema.json",
+          "schema_status": "schemas/inference.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_inference.yaml"
+        },
+        {
+          "action": "quantize",
+          "automl_default_parameters": [
+            "dataset.augmentation.distortion_prob",
+            "dataset.augmentation.iou_crop_prob",
+            "dataset.batch_size",
+            "dataset.workers",
+            "model.dec_layers",
+            "model.enc_layers",
+            "model.num_queries",
+            "model.num_select",
+            "train.ema.decay",
+            "train.optim.lr",
+            "train.optim.lr_backbone",
+            "train.optim.lr_decay",
+            "train.optim.lr_step_size",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/quantize.schema.json",
+          "schema_status": "schemas/quantize.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_quantize.yaml"
+        },
+        {
+          "action": "train",
+          "automl_default_parameters": [
+            "dataset.augmentation.distortion_prob",
+            "dataset.augmentation.iou_crop_prob",
+            "dataset.batch_size",
+            "dataset.workers",
+            "model.dec_layers",
+            "model.enc_layers",
+            "model.num_queries",
+            "model.num_select",
+            "train.ema.decay",
+            "train.optim.lr",
+            "train.optim.lr_backbone",
+            "train.optim.lr_decay",
+            "train.optim.lr_step_size",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/train.schema.json",
+          "schema_status": "schemas/train.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_train.yaml"
+        }
+      ],
+      "train_schema": "schemas/train.schema.json",
+      "train_schema_status": "schemas/train.schema.json is packaged and valid",
+      "train_spec_template": "references/spec_template_train.yaml",
+      "unsupported_actions": [
+        {
+          "action": "gen_trt_engine",
+          "reason": "schemas/gen_trt_engine.schema.json is not packaged"
+        }
+      ]
+    },
+    {
+      "actions": [
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "quantize",
+        "train"
+      ],
+      "automl_default_parameters": [
+        "dataset.segment.augmentation.random_color.brightness",
+        "dataset.segment.augmentation.random_color.color_probability",
+        "dataset.segment.augmentation.random_color.contrast",
+        "dataset.segment.augmentation.random_color.enable",
+        "dataset.segment.augmentation.random_color.hue",
+        "dataset.segment.augmentation.random_color.saturation",
+        "dataset.segment.augmentation.random_flip.enable",
+        "dataset.segment.augmentation.random_flip.hflip_probability",
+        "dataset.segment.augmentation.random_flip.vflip_probability",
+        "dataset.segment.augmentation.random_rotate.enable",
+        "dataset.segment.augmentation.random_rotate.rotate_probability",
+        "dataset.segment.augmentation.with_scale_random_crop.enable",
+        "model.backbone.freeze_backbone",
+        "train.optim.lr",
+        "train.optim.momentum",
+        "train.optim.weight_decay"
+      ],
+      "automl_enabled": true,
+      "model": "tao-train-segformer",
+      "network_arch": "segformer",
+      "supported_actions": [
+        {
+          "action": "evaluate",
+          "automl_default_parameters": [
+            "dataset.segment.augmentation.random_color.brightness",
+            "dataset.segment.augmentation.random_color.color_probability",
+            "dataset.segment.augmentation.random_color.contrast",
+            "dataset.segment.augmentation.random_color.enable",
+            "dataset.segment.augmentation.random_color.hue",
+            "dataset.segment.augmentation.random_color.saturation",
+            "dataset.segment.augmentation.random_flip.enable",
+            "dataset.segment.augmentation.random_flip.hflip_probability",
+            "dataset.segment.augmentation.random_flip.vflip_probability",
+            "dataset.segment.augmentation.random_rotate.enable",
+            "dataset.segment.augmentation.random_rotate.rotate_probability",
+            "dataset.segment.augmentation.with_scale_random_crop.enable",
+            "model.backbone.freeze_backbone",
+            "train.optim.lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/evaluate.schema.json",
+          "schema_status": "schemas/evaluate.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_evaluate.yaml"
+        },
+        {
+          "action": "export",
+          "automl_default_parameters": [
+            "dataset.segment.augmentation.random_color.brightness",
+            "dataset.segment.augmentation.random_color.color_probability",
+            "dataset.segment.augmentation.random_color.contrast",
+            "dataset.segment.augmentation.random_color.enable",
+            "dataset.segment.augmentation.random_color.hue",
+            "dataset.segment.augmentation.random_color.saturation",
+            "dataset.segment.augmentation.random_flip.enable",
+            "dataset.segment.augmentation.random_flip.hflip_probability",
+            "dataset.segment.augmentation.random_flip.vflip_probability",
+            "dataset.segment.augmentation.random_rotate.enable",
+            "dataset.segment.augmentation.random_rotate.rotate_probability",
+            "dataset.segment.augmentation.with_scale_random_crop.enable",
+            "model.backbone.freeze_backbone",
+            "train.optim.lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/export.schema.json",
+          "schema_status": "schemas/export.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_export.yaml"
+        },
+        {
+          "action": "inference",
+          "automl_default_parameters": [
+            "dataset.segment.augmentation.random_color.brightness",
+            "dataset.segment.augmentation.random_color.color_probability",
+            "dataset.segment.augmentation.random_color.contrast",
+            "dataset.segment.augmentation.random_color.enable",
+            "dataset.segment.augmentation.random_color.hue",
+            "dataset.segment.augmentation.random_color.saturation",
+            "dataset.segment.augmentation.random_flip.enable",
+            "dataset.segment.augmentation.random_flip.hflip_probability",
+            "dataset.segment.augmentation.random_flip.vflip_probability",
+            "dataset.segment.augmentation.random_rotate.enable",
+            "dataset.segment.augmentation.random_rotate.rotate_probability",
+            "dataset.segment.augmentation.with_scale_random_crop.enable",
+            "model.backbone.freeze_backbone",
+            "train.optim.lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/inference.schema.json",
+          "schema_status": "schemas/inference.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_inference.yaml"
+        },
+        {
+          "action": "quantize",
+          "automl_default_parameters": [
+            "dataset.segment.augmentation.random_color.brightness",
+            "dataset.segment.augmentation.random_color.color_probability",
+            "dataset.segment.augmentation.random_color.contrast",
+            "dataset.segment.augmentation.random_color.enable",
+            "dataset.segment.augmentation.random_color.hue",
+            "dataset.segment.augmentation.random_color.saturation",
+            "dataset.segment.augmentation.random_flip.enable",
+            "dataset.segment.augmentation.random_flip.hflip_probability",
+            "dataset.segment.augmentation.random_flip.vflip_probability",
+            "dataset.segment.augmentation.random_rotate.enable",
+            "dataset.segment.augmentation.random_rotate.rotate_probability",
+            "dataset.segment.augmentation.with_scale_random_crop.enable",
+            "model.backbone.freeze_backbone",
+            "train.optim.lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/quantize.schema.json",
+          "schema_status": "schemas/quantize.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_quantize.yaml"
+        },
+        {
+          "action": "train",
+          "automl_default_parameters": [
+            "dataset.segment.augmentation.random_color.brightness",
+            "dataset.segment.augmentation.random_color.color_probability",
+            "dataset.segment.augmentation.random_color.contrast",
+            "dataset.segment.augmentation.random_color.enable",
+            "dataset.segment.augmentation.random_color.hue",
+            "dataset.segment.augmentation.random_color.saturation",
+            "dataset.segment.augmentation.random_flip.enable",
+            "dataset.segment.augmentation.random_flip.hflip_probability",
+            "dataset.segment.augmentation.random_flip.vflip_probability",
+            "dataset.segment.augmentation.random_rotate.enable",
+            "dataset.segment.augmentation.random_rotate.rotate_probability",
+            "dataset.segment.augmentation.with_scale_random_crop.enable",
+            "model.backbone.freeze_backbone",
+            "train.optim.lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/train.schema.json",
+          "schema_status": "schemas/train.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_train.yaml"
+        }
+      ],
+      "train_schema": "schemas/train.schema.json",
+      "train_schema_status": "schemas/train.schema.json is packaged and valid",
+      "train_spec_template": "references/spec_template_train.yaml",
+      "unsupported_actions": [
+        {
+          "action": "gen_trt_engine",
+          "reason": "schemas/gen_trt_engine.schema.json is not packaged"
+        }
+      ]
+    },
+    {
+      "actions": [
+        "dataset_convert",
+        "evaluate",
+        "export",
+        "inference",
+        "quantize",
+        "train"
+      ],
+      "automl_default_parameters": [
+        "train.optim.lr"
+      ],
+      "automl_enabled": true,
+      "model": "tao-train-sparse4d",
+      "network_arch": "sparse4d",
+      "supported_actions": [
+        {
+          "action": "dataset_convert",
+          "automl_default_parameters": [],
+          "schema": "schemas/dataset_convert.schema.json",
+          "schema_status": "schemas/dataset_convert.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_dataset_convert.yaml"
+        },
+        {
+          "action": "evaluate",
+          "automl_default_parameters": [
+            "train.optim.lr"
+          ],
+          "schema": "schemas/evaluate.schema.json",
+          "schema_status": "schemas/evaluate.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_evaluate.yaml"
+        },
+        {
+          "action": "export",
+          "automl_default_parameters": [
+            "train.optim.lr"
+          ],
+          "schema": "schemas/export.schema.json",
+          "schema_status": "schemas/export.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_export.yaml"
+        },
+        {
+          "action": "inference",
+          "automl_default_parameters": [
+            "train.optim.lr"
+          ],
+          "schema": "schemas/inference.schema.json",
+          "schema_status": "schemas/inference.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_inference.yaml"
+        },
+        {
+          "action": "quantize",
+          "automl_default_parameters": [
+            "train.optim.lr"
+          ],
+          "schema": "schemas/quantize.schema.json",
+          "schema_status": "schemas/quantize.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_quantize.yaml"
+        },
+        {
+          "action": "train",
+          "automl_default_parameters": [
+            "train.optim.lr"
+          ],
+          "schema": "schemas/train.schema.json",
+          "schema_status": "schemas/train.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_train.yaml"
+        }
+      ],
+      "train_schema": "schemas/train.schema.json",
+      "train_schema_status": "schemas/train.schema.json is packaged and valid",
+      "train_spec_template": "references/spec_template_train.yaml",
+      "unsupported_actions": []
+    },
+    {
+      "actions": [
+        "evaluate",
+        "export",
+        "inference",
+        "quantize",
+        "segment_evaluate",
+        "segment_inference",
+        "segment_train",
+        "train"
+      ],
+      "automl_default_parameters": [
+        "dataset.classify.augmentation_config.augment",
+        "dataset.classify.augmentation_config.random_color.brightness",
+        "dataset.classify.augmentation_config.random_color.color_probability",
+        "dataset.classify.augmentation_config.random_color.contrast",
+        "dataset.classify.augmentation_config.random_color.enable",
+        "dataset.classify.augmentation_config.random_color.hue",
+        "dataset.classify.augmentation_config.random_color.saturation",
+        "dataset.classify.augmentation_config.random_flip.enable",
+        "dataset.classify.augmentation_config.random_flip.hflip_probability",
+        "dataset.classify.augmentation_config.random_flip.vflip_probability",
+        "dataset.classify.augmentation_config.random_rotate.enable",
+        "dataset.classify.augmentation_config.random_rotate.rotate_probability",
+        "dataset.classify.augmentation_config.with_scale_random_crop.enable",
+        "dataset.classify.fpratio_sampling",
+        "dataset.segment.augmentation.random_color.brightness",
+        "dataset.segment.augmentation.random_color.color_probability",
+        "dataset.segment.augmentation.random_color.contrast",
+        "dataset.segment.augmentation.random_color.enable",
+        "dataset.segment.augmentation.random_color.hue",
+        "dataset.segment.augmentation.random_color.saturation",
+        "dataset.segment.augmentation.random_flip.enable",
+        "dataset.segment.augmentation.random_flip.hflip_probability",
+        "dataset.segment.augmentation.random_flip.vflip_probability",
+        "dataset.segment.augmentation.random_rotate.enable",
+        "dataset.segment.augmentation.random_rotate.rotate_probability",
+        "dataset.segment.augmentation.with_scale_random_crop.enable",
+        "dataset.segment.multi_scale_train",
+        "model.classify.eval_margin",
+        "model.classify.learnable_difference_modules",
+        "model.classify.train_margin_euclid",
+        "train.optim.lr",
+        "train.optim.momentum",
+        "train.optim.weight_decay"
+      ],
+      "automl_enabled": true,
+      "model": "tao-train-visual-changenet",
+      "network_arch": "visual-changenet",
+      "supported_actions": [
+        {
+          "action": "evaluate",
+          "automl_default_parameters": [
+            "dataset.classify.augmentation_config.augment",
+            "dataset.classify.augmentation_config.random_color.brightness",
+            "dataset.classify.augmentation_config.random_color.color_probability",
+            "dataset.classify.augmentation_config.random_color.contrast",
+            "dataset.classify.augmentation_config.random_color.enable",
+            "dataset.classify.augmentation_config.random_color.hue",
+            "dataset.classify.augmentation_config.random_color.saturation",
+            "dataset.classify.augmentation_config.random_flip.enable",
+            "dataset.classify.augmentation_config.random_flip.hflip_probability",
+            "dataset.classify.augmentation_config.random_flip.vflip_probability",
+            "dataset.classify.augmentation_config.random_rotate.enable",
+            "dataset.classify.augmentation_config.random_rotate.rotate_probability",
+            "dataset.classify.augmentation_config.with_scale_random_crop.enable",
+            "dataset.classify.fpratio_sampling",
+            "dataset.segment.augmentation.random_color.brightness",
+            "dataset.segment.augmentation.random_color.color_probability",
+            "dataset.segment.augmentation.random_color.contrast",
+            "dataset.segment.augmentation.random_color.enable",
+            "dataset.segment.augmentation.random_color.hue",
+            "dataset.segment.augmentation.random_color.saturation",
+            "dataset.segment.augmentation.random_flip.enable",
+            "dataset.segment.augmentation.random_flip.hflip_probability",
+            "dataset.segment.augmentation.random_flip.vflip_probability",
+            "dataset.segment.augmentation.random_rotate.enable",
+            "dataset.segment.augmentation.random_rotate.rotate_probability",
+            "dataset.segment.augmentation.with_scale_random_crop.enable",
+            "dataset.segment.multi_scale_train",
+            "model.classify.eval_margin",
+            "model.classify.learnable_difference_modules",
+            "model.classify.train_margin_euclid",
+            "train.optim.lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/evaluate.schema.json",
+          "schema_status": "schemas/evaluate.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_evaluate.yaml"
+        },
+        {
+          "action": "inference",
+          "automl_default_parameters": [
+            "dataset.classify.augmentation_config.augment",
+            "dataset.classify.augmentation_config.random_color.brightness",
+            "dataset.classify.augmentation_config.random_color.color_probability",
+            "dataset.classify.augmentation_config.random_color.contrast",
+            "dataset.classify.augmentation_config.random_color.enable",
+            "dataset.classify.augmentation_config.random_color.hue",
+            "dataset.classify.augmentation_config.random_color.saturation",
+            "dataset.classify.augmentation_config.random_flip.enable",
+            "dataset.classify.augmentation_config.random_flip.hflip_probability",
+            "dataset.classify.augmentation_config.random_flip.vflip_probability",
+            "dataset.classify.augmentation_config.random_rotate.enable",
+            "dataset.classify.augmentation_config.random_rotate.rotate_probability",
+            "dataset.classify.augmentation_config.with_scale_random_crop.enable",
+            "dataset.classify.fpratio_sampling",
+            "dataset.segment.augmentation.random_color.brightness",
+            "dataset.segment.augmentation.random_color.color_probability",
+            "dataset.segment.augmentation.random_color.contrast",
+            "dataset.segment.augmentation.random_color.enable",
+            "dataset.segment.augmentation.random_color.hue",
+            "dataset.segment.augmentation.random_color.saturation",
+            "dataset.segment.augmentation.random_flip.enable",
+            "dataset.segment.augmentation.random_flip.hflip_probability",
+            "dataset.segment.augmentation.random_flip.vflip_probability",
+            "dataset.segment.augmentation.random_rotate.enable",
+            "dataset.segment.augmentation.random_rotate.rotate_probability",
+            "dataset.segment.augmentation.with_scale_random_crop.enable",
+            "dataset.segment.multi_scale_train",
+            "model.classify.eval_margin",
+            "model.classify.learnable_difference_modules",
+            "model.classify.train_margin_euclid",
+            "train.optim.lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/inference.schema.json",
+          "schema_status": "schemas/inference.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_inference.yaml"
+        },
+        {
+          "action": "segment_evaluate",
+          "automl_default_parameters": [
+            "dataset.classify.augmentation_config.augment",
+            "dataset.classify.augmentation_config.random_color.brightness",
+            "dataset.classify.augmentation_config.random_color.color_probability",
+            "dataset.classify.augmentation_config.random_color.contrast",
+            "dataset.classify.augmentation_config.random_color.enable",
+            "dataset.classify.augmentation_config.random_color.hue",
+            "dataset.classify.augmentation_config.random_color.saturation",
+            "dataset.classify.augmentation_config.random_flip.enable",
+            "dataset.classify.augmentation_config.random_flip.hflip_probability",
+            "dataset.classify.augmentation_config.random_flip.vflip_probability",
+            "dataset.classify.augmentation_config.random_rotate.enable",
+            "dataset.classify.augmentation_config.random_rotate.rotate_probability",
+            "dataset.classify.augmentation_config.with_scale_random_crop.enable",
+            "dataset.classify.fpratio_sampling",
+            "dataset.segment.augmentation.random_color.brightness",
+            "dataset.segment.augmentation.random_color.color_probability",
+            "dataset.segment.augmentation.random_color.contrast",
+            "dataset.segment.augmentation.random_color.enable",
+            "dataset.segment.augmentation.random_color.hue",
+            "dataset.segment.augmentation.random_color.saturation",
+            "dataset.segment.augmentation.random_flip.enable",
+            "dataset.segment.augmentation.random_flip.hflip_probability",
+            "dataset.segment.augmentation.random_flip.vflip_probability",
+            "dataset.segment.augmentation.random_rotate.enable",
+            "dataset.segment.augmentation.random_rotate.rotate_probability",
+            "dataset.segment.augmentation.with_scale_random_crop.enable",
+            "dataset.segment.multi_scale_train",
+            "model.classify.eval_margin",
+            "model.classify.learnable_difference_modules",
+            "model.classify.train_margin_euclid",
+            "train.optim.lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/segment_evaluate.schema.json",
+          "schema_status": "schemas/segment_evaluate.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_segment_evaluate.yaml"
+        },
+        {
+          "action": "segment_inference",
+          "automl_default_parameters": [
+            "dataset.classify.augmentation_config.augment",
+            "dataset.classify.augmentation_config.random_color.brightness",
+            "dataset.classify.augmentation_config.random_color.color_probability",
+            "dataset.classify.augmentation_config.random_color.contrast",
+            "dataset.classify.augmentation_config.random_color.enable",
+            "dataset.classify.augmentation_config.random_color.hue",
+            "dataset.classify.augmentation_config.random_color.saturation",
+            "dataset.classify.augmentation_config.random_flip.enable",
+            "dataset.classify.augmentation_config.random_flip.hflip_probability",
+            "dataset.classify.augmentation_config.random_flip.vflip_probability",
+            "dataset.classify.augmentation_config.random_rotate.enable",
+            "dataset.classify.augmentation_config.random_rotate.rotate_probability",
+            "dataset.classify.augmentation_config.with_scale_random_crop.enable",
+            "dataset.classify.fpratio_sampling",
+            "dataset.segment.augmentation.random_color.brightness",
+            "dataset.segment.augmentation.random_color.color_probability",
+            "dataset.segment.augmentation.random_color.contrast",
+            "dataset.segment.augmentation.random_color.enable",
+            "dataset.segment.augmentation.random_color.hue",
+            "dataset.segment.augmentation.random_color.saturation",
+            "dataset.segment.augmentation.random_flip.enable",
+            "dataset.segment.augmentation.random_flip.hflip_probability",
+            "dataset.segment.augmentation.random_flip.vflip_probability",
+            "dataset.segment.augmentation.random_rotate.enable",
+            "dataset.segment.augmentation.random_rotate.rotate_probability",
+            "dataset.segment.augmentation.with_scale_random_crop.enable",
+            "dataset.segment.multi_scale_train",
+            "model.classify.eval_margin",
+            "model.classify.learnable_difference_modules",
+            "model.classify.train_margin_euclid",
+            "train.optim.lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/segment_inference.schema.json",
+          "schema_status": "schemas/segment_inference.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_segment_inference.yaml"
+        },
+        {
+          "action": "segment_train",
+          "automl_default_parameters": [
+            "dataset.classify.augmentation_config.augment",
+            "dataset.classify.augmentation_config.random_color.brightness",
+            "dataset.classify.augmentation_config.random_color.color_probability",
+            "dataset.classify.augmentation_config.random_color.contrast",
+            "dataset.classify.augmentation_config.random_color.enable",
+            "dataset.classify.augmentation_config.random_color.hue",
+            "dataset.classify.augmentation_config.random_color.saturation",
+            "dataset.classify.augmentation_config.random_flip.enable",
+            "dataset.classify.augmentation_config.random_flip.hflip_probability",
+            "dataset.classify.augmentation_config.random_flip.vflip_probability",
+            "dataset.classify.augmentation_config.random_rotate.enable",
+            "dataset.classify.augmentation_config.random_rotate.rotate_probability",
+            "dataset.classify.augmentation_config.with_scale_random_crop.enable",
+            "dataset.classify.fpratio_sampling",
+            "dataset.segment.augmentation.random_color.brightness",
+            "dataset.segment.augmentation.random_color.color_probability",
+            "dataset.segment.augmentation.random_color.contrast",
+            "dataset.segment.augmentation.random_color.enable",
+            "dataset.segment.augmentation.random_color.hue",
+            "dataset.segment.augmentation.random_color.saturation",
+            "dataset.segment.augmentation.random_flip.enable",
+            "dataset.segment.augmentation.random_flip.hflip_probability",
+            "dataset.segment.augmentation.random_flip.vflip_probability",
+            "dataset.segment.augmentation.random_rotate.enable",
+            "dataset.segment.augmentation.random_rotate.rotate_probability",
+            "dataset.segment.augmentation.with_scale_random_crop.enable",
+            "dataset.segment.multi_scale_train",
+            "model.classify.eval_margin",
+            "model.classify.learnable_difference_modules",
+            "model.classify.train_margin_euclid",
+            "train.optim.lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/segment_train.schema.json",
+          "schema_status": "schemas/segment_train.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_segment_train.yaml"
+        },
+        {
+          "action": "train",
+          "automl_default_parameters": [
+            "dataset.classify.augmentation_config.augment",
+            "dataset.classify.augmentation_config.random_color.brightness",
+            "dataset.classify.augmentation_config.random_color.color_probability",
+            "dataset.classify.augmentation_config.random_color.contrast",
+            "dataset.classify.augmentation_config.random_color.enable",
+            "dataset.classify.augmentation_config.random_color.hue",
+            "dataset.classify.augmentation_config.random_color.saturation",
+            "dataset.classify.augmentation_config.random_flip.enable",
+            "dataset.classify.augmentation_config.random_flip.hflip_probability",
+            "dataset.classify.augmentation_config.random_flip.vflip_probability",
+            "dataset.classify.augmentation_config.random_rotate.enable",
+            "dataset.classify.augmentation_config.random_rotate.rotate_probability",
+            "dataset.classify.augmentation_config.with_scale_random_crop.enable",
+            "dataset.classify.fpratio_sampling",
+            "dataset.segment.augmentation.random_color.brightness",
+            "dataset.segment.augmentation.random_color.color_probability",
+            "dataset.segment.augmentation.random_color.contrast",
+            "dataset.segment.augmentation.random_color.enable",
+            "dataset.segment.augmentation.random_color.hue",
+            "dataset.segment.augmentation.random_color.saturation",
+            "dataset.segment.augmentation.random_flip.enable",
+            "dataset.segment.augmentation.random_flip.hflip_probability",
+            "dataset.segment.augmentation.random_flip.vflip_probability",
+            "dataset.segment.augmentation.random_rotate.enable",
+            "dataset.segment.augmentation.random_rotate.rotate_probability",
+            "dataset.segment.augmentation.with_scale_random_crop.enable",
+            "dataset.segment.multi_scale_train",
+            "model.classify.eval_margin",
+            "model.classify.learnable_difference_modules",
+            "model.classify.train_margin_euclid",
+            "train.optim.lr",
+            "train.optim.momentum",
+            "train.optim.weight_decay"
+          ],
+          "schema": "schemas/train.schema.json",
+          "schema_status": "schemas/train.schema.json is packaged and valid",
+          "spec_template": "references/spec_template_train.yaml"
+        }
+      ],
+      "train_schema": "schemas/train.schema.json",
+      "train_schema_status": "schemas/train.schema.json is packaged and valid",
+      "train_spec_template": "references/spec_template_train.yaml",
+      "unsupported_actions": [
+        {
+          "action": "export",
+          "reason": "schemas/export.schema.json is not packaged"
+        },
+        {
+          "action": "quantize",
+          "reason": "schemas/quantize.schema.json is not packaged"
+        }
+      ]
+    }
+  ],
+  "unsupported": [
+    {
+      "automl_enabled": false,
+      "model": "tao-finetune-cosmos-embed",
+      "network_arch": "cosmos-embed",
+      "reason": "automl_enabled is false in model metadata",
+      "train_schema_status": "schemas/train.schema.json is not packaged"
+    },
+    {
+      "automl_enabled": true,
+      "model": "tao-train-fast-foundation-stereo",
+      "network_arch": "depth_net_stereo",
+      "reason": "evaluate: schemas/evaluate.schema.json is not packaged; export: schemas/export.schema.json is not packaged; inference: schemas/inference.schema.json is not packaged; train: schemas/train.schema.json is not packaged",
+      "train_schema_status": "schemas/train.schema.json is not packaged",
+      "unsupported_actions": [
+        {
+          "action": "evaluate",
+          "reason": "schemas/evaluate.schema.json is not packaged"
+        },
+        {
+          "action": "export",
+          "reason": "schemas/export.schema.json is not packaged"
+        },
+        {
+          "action": "inference",
+          "reason": "schemas/inference.schema.json is not packaged"
+        },
+        {
+          "action": "train",
+          "reason": "schemas/train.schema.json is not packaged"
+        }
+      ]
+    }
+  ]
+}

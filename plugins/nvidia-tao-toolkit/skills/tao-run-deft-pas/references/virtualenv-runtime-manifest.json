@@ -1,0 +1,140 @@
+{
+  "$schema": "virtualenv-runtime-manifest.schema.json",
+  "schema_version": "1",
+  "python": {
+    "implementation": "cpython",
+    "major_minor": "3.12",
+    "machine": "x86_64",
+    "minimum_glibc": "2.28"
+  },
+  "cuda": {
+    "torch_version": "2.11.0+cu130",
+    "torch_cuda_build": "13.0",
+    "pytorch_index_url": "https://download.pytorch.org/whl/cu130"
+  },
+  "profiles": {
+    "pyt": {
+      "lock_status": "generation_required",
+      "lock_file": "virtualenv-pyt-py312-cu130.lock",
+      "lock_sha256": null,
+      "distributions": {
+        "nvidia-tao-core": "7.1.0",
+        "nvidia-tao-pytorch": "7.1.0",
+        "torch": "2.11.0+cu130",
+        "torchvision": "0.26.0+cu130"
+      },
+      "entrypoints": {
+        "clip": {
+          "distribution": "nvidia-tao-pytorch",
+          "target": "nvidia_tao_pytorch.multimodal.clip.entrypoint.clip:main"
+        }
+      },
+      "imports": [
+        "torch",
+        "yaml",
+        "nvidia_tao_pytorch.multimodal.clip.entrypoint.clip"
+      ],
+      "primary_artifacts": [
+        {
+          "distribution": "nvidia-tao-core",
+          "version": "7.1.0",
+          "index_url": "https://pypi.org/simple",
+          "sha256": "e4a8d29775dcffdc42b11c37442d15136a56cbc58dad78c15eb00510d00e510c"
+        },
+        {
+          "distribution": "nvidia-tao-pytorch",
+          "version": "7.1.0",
+          "index_url": "https://pypi.org/simple",
+          "sha256": "d56dde5d199ae35cc54639f33a5d930c36c48b4095983007188829bd1656cda4",
+          "size": 74784032
+        },
+        {
+          "distribution": "torch",
+          "version": "2.11.0+cu130",
+          "index_url": "https://download.pytorch.org/whl/cu130",
+          "sha256": "96911323dcfcd42028c7e8edde7bdf25bb187753234e8775f0f3f112e86a22db",
+          "size": 531146695
+        },
+        {
+          "distribution": "torchvision",
+          "version": "0.26.0+cu130",
+          "index_url": "https://download.pytorch.org/whl/cu130",
+          "sha256": "0f030a9bd8ada1a31b7111ea1589c1ecb5fa0884fee700a203e731b4cf378a98"
+        }
+      ],
+      "source_provenance": {
+        "nvidia-tao-core": "98764c4695b1fa9edc59f77b526069a5f36249fc",
+        "nvidia-tao-pytorch": "cff64e7e7f89c7ae37989a94a04d7c1c261d4b97"
+      }
+    },
+    "ds": {
+      "lock_status": "generation_required",
+      "lock_file": "virtualenv-ds-py312-cu130.lock",
+      "lock_sha256": null,
+      "distributions": {
+        "nvidia-tao-core": "7.1.0",
+        "nvidia-tao-ds": "7.1.0",
+        "nvidia-tao-pytorch": "7.1.0",
+        "torch": "2.11.0+cu130",
+        "torchvision": "0.26.0+cu130"
+      },
+      "entrypoints": {
+        "embedding": {
+          "distribution": "nvidia-tao-ds",
+          "target": "nvidia_tao_ds.mining.embedding.entrypoint.embedding:main"
+        },
+        "tmm": {
+          "distribution": "nvidia-tao-ds",
+          "target": "nvidia_tao_ds.mining.tmm.entrypoint.tmm:main"
+        }
+      },
+      "imports": [
+        "torch",
+        "yaml",
+        "nvidia_tao_pytorch.multimodal.clip.entrypoint.clip",
+        "nvidia_tao_ds.mining.embedding.entrypoint.embedding",
+        "nvidia_tao_ds.mining.tmm.entrypoint.tmm"
+      ],
+      "primary_artifacts": [
+        {
+          "distribution": "nvidia-tao-core",
+          "version": "7.1.0",
+          "index_url": "https://pypi.org/simple",
+          "sha256": "e4a8d29775dcffdc42b11c37442d15136a56cbc58dad78c15eb00510d00e510c"
+        },
+        {
+          "distribution": "nvidia-tao-pytorch",
+          "version": "7.1.0",
+          "index_url": "https://pypi.org/simple",
+          "sha256": "d56dde5d199ae35cc54639f33a5d930c36c48b4095983007188829bd1656cda4",
+          "size": 74784032
+        },
+        {
+          "distribution": "nvidia-tao-ds",
+          "version": "7.1.0",
+          "index_url": "https://pypi.org/simple",
+          "sha256": "7a6cea1acf183a5468dfdd6493b9c0b1bdfe34a6123527f99c46879341a9d27d",
+          "size": 337516
+        },
+        {
+          "distribution": "torch",
+          "version": "2.11.0+cu130",
+          "index_url": "https://download.pytorch.org/whl/cu130",
+          "sha256": "96911323dcfcd42028c7e8edde7bdf25bb187753234e8775f0f3f112e86a22db",
+          "size": 531146695
+        },
+        {
+          "distribution": "torchvision",
+          "version": "0.26.0+cu130",
+          "index_url": "https://download.pytorch.org/whl/cu130",
+          "sha256": "0f030a9bd8ada1a31b7111ea1589c1ecb5fa0884fee700a203e731b4cf378a98"
+        }
+      ],
+      "source_provenance": {
+        "nvidia-tao-core": "98764c4695b1fa9edc59f77b526069a5f36249fc",
+        "nvidia-tao-pytorch": "cff64e7e7f89c7ae37989a94a04d7c1c261d4b97",
+        "nvidia-tao-ds": "d825dfc181a8565b4401682286317ad48b28ea24"
+      }
+    }
+  }
+}

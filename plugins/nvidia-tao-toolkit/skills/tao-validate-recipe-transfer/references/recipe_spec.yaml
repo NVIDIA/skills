@@ -1,0 +1,152 @@
+# Recipe spec template
+#
+# Fill this out at the end of Phase A, before touching customer data.
+#
+# Two tags per field:
+#   provenance: paper | code | issue | default | unspecified
+#   bucket:     INVARIANT | SCALE | DERIVED
+#
+# The `unspecified` entries are your risk register. When the number later comes up short,
+# that list is the hypothesis space -- and it is far smaller than the space of all
+# hyperparameters. The `DERIVED` entries must be recomputed from the customer's data;
+# copying them from the paper is the most common silent transfer error.
+
+meta:
+  paper: ""
+  repo: ""
+  commit: ""            # pin it
+  container: ""         # image tag, if custom CUDA ops are involved
+  code_license: ""      # research-only / AGPL / Apache-2.0 / ...
+  weights_license: ""   # often stricter than the code
+  reported_metric: ""   # the number you are gating against in Phase A3
+  reproduced_metric: "" # what you actually got. If blank, do not proceed to Phase B.
+
+init:
+  from: ""              # scratch | imagenet | released_checkpoint
+  checkpoint: ""
+  missing_keys: 0       # assert 0, or justify every one
+  unexpected_keys: 0
+
+fields:
+  # - name: lr
+  #   value: 0.01
+  #   paper_value: 0.02
+  #   provenance: paper
+  #   bucket: SCALE
+  #   reason: "halved; effective batch is half the paper's (16 vs 32)"
+
+  - name: architecture
+    value:
+    provenance:
+    bucket: INVARIANT
+    reason:
+
+  - name: effective_batch_size   # batch x grad_accum x num_gpus -- compute, do not assume
+    value:
+    provenance:
+    bucket: SCALE
+    reason:
+
+  - name: base_lr
+    value:
+    provenance:
+    bucket: SCALE
+    reason:
+
+  - name: schedule_total_steps   # steps, not epochs -- epochs are meaningless across datasets
+    value:
+    provenance:
+    bucket: SCALE
+    reason:
+
+  - name: warmup_steps
+    value:
+    provenance:
+    bucket: SCALE
+    reason:
+
+  - name: weight_decay
+    value:
+    provenance:
+    bucket: SCALE
+    reason:
+
+  - name: wd_excludes_bias_and_norm
+    value:
+    provenance: unspecified      # very commonly unstated, and worth ~0.5 points
+    bucket: INVARIANT
+    reason:
+
+  - name: grad_clip
+    value:
+    provenance: unspecified
+    bucket: INVARIANT
+    reason:
+
+  - name: ema_decay
+    value:
+    provenance: unspecified
+    bucket: SCALE
+    reason:
+
+  - name: input_resolution
+    value:
+    provenance:
+    bucket: DERIVED              # from target object size distribution
+    reason:
+
+  - name: anchor_scales
+    value:
+    provenance:
+    bucket: DERIVED              # cluster target box dimensions
+    reason:
+
+  - name: num_classes
+    value:
+    provenance:
+    bucket: DERIVED              # check N vs N+1 semantics for this framework
+    reason:
+
+  - name: score_threshold
+    value:
+    provenance:
+    bucket: DERIVED              # the operating point -- choose from the PR curve
+    reason:
+
+  - name: nms_iou
+    value:
+    provenance:
+    bucket: DERIVED
+    reason:
+
+  - name: max_detections
+    value:
+    provenance:
+    bucket: DERIVED              # default 100 truncates recall in dense scenes
+    reason:
+
+preprocessing:                   # single shared artifact for train / eval / export
+  resize: ""                     # letterbox | stretch | shortest_side
+  size: []
+  pad_value:
+  interpolation: ""
+  channel_order: ""              # must match the pretrained backbone
+  scale: 255.0
+  mean: []
+  std: []
+  parity_verified: false         # set true only after preprocess_parity.py passes
+
+augmentation:
+  # For each op: keep/drop, and the semantic reason. "The paper used it" is not a reason.
+  # - op: hflip
+  #   enabled: false
+  #   reason: "left/right are distinct classes in this dataset"
+
+evaluation:
+  test_set_grouping: ""          # how the split was grouped (video/site/subject/lot/time)
+  leakage_checked: false         # split_leakage_check.py
+  frozen: false                  # frozen golden set, untouched during iteration
+  baseline: ""                   # pretrained/zero-shot baseline number to beat
+  operating_point: ""            # chosen threshold and the precision/recall tradeoff behind it
+
+unspecified_risk_register: []    # every field above tagged `unspecified`, collected here

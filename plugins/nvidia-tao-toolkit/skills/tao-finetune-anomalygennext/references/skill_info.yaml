@@ -1,0 +1,74 @@
+network_arch: tao-finetune-anomalygennext
+type: data
+container_image: nvcr.io/nvidia/paidf-anomalygen:1.1.0  # versions-key: images.metropolis_sdg.anomalygen_next
+execution_environment: container
+gpu_spec_key: num_gpus
+required_credentials: []
+optional_credentials:
+- name: NGC_KEY
+  source: env_var
+  only_when: the selected platform requires authenticated access to nvcr.io
+actions:
+  prepare_recipe:
+    command: scripts/prepare_finetune_recipe.py
+    mode: args
+    inputs:
+      dataset_root: {type: folder}
+      validation_testcase: {type: file}
+      base_checkpoint: {type: folder}
+      vae_path: {type: file}
+      checkpoint_root: {type: folder}
+      defect_spec: {type: file, optional: true}
+      recipe_template: {type: file, optional: true}
+    outputs:
+      recipe: {type: file}
+      normalized_validation: {type: file}
+      metadata: {type: file}
+    upload_excludes:
+    - inputs/
+    args:
+      dataset_root: --dataset-root {dataset_root}
+      validation_testcase: --validation-testcase {validation_testcase}
+      base_checkpoint: --base-checkpoint {base_checkpoint}
+      vae_path: --vae-path {vae_path}
+      checkpoint_root: --checkpoint-root {checkpoint_root}
+      defect_spec: --defect-spec {defect_spec}
+      recipe_template: --recipe-template {recipe_template}
+      dataset_name: --dataset-name {dataset_name}
+      output: --output {recipe}
+  train:
+    command: scripts/finetune_anomalygennext.sh
+    mode: args
+    inputs:
+      recipe: {type: file}
+      dataset_root: {type: folder}
+      validation_testcase: {type: file}
+      base_checkpoint: {type: folder}
+      vae_path: {type: file}
+      checkpoint_root:
+        type: folder
+        container_path: /workspace/paidf-anomalygen/checkpoints
+    outputs:
+      results_dir: {type: folder}
+      nn_improvement_summary: {type: file}
+      status: {type: file}
+      best_model_checkpoint: {type: file}
+      training_handoff: {type: file}
+    upload_excludes:
+    - runtime/anomalygen/*/*/checkpoints/optim/
+    - runtime/anomalygen/*/*/checkpoints/scheduler/
+    - runtime/anomalygen/*/*/checkpoints/trainer/
+    args:
+      recipe: --recipe {recipe}
+      results_dir: --results-dir {results_dir}
+      checkpoint_root: --checkpoint-root {checkpoint_root}
+      num_gpus: --num-gpus {num_gpus}
+      min_nn_improvement: --min-nn-improvement {min_nn_improvement}
+      parallelism: --parallelism {parallelism}
+      compile: --compile {compile}
+      job_id: --job-id {job_id}
+    defaults:
+      num_gpus: 1
+      min_nn_improvement: 0.0
+      parallelism: ddp
+      compile: true

@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://developer.nvidia.com/tao/schemas/pas-virtualenv-runtime-manifest-v1.json",
+  "title": "PAS DEFT virtualenv runtime manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "python", "cuda", "profiles"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "schema_version": {"const": "1"},
+    "python": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["implementation", "major_minor", "machine", "minimum_glibc"],
+      "properties": {
+        "implementation": {"const": "cpython"},
+        "major_minor": {"const": "3.12"},
+        "machine": {"const": "x86_64"},
+        "minimum_glibc": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+$"}
+      }
+    },
+    "cuda": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["torch_version", "torch_cuda_build", "pytorch_index_url"],
+      "properties": {
+        "torch_version": {"type": "string", "minLength": 1},
+        "torch_cuda_build": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+$"},
+        "pytorch_index_url": {"type": "string", "format": "uri"}
+      }
+    },
+    "profiles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pyt", "ds"],
+      "properties": {
+        "pyt": {"$ref": "#/$defs/profile"},
+        "ds": {"$ref": "#/$defs/profile"}
+      }
+    }
+  },
+  "$defs": {
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["distribution", "version", "index_url", "sha256"],
+      "properties": {
+        "distribution": {"type": "string", "minLength": 1},
+        "version": {"type": "string", "minLength": 1},
+        "filename": {"type": "string", "minLength": 1},
+        "index_url": {"type": "string", "format": "uri"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "size": {"type": "integer", "minimum": 1}
+      }
+    },
+    "entrypoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["distribution", "target"],
+      "properties": {
+        "distribution": {"type": "string", "minLength": 1},
+        "target": {"type": "string", "minLength": 1}
+      }
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lock_status", "lock_file", "lock_sha256", "distributions",
+        "entrypoints", "imports", "primary_artifacts", "source_provenance"
+      ],
+      "properties": {
+        "lock_status": {"enum": ["generation_required", "complete"]},
+        "lock_file": {"type": "string", "minLength": 1},
+        "lock_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+        "distributions": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {"type": "string", "minLength": 1}
+        },
+        "entrypoints": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {"$ref": "#/$defs/entrypoint"}
+        },
+        "imports": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "primary_artifacts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/artifact"}
+        },
+        "source_provenance": {
+          "type": "object",
+          "additionalProperties": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+        }
+      }
+    }
+  }
+}

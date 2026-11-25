@@ -1,0 +1,26 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+# Fragment: merge into the selected pretrained model's complete train spec.
+# Preserve its backbone, anchors, input dimensions, and validation dataset.
+model:
+  cotrain_param_touch: false
+  head:
+    loose_to_tight:
+      enable: true
+      pseudo_enable: true
+      mlp_ckpt: /data/sparse4d_rn50_vtrainable_v3.0/_loose_to_tight_mlp.pth
+      num_classes: 0
+      loss_weight: 0.1
+      pseudo_box_weight: 0.1
+      pseudo_cls_weight: 1.0
+dataset:
+  classes: [person, gr1_t2, agility_digit, nova_carter, transporter, forklift, pallet_truck]
+  train_dataset:
+    ann_file: /data/mixed_train_split.txt
+  lazy_load: true
+  rtdetr_2d_cache_dir: /data/rtdetr
+  rtdetr_2d_mark_real: true
+  sync_route: true
+  real_scene_keywords: [RealWarehouse]
+  real_block_prob: 0.5
+  scene_switch_iters: 100

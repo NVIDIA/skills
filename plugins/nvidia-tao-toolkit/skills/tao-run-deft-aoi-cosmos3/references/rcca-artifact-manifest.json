@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "contract_version": "7.2",
+  "artifact_classes": {
+    "container_or_script_produced_required": [
+      {
+        "path": "gaps_summary.json",
+        "kind": "file",
+        "state_field": "proxy_gaps_summary",
+        "validation": "non_empty"
+      },
+      {
+        "path": "false_accepts.json",
+        "kind": "file",
+        "state_field": "false_accepts_json",
+        "validation": "non_empty"
+      },
+      {
+        "path": "false_rejects.json",
+        "kind": "file",
+        "state_field": "false_rejects_json",
+        "validation": "non_empty"
+      }
+    ],
+    "agent_produced_required": [
+      {
+        "path": "RCCA_Report.md",
+        "kind": "file",
+        "state_field": "rcca_report",
+        "validation": {
+          "type": "markdown_sections",
+          "required_headings": [
+            "Verdict",
+            "False-Accept Breakdown",
+            "False-Reject Breakdown",
+            "Top-K Worst Samples",
+            "Per-Defect Analysis",
+            "Recommended Actions"
+          ]
+        }
+      }
+    ]
+  }
+}

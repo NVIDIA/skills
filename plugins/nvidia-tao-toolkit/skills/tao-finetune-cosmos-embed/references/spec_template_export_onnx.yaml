@@ -1,0 +1,42 @@
+results_dir: /results
+
+export:
+  checkpoint: null
+  onnx_file: /results/export/cosmos_embed1_vision.onnx
+  # video or text: one graph per tower (recommended for TensorRT; run export twice).
+  # combined: both towers in one graph. huggingface: use spec_template_export_hf.yaml.
+  mode: video
+  opset_version: 17
+  batch_size: -1     # dynamic batch axis; a positive value fixes the batch size
+  on_cpu: true
+  verbose: false
+  simplify: false
+
+model:
+  pretrained_model_path: null
+  precision: fp32
+  fsdp_shard_size: 1
+  # For a LoRA checkpoint copy the training spec's model.lora block here, with the exact
+  # target_modules that were trained. Export merges the adapters into the weights.
+  lora:
+    enabled: false
+  input_hw: [224, 224]
+  network:
+    embed_dim: 256
+    num_query_tokens: 32
+    max_txt_len: 128
+    num_video_frames: 8
+    spatial_resolution: [224, 224]
+    temporal_encoding_type: neighboring_token_propagation
+    contrastive_type: clip
+    qformer_pretrain_ckpt: null
+    query_pooling_type: avg
+    pretrained_text_encoder: false
+    pretrained_visual_encoder: false
+    num_heldout_frames: 0
+    visual_encoder:
+      type: eva_vit_g
+      img_size: 224
+      pretrained: false
+      use_fp8: false
+      transformer_engine: false

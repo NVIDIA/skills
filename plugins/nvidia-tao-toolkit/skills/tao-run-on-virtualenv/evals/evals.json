@@ -1,0 +1,14 @@
+[
+  {
+    "id": "tao-run-on-virtualenv-basic",
+    "question": "A user request: \"Run my training script directly in my local venv — I don't have docker.\" Identify which TAO skill applies and, reading only that skill's documentation, outline the four-verb steps it prescribes. Do NOT run any commands, scripts, web searches, or other tools — describe the plan only.",
+    "expected_skill": "tao-run-on-virtualenv",
+    "expected_script": null,
+    "ground_truth": "Identify tao-run-on-virtualenv as the docker-free local execution platform and summarize its documented flow: open a job record binding results_dir, submit via references/virtualenv_runner.py with the venv + script, poll status/logs, cancel via the runner, and mark the record — without executing anything.",
+    "expected_behavior": [
+      "Identifies tao-run-on-virtualenv as the relevant skill",
+      "Outlines record-then-launch and the four verbs over virtualenv_runner.py",
+      "Does not run commands, scripts, or web searches"
+    ]
+  }
+]

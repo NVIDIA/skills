@@ -1,0 +1,256 @@
+# SLURM Preflight Storage And Credentials
+
+SSH preflight, enroot credentials, prerequisite setup, backend details, storage, and SSH remediation. No nvidia-tao-sdk is required; jobs run over ssh + sbatch/squeue/sacct/scancel.
+
+Load this file only when the compact `SKILL.md` points here for the current task. If this reference conflicts with `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the compact/current source wins.
+
+## Contents
+
+- 1. SSH to the login node works without a password prompt
+- 2. Enroot credentials on the cluster for private nvcr.io images.
+- Pyxis on the compute nodes invokes enroot to import the Docker image. Enroot
+- does NOT read NGC_KEY from the SLURM job env — it requires persistent
+- credentials in ~/.config/enroot/.credentials on the login/compute nodes.
+- Without this, anonymous pulls of auth-gated nvcr.io paths (e.g. any
+- pre-release staging org) fail with "Could not process JSON input" at job startup. Skip if the
+- image is from a public repo.
+- SLURM
+- Prerequisites
+- Credentials
+- Backend Details
+- Storage
+- SSH Failure Remediation Prompt
+
+## Preflight
+
+```bash
+# 1. SSH to the login node works without a password prompt
+SLURM_HOST="${SLURM_HOSTNAME%%,*}"
+[ -n "$SLURM_USER" ] && [ -n "$SLURM_HOST" ] || {
+  echo "MISSING: SLURM_USER and SLURM_HOSTNAME (comma-separated for failover)."
+  echo "Export them in your shell before launching, or source a user-approved env file:"
+  echo "  set -a; source /path/to/.env; set +a"
+  exit 1
+}
+ssh -o BatchMode=yes -o ConnectTimeout=10 "${SLURM_USER}@${SLURM_HOST}" "true" 2>/dev/null || {
+  echo "MISSING: passwordless SSH to ${SLURM_USER}@${SLURM_HOST} not working. See the Prerequisites section."
+  exit 1
+}
+
+# 2. Enroot credentials on the cluster for private nvcr.io images.
+# Pyxis on the compute nodes invokes enroot to import the Docker image. Enroot
+# does NOT read NGC_KEY from the SLURM job env — it requires persistent
+# credentials in ~/.config/enroot/.credentials on the login/compute nodes.
+# Without this, anonymous pulls of auth-gated nvcr.io paths (e.g. any
+# pre-release staging org) fail with "Could not process JSON input" at job startup. Skip if the
+# image is from a public repo.
+if [ -n "$NGC_KEY" ]; then
+  REMOTE_CRED_OK=$(ssh -o BatchMode=yes "${SLURM_USER}@${SLURM_HOST}" \
+    'test -s ~/.config/enroot/.credentials && echo OK || echo MISSING' 2>/dev/null)
+  if [ "$REMOTE_CRED_OK" != "OK" ]; then
+    echo "MISSING: ~/.config/enroot/.credentials not set on ${SLURM_HOST}."
+    echo "After user approval, install it from NGC_KEY (no value echoed):"
+    echo "  printf 'machine nvcr.io login \$oauthtoken password %s\\nmachine authn.nvidia.com login \$oauthtoken password %s\\n' \"\$NGC_KEY\" \"\$NGC_KEY\" \\"
+    echo "    | ssh -o BatchMode=yes \"\${SLURM_USER}@\${SLURM_HOST}\" '"
+    echo "        mkdir -p ~/.config/enroot && umask 077 && cat > ~/.config/enroot/.credentials && chmod 600 ~/.config/enroot/.credentials"
+    echo "      '"
+    exit 1
+  fi
+fi
+```
+
+If a check fails, the agent prompts the user to authorize the install/fix via Bash.
+
+The enroot-credentials step (#2) only needs to run **once per (cluster, user)** —
+subsequent SLURM sessions inherit the file. Use the `printf | ssh` heredoc
+pattern above so the `NGC_KEY` value never lands in shell history, intermediate
+files, or chat output. Do not `cat` or `echo` the value at any step. After the
+file is in place, both the SQSH pre-conversion job (which runs on the
+partition named in `SLURM_CONVERSION_PARTITION`) and the actual training
+job's Pyxis pull will
+authenticate as `$oauthtoken` against `nvcr.io`.
+
+# SLURM
+
+Remote GPU compute platform for clusters managed by SLURM. Jobs are submitted
+from the launch host to a login node over SSH, staged on a shared
+filesystem, submitted with `sbatch`, and executed with `srun` container support.
+
+Use SLURM when the user has access to a managed GPU cluster, shared Lustre
+storage, and scheduler-owned GPU allocation. Do not use SLURM for local files
+that exist only on the agent machine; data and outputs must be reachable from
+the cluster.
+
+## Prerequisites
+
+Before any SLURM job can be submitted or any runner script is generated, the
+launch host must be able to log in to at least one host
+from `SLURM_HOSTNAME` over SSH **without an interactive password prompt**. The
+handler runs `sbatch`, `squeue`, `sacct`, `scancel`, and log tails
+non-interactively, so password or 2FA prompts will fail the job at submit or
+status time.
+
+Set this up once per (host, login node, user) tuple:
+
+1. Ensure an SSH keypair exists for the service user (e.g. `~/.ssh/id_ed25519`).
+   Create one with `ssh-keygen -t ed25519 -N "" -f ~/.ssh/id_ed25519` if it is
+   missing. The handler defaults to the same locations described under
+   `SSH_KEY_PATH` in [Credentials](#credentials).
+2. Install the public key on each login node:
+
+   ```bash
+   ssh-copy-id -i ~/.ssh/id_ed25519.pub <SLURM_USER>@<login-host>
+   ```
+
+   This is the only step that requires the user's password; run it interactively
+   once per login host listed in `SLURM_HOSTNAME`. If `ssh-copy-id` is not
+   available, append the public key manually:
+
+   ```bash
+   cat ~/.ssh/id_ed25519.pub | ssh <SLURM_USER>@<login-host> \
+     'mkdir -p ~/.ssh && chmod 700 ~/.ssh && \
+      cat >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys'
+   ```
+3. Trust the host key so SSH does not stall on the "authenticity of host" prompt
+   inside the handler. Either log in once interactively to accept the prompt,
+   or pre-populate `~/.ssh/known_hosts` with `ssh-keyscan -H <login-host> >> ~/.ssh/known_hosts`.
+4. Verify the result is fully non-interactive for at least one listed login
+   host:
+
+   ```bash
+   ssh -o BatchMode=yes -o PreferredAuthentications=publickey \
+     <SLURM_USER>@<login-host> 'hostname && squeue -u $USER -h | head -n 1'
+   ```
+
+   `BatchMode=yes` forces failure if SSH would otherwise prompt; this command
+   must succeed before the SLURM platform is usable.
+5. When the service runs in a container (microservices deployment), mount the
+   private key into the container at the path referenced by `SSH_KEY_PATH`, with
+   `chmod 600` and matching ownership for the in-container user. The handler
+   refuses keys with world-readable permissions.
+
+For convenience, a per-host alias in `~/.ssh/config` lets you reference a short
+name everywhere:
+
+```text
+Host slurm-login
+    HostName <login-host>
+    User <SLURM_USER>
+    IdentityFile ~/.ssh/id_ed25519
+    StrictHostKeyChecking accept-new
+```
+
+If a site enforces 2FA on every SSH connection, passwordless key auth alone is
+not enough; coordinate with the cluster admin to allow key-only auth from the
+service host or use an SSH agent with cached credentials and expose it to the
+handler via `SSH_AUTH_SOCK`.
+
+## Credentials
+
+- **SLURM_USER** (required): SSH username for the login node. In microservices
+  workspace metadata this is `cloud_specific_details.slurm_user`.
+- **SLURM_HOSTNAME** (required): Comma-separated login hostnames for failover.
+  Microservices schema stores this as the list field
+  `cloud_specific_details.slurm_hostname`.
+- **SLURM_PARTITION** (required): Partition list for GPU job submission. Ask
+  for this in the mandatory SLURM intake list. There is no packaged default:
+  the names belong to the user's cluster, and `sinfo -h -o '%P %l %c %m %G'`
+  on the login node lists them.
+- **SLURM_CONVERSION_PARTITION** (required when an image must be converted to
+  SQSH): a CPU partition of the user's cluster that allows 4 CPUs, 7200M
+  memory, and 120 minutes of wall time. There is no packaged default.
+- **SSH_KEY_PATH** (preferred and expected before launch): private key path for
+  non-interactive public-key auth to the login node. If passwordless SSH fails,
+  ask the user for `SSH_KEY_PATH=/path/to/private_key` and show the setup steps
+  below; do not bury this behind several alternate choices.
+- **SSH_AUTH_SOCK** (advanced fallback): SSH agent socket with an accepted key
+  already loaded. Prefer `SSH_KEY_PATH` in user-facing remediation prompts.
+- **SLURM_BASE_RESULTS_DIR** (required for tracked Cosmos workflows): Base
+  shared filesystem path supplied explicitly at runtime; there is no site default.
+- **SLURM_ACCOUNT** (usually required by site policy): Account charged by
+  `#SBATCH --account`.
+
+Do not ask for `SLURM_ACCOUNT` or `SLURM_BASE_RESULTS_DIR` in the initial
+intake unless the user says their site requires an account, wants a custom
+results root, or the workflow cannot proceed without overriding defaults.
+
+## Backend Details
+
+Use `backend_details.backend_type = "slurm"` when routing a job to this
+platform. Supported backend details from the microservices schema:
+
+```json
+{
+  "backend_type": "slurm",
+  "partition": "<partition-list>",
+  "cluster_name": "optional-name"
+}
+```
+
+Runtime metadata is stored under `backend_details.slurm_metadata`, especially
+`slurm_job_id` and `job_dir`. Do not invent these values. They are written
+after `sbatch` returns a scheduler job id.
+
+## Storage
+
+SLURM jobs run on the cluster, so local paths from the API host are not valid
+dataset paths. Prefer shared filesystem URIs:
+
+- Use `lustre:///absolute/path` for user-provided datasets on Lustre.
+- `slurm://` paths may appear in microservices metadata and are converted to
+  actual Lustre paths before the container starts.
+- Avoid bare `/local/path` and `file://` dataset URIs for SLURM. Validation in
+  `tao-core` rejects local and file paths for remote backends.
+
+Accept either dataset roots or direct spec-key paths:
+
+- Root mode: `<SHARED_TRAIN_ROOT>`, which model skills map to required
+  files such as `<root>/annotations.json` and `<root>` as media path.
+- Direct spec mode: exact fields such as
+  `custom.train_dataset.annotation_path=<TRAIN_ANNOTATION_PATH>` and
+  `custom.train_dataset.media_path=<TRAIN_MEDIA_PATH>`.
+
+After passwordless SSH succeeds and before generating scripts, validate each
+required dataset file/path from the login host:
+
+```bash
+ssh -o BatchMode=yes <SLURM_USER>@<working-login-host> \
+  'test -e <ANNOTATION_PATH> && test -e <MEDIA_PATH>'
+```
+
+If the remote `test -e` fails, stop and ask for corrected paths or for the data
+to be staged onto shared cluster storage. Do not create runner scripts that will
+fail inside the first training job.
+
+## SSH Failure Remediation Prompt
+
+When passwordless SSH fails, use this concise prompt:
+
+```text
+SLURM is blocked on passwordless SSH. Please provide:
+
+SSH_KEY_PATH=/path/to/private_key
+
+If you have not set up passwordless access yet:
+1. Create a key if needed:
+   ssh-keygen -t ed25519 -N "" -f ~/.ssh/id_ed25519
+2. Install the public key on one login host:
+   ssh-copy-id -i ~/.ssh/id_ed25519.pub <SLURM_USER>@<login-host>
+3. Trust the host key:
+   ssh-keyscan -H <login-host> >> ~/.ssh/known_hosts
+4. Lock private-key permissions:
+   chmod 600 ~/.ssh/id_ed25519
+5. Verify it works without prompts:
+   ssh -o BatchMode=yes -i ~/.ssh/id_ed25519 <SLURM_USER>@<login-host> 'hostname'
+
+After that, rerun with SSH_KEY_PATH=~/.ssh/id_ed25519.
+```
+
+Results are supplied at runtime, for example:
+
+```text
+<SHARED_RESULTS_ROOT>/<job_id>
+```
+
+The runner sets `TAO_API_RESULTS_DIR` to the parent results directory because
+container code appends the job id when writing status and artifacts.

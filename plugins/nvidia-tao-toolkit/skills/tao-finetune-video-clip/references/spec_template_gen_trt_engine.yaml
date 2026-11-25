@@ -1,0 +1,16 @@
+results_dir: /results/gen_trt_engine
+model:
+  type: internvideo2-clip-l14
+  image_size: 224
+  canonicalize_text: false
+gen_trt_engine:
+  onnx_file: /models/video_clip.onnx
+  trt_engine: /results/gen_trt_engine/video_clip.engine
+  batch_size: -1
+  tensorrt:
+    workspace_size: 8192
+    data_type: fp32
+    strongly_typed: false
+    min_batch_size: 1
+    opt_batch_size: 8
+    max_batch_size: 16

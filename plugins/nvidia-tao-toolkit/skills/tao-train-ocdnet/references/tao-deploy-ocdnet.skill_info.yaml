@@ -1,0 +1,109 @@
+name: ocdnet-deploy
+type: model
+network_arch: ocdnet
+container_image: tao_toolkit.deploy
+data_format: default
+actions:
+  gen_trt_engine:
+    command: ocdnet gen_trt_engine -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      gen_trt_engine.onnx_file:
+        type: file
+      gen_trt_engine.tensorrt.calibration.cal_image_dir:
+        type: folder
+    outputs:
+      results_dir:
+        type: folder
+      gen_trt_engine.trt_engine:
+        type: file
+    upload_excludes:
+    - inputs/
+  evaluate:
+    command: ocdnet evaluate -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      evaluate.trt_engine:
+        type: file
+      dataset.validate_dataset.data_path:
+        type: folder
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  inference:
+    command: ocdnet inference -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      inference.trt_engine:
+        type: file
+      inference.input_folder:
+        type: folder
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+data_sources:
+  gen_trt_engine:
+    gen_trt_engine.tensorrt.calibration.cal_image_dir:
+      source: calibration_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+      list: true
+  evaluate:
+    dataset.validate_dataset.data_path:
+      source: eval_dataset
+      path: test.tar.gz
+      runtime: extracted_folder
+      list: true
+  inference:
+    inference.input_folder:
+      source: inference_dataset
+      path: test/img.tar.gz
+      runtime: extracted_folder
+spec_params:
+  gen_trt_engine:
+    encryption_key: key
+    results_dir: output_dir
+    gen_trt_engine.results_dir: output_dir
+    gen_trt_engine.onnx_file: parent_model
+    gen_trt_engine.trt_engine: create_engine_file
+    gen_trt_engine.tensorrt.calibration.cal_cache_file: create_cal_cache
+  evaluate:
+    encryption_key: key
+    results_dir: output_dir
+    evaluate.trt_engine: parent_model
+  inference:
+    encryption_key: key
+    results_dir: output_dir
+    inference.trt_engine: parent_model
+spec_shorthand_keys:
+  trt_data_type: gen_trt_engine.tensorrt.data_type
+  trt_engine: gen_trt_engine.trt_engine
+  batch_size: dataset.validate_dataset.loader.batch_size
+  cal_batch_size: gen_trt_engine.tensorrt.calibration.cal_batch_size
+  cal_batches: gen_trt_engine.tensorrt.calibration.cal_batches
+  trt_min_batch_size: gen_trt_engine.tensorrt.min_batch_size
+  trt_opt_batch_size: gen_trt_engine.tensorrt.opt_batch_size
+  trt_max_batch_size: gen_trt_engine.tensorrt.max_batch_size
+  engine_width: gen_trt_engine.width
+  engine_height: gen_trt_engine.height
+  inference_width: inference.width
+  inference_height: inference.height
+description: OCDNet deploy workflow for gen_trt_engine, evaluate, inference using
+  TAO Deploy.
+spec_templates:
+  gen_trt_engine: spec_template_deploy_gen_trt_engine.yaml
+  evaluate: spec_template_deploy_evaluate.yaml
+  inference: spec_template_deploy_inference.yaml
+notes:
+- The starter-kit deploy flow builds OCDNet engines with INT8; provide calibration
+  images and a writable calibration cache path.
+- Evaluate and inference expect `evaluate.trt_engine` and `inference.trt_engine` overrides
+  even where the template also shows checkpoint-style fields.
+- Keep width, height, and image mode aligned across engine build, evaluate, and inference.

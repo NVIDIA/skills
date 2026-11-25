@@ -1,0 +1,33 @@
+results_dir: /results
+encryption_key: nvidia_tao
+
+model:
+  type: internvideo2-clip-l14
+  image_size: 224
+  num_frames: 8
+  canonicalize_text: false
+  freeze_vision_encoder: true
+  freeze_text_encoder: true
+  init_logit_scale: 4.605170185988092
+  init_logit_bias: 0.0
+  internvideo2clip_hf_id: OpenGVLab/InternVideo2_distillation_models
+  text_encoder: /model/mobileclip_blt.pt
+  vision_encoder: null
+  clip_head: null
+  pretrained_ckpt: null
+  use_flash_attn: false
+  use_fused_rmsnorm: false
+  use_fused_mlp: false
+
+export:
+  checkpoint: /results/train/video_clip_latest.pth
+  onnx_file: /results/export/internvideo2clip.onnx
+  encoder_type: combined
+  input_height: 224
+  input_width: 224
+  input_channel: 3
+  batch_size: -1
+  opset_version: 23
+  gpu_id: 0
+  on_cpu: false
+  verbose: false

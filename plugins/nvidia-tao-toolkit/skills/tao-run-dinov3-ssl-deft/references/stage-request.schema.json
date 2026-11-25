@@ -1,0 +1,74 @@
+{
+  "$comment": "Copy of tao-data-services:nvidia_tao_ds/mining/dinov3/workflow/schemas/stage-request.schema.yaml; source handoff enforces semantic parity.",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://developer.nvidia.com/tao/dinov3-ssl-deft/stage-request-1.0.schema.json",
+  "title": "DINOv3 SSL DEFT Stage Request",
+  "type": "object",
+  "required": ["client_job_id", "run_id", "round_index", "stage", "command", "workdir", "results_dir", "environment", "resources", "execution_contract"],
+  "properties": {
+    "client_job_id": {"type": "string", "pattern": "^d3deft-[0-9a-f]{20}$"},
+    "run_id": {"type": "string"},
+    "round_index": {"type": "integer", "minimum": 0},
+    "stage": {"type": "string"},
+    "command": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "workdir": {"type": "string"},
+    "results_dir": {"type": "string"},
+    "environment": {"type": "object", "additionalProperties": {"type": "string"}},
+    "resources": {
+      "type": "object",
+      "properties": {
+        "nodes": {"type": "integer", "minimum": 1},
+        "gpus": {"type": "integer", "minimum": 0},
+        "gpus_per_node": {"type": "integer", "minimum": 0},
+        "cpus": {"type": "integer", "minimum": 1},
+        "memory": {"type": ["string", "integer"]},
+        "time_limit": {"type": "string"},
+        "local_scratch": {
+          "type": "object",
+          "required": ["path_environment"],
+          "properties": {"path_environment": {"type": "string"}},
+          "additionalProperties": false
+        }
+      }
+    },
+    "execution_contract": {
+      "type": "object",
+      "required": ["membership", "attempt_scope", "retry_scope", "attempt_id_scope", "launch_id_environment", "adapter_managed_resources", "required_capabilities"],
+      "properties": {
+        "container_image": {"type": "string", "minLength": 1},
+        "membership": {"const": "static"},
+        "attempt_scope": {"enum": ["process", "gang"]},
+        "retry_scope": {"enum": ["process", "cancel_all_then_restart"]},
+        "attempt_id_scope": {"const": "backend_attempt"},
+        "launch_id_environment": {"type": ["string", "null"]},
+        "node_environment": {
+          "type": "object",
+          "required": ["contract", "world_size_semantics", "required_for_multinode", "forbidden_at_entrypoint"],
+          "properties": {
+            "contract": {"const": "lightning_node_entrypoint_v1"},
+            "world_size_semantics": {"const": "nodes"},
+            "required_for_multinode": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {"type": "string", "minLength": 1}
+            },
+            "forbidden_at_entrypoint": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {"type": "string", "minLength": 1}
+            }
+          },
+          "additionalProperties": false
+        },
+        "adapter_managed_resources": {"type": ["object", "null"]},
+        "required_capabilities": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
