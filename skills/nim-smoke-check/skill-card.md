@@ -9,14 +9,14 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 CC-BY-4.0 AND Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to smoke check a running NVIDIA NIM LLM or VLM (Docker, Kubernetes, a URL or the hosted API) after a deploy or when a feature fails, reporting which documented features pass, fail or do not apply, without changing the deployment. <br>
+Developers and engineers use this skill to smoke check a running NVIDIA NIM LLM or VLM (Docker, Kubernetes, or hosted URL) after a deploy or when a feature fails, reporting which documented features pass, fail, or are not applicable without changing the deployment. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
 **Requires API Key or External Credential:** [Optional] <br>
-**Credential Type(s):** [API key, Other [Kubernetes context credentials]] <br>
+**Credential Type(s):** [API key, Other [Kubernetes kube context access]] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -25,17 +25,17 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [references/checks.md](references/checks.md) <br>
-- [references/model-features.md](references/model-features.md) <br>
-- [references/access.md](references/access.md) <br>
-- [references/security.md](references/security.md) <br>
+- [Access: reaching a running NIM, read-only](references/access.md) <br>
+- [Checks: what each sends, when it passes, why it fails](references/checks.md) <br>
+- [Model features: what the table holds and how it decides](references/model-features.md) <br>
+- [Security: requests, programs, environment and files](references/security.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Analysis, Shell commands, Files] <br>
-**Output Format:** [JSON from the smoke-check script, summarized as a Markdown results table] <br>
+**Output Type(s):** [Shell commands, Analysis, Files] <br>
+**Output Format:** [Markdown report table of check results; the bundled script prints one JSON object and writes per-check evidence files] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [Each run writes its own evidence folder and report with the request and response of every check] <br>
+**Other Properties Related to Output:** [Concurrency capped at 4 by default (at most 8; at most 4 on the hosted API); no deployment changes] <br>
 
 ## Evaluation Agents Used: <br>
 - Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`) <br>
@@ -44,7 +44,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-31 evaluation tasks (31 positive), 1 attempt per task, run in the `k8s-sandbox` environment with each task attempt in its own isolated sandbox pod; each task was also attempted without the skill as a baseline. Evaluation date 2026-11-25, evaluator version `1.6.10`. <br>
+31 evaluation tasks (31 positive), 1 attempt per task, each in its own isolated sandbox pod (`k8s-sandbox` environment); evaluator version `1.6.10`, evaluation date 2026-11-25. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -55,13 +55,13 @@ Reported benchmark dimensions: <br>
 - Efficiency: Did it avoid wasted tool calls and token usage? Scored from `skill_efficiency` (50%) + `token_efficiency` (50%). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Security: unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Skill Execution: whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
-- `skill_efficiency`: Tool Productivity: tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
-- `accuracy`: Accuracy: final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Goal Accuracy: whether the user's goal was achieved. <br>
-- `behavior_check`: Behavior Check: whether the expected workflow behavior was followed. <br>
-- `token_efficiency`: Token Efficiency: actual uncached prompt plus completion usage (50% of Efficiency). <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `token_efficiency`: Actual uncached prompt plus completion usage (50% of Efficiency). <br>
 
 
 
@@ -76,14 +76,16 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 80.3% — baseline ran, but no comparable score was available; uplift unavailable | 81.9% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 66.1% → 87.1% (+21.0 points) | 58.1% → 95.2% (+37.1 points) |
-| Correctness | 45.8% → 86.5% (+40.7 points) | 45.8% → 81.3% (+35.5 points) |
-| Discoverability | 78.1% — baseline ran, but no comparable score was available; uplift unavailable | 92.4% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 32.8% → 59.8% (+27.0 points) | 37.3% → 52.2% (+14.9 points) |
-| Efficiency | 90.1% — baseline ran, but no comparable score was available; uplift unavailable | 88.1% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 79.9% — baseline ran, but no comparable score was available; uplift unavailable | 80.2% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 77.4% → 87.1% (+9.7 points) | 64.5% → 95.2% (+30.7 points) |
+| Correctness | 45.2% → 88.4% (+43.2 points) | 47.1% → 76.8% (+29.7 points) |
+| Discoverability | 75.6% — baseline ran, but no comparable score was available; uplift unavailable | 92.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 32.3% → 58.5% (+26.2 points) | 34.4% → 48.7% (+14.3 points) |
+| Efficiency | 89.7% — baseline ran, but no comparable score was available; uplift unavailable | 88.3% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
+
+Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92.0%, 45.0 percentage points above its 47.0% no-skill baseline.
 
 A partial dimension was calculated from only the available configured signals; review the detailed report before relying on it.
 
@@ -94,9 +96,9 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 97.9% → 95.7% (-2.2 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 98.1% → 95.7% (-2.4 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 89.9% → 89.2% (-0.7 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 89.4% → 89.0% (-0.4 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ### Tier Status
 
@@ -105,7 +107,6 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 79 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 10 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 31 task(s) |
-
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>
