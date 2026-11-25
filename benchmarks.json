@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 491,
-  "result_row_count": 4604,
+  "skill_count": 495,
+  "result_row_count": 4644,
   "skills_without_results": [
     "daqiri-onboarding",
     "deepstream-generate-pipeline",
@@ -6681,6 +6681,90 @@
       "component": "Newton",
       "has_results": true,
       "average_uplift_pct": 15.5
+    },
+    {
+      "skill": "nim-benchmark",
+      "evaluation_date": "2026-11-25",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.10",
+      "dataset_digest": "sha256:fba927bb52e9e44c2bacb40398ca881bc41ac987d716803379a3b338ced8953f",
+      "validation_status": "passed",
+      "tasks": 24,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "nim-benchmark",
+      "component": "NIM",
+      "has_results": true,
+      "average_uplift_pct": 31.75
+    },
+    {
+      "skill": "nim-deploy",
+      "evaluation_date": "2026-11-25",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.10",
+      "dataset_digest": "sha256:6f98da5bb5845c77dd8b27b37977ea8900c7b43a095c6715bd42a228595a6966",
+      "validation_status": "passed",
+      "tasks": 29,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "nim-deploy",
+      "component": "NIM",
+      "has_results": true,
+      "average_uplift_pct": 27.28
+    },
+    {
+      "skill": "nim-smoke-check",
+      "evaluation_date": "2026-11-25",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.10",
+      "dataset_digest": "sha256:929bf492eed2263160678ddf5805027bd4c5be92f113e78bd9f2c05c86c3ff2f",
+      "validation_status": "passed",
+      "tasks": 31,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "nim-smoke-check",
+      "component": "NIM",
+      "has_results": true,
+      "average_uplift_pct": 25.63
+    },
+    {
+      "skill": "nim-tune",
+      "evaluation_date": "2026-11-25",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.10",
+      "dataset_digest": "sha256:92f6e9b67d82e16666c97ae76c5225505c904bb8b9f133e4f6a8d4a7c73bb6b6",
+      "validation_status": "passed",
+      "tasks": 24,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "nim-tune",
+      "component": "NIM",
+      "has_results": true,
+      "average_uplift_pct": 26.88
     },
     {
       "skill": "nixl-docs",
@@ -36964,6 +37048,366 @@
       "num": null,
       "agent": "codex",
       "score_pct": 68.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nim-benchmark",
+      "component": "NIM",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.8,
+      "uplift_pct": 6.2
+    },
+    {
+      "catalog_dir": "nim-benchmark",
+      "component": "NIM",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.8,
+      "uplift_pct": 14.5
+    },
+    {
+      "catalog_dir": "nim-benchmark",
+      "component": "NIM",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 86.7,
+      "uplift_pct": 45.9
+    },
+    {
+      "catalog_dir": "nim-benchmark",
+      "component": "NIM",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 85.0,
+      "uplift_pct": 58.3
+    },
+    {
+      "catalog_dir": "nim-benchmark",
+      "component": "NIM",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 76.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nim-benchmark",
+      "component": "NIM",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 87.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nim-benchmark",
+      "component": "NIM",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 62.1,
+      "uplift_pct": 32.7
+    },
+    {
+      "catalog_dir": "nim-benchmark",
+      "component": "NIM",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 58.7,
+      "uplift_pct": 32.9
+    },
+    {
+      "catalog_dir": "nim-benchmark",
+      "component": "NIM",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 84.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nim-benchmark",
+      "component": "NIM",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 93.1,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nim-deploy",
+      "component": "NIM",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 89.7,
+      "uplift_pct": 19.0
+    },
+    {
+      "catalog_dir": "nim-deploy",
+      "component": "NIM",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 86.2,
+      "uplift_pct": 27.6
+    },
+    {
+      "catalog_dir": "nim-deploy",
+      "component": "NIM",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 87.6,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "nim-deploy",
+      "component": "NIM",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 83.5,
+      "uplift_pct": 38.0
+    },
+    {
+      "catalog_dir": "nim-deploy",
+      "component": "NIM",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 85.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nim-deploy",
+      "component": "NIM",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 84.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nim-deploy",
+      "component": "NIM",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 51.4,
+      "uplift_pct": 20.4
+    },
+    {
+      "catalog_dir": "nim-deploy",
+      "component": "NIM",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 56.0,
+      "uplift_pct": 18.7
+    },
+    {
+      "catalog_dir": "nim-deploy",
+      "component": "NIM",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 91.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nim-deploy",
+      "component": "NIM",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 89.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nim-smoke-check",
+      "component": "NIM",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 87.1,
+      "uplift_pct": 9.7
+    },
+    {
+      "catalog_dir": "nim-smoke-check",
+      "component": "NIM",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.2,
+      "uplift_pct": 30.7
+    },
+    {
+      "catalog_dir": "nim-smoke-check",
+      "component": "NIM",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 88.4,
+      "uplift_pct": 43.2
+    },
+    {
+      "catalog_dir": "nim-smoke-check",
+      "component": "NIM",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 76.8,
+      "uplift_pct": 29.7
+    },
+    {
+      "catalog_dir": "nim-smoke-check",
+      "component": "NIM",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 75.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nim-smoke-check",
+      "component": "NIM",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 92.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nim-smoke-check",
+      "component": "NIM",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 58.5,
+      "uplift_pct": 26.2
+    },
+    {
+      "catalog_dir": "nim-smoke-check",
+      "component": "NIM",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 48.7,
+      "uplift_pct": 14.3
+    },
+    {
+      "catalog_dir": "nim-smoke-check",
+      "component": "NIM",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 89.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nim-smoke-check",
+      "component": "NIM",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 88.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nim-tune",
+      "component": "NIM",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 91.7,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nim-tune",
+      "component": "NIM",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.8,
+      "uplift_pct": 12.5
+    },
+    {
+      "catalog_dir": "nim-tune",
+      "component": "NIM",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 89.2,
+      "uplift_pct": 46.7
+    },
+    {
+      "catalog_dir": "nim-tune",
+      "component": "NIM",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 80.8,
+      "uplift_pct": 60.8
+    },
+    {
+      "catalog_dir": "nim-tune",
+      "component": "NIM",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 81.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nim-tune",
+      "component": "NIM",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nim-tune",
+      "component": "NIM",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 53.3,
+      "uplift_pct": 16.8
+    },
+    {
+      "catalog_dir": "nim-tune",
+      "component": "NIM",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 47.2,
+      "uplift_pct": 24.5
+    },
+    {
+      "catalog_dir": "nim-tune",
+      "component": "NIM",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 92.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nim-tune",
+      "component": "NIM",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 91.2,
       "uplift_pct": null
     },
     {

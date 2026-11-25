@@ -2235,6 +2235,34 @@
       "last_modified": "2026-11-12"
     },
     {
+      "name": "nim-benchmark",
+      "path": "skills/nim-benchmark",
+      "content_digest": "sha256:a73db3d2ca6e8055f453181c0ca704e7de455f9ded01958f1e9a3fa3a498c9b2",
+      "last_commit": "da686e074116f08c6d38f4fbd81a4fb0ad498b0c",
+      "last_modified": "2026-11-25"
+    },
+    {
+      "name": "nim-deploy",
+      "path": "skills/nim-deploy",
+      "content_digest": "sha256:1fbd6812dc7dae9de0f0cc2f6a71ad65d3331833fbb33749d5f26b790be3fa3e",
+      "last_commit": "da686e074116f08c6d38f4fbd81a4fb0ad498b0c",
+      "last_modified": "2026-11-25"
+    },
+    {
+      "name": "nim-smoke-check",
+      "path": "skills/nim-smoke-check",
+      "content_digest": "sha256:ee7b2dbecb08cf20ffaffbe98c44625eb5cb1b1b352d61703ab9e97e917317c5",
+      "last_commit": "da686e074116f08c6d38f4fbd81a4fb0ad498b0c",
+      "last_modified": "2026-11-25"
+    },
+    {
+      "name": "nim-tune",
+      "path": "skills/nim-tune",
+      "content_digest": "sha256:d3b3672b46796e6ed07e61d533172f7fceee16a96d7e672088710c1f5583722d",
+      "last_commit": "da686e074116f08c6d38f4fbd81a4fb0ad498b0c",
+      "last_modified": "2026-11-25"
+    },
+    {
       "name": "nixl-docs",
       "path": "skills/nixl-docs",
       "content_digest": "sha256:dbf7b8cb83a75647c199829b630ff5050f47ec9e20f229df16c941fc3c8e99b5",
