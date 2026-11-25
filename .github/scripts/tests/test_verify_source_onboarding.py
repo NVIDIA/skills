@@ -298,6 +298,40 @@ links:
 
         self.assertEqual(c["ref"], "develop")
 
+    def test_plugin_paths_are_not_read_as_skills(self):
+        """A plugins: entry is checked by sync-plugins.yml, not as a skill."""
+        c = vso.parse_component(
+            "repo: NVIDIA-TAO/tao-skill-bank\nskills:\n"
+            "  - path: skills/core/tao-setup/\n"
+            "plugins:\n"
+            "  - path: plugins/nvidia-tao-toolkit/\n"
+            "    catalog_dir: nvidia-tao-toolkit\n"
+        )
+
+        self.assertEqual(c["paths"], ["skills/core/tao-setup"])
+
+    def test_unindented_plugin_list_is_skipped(self):
+        """YAML lets list items sit at the key's indent; still a plugin."""
+        c = vso.parse_component(
+            "repo: NVIDIA/demo\nplugins:\n- path: plugins/nvidia-demo/\n"
+        )
+
+        self.assertEqual(c["paths"], [])
+
+    def test_skills_after_plugins_are_still_read(self):
+        c = vso.parse_component(
+            "repo: NVIDIA/demo\nplugins:\n  - path: plugins/nvidia-demo/\n"
+            "skills:\n  - path: skills/demo-skill/\n"
+        )
+
+        self.assertEqual(c["paths"], ["skills/demo-skill"])
+
+    def test_adding_only_a_plugin_adds_no_skill_paths(self):
+        base = "repo: NVIDIA/demo\nskills:\n  - path: skills/demo-skill/\n"
+        head = base + "plugins:\n  - path: plugins/nvidia-demo/\n"
+
+        self.assertEqual(vso.added_paths(base, head), set())
+
 
 class BlockingScopeTests(unittest.TestCase):
     """Only paths the PR adds may fail the build."""
