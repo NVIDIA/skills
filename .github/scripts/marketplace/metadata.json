@@ -5951,6 +5951,30 @@
       }
     },
     {
+      "name": "nvidia-nvflare",
+      "path": "plugins/nvidia-nvflare",
+      "source": "components.d/nvflare.yml",
+      "description": "NVIDIA FLARE skills for federated learning conversion, job diagnosis, federated statistics, and Auto-FL optimization and reporting.",
+      "skills": [
+        "skills/nvflare-autofl",
+        "skills/nvflare-autofl-report",
+        "skills/nvflare-convert-huggingface",
+        "skills/nvflare-convert-lightning",
+        "skills/nvflare-convert-pytorch",
+        "skills/nvflare-diagnose-job",
+        "skills/nvflare-fed-stats",
+        "skills/nvflare-orient",
+        "skills/nvflare-shared"
+      ],
+      "metadata": {
+        "classification.category.primary": "ai_and_machine_learning",
+        "product.primary": [
+          "NVIDIA FLARE"
+        ],
+        "audience": "ai_engineer,developer,ml_engineer"
+      }
+    },
+    {
       "name": "nvidia-skills",
       "path": "plugins/nvidia-skills",
       "source": "plugins.d/nvidia-skills.yml",
