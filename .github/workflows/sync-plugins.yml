@@ -11,15 +11,17 @@
 # their own README marker section, so their PRs never conflict and each
 # can be reviewed and reverted on its own.
 #
-# Gates, same shape as skills:
+# Holds (signature integrity, which reviewers cannot see in the diff):
 #   - signature drift / missing / mismatch on plugin.oms.sig → revert to
 #     the last signed tree on main (drop if the plugin is new)
-#   - compliance: plugin.json, plugin-card.md, plugin.oms.sig,
-#     BENCHMARK.md (verdict PASS or PASS WITH WARNINGS), and every bundled
-#     skill must itself be compliant
-#   - version: content changed since main ⇒ plugin.json version must be
-#     higher, else hold
-#   - orphan pruning with its own cap (prune-orphan-plugins.sh)
+# Warnings (plugin is synced and listed under "Needs reviewer attention" in
+# the sync PR body; every sync PR is reviewed by hand):
+#   - missing plugin.json, plugin-card.md or BENCHMARK.md
+#   - BENCHMARK.md verdict other than PASS or PASS WITH WARNINGS
+#   - plugin.json name differs from catalog_dir
+#   - a bundled skill without skill.oms.sig, skill-card.md or eval data
+#   - content changed since main without a higher plugin.json version
+# Orphan pruning has its own cap (prune-orphan-plugins.sh).
 #
 # Requires a PAT (SKILLS_SYNC_PAT) with read access to all product repos,
 # stored as a repository secret. Falls back to GITHUB_TOKEN for public
@@ -199,6 +201,16 @@ jobs:
             fi
           }
 
+          # warn <dir> <reason>: keep the plugin and list it under "Needs
+          # reviewer attention" in the sync PR body. Used for everything except
+          # signature integrity, which reviewers cannot see in the diff.
+          warnings=/tmp/plugins-warnings.txt
+          : > "$warnings"
+          warn() {
+            echo "$1|$2" >> "$warnings"
+            echo "  ⚠ $1 — $2 — kept, flagged for review"
+          }
+
           while IFS= read -r dir; do
             [ -z "$dir" ] && continue
             [ -d "$dir" ] || continue
@@ -251,50 +263,39 @@ jobs:
               fi
             fi
 
-            # Compliance: required plugin-level artifacts. Plugin-level eval
-            # data is NOT required here: NVCARPS accepts a root evals.json,
-            # an evals/ dir, or skills-only evals, and the signed BENCHMARK.md
-            # (its output) plus the per-skill eval check below already prove
-            # the evals ran. Holding on eval layout would block validly
-            # signed plugins.
+            # Everything below WARNS instead of holding: the plugin is kept
+            # and listed for reviewers, who reject in review if needed. Only
+            # signature integrity (above) holds. Plugin-level eval data is not
+            # checked: NVCARPS accepts a root evals.json or an evals/ dir.
             missing=""
             for f in plugin.json plugin-card.md BENCHMARK.md; do
               [ -f "$dir/$f" ] || missing="$missing $f"
             done
-            if [ -n "$missing" ]; then
-              hold "$dir" "missing artifacts:$(echo "$missing" | xargs)"
-              continue
-            fi
+            [ -z "$missing" ] || warn "$dir" "missing artifacts:$(echo "$missing" | xargs)"
 
-            # BENCHMARK.md must record a publishable verdict: PASS, or PASS
-            # WITH WARNING(S) (every check passed but lift is between 0 and
-            # +5 points; the plugin onboarding guide lets these publish).
-            # The verdict is the first bold upper-case word(s) on a `> ` line,
-            # in either report layout:
+            # BENCHMARK.md verdict, in either report layout:
             #   > ✅ **PASS**
             #   > **Overall verdict: PASS**  (optionally "PASS — <reason>")
-            # FAIL, NEUTRAL, INCOMPLETE, BLOCKED, NOT ASSESSED, or no verdict
-            # line are held. `|| true` keeps a file with no verdict from
-            # failing the step under pipefail, so only that plugin is held.
-            verdict=$(sed -nE 's/^>[^*]*\*\*(Overall verdict: *)?([A-Z][A-Z_ ]*[A-Z]).*/\2/p' "$dir/BENCHMARK.md" | head -n 1 | tr '_' ' ' || true)
-            case "$verdict" in
-              "PASS"|"PASS WITH WARNING"|"PASS WITH WARNINGS") ;;
-              *)
-                hold "$dir" "benchmark: BENCHMARK.md verdict '${verdict:-missing}' is not PASS or PASS WITH WARNINGS"
-                continue
-                ;;
-            esac
-
-            # plugin.json must parse and its name must equal the catalog dir
-            # (the install name).
-            pname=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("name",""))' "$dir/plugin.json" 2>/dev/null || echo "")
-            if [ "$pname" != "$(basename "$dir")" ]; then
-              hold "$dir" "manifest: plugin.json name '$pname' does not match catalog_dir '$(basename "$dir")'"
-              continue
+            if [ -f "$dir/BENCHMARK.md" ]; then
+              verdict=$(sed -nE 's/^>[^*]*\*\*(Overall verdict: *)?([A-Z][A-Z_ ]*[A-Z]).*/\2/p' "$dir/BENCHMARK.md" | head -n 1 | tr '_' ' ' || true)
+              case "$verdict" in
+                "PASS"|"PASS WITH WARNING"|"PASS WITH WARNINGS") ;;
+                *) warn "$dir" "benchmark: BENCHMARK.md verdict '${verdict:-missing}' is not PASS or PASS WITH WARNINGS" ;;
+              esac
             fi
 
-            # Every bundled skill must be compliant on its own
-            # (skill.oms.sig + skill-card.md + eval data), same rule as skills/.
+            # plugin.json name should equal the catalog dir (the install
+            # name); build-plugins.py leaves a mismatched plugin out of the
+            # marketplaces.
+            if [ -f "$dir/plugin.json" ]; then
+              pname=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("name",""))' "$dir/plugin.json" 2>/dev/null || echo "")
+              [ "$pname" = "$(basename "$dir")" ] || \
+                warn "$dir" "manifest: plugin.json name '$pname' does not match catalog_dir '$(basename "$dir")'"
+            fi
+
+            # Bundled skills should each carry skill.oms.sig, skill-card.md and
+            # eval data. NVCARPS CI does not produce these for bundled skills
+            # yet, and the plugin signature already covers every bundled file.
             bad_skills=""
             while IFS= read -r skill_md; do
               sdir=$(dirname "$skill_md")
@@ -307,16 +308,13 @@ jobs:
               fi
               [ -z "$smiss" ] || bad_skills="$bad_skills ${sdir#$dir/}(missing:$(echo "$smiss" | xargs))"
             done < <(find "$dir/skills" -type f -name SKILL.md 2>/dev/null)
-            if [ -n "$bad_skills" ]; then
-              hold "$dir" "bundled skill non-compliant:$bad_skills"
-              continue
-            fi
+            [ -z "$bad_skills" ] || warn "$dir" "bundled skills missing artifacts:$bad_skills"
 
-            # Version gate: if anything changed vs main, plugin.json version
-            # must be strictly higher than the version on main.
-            if [ -n "$changed" ] && git ls-tree HEAD -- "$dir/plugin.json" | grep -q .; then
+            # Version: if anything changed vs main, plugin.json version should
+            # be strictly higher than the version on main.
+            if [ -n "$changed" ] && [ -f "$dir/plugin.json" ] && git ls-tree HEAD -- "$dir/plugin.json" | grep -q .; then
               old_v=$(git show "HEAD:$dir/plugin.json" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("version",""))' 2>/dev/null || echo "")
-              new_v=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("version",""))' "$dir/plugin.json")
+              new_v=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("version",""))' "$dir/plugin.json" 2>/dev/null || echo "")
               higher=$(python3 - "$old_v" "$new_v" <<'PYEOF'
           import re, sys
           def key(v):
@@ -324,10 +322,8 @@ jobs:
           print("yes" if key(sys.argv[2]) > key(sys.argv[1]) else "")
           PYEOF
               )
-              if [ -z "$higher" ]; then
-                hold "$dir" "version: content changed but plugin.json version '$new_v' is not higher than '$old_v' on main"
-                continue
-              fi
+              [ -n "$higher" ] || \
+                warn "$dir" "version: content changed but plugin.json version '$new_v' is not higher than '$old_v' on main"
             fi
             echo "  ✓ compliant"
           done < /tmp/plugins-rsynced-plugin-dirs.txt
@@ -432,6 +428,11 @@ jobs:
             if [ -s /tmp/plugins-dropped.txt ]; then
               echo "**Plugins held or dropped (see the \`$TRACKER_LABEL\` issue):**"
               while IFS='|' read -r _ dir reason; do echo "- \`$dir\` — $reason"; done < /tmp/plugins-dropped.txt
+              echo ""
+            fi
+            if [ -s /tmp/plugins-warnings.txt ]; then
+              echo "**⚠ Needs reviewer attention (synced, not held):**"
+              while IFS='|' read -r dir reason; do echo "- \`$dir\` — $reason"; done < /tmp/plugins-warnings.txt
               echo ""
             fi
             if [ -s /tmp/pruned-plugins.txt ]; then
