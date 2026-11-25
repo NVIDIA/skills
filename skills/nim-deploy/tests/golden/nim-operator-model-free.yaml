@@ -1,0 +1,68 @@
+apiVersion: apps.nvidia.com/v1alpha1
+kind: NIMService
+metadata:
+  name: llama-31-8b
+  namespace: nim-service
+  labels:
+    app.kubernetes.io/managed-by: nim-deploy
+  annotations:
+    nim-deploy/run-id: golden
+spec:
+  image:
+    repository: nvcr.io/nim/nvidia/llm-nim
+    tag: "2.0.0"
+    pullPolicy: IfNotPresent
+    pullSecrets:
+    - ngc-secret
+  authSecret: ngc-api-secret
+  storage:
+    pvc:
+      name: llama-31-8b-model-store
+      create: true
+      storageClass: ""
+      size: "50Gi"
+      volumeAccessMode: ReadWriteOnce
+  replicas: 1
+  resources:
+    limits:
+      nvidia.com/gpu: 1
+  expose:
+    service:
+      type: ClusterIP
+      port: 8000
+  env:
+  - name: NIM_MODEL_PATH
+    value: "hf://Qwen/Qwen3-0.6B"
+  startupProbe:
+    enabled: true
+    probe:
+      httpGet:
+        path: /v1/health/ready
+        port: api
+      initialDelaySeconds: 30
+      timeoutSeconds: 1
+      periodSeconds: 10
+      successThreshold: 1
+      failureThreshold: 120
+  readinessProbe:
+    enabled: true
+    probe:
+      httpGet:
+        path: /v1/health/ready
+        port: api
+      initialDelaySeconds: 15
+      timeoutSeconds: 1
+      periodSeconds: 10
+      successThreshold: 1
+      failureThreshold: 3
+  livenessProbe:
+    enabled: true
+    probe:
+      httpGet:
+        path: /v1/health/live
+        port: api
+      initialDelaySeconds: 15
+      timeoutSeconds: 1
+      periodSeconds: 10
+      successThreshold: 1
+      failureThreshold: 3

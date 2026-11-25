@@ -1,0 +1,56 @@
+[
+  {
+    "id": "cuda-oom",
+    "pattern": "CUDA out of memory|OutOfMemoryError|CUDA error: out of memory|No available memory for the cache blocks|not enough (GPU|KV cache) memory|cudaErrorMemoryAllocation",
+    "meaning": "The model, KV cache or activations do not fit in GPU memory.",
+    "fix": "Lower the context length (NIM_MAX_MODEL_LEN or --max-model-len), lower GPU memory utilization, pick a smaller or quantized profile, or use more GPUs (tensor parallel). Then nimdeploy.py set RUN ... and re-render."
+  },
+  {
+    "id": "ngc-401",
+    "pattern": "401 Unauthorized|unauthorized: (authentication required|401)|Invalid (NGC_API_KEY|API key)|NGC_API_KEY.*(invalid|not set|missing)|status(_code)?[ =:]*401.*(ngc|nvcr)|(ngc|nvcr).*status(_code)?[ =:]*401",
+    "meaning": "NGC rejected the credentials for the image or the model download.",
+    "fix": "Ask the user for a valid NGC_API_KEY in the environment (never in a file), run: echo \"$NGC_API_KEY\" | docker login nvcr.io -u '$oauthtoken' --password-stdin; on Kubernetes recreate the image pull secret and the NGC API key secret."
+  },
+  {
+    "id": "no-gpu",
+    "pattern": "could not select device driver .* with capabilities: \\[\\[gpu\\]\\]|No CUDA GPUs are available|Found no NVIDIA driver|NVIDIA driver .*not (found|loaded)|nvidia-container-cli: (initialization error|requirement error)|unknown or invalid runtime name: nvidia|no GPU (devices )?(found|detected)|NVML.*(Driver Not Loaded|not found)",
+    "meaning": "The container cannot see a GPU: the NVIDIA driver or NVIDIA Container Toolkit is missing or not configured.",
+    "fix": "Ask the user to install the NVIDIA Container Toolkit and run: sudo nvidia-ctk runtime configure --runtime=docker && sudo systemctl restart docker. Check with: docker run --rm --gpus all ubuntu nvidia-smi."
+  },
+  {
+    "id": "profile-not-found",
+    "pattern": "[Nn]o compatible profile|Could not find a profile|[Pp]rofile .* (not found|is not compatible|not supported)|No matching profile|NIM_MODEL_PROFILE.*(invalid|not (found|valid|compatible))",
+    "meaning": "No model profile matches the GPUs, or NIM_MODEL_PROFILE names a profile this image does not have.",
+    "fix": "Stop and ask the user; never unset the profile so that NIM picks one. List profiles (read-only; the guard allows exactly this form, with no -d, -p or extra mounts) with: docker run --rm --gpus all -e NGC_API_KEY IMAGE list-model-profiles. A profile chosen in nim-select (approval summary handoff.profile) that is missing means the image or GPUs differ from what was selected: run nim-select again. Otherwise, with the user, set a profile marked compatible or change the GPU count; then re-render."
+  },
+  {
+    "id": "port-in-use",
+    "pattern": "[Aa]ddress already in use|port is already allocated|Bind for \\S+ failed",
+    "meaning": "The host port is taken by another process or container.",
+    "fix": "Ask the user for a free port, run nimdeploy.py set RUN port=NNNN, and re-render. Find the owner with: docker ps --filter publish=PORT or ss -ltnp."
+  },
+  {
+    "id": "hf-token",
+    "pattern": "GatedRepoError|Cannot access gated repo|Access to model .* is restricted|HF_TOKEN.*(not set|missing|invalid)|Invalid user token|401 Client Error.*(huggingface|hf\\.co)|(huggingface|hf\\.co).*401",
+    "meaning": "The Hugging Face model is gated or the HF token is missing or invalid.",
+    "fix": "Ask the user for an HF token with access to the model; pass it as HF_TOKEN from the environment or a Kubernetes secret (hf_token_secret input), never in a rendered file."
+  },
+  {
+    "id": "image-pull-backoff",
+    "pattern": "ImagePullBackOff|ErrImagePull|Failed to pull image|pull access denied|manifest unknown|manifest for \\S+ not found",
+    "meaning": "Kubernetes or Docker cannot pull the image (wrong tag, or missing/invalid pull secret).",
+    "fix": "Check the image tag exists (docker manifest inspect IMAGE), and that the namespace has an nvcr.io pull secret (ngc_secret input) referenced by the manifest; recreate it with the user's NGC key if needed."
+  },
+  {
+    "id": "insufficient-gpu",
+    "pattern": "Insufficient nvidia\\.com/gpu|\\d+/\\d+ nodes are available:.*nvidia\\.com/gpu|[Ii]nsufficient (GPU|gpu)",
+    "meaning": "No node has enough free GPUs for the pod.",
+    "fix": "Check free GPUs with: kubectl describe nodes --context CTX | grep -A5 Allocated. Lower gpus/tp or replicas with nimdeploy.py set RUN ..., or ask the user to free GPUs."
+  },
+  {
+    "id": "shm-too-small",
+    "pattern": "Bus error|/dev/shm|[Ss]hared memory.*(too small|exhausted|No space)|shm size|No space left on device.*shm|unable to (mmap|allocate) shared memory",
+    "meaning": "Shared memory (/dev/shm) is too small for NCCL or the data loader.",
+    "fix": "Docker: add --shm-size=16g. Kubernetes: mount an emptyDir with medium: Memory at /dev/shm. Then re-render."
+  }
+]

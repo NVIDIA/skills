@@ -1,0 +1,81 @@
+# Reviewed false positives for the nim-smoke-check skill in nim-skills PR #9 at
+# commit dd5b63592bb1d6a4aec482bb2bedcdc9c31573bb, using SkillSpector 2.13.5.
+# Each rule scopes one rule ID, exact skill-relative file, and matched text.
+# Glob metacharacters in matched text are escaped for literal matching.
+# These rules do not bind file hashes: re-review when the named files change.
+# Other findings and incomplete evaluations remain active.
+version: 2
+rules:
+- id: PE4
+  path: tests/nsc_testkit.py
+  message: /var/run/docker.sock
+  reason: >-
+    Reviewed 2026-11-24: docker_context() builds the JSON that the test kit's fake docker prints for
+    `docker context inspect`. Its default host, unix:///var/run/docker.sock, stands for a daemon on
+    this machine; test_nsc_access passes an ssh:// host to check that a remote daemon is refused.
+    The fake docker answers from fixtures and never contacts a daemon, and the kit never opens,
+    mounts or changes the permissions of the socket.
+- id: PE4
+  path: tests/test_nsc_access.py
+  message: /var/run/docker.sock
+  reason: >-
+    Reviewed 2026-11-24: Test inputs for the Docker access checks.
+    test_from_docker_refuses_a_remote_daemon sets DOCKER_HOST, with pytest's monkeypatch (undone
+    after the test), to the local unix:// socket to check that a remote active Docker context is
+    still refused after only `docker context inspect`.
+    test_from_docker_a_missing_docker_socket_is_a_daemon_error_not_a_missing_container gives a fake
+    `docker container inspect` the Docker CLI's missing-socket error as stderr and asserts
+    docker_failed (exit 4), not a missing container. The fake fixture puts only fake docker and
+    kubectl on PATH, so no daemon is contacted and the socket is never opened, mounted or changed.
+- id: E2
+  path: tests/nsc_testkit.py
+  message: os.environ.items()
+  reason: >-
+    Reviewed 2026-11-24: child_env in the test kit builds the environment for the Python child
+    processes started by run_cli, by start_server and a nested pytest run in test_nsc_testkit, by
+    the Ctrl-C test in test_nimsmoke and by the SIGTERM test in test_nsc_access (the skill's
+    scripts, the kit's fake NIM server, small probe scripts and pytest). It copies os.environ
+    without any variable whose name contains KEY, TOKEN, SECRET, PASSWORD, PASSWD or CREDENTIAL
+    (any case), then adds the variables the calling test passes. Each caller passes the result
+    straight to the env argument of subprocess.run or subprocess.Popen; nothing prints, logs, saves
+    or sends it. Without it those children would inherit the whole environment, credential
+    variables included. test_run_cli_runs_isolated_with_no_stdin_and_no_real_keys checks that a
+    credential variable set in the parent does not reach a run_cli child.
+- id: PE3
+  path: references/access.md
+  message: kubeconfig
+  reason: >-
+    Reviewed 2026-11-24: The keys table names KUBECONFIG only to say that kubectl reads it and the
+    skill never sets or exports it. The command and error tables say that when --context is not in
+    the kubeconfig, the script runs kubectl config get-contexts -o name, which prints context names
+    only, and stops with context_not_found so the agent asks the user. The scripts never open the
+    kubeconfig, and run_tool refuses --kubeconfig and kubectl config view.
+- id: PE3
+  path: references/security.md
+  message: KUBECONFIG
+  reason: >-
+    Reviewed 2026-11-24: The security reference discloses that kubectl, which inherits the script's
+    environment, reads KUBECONFIG for the cluster and credentials of --context, and that a
+    credential plugin set in that kubeconfig runs. The Trust section tells the user to run the
+    scripts only from an environment they trust. The scripts never read or set KUBECONFIG and never
+    open the file it names; when kubectl fails, the one line of its output that the script's error
+    message quotes (masked and cut to 300 characters) can name that file.
+- id: PE3
+  path: tests/nsc_testkit.py
+  message: kubeconfig
+  reason: >-
+    Reviewed 2026-11-24: VALUE_FLAGS tells the test kit's fake kubectl which flags take a value, so
+    its argv parser skips that value when it looks for the command words that its own read-only
+    allow-list checks. --kubeconfig is listed because the real kubectl flag takes a path. The fake
+    logs each argv and answers from test fixtures; it never opens a kubeconfig or starts the real
+    kubectl.
+- id: PE3
+  path: tests/test_nsc_access.py
+  message: kubeconfig
+  reason: >-
+    Reviewed 2026-11-24: A negative case of
+    test_run_tool_refuses_anything_off_the_list_before_it_runs passes kubectl get pods --kubeconfig
+    /tmp/other as argv and asserts that run_tool refuses it (refused_command, exit 5) and that the
+    fake kubectl never starts. It checks that the script cannot switch to another kubeconfig; no
+    file is read.
+fingerprints: []

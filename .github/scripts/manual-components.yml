@@ -36,3 +36,10 @@ components:
       - pva-opgen
       - pva-setup
       - pva-spec
+  - name: NIM
+    description: Deploy NVIDIA NIM LLMs with Docker, Helm or the NIM Operator, smoke-check which features work, tune runtime settings on measured evidence, and benchmark speed and accuracy.
+    catalog_dirs:
+      - nim-benchmark
+      - nim-deploy
+      - nim-smoke-check
+      - nim-tune

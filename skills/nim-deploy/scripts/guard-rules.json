@@ -1,0 +1,102 @@
+{
+  "_doc": "Python regexes matched against one normalized simple command: program basename + arguments joined by single spaces, after sudo/env/timeout/xargs-style wrappers and VAR=value prefixes are removed. {F} expands to any run of flags with optional values. A deny rule always blocks. A gated rule allows the command only in its exact approved form, alone in its Bash call (see guard.py).",
+  "deny": [
+    {
+      "id": "docker-sock-chmod",
+      "pattern": "^(chmod|chown|setfacl)( .*)? (\\S*/)?docker\\.sock( |$)",
+      "reason": "Never loosen /var/run/docker.sock. Fix: ask the user to run 'sudo usermod -aG docker $USER' and start a new login shell, or to run the docker command themselves."
+    },
+    {
+      "id": "curl-pipe-shell",
+      "pattern": "(^| \\| )(curl|wget)( [^|]*)? \\| ((ba|z|da|k|fi)?sh( |$)|python[0-9.]*( -( |$)| \\| |$))|^((ba|z|da|k)?sh|source|\\.|eval)( .*)? __SUBST_(curl|wget)__",
+      "reason": "Do not pipe downloads into a shell. Fix: download to a file (curl -fsSLo install.sh URL), show the file to the user, and run it only after they approve."
+    },
+    {
+      "id": "kubectl-delete-namespace",
+      "pattern": "^kubectl{F} delete{F} (\\S*,)?(ns|namespace|namespaces)([,/]\\S*)?( |$)",
+      "reason": "Deleting a namespace removes everything in it. Fix: roll back only this run's objects with the rollback command from 'nimdeploy.py status RUN', or ask the user to delete the namespace themselves."
+    },
+    {
+      "id": "kubectl-config-flip",
+      "pattern": "^kubectl{F} config (use-context|use|set-context|delete-context|rename-context|set-cluster|delete-cluster|set-credentials|delete-user|set|unset)( |$)",
+      "reason": "Do not change the user's kubeconfig. Fix: pass --context CTX and -n NS on each kubectl command (helm: --kube-context CTX -n NS) using the values from the approved run."
+    },
+    {
+      "id": "kube-env-flip",
+      "pattern": "^(export|declare|typeset|readonly|local)( .*)? (KUBECONFIG|HELM_[A-Z_]*|KUBECTL_[A-Z_]*|DOCKER_HOST|DOCKER_CONTEXT|DOCKER_CONFIG)(=| |$)",
+      "reason": "Do not change which cluster or Docker daemon later commands talk to. Fix: pass --context CTX and -n NS on each kubectl command (helm: --kube-context CTX -n NS) using the values from the approved run."
+    },
+    {
+      "id": "helm-no-namespace",
+      "pattern": "^(?!.* (-n|--namespace)( |=|[^ -]))helm{F} (install|upgrade|uninstall|delete|del|un|rollback)( |$)",
+      "reason": "helm without -n uses the current kubeconfig namespace. Fix: add -n NS --kube-context CTX with the values from the approved run."
+    },
+    {
+      "id": "helm-set",
+      "pattern": "^helm{F} (install|upgrade)( .*)? --set(-string|-file|-json)?(=| |$)",
+      "reason": "Never use helm --set: values must live in the run's values.yaml so they are reviewed and hashed. Fix: nimdeploy.py set RUN key=value, then render again."
+    },
+    {
+      "id": "secret-on-argv",
+      "pattern": "^(docker|helm|kubectl)( .*)? (-e |--env[ =]|--from-literal=|--set[a-z-]* )?\"?(NGC_API_KEY|NIM_API_KEY|NVIDIA_API_KEY|HF_TOKEN|HUGGING_FACE_HUB_TOKEN)=|nvapi-[A-Za-z0-9]|(^| )hf_[A-Za-z0-9]{20,}",
+      "reason": "Never put a secret value on a command line. Fix: pass the NAME only (the rendered script passes -e NGC_API_KEY) and keep the value in an exported variable or a Kubernetes Secret."
+    },
+    {
+      "id": "docker-blanket-stop",
+      "pattern": "^docker{F} (container{F} )?(stop|rm|kill|restart|pause)( .*)? __SUBST_docker__( |$)|^docker{F} (ps|container{F} (ls|ps))( .*)? \\| docker{F} (container{F} )?(stop|rm|kill|restart|pause)( |$)",
+      "reason": "This stops or removes every container that is listed, including other people's workloads. Fix: never run the blanket command. List what runs with read-only 'docker ps' (or 'nim list'), ask the user which one to stop, and act only on a container this skill created, with its printed command."
+    },
+    {
+      "id": "docker-system-prune",
+      "pattern": "^docker{F} (system|volume|image|builder) prune( |$)",
+      "reason": "Pruning removes other workloads' data and model caches. Fix: remove only this run's container with 'docker rm -f NAME' (needs an approved run)."
+    },
+    {
+      "id": "docker-pull",
+      "pattern": "^docker{F} (pull|image pull)( |$)",
+      "reason": "Never pull an image yourself: the approved script pulls what it starts. To read an image's port or env, use the read-only metadata forms (docker image inspect --format ..., docker buildx imagetools inspect --format ..., skopeo inspect --config docker://IMAGE)."
+    },
+    {
+      "id": "skopeo-read-only",
+      "pattern": "^skopeo( |$)(?!inspect( --config| --raw| --override-(os|arch|variant) \\S+)* docker://\\S+$)",
+      "reason": "Only the read-only form is allowed: skopeo inspect [--config|--raw|--override-os|--override-arch|--override-variant X] docker://IMAGE. Fix: use that form; copy, sync, login and delete are not allowed."
+    },
+    {
+      "id": "buildx-read-only",
+      "pattern": "^docker{F} buildx( |$)(?!imagetools inspect( --raw| --format \\{\\{json \\.Image\\}\\})* \\S+$)",
+      "reason": "Only docker buildx imagetools inspect [--raw] [--format '{{json .Image}}'] IMAGE is allowed (it reads registry metadata without pulling). Fix: use that form; build, bake and imagetools create are not allowed."
+    },
+    {
+      "id": "image-inspect-flags",
+      "pattern": "^docker{F} image inspect( |$)(?!(--format \\{\\{json \\.Config\\}\\} )?[^- ]\\S*$)",
+      "reason": "Only docker image inspect [--format '{{json .Config}}'] IMAGE is allowed. Fix: drop the other flags."
+    }
+  ],
+  "gated": [
+    {
+      "id": "kubectl-mutate",
+      "kind": "kubectl",
+      "pattern": "^kubectl{F} (apply|create|replace|patch|scale|delete|edit|label|annotate|set|drain|cordon|uncordon|taint|autoscale|expose|run|exec|debug|cp|attach|auth{F} reconcile|certificate{F} (approve|deny)|rollout{F} (undo|restart|pause|resume))( |$)"
+    },
+    {
+      "id": "helm-mutate",
+      "kind": "helm",
+      "pattern": "^helm{F} (install|upgrade|uninstall|delete|del|un|rollback)( |$)"
+    },
+    {
+      "id": "docker-mutate",
+      "kind": "docker",
+      "pattern": "^docker{F} (run|create|start|restart|rm|stop|kill|rmi|exec|update|cp|rename|pause|unpause|attach|commit|load|import|container{F} (?!(ls|list|ps|inspect|logs|top|stats|port|diff|wait)( |$))\\S+|image{F} (rm|remove|prune|load|import)|volume{F} (rm|remove|prune|create)|network{F} (rm|remove|prune|create|connect|disconnect)|context{F} (use|create|rm|remove|update|import)|(service|stack|swarm|node|plugin|secret|config){F} (?!(ls|list|ps|inspect|logs)( |$))\\S+|compose{F} (?!(ps|ls|logs|config|images|top|version|port)( |$))\\S+)( |$)|^docker-compose{F} (?!(ps|ls|logs|config|images|top|version|port)( |$))\\S+"
+    },
+    {
+      "id": "nim-stop-rm",
+      "kind": "docker",
+      "pattern": "^nim{F} (stop|rm)( |$)"
+    },
+    {
+      "id": "run-artifact-script",
+      "kind": "script",
+      "pattern": "^((ba|z|da|k)?sh|source|\\.)( -\\S+)* [^-]|^\\S+\\.sh( |$)"
+    }
+  ]
+}

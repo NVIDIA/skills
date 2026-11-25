@@ -1,0 +1,18 @@
+image:
+  repository: nvcr.io/nim/meta/llama-3.1-8b-instruct
+  tag: "1.8"
+  pullPolicy: IfNotPresent
+imagePullSecrets:
+- name: ngc-secret
+replicaCount: 1
+model:
+  ngcAPISecret: ngc-api-secret
+  name: meta/llama-3.1-8b-instruct
+resources:
+  limits:
+    nvidia.com/gpu: 1
+persistence:
+  enabled: true
+  size: "50Gi"
+podAnnotations:
+  nim-deploy/run-id: golden

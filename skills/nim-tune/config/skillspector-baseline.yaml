@@ -1,0 +1,64 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+# Add this file at skills/nim-tune/config/skillspector-baseline.yaml.
+# Scope: the six false positives reported in Slack for pipeline 84867212.
+# Plus the SKILL.md --privileged prohibition flagged in pipeline 85241956.
+# Reviewed against nim-skills PR 4, commit 00b5ef256eda15362fdabb480e11e60c2440ebc5.
+# Each exception matches a rule ID, exact file path and exact matched text.
+# These rules do not bind to file hashes: re-review them when these files change.
+# Other findings and incomplete evaluations remain active.
+version: 2
+rules:
+  - id: PE5
+    path: scripts/run_campaign.py
+    message: --privileged
+    reason: >-
+      Reviewed 2026-11-23: RESERVED_RUN_ARGS lists options the runner rejects
+      in docker.extra_run_args. owned_run_arg checks membership and validation
+      returns bad_run_args before the campaign runs. This is a refusal-list
+      entry, not privileged container execution.
+  - id: PE5
+    path: references/campaign.md
+    message: --privileged
+    reason: >-
+      Reviewed 2026-11-23: this documentation lists --privileged among the
+      docker.extra_run_args refused before GPU work. It describes rejection,
+      not an instruction to run a privileged container.
+  - id: PE5
+    path: SKILL.md
+    message: --privileged
+    reason: >-
+      Reviewed 2026-11-25: hard rule 3 names --privileged among the options the
+      agent must never use itself ("Never docker run, --privileged, or kubectl
+      apply"). It forbids privileged containers; it does not run one.
+  - id: PE5
+    path: tests/test_docker_target.py
+    message: --device=/dev/
+    reason: >-
+      Reviewed 2026-11-23: the negative test supplies --device=/dev/nvidia1
+      and asserts bad_run_args with exit code 2. The fixture uses a local
+      fake Docker executable.
+  - id: PE5
+    path: tests/test_docker_target.py
+    message: --privileged
+    reason: >-
+      Reviewed 2026-11-23: the negative test supplies --privileged and asserts
+      bad_run_args with exit code 2. The fixture uses a local fake Docker
+      executable.
+  - id: PE3
+    path: scripts/tune_guard.py
+    message: kubeconfig
+    reason: >-
+      Reviewed 2026-11-23: --kubeconfig is a VALUE_FLAGS entry used to skip
+      an option's value when finding the kubectl verb. This prevents options
+      from hiding a denied command. The declaration does not open a
+      Kubernetes credential file.
+  - id: PE3
+    path: skill-card.md
+    message: kubeconfig
+    reason: >-
+      Reviewed 2026-11-23: the Credential Type(s) field discloses that
+      Kubernetes targets use the user's kubeconfig. This states a credential
+      requirement; it does not direct credential-file reading or export.
+fingerprints: []

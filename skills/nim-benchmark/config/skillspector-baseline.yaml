@@ -1,0 +1,31 @@
+# Reviewed false positives for nim-skills PR #5 at commit
+# 3f50725bb5bacfc20cb79a512b56f6293b0ddda5, using SkillSpector 2.13.5.
+# Each rule scopes one rule ID, exact skill-relative file, and matched text.
+# Glob metacharacters in matched text are escaped for literal matching.
+# These rules do not bind file hashes: re-review when the named files change.
+# Other findings and incomplete evaluations remain active.
+version: 2
+rules:
+- id: E2
+  path: scripts/nb_common.py
+  message: os.environ.items()
+  reason: >-
+    Reviewed 2026-11-24: Scrubber reads credential-named environment values only to mask them
+    from emitted JSON, saved output and command logs. These values stay in its in-memory redaction
+    set; this expression does not export them.
+- id: TM1
+  path: scripts/nb_perf.py
+  message: rm -f {shlex.quote(f'{adir}/{EXPORT_NAME}')}
+  reason: >-
+    Reviewed 2026-11-24: run_once removes only the stale EXPORT_NAME before starting an approved
+    pod benchmark. artifact_dir_for constructs the directory under /tmp/nim-benchmark from a
+    run-folder hash and fixed load/repeat path, and shlex.quote quotes the complete filename.
+    This prevents stale results from passing as a new run.
+- id: TM1
+  path: tests/test_nb_perf.py
+  message: rm -f {adir}/{nb_perf.EXPORT_NAME}
+  reason: >-
+    Reviewed 2026-11-24: The pod-read failure test asserts the exact stale-export cleanup prefix
+    captured by a mocked run_command. The string is an assertion; no kubectl or removal command
+    runs in this test.
+fingerprints: []
