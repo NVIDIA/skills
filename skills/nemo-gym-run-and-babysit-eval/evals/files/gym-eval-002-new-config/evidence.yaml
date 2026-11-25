@@ -1,0 +1,34 @@
+model_card:
+  model: example/reasoning-model
+  served_name: reasoning-model
+  context_length: 65536
+  reasoning_parser: deepseek_r1
+  tool_call_parser: hermes
+  template_switch:
+    enable_thinking: true
+  generation_config: auto
+serving_request:
+  tensor_parallel_size: 2
+  pipeline_parallel_size: 1
+  number_of_instances: 1
+  max_num_seqs: 128
+  trust_remote_code: false
+benchmark:
+  name: ifbench
+  config_path: benchmarks/ifbench/config.yaml
+  canonical_repeats: 5
+  uses_tools: false
+  sampling_and_token_budget: retain benchmark values
+gym_commit: 0aa31eb833ee469a88af5b171c52f696d6249e1d # pragma: allowlist secret -- public Gym commit SHA
+site:
+  image_env: SERVING_IMAGE
+  driver_image_env: GYM_DRIVER_IMAGE
+  slurm_account_env: SLURM_ACCOUNT
+  slurm_hostname_env: SLURM_LOGIN_HOST
+  slurm_partition_env: SLURM_PARTITION
+  cache_dir_env: CACHE_DIR
+  output_env: OUTPUT_DIR
+  walltime: 04:00:00
+  nodes: 1
+  gpus_per_node: 2
+  mlflow_required: false

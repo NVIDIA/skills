@@ -1,7 +1,7 @@
 ---
 name: nvflare-autofl-report
 description: "Generate a reproducible final report, literature-outcome synthesis, JSON summary, and refreshed progress plot for a stopped or interrupted NVFLARE Auto-FL campaign."
-license: Apache-2.0
+license: Apache-2.0 AND CC-BY-4.0
 compatibility: "Requires NVFLARE 2.9.0+, Python, and artifacts from an NVFLARE Auto-FL campaign."
 metadata:
   version: "0.1.0"

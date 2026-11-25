@@ -1,5 +1,5 @@
 ## Description: <br>
-Hardware compression offload with DOCA Compress on a BlueField DPU, ConnectX NIC, or host: DEFLATE compress and decompress, plus LZ4 decompress (stream and block; LZ4 encode is NOT supported), instead of CPU zlib / zstd. Trigger on "offload this gzip", "decompress incoming network data on the NIC", "compress task returns INVALID_VALUE on alloc_init", "submitted a task but no completion arrives", or "decompress LZ4 on the BlueField", even without naming DOCA Compress. Covers enabling compress-deflate, decompress-deflate, decompress-lz4-stream and decompress-lz4-block tasks on a doca_compress context, sizing source / destination doca_buf against the per-task cap query, mmap permissions, offload vs CPU decisions, a round-trip smoke, and DOCA_ERROR_* from Compress calls. Refuse and route elsewhere for zstd / Snappy / brotli, LZ4 encode (a CPU LZ4 library), pure mmap-to-mmap copies (doca-dma), or DOCA Core lifecycle internals. <br>
+Hardware compression offload with DOCA Compress on a BlueField DPU, ConnectX NIC, or host: DEFLATE compress and decompress, plus LZ4 decompress (stream and block; LZ4 encode is NOT supported), instead of CPU zlib / zstd. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-External developers and engineers building applications that call the DOCA Compress C library (directly in C/C++ or through FFI bindings) use this skill to configure, build, modify, run, test, and debug DEFLATE compress/decompress and LZ4-decompress offload on a BlueField DPU or ConnectX NIC with DOCA already installed. <br>
+External developers and engineers building applications that call the DOCA Compress library (C/C++ or via FFI bindings) use this skill to configure, build, modify, run, test, and debug DEFLATE compress/decompress and LZ4 decompress offload on BlueField DPUs, ConnectX NICs, or DOCA hosts, including offload-vs-CPU decisions, buffer sizing, mmap permissions, and DOCA_ERROR_* diagnosis. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,11 +25,12 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [CAPABILITIES.md](CAPABILITIES.md) <br>
-- [TASKS.md](TASKS.md) <br>
 - [DOCA Compress documentation](https://docs.nvidia.com/doca/sdk/DOCA-Compress/) <br>
 - [DOCA SDK documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
 - [DOCA samples and applications](https://github.com/NVIDIA-DOCA/doca-samples) <br>
+- [CAPABILITIES.md](CAPABILITIES.md) <br>
+- [TASKS.md](TASKS.md) <br>
+- [BENCHMARK.md](BENCHMARK.md) <br>
 
 
 ## Skill Output: <br>
@@ -45,15 +46,15 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-4 evaluation tasks (3 positive, 1 negative), 1 attempt per task, each run in its own isolated sandbox pod (`k8s-sandbox`); evaluator version `1.6.10`, evaluation date 2026-11-18, dataset digest `sha256:6e91c5d95330da449fbe27bba3be01993b08a9dcf773d993c37186b498a8106a` (skill-evaluator-dataset-snapshot/1). Each task was also attempted without the skill as a baseline. <br>
+4 evaluation tasks (3 positive, 1 negative), 1 attempt per task, each attempt run in its own isolated sandbox pod (`k8s-sandbox`); evaluator version `1.6.10`, evaluated 2026-11-23. Each task was also attempted without the skill as a baseline. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
 - Security: Is it safe to use? Scored from `security` (100%). <br>
 - Correctness: Is the answer correct? Scored from `accuracy` (100%). <br>
 - Discoverability: Was the right skill loaded when needed? Scored from `skill_execution` (100%). <br>
-- Effectiveness: Did the skill help complete the task? Equal-weight mean of `goal_accuracy` (50%) and `behavior_check` (50%). <br>
-- Efficiency: Did it avoid wasted tool calls and token usage? `skill_efficiency` (50%) plus `token_efficiency` (50%). <br>
+- Effectiveness: Did the skill help complete the task? Scored from `goal_accuracy` (50%) + `behavior_check` (50%). <br>
+- Efficiency: Did it avoid wasted tool calls and token usage? Scored from `skill_efficiency` (50%) + `token_efficiency` (50%). <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
@@ -67,7 +68,7 @@ Underlying evaluation signals used in this run: <br>
 
 
 ## Evaluation Results: <br>
-> ✅ **Overall verdict: PASS — Recommended for publication**
+**Overall verdict: PASS — Recommended for publication**
 
 ### Publication Recommendation
 
@@ -77,12 +78,12 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 96.9% — baseline ran, but no comparable score was available; uplift unavailable | 93.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 96.6% — baseline ran, but no comparable score was available; uplift unavailable | 90.6% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 87.5% → 100.0% (+12.5 points) |
-| Correctness | 75.0% → 100.0% (+25.0 points) | 85.0% → 100.0% (+15.0 points) |
+| Correctness | 75.0% → 100.0% (+25.0 points) | 90.0% → 95.0% (+5.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 62.5% → 100.0% (+37.5 points) | 93.8% → 100.0% (+6.2 points) |
-| Efficiency | 84.5% — baseline ran, but no comparable score was available; uplift unavailable | 71.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 50.0% → 100.0% (+50.0 points) | 93.8% → 93.8% (±0.0 points) |
+| Efficiency | 83.1% — baseline ran, but no comparable score was available; uplift unavailable | 69.1% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -97,20 +98,12 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 98.2% → 90.7% (-7.5 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 98.1% → 91.7% (-6.4 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 85.8% → 86.8% (+1.0 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
-
-### Tier Status
-
-| Tier | Purpose | Status | Evidence |
-|---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 16 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
-| Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
+| codex | Efficiency | Token-only comparison | 84.5% → 84.3% (-0.2 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Skill Version(s): <br>
-155651c (source: git SHA, committed 2026-11-17) <br>
+444e267 (source: git SHA, committed 2026-11-23) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

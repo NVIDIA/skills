@@ -10,7 +10,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 - Skill: `doca-bf3-deployment`
 - Validation status: `passed`
-- Evaluation date: 2026-11-18
+- Evaluation date: 2026-11-23
 - Evaluator version: `1.6.10`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 3 evaluation tasks (2 positive, 1 negative)
@@ -50,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 96.4% — baseline ran, but no comparable score was available; uplift unavailable | 87.9% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 96.7% — baseline ran, but no comparable score was available; uplift unavailable | 89.9% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 66.7% → 100.0% (+33.3 points) | 80.0% → 93.3% (+13.3 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 85.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 72.2% → 100.0% (+27.8 points) | 69.5% → 83.3% (+13.8 points) |
-| Efficiency | 81.8% — baseline ran, but no comparable score was available; uplift unavailable | 78.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 66.7% → 100.0% (+33.3 points) | 73.3% → 80.0% (+6.7 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 77.8% → 100.0% (+22.2 points) | 77.8% → 100.0% (+22.2 points) |
+| Efficiency | 83.5% — baseline ran, but no comparable score was available; uplift unavailable | 74.7% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -70,9 +70,9 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 97.3% → 92.8% (-4.5 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 97.4% → 93.8% (-3.6 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 83.0% → 82.7% (-0.3 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 81.7% → 82.6% (+0.9 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -80,15 +80,15 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 797,248 | 402,109 | +395,139 | +98.27% | skill 3/3; base 3/3 |
-| claude-code | doca-bf3-deployment.explicit-positive.v1 | 355,114 | 145,566 | +209,548 | +143.95% | skill 1/1; base 1/1 |
-| claude-code | doca-bf3-deployment.implicit-positive.v1 | 292,492 | 148,314 | +144,178 | +97.21% | skill 1/1; base 1/1 |
-| claude-code | doca-bf3-deployment.negative.v1 | 149,642 | 108,229 | +41,413 | +38.26% | skill 1/1; base 1/1 |
-| codex | All cases | 340,714 | 204,286 | +136,428 | +66.78% | skill 3/3; base 3/3 |
-| codex | doca-bf3-deployment.explicit-positive.v1 | 160,086 | 72,645 | +87,441 | +120.37% | skill 1/1; base 1/1 |
-| codex | doca-bf3-deployment.implicit-positive.v1 | 99,856 | 83,939 | +15,917 | +18.96% | skill 1/1; base 1/1 |
-| codex | doca-bf3-deployment.negative.v1 | 80,772 | 47,702 | +33,070 | +69.33% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,137,962 | 606,395 | +531,567 | +87.66% | skill 6/6; base 6/6 |
+| claude-code | All cases | 662,031 | 554,766 | +107,265 | +19.34% | skill 3/3; base 3/3 |
+| claude-code | doca-bf3-deployment.explicit-positive.v1 | 205,781 | 145,015 | +60,766 | +41.90% | skill 1/1; base 1/1 |
+| claude-code | doca-bf3-deployment.implicit-positive.v1 | 302,589 | 301,282 | +1,307 | +0.43% | skill 1/1; base 1/1 |
+| claude-code | doca-bf3-deployment.negative.v1 | 153,661 | 108,469 | +45,192 | +41.66% | skill 1/1; base 1/1 |
+| codex | All cases | 260,512 | 218,054 | +42,458 | +19.47% | skill 3/3; base 3/3 |
+| codex | doca-bf3-deployment.explicit-positive.v1 | 105,378 | 73,181 | +32,197 | +44.00% | skill 1/1; base 1/1 |
+| codex | doca-bf3-deployment.implicit-positive.v1 | 102,735 | 89,176 | +13,559 | +15.20% | skill 1/1; base 1/1 |
+| codex | doca-bf3-deployment.negative.v1 | 52,399 | 55,697 | -3,298 | -5.92% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 922,543 | 772,820 | +149,723 | +19.37% | skill 6/6; base 6/6 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
@@ -111,10 +111,10 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 - **HIGH** DUPLICATE/duplicate: Duplicate content found across CAPABILITIES.md and SKILL.md and TASKS.md and references/details.md:
   "# DOCA BlueField-3 (BF3) deployment — Capabilities" in CAPABILITIES.md (lines 1-26)
   vs "## Pattern overview" in CAPABILITIES.md (lines 27-63)
-  vs "## Instructions" in SKILL.md (lines 11-46)
-  vs "## Audience" in SKILL.md (lines 47-87)
-  vs "## When to load this skill" in SKILL.md (lines 88-137)
-  vs "## What this skill provides" in SKILL.md (lines 138-181)
+  vs "## Instructions" in SKILL.md (lines 13-48)
+  vs "## Audience" in SKILL.md (lines 49-89)
+  vs "## When to load this skill" in SKILL.md (lines 90-139)
+  vs "## What this skill provides" in SKILL.md (lines 140-183)
   vs "# DOCA BlueField-3 (BF3) deployment — Tasks" in TASKS.md (lines 1-28)
   vs "## build" in TASKS.md (lines 94-116)
   vs "## Deferred task verbs" in TASKS.md (lines 348-385)

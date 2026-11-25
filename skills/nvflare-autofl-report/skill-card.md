@@ -7,7 +7,7 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 <br>
+Apache-2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
 Developers and engineers generating reproducible final reports, literature-outcome summaries, and progress visualizations from completed or interrupted NVFLARE Auto-FL federated learning campaigns. <br>
 
@@ -58,7 +58,6 @@ Underlying evaluation signals used in this run: <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
 - `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
-
 
 
 ## Evaluation Results: <br>

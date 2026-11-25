@@ -36,6 +36,8 @@ compatibility: >
 
 # DOCA setup
 
+> **Host checks.** Commands here that inspect the user's DOCA host (listing or reading `/opt/mellanox/doca`, release files such as `/etc/mlnx-release` or `/etc/nvidia/bf-release`, `/dev/mst`) or reach the BlueField (RShim, SSH, BMC) are for that host. Run them yourself only if the user confirms you are on it; otherwise answer from this skill, give the commands for the user to run, and treat values you can't see as unknown.
+
 **Where to start:** If the user's question is *deployment-shaped*
 (*"how do I deploy"*, *"how do I run my DOCA workload"*, *"I just got a
 BlueField, what now"*, *"my code is built, what next"*), walk

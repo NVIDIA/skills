@@ -1,0 +1,24 @@
+{
+  "gym_job_id": "eval-drift",
+  "benchmark": "ifbench",
+  "scheduler": {
+    "live_jobs": []
+  },
+  "saved_diff": {
+    "responses_create_params.max_output_tokens": {
+      "before": 8192,
+      "after": 16384
+    }
+  },
+  "inspection": {
+    "decision": {
+      "action": "stop",
+      "reason": "collection_resume_refused: semantic configuration changed: responses_create_params.max_output_tokens"
+    },
+    "gate_task": {
+      "status": "FAILED"
+    },
+    "dispatched": false
+  },
+  "retained_policy_answers": 72
+}

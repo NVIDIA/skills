@@ -1,0 +1,25 @@
+{
+  "gym_job_id": "eval-walltime",
+  "benchmark": "ifbench",
+  "inspection_command": "gym eval resubmit eval-walltime ifbench --recover --inspect --no-auto-repin --score-agent ifbench_benchmark_simple_agent --score-key '[\"agent_metrics\",\"mean/reward\"]'",
+  "inspection": {
+    "decision": {
+      "action": "stop",
+      "reason": "max_walltime budget exhausted"
+    },
+    "gate_task": {
+      "status": "FAILED",
+      "expected_samples": 100,
+      "scored_samples": 85
+    },
+    "dispatched": false
+  },
+  "scheduler": {
+    "live_jobs": []
+  },
+  "recorded_budgets": {
+    "max_walltime": "08:00:00",
+    "infra_retries_remaining": 1,
+    "rollout_attempts_remaining": 2
+  }
+}

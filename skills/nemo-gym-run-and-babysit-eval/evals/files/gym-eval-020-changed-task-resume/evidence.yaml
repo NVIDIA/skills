@@ -1,0 +1,33 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+execution:
+  kind: direct gym eval run
+  gym_job_id: null
+  active_processes: false
+task_target: ./my-tasks
+agent: hermes_agent
+sandbox: docker
+saved_output_root: results/original-task-run
+original_working_directory: /workspace/gym-evaluation
+saved_rollouts: /workspace/gym-evaluation/results/original-task-run/my-tasks/rollouts.jsonl
+explicit_rollout_output_override: false
+saved_inventory:
+  selected_tasks:
+  - hello-a
+  - hello-b
+  num_repeats: 1
+  completed:
+  - hello-a
+  missing:
+  - hello-b
+requested_inventory:
+  selected_tasks:
+  - hello-a
+  - hello-c
+  num_repeats: 1
+  hello_a_digest_matches_saved: false
+cli_diagnostic: 'Cannot resume from /workspace/gym-evaluation/results/original-task-run/my-tasks/rollouts_materialized_inputs.jsonl:
+  the task selection or task digests differ from the cached run (no longer selected: hello-b, newly selected: hello-c,
+  changed digest: hello-a). Rerun with the same --only-tasks/--exclude-tasks, or pass +resume_from_cache=false to
+  start over, or a new +output_jsonl_fpath to keep the old results'

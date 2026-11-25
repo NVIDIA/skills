@@ -1,5 +1,5 @@
 ## Description: <br>
-Guides agents through raw verbs inside DOCA Core (doca-verbs) — direct control of QP, CQ, PD, SRQ and address-handle objects through doca_verbs_context, porting libibverbs code into DOCA Core, and QP attributes, opcodes or WR flags the doca-rdma task API does not expose — while routing ordinary doca-rdma / doca-eth / doca-rmax workloads, DOCA install, Core internals, and general libibverbs theory elsewhere. <br>
+Guides raw verbs work inside DOCA Core (doca-verbs) — direct control of QP, CQ, PD, SRQ and address-handle objects through doca_verbs_context and doca_verbs_qp_create / doca_verbs_qp_modify / doca_verbs_cq_create, porting libibverbs code into DOCA Core, and reaching QP attributes, opcodes or WR flags the doca-rdma task API does not expose, while routing ordinary RDMA, Ethernet and Rivermax workloads back to the higher-level DOCA libraries. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-External developers building applications on the NVIDIA DOCA Verbs library use this skill to decide whether they truly need raw verbs below doca-rdma / doca-eth / doca-rmax, and, when they do, to configure, build, port libibverbs code into, run, test, and debug raw QP / CQ / PD / MR / SRQ / Address-Handle control inside a DOCA Core context. <br>
+External developers building C/C++ (or FFI-bound) applications on BlueField DPUs or ConnectX NICs use this skill to decide whether they truly need raw DOCA Verbs instead of doca-rdma / doca-eth / doca-rmax, port libibverbs code into the DOCA Core model, control raw QP / CQ / SRQ / Address-Handle / congestion-control-group attributes, and diagnose DOCA_ERROR_* returns from doca_verbs_* calls. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,21 +25,21 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
+- [DOCA SDK documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
+- [DOCA samples (GitHub)](https://github.com/NVIDIA-DOCA/doca-samples) <br>
 - [CAPABILITIES.md](CAPABILITIES.md) <br>
 - [TASKS.md](TASKS.md) <br>
-- [references/command-appendix.md](references/command-appendix.md) <br>
-- [references/deferred-topics.md](references/deferred-topics.md) <br>
-- [references/deferred-verbs.md](references/deferred-verbs.md) <br>
-- [references/install.md](references/install.md) <br>
-- [references/pattern-overview.md](references/pattern-overview.md) <br>
-- [references/use.md](references/use.md) <br>
-- [NVIDIA DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
-- [NVIDIA DOCA Samples](https://github.com/NVIDIA-DOCA/doca-samples) <br>
+- [Command appendix](references/command-appendix.md) <br>
+- [Deferred topic boundaries](references/deferred-topics.md) <br>
+- [Deferred task verbs](references/deferred-verbs.md) <br>
+- [Install](references/install.md) <br>
+- [Pattern overview](references/pattern-overview.md) <br>
+- [Use](references/use.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Analysis, Shell commands, Configuration instructions, Code] <br>
-**Output Format:** [Markdown with inline bash and C code blocks] <br>
+**Output Type(s):** [Analysis, Code, Shell commands, Configuration instructions] <br>
+**Output Format:** [Markdown with inline C and bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -50,7 +50,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-4 evaluation tasks (3 positive, 1 negative), 1 attempt per task, run in the `k8s-sandbox` environment with each task attempt in its own isolated sandbox pod; each task was also attempted without the skill as a baseline. Evaluator version `1.6.10`; evaluation date 2026-11-18. <br>
+4 evaluation tasks (3 positive, 1 negative), 1 attempt per task, each run in an isolated sandbox pod (`k8s-sandbox`) with and without the skill; evaluator version `1.6.10`, evaluated 2026-11-23. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -61,33 +61,27 @@ Reported benchmark dimensions: <br>
 - Efficiency: Did it avoid wasted tool calls and token usage? Scored from `skill_efficiency` (50%) + `token_efficiency` (50%). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Security: unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Skill Execution: whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
-- `skill_efficiency`: Tool Productivity: tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
-- `accuracy`: Accuracy: final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Goal Accuracy: whether the user's goal was achieved. <br>
-- `behavior_check`: Behavior Check: whether the expected workflow behavior was followed. <br>
-- `token_efficiency`: Token Efficiency: actual uncached prompt plus completion usage (50% of Efficiency). <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `token_efficiency`: Actual uncached prompt plus completion usage (50% of Efficiency). <br>
 
 
 
 ## Evaluation Results: <br>
-> ✅ **Overall verdict: PASS — Recommended for publication**
-
-### Publication Recommendation
-
-Recommended for publication based on the completed evaluation evidence in this report.
-
 ### Results at a Glance
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 95.1% — baseline ran, but no comparable score was available; uplift unavailable | 91.6% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 35.0% → 95.0% (+60.0 points) | 85.0% → 90.0% (+5.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 31.3% → 100.0% (+68.7 points) | 75.0% → 100.0% (+25.0 points) |
-| Efficiency | 80.4% — baseline ran, but no comparable score was available; uplift unavailable | 73.2% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 94.6% — baseline ran, but no comparable score was available; uplift unavailable | Not available |
+| Security | 100.0% → 100.0% (±0.0 points) | Not available |
+| Correctness | 40.0% → 95.0% (+55.0 points) | Not available |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | Not available |
+| Effectiveness | 31.3% → 87.5% (+56.2 points) | Not available |
+| Efficiency | 90.3% — baseline ran, but no comparable score was available; uplift unavailable | Not available |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -95,19 +89,29 @@ Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92
 
 A partial dimension was calculated from only the available configured signals; review the detailed report before relying on it.
 
-#### Comparison details
+### Comparison details
 
 Shared-source comparisons use the same signals and weights on both conditions. They do not replace the full dimension scores above or change the publication verdict.
 
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 98.4% → 89.0% (-9.4 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
-| codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 83.5% → 87.4% (+3.9 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 98.3% → 89.0% (-9.3 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+
+### Tier Status
+
+| Tier | Purpose | Status | Evidence |
+|---|---|---|---|
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 18 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
+| Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
+
+**Overall verdict:** PASS — Recommended for publication
+
+**Publication Recommendation:** Recommended for publication based on the completed evaluation evidence in this report.
 
 ## Skill Version(s): <br>
-b8dfd53 (source: git SHA, committed 2026-11-18); DOCA 3.6 (source: frontmatter doca_version) <br>
+444e267 (source: git SHA, committed 2026-11-23); targets DOCA 3.6 (source: frontmatter metadata) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

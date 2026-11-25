@@ -7,7 +7,7 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 <br>
+Apache-2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
 Developers and engineers converting Hugging Face Transformers or TRL training code into NVFLARE federated learning jobs for secure, privacy-preserving distributed training. <br>
 
@@ -64,7 +64,6 @@ Underlying evaluation signals used in this run: <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
 - `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
-
 
 
 ## Evaluation Results: <br>

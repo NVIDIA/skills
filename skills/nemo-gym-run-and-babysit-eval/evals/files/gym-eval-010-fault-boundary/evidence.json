@@ -1,0 +1,44 @@
+{
+  "runs": {
+    "A": {
+      "expected_samples": 100,
+      "scored_samples": 100,
+      "score": 0.6,
+      "evaluation_health": {
+        "status": "PASS",
+        "model": {
+          "count": 40,
+          "kinds": {
+            "truncated": 25,
+            "empty": 15
+          }
+        },
+        "evaluation": {
+          "count": 0
+        }
+      },
+      "settled_results": true
+    },
+    "B": {
+      "expected_samples": 100,
+      "scored_samples": 97,
+      "score": 0.62,
+      "evaluation_health": {
+        "status": "FAIL",
+        "evaluation": {
+          "count": 3,
+          "kinds": {
+            "judge_failed": 3
+          }
+        },
+        "model": {
+          "count": 0
+        }
+      },
+      "recovery_decision": "reverify",
+      "saved_answers": 3
+    }
+  },
+  "benchmark_limits_changed": false,
+  "judge_outage_fixed": true
+}

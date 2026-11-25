@@ -1,5 +1,5 @@
 ## Description: <br>
-Reads DOCA hardware-counter events from a `doca_dev` through the per-domain DOCA Telemetry reader libraries (`doca_telemetry_pcc`, `_dpa`, `_diag`, `_adp_retx`, `_phy`, and `_pci`), covering capability checks, context creation, startup, and per-domain reads or samples, while routing publishing/export to `doca-telemetry-exporter` and the deployed DOCA Telemetry Service to `doca-dts`. <br>
+Guides agents in reading DOCA hardware-counter events from a `doca_dev` through the per-domain DOCA Telemetry reader libraries (`doca_telemetry_pcc`, `_dpa`, `_diag`, `_adp_retx`, `_phy`, and `_pci`), covering capability checks, context creation, startup, and per-domain reads or samples, while routing publishing/export to `doca-telemetry-exporter` and the deployed DOCA Telemetry Service to `doca-dts`. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-External developers building C/C++ (or FFI-bound) applications on BlueField DPUs or ConnectX NICs use this skill to pick the right per-domain DOCA Telemetry reader, run capability queries, walk the create/start/read/stop/destroy lifecycle on a `doca_dev`, and debug per-domain hardware-counter reads. <br>
+External developers and engineers building C/C++ (or FFI-bound) applications on BlueField DPUs or ConnectX NICs use this skill to configure, build, run, test, and debug per-domain DOCA Telemetry hardware-counter readers (PCC, DPA, DIAG, ADP_RETX, PHY, PCI) on a `doca_dev`. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,11 +25,11 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [references/details.md](references/details.md) <br>
-- [CAPABILITIES.md](CAPABILITIES.md) <br>
-- [TASKS.md](TASKS.md) <br>
-- [DOCA Telemetry Programming Guide](https://docs.nvidia.com/doca/sdk/DOCA-Telemetry/index.html) <br>
-- [DOCA Telemetry Exporter Programming Guide](https://docs.nvidia.com/doca/sdk/DOCA-Telemetry-Exporter/index.html) <br>
+- [DOCA Telemetry capabilities companion](CAPABILITIES.md) <br>
+- [DOCA Telemetry task workflows companion](TASKS.md) <br>
+- [doca-telemetry reference detail](references/details.md) <br>
+- [DOCA Telemetry SDK documentation](https://docs.nvidia.com/doca/sdk/DOCA-Telemetry/index.html) <br>
+- [DOCA Telemetry Exporter SDK documentation](https://docs.nvidia.com/doca/sdk/DOCA-Telemetry-Exporter/index.html) <br>
 - [DOCA SDK documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
 - [DOCA samples and applications](https://github.com/NVIDIA-DOCA/doca-samples) <br>
 
@@ -47,16 +47,15 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-4 evaluation tasks (3 positive, 1 negative), 1 attempt per task, each run in its own isolated sandbox pod (`k8s-sandbox` environment); evaluator version `1.6.10`, evaluation date 2026-11-18. Baseline is the same task attempted without the target skill. <br>
+4 evaluation tasks (3 positive, 1 negative), 1 attempt per task, each run in its own isolated sandbox pod (`k8s-sandbox`), with a no-skill baseline for each task. Evaluator version `1.6.10`; evaluation date 2026-11-23. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
 - Security: Is it safe to use? Scored from `security` (100%). <br>
 - Correctness: Is the answer correct? Scored from `accuracy` (100%). <br>
 - Discoverability: Was the right skill loaded when needed? Scored from `skill_execution` (100%). <br>
-- Effectiveness: Did the skill help complete the task? Equal-weight mean of `goal_accuracy` (50%) and `behavior_check` (50%). <br>
-- Efficiency: Did it avoid wasted tool calls and token usage? `skill_efficiency` (50%) + `token_efficiency` (50%); N/A sources are omitted, remaining weights renormalized, and the dimension marked partial. <br>
-- Thresholds: Dimension bands: PASS at 50% or above; NEUTRAL from 40% to below 50%; FAIL below 40%. Overall Tier 3 lift: PASS at +5 points or more; FAIL at -10 points or less; NEUTRAL in between. Overall verdict is PASS only when every configured dimension passes for at least one supported agent; lift is diagnostic and does not override this gate. The 50% attempt pass threshold is a separate per-task gate. <br>
+- Effectiveness: Did the skill help complete the task? Scored from `goal_accuracy` (50%) + `behavior_check` (50%). <br>
+- Efficiency: Did it avoid wasted tool calls and token usage? Scored from `skill_efficiency` (50%) + `token_efficiency` (50%). <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Security: unsafe operations, secret leakage, and unauthorized access. <br>
@@ -70,22 +69,20 @@ Underlying evaluation signals used in this run: <br>
 
 
 ## Evaluation Results: <br>
-> ✅ **Overall verdict: PASS — Recommended for publication**
+**Overall verdict: PASS — Recommended for publication**
 
-### Publication Recommendation
-
-Recommended for publication based on the completed evaluation evidence in this report.
+**Publication Recommendation:** Recommended for publication based on the completed evaluation evidence in this report.
 
 ### Results at a Glance
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 95.4% — baseline ran, but no comparable score was available; uplift unavailable | 88.9% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 95.3% — baseline ran, but no comparable score was available; uplift unavailable | 91.1% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 45.0% → 100.0% (+55.0 points) | 70.0% → 100.0% (+30.0 points) |
+| Correctness | 45.0% → 100.0% (+55.0 points) | 60.0% → 95.0% (+35.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 43.8% → 100.0% (+56.2 points) | 68.8% → 81.3% (+12.5 points) |
-| Efficiency | 77.1% — baseline ran, but no comparable score was available; uplift unavailable | 68.2% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 50.0% → 100.0% (+50.0 points) | 68.8% → 100.0% (+31.2 points) |
+| Efficiency | 76.7% — baseline ran, but no comparable score was available; uplift unavailable | 65.7% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -100,20 +97,12 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 98.1% → 93.7% (-4.4 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 98.2% → 92.3% (-5.9 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 85.3% → 84.2% (-1.1 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
-
-### Tier Status
-
-| Tier | Purpose | Status | Evidence |
-|---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 15 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 2 finding(s) |
-| Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
+| codex | Efficiency | Token-only comparison | 85.2% → 83.2% (-2.0 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Skill Version(s): <br>
-155651c (source: git SHA, committed 2026-11-17) <br>
+444e267 (source: git SHA, committed 2026-11-23); targets DOCA 3.6 (source: frontmatter metadata) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

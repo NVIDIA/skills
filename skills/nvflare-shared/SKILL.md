@@ -1,7 +1,7 @@
 ---
 name: nvflare-shared
 description: Internal NVFLARE conversion references and templates. Use only when another NVFLARE skill directs you to a shared workflow, policy, or asset.
-license: Apache-2.0
+license: Apache-2.0 AND CC-BY-4.0
 metadata:
   version: "0.1.0"
   author: "NVIDIA FLARE Team <federatedlearning@nvidia.com>"

@@ -10,7 +10,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 - Skill: `doca-dma`
 - Validation status: `passed`
-- Evaluation date: 2026-11-18
+- Evaluation date: 2026-11-23
 - Evaluator version: `1.6.10`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
@@ -50,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 93.1% — baseline ran, but no comparable score was available; uplift unavailable | 86.6% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 95.2% — baseline ran, but no comparable score was available; uplift unavailable | 89.9% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 75.0% → 100.0% (+25.0 points) | 95.0% → 100.0% (+5.0 points) |
+| Correctness | 75.0% → 100.0% (+25.0 points) | 90.0% → 100.0% (+10.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 43.8% → 83.3% (+39.5 points) | 56.3% → 79.2% (+22.9 points) |
-| Efficiency | 82.0% — baseline ran, but no comparable score was available; uplift unavailable | 58.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 37.5% → 89.6% (+52.1 points) | 56.3% → 91.7% (+35.4 points) |
+| Efficiency | 86.3% — baseline ran, but no comparable score was available; uplift unavailable | 63.0% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -70,9 +70,9 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 98.2% → 91.3% (-6.9 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 98.0% → 92.0% (-6.0 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 82.9% → 82.0% (-0.9 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 83.8% → 82.5% (-1.3 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -80,17 +80,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 856,516 | 325,308 | +531,208 | +163.29% | skill 4/4; base 4/4 |
-| claude-code | doca-dma.explicit-positive.v1 | 335,329 | 37,056 | +298,273 | +804.92% | skill 1/1; base 1/1 |
-| claude-code | doca-dma.implicit-positive.v1 | 225,004 | 72,424 | +152,580 | +210.68% | skill 1/1; base 1/1 |
-| claude-code | doca-dma.implicit-positive.v2 | 260,019 | 108,242 | +151,777 | +140.22% | skill 1/1; base 1/1 |
-| claude-code | doca-dma.negative.v1 | 36,164 | 107,586 | -71,422 | -66.39% | skill 1/1; base 1/1 |
-| codex | All cases | 387,606 | 258,406 | +129,200 | +50.00% | skill 4/4; base 4/4 |
-| codex | doca-dma.explicit-positive.v1 | 91,884 | 73,029 | +18,855 | +25.82% | skill 1/1; base 1/1 |
-| codex | doca-dma.implicit-positive.v1 | 120,702 | 43,351 | +77,351 | +178.43% | skill 1/1; base 1/1 |
-| codex | doca-dma.implicit-positive.v2 | 119,237 | 79,987 | +39,250 | +49.07% | skill 1/1; base 1/1 |
-| codex | doca-dma.negative.v1 | 55,783 | 62,039 | -6,256 | -10.08% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,244,122 | 583,714 | +660,408 | +113.14% | skill 8/8; base 8/8 |
+| claude-code | All cases | 644,873 | 292,327 | +352,546 | +120.60% | skill 4/4; base 4/4 |
+| claude-code | doca-dma.explicit-positive.v1 | 177,226 | 38,274 | +138,952 | +363.05% | skill 1/1; base 1/1 |
+| claude-code | doca-dma.implicit-positive.v1 | 225,157 | 37,623 | +187,534 | +498.46% | skill 1/1; base 1/1 |
+| claude-code | doca-dma.implicit-positive.v2 | 206,356 | 108,240 | +98,116 | +90.65% | skill 1/1; base 1/1 |
+| claude-code | doca-dma.negative.v1 | 36,134 | 108,190 | -72,056 | -66.60% | skill 1/1; base 1/1 |
+| codex | All cases | 394,545 | 181,207 | +213,338 | +117.73% | skill 4/4; base 4/4 |
+| codex | doca-dma.explicit-positive.v1 | 124,008 | 37,102 | +86,906 | +234.24% | skill 1/1; base 1/1 |
+| codex | doca-dma.implicit-positive.v1 | 92,666 | 39,267 | +53,399 | +135.99% | skill 1/1; base 1/1 |
+| codex | doca-dma.implicit-positive.v2 | 87,946 | 70,233 | +17,713 | +25.22% | skill 1/1; base 1/1 |
+| codex | doca-dma.negative.v1 | 89,925 | 34,605 | +55,320 | +159.86% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,039,418 | 473,534 | +565,884 | +119.50% | skill 8/8; base 8/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
@@ -109,9 +109,9 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 - **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/libs/doca-dma/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/libs/doca-dma`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: Sudo           (`BENCHMARK.md:112`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: Sudo           (`BENCHMARK.md:113`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: Sudo           (`BENCHMARK.md:114`)
+- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: Sudo             (`BENCHMARK.md:112`)
+- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: Sudo             (`BENCHMARK.md:113`)
+- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: Sudo             (`BENCHMARK.md:114`)
 - 10 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
