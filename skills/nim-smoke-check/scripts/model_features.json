@@ -1,0 +1,2313 @@
+{
+  "schema_version": 1,
+  "reviewed": "2026-11-11",
+  "docs": {
+    "nim_llm": "2.1.5",
+    "nim_vlm": "2.1.2-variant",
+    "nim_llm_1x": "1.15.0",
+    "vllm": "0.31.0",
+    "sglang": "0.5.21"
+  },
+  "engine": {
+    "health": {
+      "sources": [
+        {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/get-started/quickstart.html#ready-endpoint", "doc_version": "2.1.5", "quote": "Perform a readiness check to see if the model is fully loaded and ready for inference:"},
+        {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/get-started/quickstart.html#verify-health-endpoints", "doc_version": "2.1.5", "quote": "By default, these endpoints are served on port 8000. If you set NIM_HEALTH_PORT, use that port instead."}
+      ],
+      "notes": "The hosted API serves no health route (404 on /v1/health/ready, observed 2026-11-11), so health is not applicable there."
+    },
+    "models": {
+      "sources": [
+        {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/get-started/quickstart.html#find-the-model-name", "doc_version": "2.1.5", "quote": "The id field in the response is the model name to use in your requests."}
+      ]
+    },
+    "chat": {
+      "sources": [
+        {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/api-reference.html#inference-endpoints", "doc_version": "2.1.5", "quote": "Multi-turn chat completions with message history. Supports streaming and tool calling."}
+      ]
+    },
+    "stream": {
+      "sources": [
+        {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/get-started/quickstart.html#streaming", "doc_version": "2.1.5", "quote": "The response is streamed back in chunks, with each chunk containing a data JSON object. The stream terminates with a data: [DONE] message:"}
+      ]
+    },
+    "json_schema": {
+      "sources": [
+        {"tier": "D", "url": "https://docs.vllm.ai/en/v0.31.0/features/structured_outputs/", "doc_version": "0.31.0", "quote": "Structured outputs are supported by default in the OpenAI-Compatible Server."},
+        {"tier": "D", "url": "https://docs.sglang.io/docs/advanced_features/structured_outputs", "doc_version": "unversioned (fetched 2026-11-11)", "quote": "You can specify a JSON schema, regular expression or EBNF to constrain the model output."},
+        {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/structured-generation.html", "doc_version": "1.15.0", "quote": "NIM for LLMs supports structured outputs by specifying a JSON schema, regular expression, context-free grammar, or by constraining the output to particular choices."}
+      ]
+    },
+    "concurrency": {
+      "sources": [
+        {"tier": "D", "url": "https://docs.vllm.ai/en/v0.31.0/cli/serve/", "doc_version": "0.31.0", "quote": "When the limit is reached, new requests are rejected with HTTP 503 so the client can retry on another instance."}
+      ],
+      "notes": "A few parallel chats on one endpoint; a load test is nim-benchmark's job."
+    },
+    "image_text_only": {
+      "sources": [
+        {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/advanced-use-cases/multimodal-input.html", "doc_version": "2.1.5", "quote": "A text-only model cannot process image, audio, or video input."}
+      ]
+    },
+    "tool_parser_flags": {
+      "sources": [
+        {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/advanced-use-cases/tool-calling-and-mcp.html#enable-tool-calling", "doc_version": "2.1.5", "quote": "SGLang does not accept --enable-auto-tool-choice. Parser names also differ between engines, so use a name supported by the backend in your image."},
+        {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/advanced-use-cases/tool-calling-and-mcp.html#error-auto-tool-choice-requires-configuration-vllm-backend", "doc_version": "2.1.5", "quote": "If you see \"auto\" tool choice requires --enable-auto-tool-choice and --tool-call-parser to be set, both arguments must be provided when launching the container."},
+        {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/advanced-configuration.html#passthrough-arguments-nim-passthrough-args", "doc_version": "2.1.5", "quote": "Docker and Kubernetes replace an image environment value when a deployment sets a variable with the same name. They do not append to the image value."},
+        {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/advanced-configuration.html#cli-arguments", "doc_version": "2.1.5", "quote": "Direct arguments resolve at CLI priority and preserve any NIM_PASSTHROUGH_ARGS value provided by the image."}
+      ],
+      "hint": "Start the NIM with the tool-call parser for this model: on vLLM --enable-auto-tool-choice --tool-call-parser <parser>, on SGLang --tool-call-parser <parser>, as container arguments."
+    },
+    "pipeline_parallel_1x": {
+      "sources": [
+        {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/release-notes.html#model-support-and-functionality", "doc_version": "1.15.0", "quote": "Function calling and structured generation is not supported for pipeline parallelism greater than 1."}
+      ]
+    }
+  },
+  "families": [
+    {
+      "id": "llama-3.1-instruct",
+      "name": "Llama 3.1 Instruct (8B, 70B, 405B)",
+      "match": {
+        "repos": [
+          "nim/meta/llama-3.1-8b-instruct",
+          "nim/meta/llama-3.1-70b-instruct",
+          "nim/meta/llama-3.1-405b-instruct",
+          "nim/meta/llama-3.1-8b-instruct-pb6",
+          "nim/meta/llama-3.1-8b-instruct-pb24h2",
+          "nim/meta/llama-3.1-8b-instruct-pb25h1",
+          "nim/meta/llama-3.1-8b-instruct-pb25h2",
+          "nim/meta/llama-3.1-70b-instruct-pb24h2",
+          "nim/meta/llama-3.1-70b-instruct-pb25h1",
+          "nim/meta/llama-3.1-70b-instruct-pb25h2"
+        ],
+        "served_ids": [
+          "meta/llama-3.1-8b-instruct",
+          "meta/llama-3.1-70b-instruct",
+          "meta/llama-3.1-405b-instruct"
+        ],
+        "patterns": ["^(meta|meta-llama)/llama-3-1-(8b|70b|405b)-instruct(-pb[0-9a-z]+)?$"]
+      },
+      "status": "supported",
+      "kind": "llm",
+      "backend": "vllm",
+      "reasoning": {
+        "default": "none",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/reasoning-model.html#reasoning-mode", "doc_version": "1.15.0", "quote": "Select one of the following: ... Llama 3.3 Nemotron Super 49B V1 and Llama 3.1 Nemotron Ultra 253B V1 ... Llama 3.3 Nemotron Super 49B V1.5 ... MiMo-V2-Flash ... Nemotron 3 Nano ... Nemotron 3 Super"}
+        ],
+        "notes": "Not in the list of reasoning models the NIM docs describe."
+      },
+      "tools": {
+        "documented": "yes",
+        "default_on": {"1.x": true, "2.x": null},
+        "parser": "llama3_json",
+        "parallel": "info",
+        "stream": "unknown",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/function-calling.html", "doc_version": "1.15.0", "quote": "Tool calling is supported in the following LLM-specific NIM containers and is automatically enabled for the following models:"},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/function-calling.html#prerequisites", "doc_version": "1.15.0", "quote": "For LLM-specific NIMs, do not set tool calling environment variables externally. If an LLM-specific NIM container supports tool calling, it is enabled automatically."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/supported-models.html", "doc_version": "1.15.0", "quote": "Llama 3.1 8B Instruct | Meta | meta/llama-3.1-8b-instruct | 1.0, 1.1, 1.1.1, 1.1.2, 1.2, 1.2.3, 1.3, 1.3.3, 1.8, 1.8.3, 1.8.4, 1.8.5, 1.8.6, 1.10.1, 1.12.0, 1.13.1, 1.15.2, 1.15.4, 1.15.5 | Yes | Yes | Yes | No"},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/advanced-use-cases/tool-calling-and-mcp.html#enable-tool-calling", "doc_version": "2.1.5", "quote": "Pass the appropriate arguments to nim-serve. The following example uses a vLLM image and the llama3_json parser:"}
+        ],
+        "conflicts": [
+          {"tier": "D", "url": "https://docs.vllm.ai/en/v0.31.0/features/tool_calling/", "doc_version": "0.31.0", "quote": "Parallel tool calls are not supported for Llama 3, but it is supported in Llama 4 models."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.8.0/function-calling.html#supported-models", "doc_version": "1.8.0", "quote": "Llama-3.1-8B-Instruct | No | 1.2"}
+        ],
+        "notes": "1.15.0 lists parallel calls as Yes for 8B and 405B and No for 70B; vLLM and NIM 1.8 say no. Parallel calls are information only. The 2.x images set no NIM_PASSTHROUGH_ARGS, so whether 2.x turns the parser on by default is not documented."
+      },
+      "image": {
+        "documented": "no",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#llms", "doc_version": "2.1.5", "quote": "The following section lists all of the supported LLMs."}
+        ]
+      },
+      "json_schema": {"documented": "engine"},
+      "stream": {"documented": "engine"},
+      "server_switches": {
+        "tools": {
+          "2.x-vllm": "--enable-auto-tool-choice --tool-call-parser llama3_json",
+          "1.x": "LLM-specific 1.x NIMs turn tool calling on by themselves; the multi-LLM NIM needs NIM_ENABLE_AUTO_TOOL_CHOICE=1 NIM_TOOL_CALL_PARSER=llama3_json"
+        }
+      },
+      "known_issues": [
+        {"url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/release-notes.html#model-support-and-functionality", "affects": ["tools"], "text": "1.x: models of 8B or fewer can call tools but are highly inaccurate."}
+      ],
+      "overrides": [
+        {
+          "name": "End of Support images (405B and the 2024-2025 PB images)",
+          "ids": ["meta/llama-3-1-405b-instruct"],
+          "patterns": ["^meta/llama-3-1-(8b|70b)-instruct-pb(24h2|25h1|25h2)$"],
+          "status": "eos"
+        }
+      ]
+    },
+    {
+      "id": "llama-3.1-8b-instruct-dgx-spark",
+      "name": "Llama 3.1 8B Instruct DGX Spark (1.x variant)",
+      "match": {"repos": ["nim/meta/llama-3.1-8b-instruct-dgx-spark"], "served_ids": [], "patterns": []},
+      "status": "eos",
+      "kind": "llm",
+      "backend": "vllm",
+      "reasoning": {
+        "default": "none",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/reasoning-model.html#reasoning-mode", "doc_version": "1.15.0", "quote": "Select one of the following: ... Llama 3.3 Nemotron Super 49B V1 and Llama 3.1 Nemotron Ultra 253B V1 ... Llama 3.3 Nemotron Super 49B V1.5 ... MiMo-V2-Flash ... Nemotron 3 Nano ... Nemotron 3 Super"}
+        ],
+        "notes": "Not in the list of reasoning models the NIM docs describe."
+      },
+      "tools": {
+        "documented": "no",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/release-notes.html#all-current-known-issues-for-specific-models", "doc_version": "1.15.0", "quote": "Llama-3.1-8b-Instruct-DGX-Spark ... Tool calling is not supported. ... Guided decoding is not supported."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/supported-models.html", "doc_version": "1.15.0", "quote": "Llama-3.1-8b-Instruct-DGX-Spark | Meta | meta/llama-3.1-8b-instruct-dgx-spark | 1.0.0-variant | No | No | No | No"}
+        ]
+      },
+      "image": {
+        "documented": "no",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#x-nim-llm-models", "doc_version": "2.1.5", "quote": "For more information on version 1.x NIMs, refer to the 1.15 version of the NIM LLM Supported Models page."}
+        ]
+      },
+      "json_schema": {
+        "documented": "no",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/release-notes.html#all-current-known-issues-for-specific-models", "doc_version": "1.15.0", "quote": "Llama-3.1-8b-Instruct-DGX-Spark ... Tool calling is not supported. ... Guided decoding is not supported."}
+        ]
+      },
+      "stream": {"documented": "engine"},
+      "notes": "Matched only by its image: it serves the same model id as Llama 3.1 8B Instruct."
+    },
+    {
+      "id": "llama-3.2-instruct",
+      "name": "Llama 3.2 Instruct (1B, 3B)",
+      "match": {
+        "repos": ["nim/meta/llama-3.2-1b-instruct", "nim/meta/llama-3.2-3b-instruct"],
+        "served_ids": ["meta/llama-3.2-1b-instruct", "meta/llama-3.2-3b-instruct"],
+        "patterns": ["^(meta|meta-llama)/llama-3-2-(1b|3b)-instruct$"]
+      },
+      "status": "eos",
+      "kind": "llm",
+      "backend": "vllm",
+      "reasoning": {
+        "default": "none",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/reasoning-model.html#reasoning-mode", "doc_version": "1.15.0", "quote": "Select one of the following: ... Llama 3.3 Nemotron Super 49B V1 and Llama 3.1 Nemotron Ultra 253B V1 ... Llama 3.3 Nemotron Super 49B V1.5 ... MiMo-V2-Flash ... Nemotron 3 Nano ... Nemotron 3 Super"}
+        ],
+        "notes": "Not in the list of reasoning models the NIM docs describe."
+      },
+      "tools": {
+        "documented": "yes",
+        "default_on": {"1.x": true, "2.x": null},
+        "parser": "llama3_json",
+        "parallel": "info",
+        "stream": "unknown",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/function-calling.html", "doc_version": "1.15.0", "quote": "Tool calling is supported in the following LLM-specific NIM containers and is automatically enabled for the following models:"},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/function-calling.html#prerequisites", "doc_version": "1.15.0", "quote": "For LLM-specific NIMs, do not set tool calling environment variables externally. If an LLM-specific NIM container supports tool calling, it is enabled automatically."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/supported-models.html", "doc_version": "1.15.0", "quote": "Llama 3.2 1B Instruct | Meta | meta/llama-3.2-1b-instruct | 1.6.0, 1.8.1, 1.8.3, 1.8.5, 1.8.6, 1.10.1, 1.12.0 | Yes | Yes | Yes | No"},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/supported-models.html", "doc_version": "1.15.0", "quote": "Llama 3.2 3B Instruct | Meta | meta/llama-3.2-3b-instruct | 1.6.0, 1.8.3, 1.8.4, 1.8.5, 1.8.6, 1.10.1 | Yes | Yes | No | No"}
+        ],
+        "conflicts": [
+          {"tier": "D", "url": "https://docs.vllm.ai/en/v0.31.0/features/tool_calling/", "doc_version": "0.31.0", "quote": "Parallel tool calls are not supported for Llama 3, but it is supported in Llama 4 models."}
+        ],
+        "notes": "Parallel calls: 1B Yes and 3B No in 1.15.0, not supported for Llama 3 in vLLM; information only."
+      },
+      "image": {
+        "documented": "no",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#x-nim-llm-models", "doc_version": "2.1.5", "quote": "For more information on version 1.x NIMs, refer to the 1.15 version of the NIM LLM Supported Models page."}
+        ]
+      },
+      "json_schema": {"documented": "engine"},
+      "stream": {"documented": "engine"},
+      "server_switches": {
+        "tools": {
+          "2.x-vllm": "--enable-auto-tool-choice --tool-call-parser llama3_json",
+          "1.x": "LLM-specific 1.x NIMs turn tool calling on by themselves"
+        }
+      },
+      "known_issues": [
+        {"url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/release-notes.html#model-support-and-functionality", "affects": ["tools"], "text": "1.x: function calling lost guided decoding, so Llama 3.2 1B/3B call tools less accurately."}
+      ]
+    },
+    {
+      "id": "llama-3.3-70b-instruct",
+      "name": "Llama 3.3 70B Instruct",
+      "match": {
+        "repos": ["nim/meta/llama-3.3-70b-instruct", "nim/meta/llama-3.3-70b-instruct-pb6"],
+        "served_ids": ["meta/llama-3.3-70b-instruct"],
+        "patterns": ["^(meta|meta-llama)/llama-3-3-70b-instruct(-pb[0-9a-z]+)?$"]
+      },
+      "status": "supported",
+      "kind": "llm",
+      "backend": "vllm",
+      "reasoning": {
+        "default": "none",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/reasoning-model.html#reasoning-mode", "doc_version": "1.15.0", "quote": "Select one of the following: ... Llama 3.3 Nemotron Super 49B V1 and Llama 3.1 Nemotron Ultra 253B V1 ... Llama 3.3 Nemotron Super 49B V1.5 ... MiMo-V2-Flash ... Nemotron 3 Nano ... Nemotron 3 Super"}
+        ],
+        "notes": "Not in the list of reasoning models the NIM docs describe."
+      },
+      "tools": {
+        "documented": "yes",
+        "default_on": {"1.x": true, "2.x": null},
+        "parser": "llama3_json",
+        "parallel": "no",
+        "stream": "unknown",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/function-calling.html", "doc_version": "1.15.0", "quote": "Tool calling is supported in the following LLM-specific NIM containers and is automatically enabled for the following models:"},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/function-calling.html#prerequisites", "doc_version": "1.15.0", "quote": "For LLM-specific NIMs, do not set tool calling environment variables externally. If an LLM-specific NIM container supports tool calling, it is enabled automatically."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/supported-models.html", "doc_version": "1.15.0", "quote": "Llama 3.3 70B Instruct | Meta | meta/llama-3.3-70b-instruct | 1.5.2, 1.8.2, 1.8.3, 1.8.4, 1.8.5, 1.10.1, 1.12.0, 1.13.1, 1.14.0, 1.15.1, 1.15.4, 1.15.5 | Yes | Yes | No | No"}
+        ]
+      },
+      "image": {
+        "documented": "no",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#llms", "doc_version": "2.1.5", "quote": "The following section lists all of the supported LLMs."},
+          {"tier": "D", "url": "https://api.ngc.nvidia.com/v2/repos/nim/meta/llama-3.3-70b-instruct", "doc_version": "NGC description (2026-11-11)", "quote": "With 70 billion parameters, it provides strong performance that is comparable to larger models but with lower hardware requirements, and it does not process images or audio."}
+        ]
+      },
+      "json_schema": {"documented": "engine"},
+      "stream": {"documented": "engine"},
+      "server_switches": {
+        "tools": {
+          "2.x-vllm": "--enable-auto-tool-choice --tool-call-parser llama3_json",
+          "1.x": "LLM-specific 1.x NIMs turn tool calling on by themselves"
+        }
+      },
+      "known_issues": [
+        {"url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/release-notes.html#all-current-known-issues-for-specific-models", "affects": ["tools"], "text": "Llama 3.3 70B Instruct: tool calling may have accuracy issues (1.x)."}
+      ]
+    },
+    {
+      "id": "llama-3.2-vision",
+      "name": "Llama 3.2 Vision Instruct (11B, 90B)",
+      "match": {
+        "repos": ["nim/meta/llama-3.2-11b-vision-instruct", "nim/meta/llama-3.2-90b-vision-instruct"],
+        "served_ids": ["meta/llama-3.2-11b-vision-instruct", "meta/llama-3.2-90b-vision-instruct"],
+        "patterns": ["^(meta|meta-llama)/llama-3-2-(11b|90b)-vision-instruct$"]
+      },
+      "status": "eos",
+      "kind": "vlm",
+      "backend": "vllm",
+      "reasoning": {
+        "default": "none",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/reasoning-model.html#reasoning-mode", "doc_version": "1.15.0", "quote": "Select one of the following: ... Llama 3.3 Nemotron Super 49B V1 and Llama 3.1 Nemotron Ultra 253B V1 ... Llama 3.3 Nemotron Super 49B V1.5 ... MiMo-V2-Flash ... Nemotron 3 Nano ... Nemotron 3 Super"}
+        ],
+        "notes": "Not in the list of reasoning models the NIM docs describe."
+      },
+      "tools": {
+        "documented": "no",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/1.1.1/release-notes.html#limitations", "doc_version": "1.1.1", "quote": "Following Meta’s guidance, function calling is not supported."}
+        ]
+      },
+      "image": {
+        "documented": "yes",
+        "max_images": 1,
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/1.1.1/release-notes.html#limitations", "doc_version": "1.1.1", "quote": "Following Meta’s guidance, only one image per request is supported."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#additional-vlm-models", "doc_version": "2.1.5", "quote": "VLMs that were released prior to version 2.0.12 are documented on the NVIDIA NIM for Vision Language Models site."}
+        ],
+        "notes": "System messages are not allowed with images; the image check sends none."
+      },
+      "json_schema": {"documented": "engine"},
+      "stream": {"documented": "engine"}
+    },
+    {
+      "id": "llama-nemotron-v1",
+      "name": "Llama Nemotron v1 (Super 49B v1, Ultra 253B v1, Nano 8B v1, Nano 4B v1.1)",
+      "match": {
+        "repos": [
+          "nim/nvidia/llama-3.3-nemotron-super-49b-v1",
+          "nim/nvidia/llama-3.1-nemotron-ultra-253b-v1",
+          "nim/nvidia/llama-3.1-nemotron-nano-8b-v1",
+          "nim/nvidia/llama3.1-nemotron-nano-4b-v1.1"
+        ],
+        "served_ids": [
+          "nvidia/llama-3.3-nemotron-super-49b-v1",
+          "nvidia/llama-3.1-nemotron-ultra-253b-v1",
+          "nvidia/llama-3.1-nemotron-nano-8b-v1",
+          "nvidia/llama3.1-nemotron-nano-4b-v1.1"
+        ],
+        "patterns": [
+          "^nvidia/llama-3-3-nemotron-super-49b-v1$",
+          "^nvidia/llama-3-1-nemotron-ultra-253b-v1$",
+          "^nvidia/llama-?3-1-nemotron-nano-(8b-v1|4b-v1-1)$"
+        ]
+      },
+      "status": "eos",
+      "kind": "llm",
+      "backend": "either",
+      "reasoning": {
+        "default": "prompt",
+        "on": {"method": "system", "value": "detailed thinking on"},
+        "off": {"method": "system", "value": "detailed thinking off"},
+        "sampling_on": {"temperature": 0.6, "top_p": 0.95},
+        "sampling_off": {"temperature": 0},
+        "max_tokens": 4096,
+        "where": ["inline", "reasoning", "reasoning_content"],
+        "prefills_off": false,
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/reasoning-model.html#reasoning-mode", "doc_version": "1.15.0", "quote": "For models where this mode is controlled by the system prompt, the system prompt must be the first message in the conversation."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/reasoning-model.html#detailed-thinking-prompt", "doc_version": "1.15.0", "quote": "detailed thinking on | Generates long chain-of-thought style responses with explicit thinking tokens. | temperature = 0.6, top p = 0.95 | detailed thinking off | Generates more concise responses without extended chain-of-thought or thinking tokens. | temperature = 0"},
+          {"tier": "D", "url": "https://huggingface.co/nvidia/Llama-3.1-Nemotron-Nano-8B-v1/blob/54641c1611fcff44fa4865626462445e0a153fc7/README.md", "doc_version": "54641c1", "quote": "For some prompts, even though thinking is disabled, the model emergently prefers to think before responding."}
+        ],
+        "notes": "The mode is set by the system prompt; the default with no system prompt is not documented. Nano can still think on hard prompts with thinking off."
+      },
+      "tools": {
+        "documented": "yes",
+        "default_on": {"1.x": true, "2.x": null},
+        "parallel": "no",
+        "stream": "unknown",
+        "mode": [{"method": "system", "value": "detailed thinking off"}],
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/function-calling.html", "doc_version": "1.15.0", "quote": "Tool calling is supported in the following LLM-specific NIM containers and is automatically enabled for the following models:"},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/function-calling.html", "doc_version": "1.15.0", "quote": "Llama Nemotron Super models (supports detailed thinking off)"},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/supported-models.html", "doc_version": "1.15.0", "quote": "Llama 3.3 Nemotron Super 49B V1 | NVIDIA | nvidia/llama-3.3-nemotron-super-49b-v1 | 1.8.3, 1.8.4, 1.8.5, 1.8.6, 1.10.1 | No | Yes | No | No"}
+        ]
+      },
+      "image": {
+        "documented": "no",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#x-nim-llm-models", "doc_version": "2.1.5", "quote": "For more information on version 1.x NIMs, refer to the 1.15 version of the NIM LLM Supported Models page."}
+        ]
+      },
+      "json_schema": {"documented": "engine"},
+      "stream": {"documented": "engine"},
+      "known_issues": [
+        {"url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/release-notes.html#all-current-known-issues-for-specific-models", "affects": ["reasoning_on", "concurrency"], "text": "Super 49B v1: more than 15 concurrent requests with detailed thinking on can crash the container; the concurrency check never turns thinking on."},
+        {"url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/release-notes.html#all-current-known-issues-for-specific-models", "affects": ["tools"], "text": "Ultra 253B v1: tool calling is not supported when the request sets nvext (never sent)."}
+      ],
+      "overrides": [
+        {
+          "name": "Ultra 253B v1",
+          "ids": ["nvidia/llama-3-1-nemotron-ultra-253b-v1"],
+          "tools": {
+            "parallel": "yes",
+            "sources": [
+              {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/supported-models.html", "doc_version": "1.15.0", "quote": "Llama 3.1 Nemotron Ultra 253B V1 | NVIDIA | nvidia/llama-3.1-nemotron-ultra-253b-v1 | 1.8.4, 1.12.0 | No | Yes | Yes | No"}
+            ]
+          }
+        },
+        {
+          "name": "Nano 8B v1",
+          "ids": ["nvidia/llama-3-1-nemotron-nano-8b-v1"],
+          "tools": {
+            "parallel": "unknown",
+            "sources": [
+              {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/supported-models.html", "doc_version": "1.15.0", "quote": "Llama 3.1 Nemotron Nano 8B V1 | NVIDIA | nvidia/llama-3.1-nemotron-nano-8b-v1 | 1.6.0, 1.8.3, 1.8.4 | No | Yes | - | No"}
+            ]
+          }
+        },
+        {
+          "name": "Nano 4B v1.1",
+          "ids": ["nvidia/llama3-1-nemotron-nano-4b-v1-1", "nvidia/llama-3-1-nemotron-nano-4b-v1-1"],
+          "tools": {
+            "stream": "no",
+            "sources": [
+              {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/supported-models.html", "doc_version": "1.15.0", "quote": "Llama 3.1 Nemotron Nano 4B V1.1 | NVIDIA | nvidia/llama3.1-nemotron-nano-4b-v1.1 | 1.8.4, 1.8.5 | Yes | Yes | No | No"},
+              {"tier": "D", "url": "https://huggingface.co/nvidia/Llama-3.1-Nemotron-Nano-4B-v1.1/blob/d552708a9d575fa8d4a690b988fd870d65279f98/llama_nemotron_nano_toolcall_parser.py", "doc_version": "d552708", "quote": "raise NotImplementedError(\"Tool calling is not supported in streaming mode!\")"}
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "llama-3.3-nemotron-super-49b-v1.5",
+      "name": "Llama 3.3 Nemotron Super 49B v1.5",
+      "match": {
+        "repos": [
+          "nim/nvidia/llama-3.3-nemotron-super-49b-v1.5",
+          "nim/nvidia/llama-3.3-nemotron-super-49b-v1.5-pb6",
+          "nim/nvidia/llama-3.3-nemotron-super-49b-v1.5-pb25h2"
+        ],
+        "served_ids": ["nvidia/llama-3.3-nemotron-super-49b-v1.5"],
+        "patterns": ["^nvidia/llama-3-3-nemotron-super-49b-v1-5(-pb[0-9a-z]+)?$"]
+      },
+      "status": "supported",
+      "kind": "llm",
+      "backend": "vllm",
+      "reasoning": {
+        "default": "on",
+        "on": {"method": "default"},
+        "off": {"method": "system", "value": "/no_think"},
+        "sampling_on": {"temperature": 0.6, "top_p": 0.95},
+        "sampling_off": {"temperature": 0},
+        "max_tokens": 4096,
+        "where": ["inline", "inline_close_only", "reasoning"],
+        "prefills_off": true,
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/release-notes.html#all-current-known-issues-for-specific-models", "doc_version": "1.15.0", "quote": "By default, the model responds in reasoning ON mode. Set /no_think in the system prompt to enable reasoning OFF mode."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/reasoning-model.html#no-think-prompt", "doc_version": "1.15.0", "quote": "Detailed reasoning is on by default for these models. Use the following system prompt to change the default reasoning mode:"},
+          {"tier": "D", "url": "https://huggingface.co/nvidia/Llama-3_3-Nemotron-Super-49B-v1_5/blob/420ba7d28211abf116b8b103ab700d92619daf98/README.md", "doc_version": "420ba7d", "quote": "We recommend setting temperature to 0.6, and Top P to 0.95 for Reasoning ON mode"},
+          {"tier": "D", "url": "https://huggingface.co/nvidia/Llama-3_3-Nemotron-Super-49B-v1_5/blob/420ba7d28211abf116b8b103ab700d92619daf98/tokenizer_config.json", "doc_version": "420ba7d", "quote": "{%- if not enable_thinking -%}{{- '<think>\\n\\n</think>\\n\\n' -}}"}
+        ],
+        "notes": "The template pre-fills an empty think block for /no_think, so the answer can land in the reasoning field on a misconfigured parser. Which reasoning parser the NIM image sets is not documented."
+      },
+      "tools": {
+        "documented": "yes",
+        "default_on": {"1.x": true, "2.x": null},
+        "parser": "llama_nemotron_json",
+        "parallel": "yes",
+        "stream": "no",
+        "mode": [{"method": "system", "value": "/no_think"}],
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/function-calling.html", "doc_version": "1.15.0", "quote": "Tool calling is supported in the following LLM-specific NIM containers and is automatically enabled for the following models:"},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/function-calling.html", "doc_version": "1.15.0", "quote": "Llama Nemotron Super models (supports detailed thinking off)"},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/supported-models.html", "doc_version": "1.15.0", "quote": "Llama-3.3-Nemotron-Super-49B-v1.5 | NVIDIA | nvidia/llama-3.3-nemotron-super-49b-v1.5 | 1.12.0, 1.13.1, 1.14.0, 1.15.1, 1.15.4, 1.15.5 | Yes | Yes | Yes | No"},
+          {"tier": "D", "url": "https://huggingface.co/nvidia/Llama-3_3-Nemotron-Super-49B-v1_5/blob/420ba7d28211abf116b8b103ab700d92619daf98/llama_nemotron_toolcall_parser_no_streaming.py", "doc_version": "420ba7d", "quote": "raise NotImplementedError(\"Tool calling is not supported in streaming mode!\")"}
+        ],
+        "notes": "Tools are tested with /no_think, as the NIM docs pair tool calling with thinking off. The model card's tool parser does not stream, so streamed tool calls are not applicable."
+      },
+      "image": {
+        "documented": "no",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#llms", "doc_version": "2.1.5", "quote": "The following section lists all of the supported LLMs."}
+        ]
+      },
+      "json_schema": {"documented": "engine"},
+      "stream": {"documented": "engine"},
+      "server_switches": {"tools": {"1.x": "LLM-specific 1.x NIMs turn tool calling on by themselves"}},
+      "known_issues": [
+        {"url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/about-nim-llm/release-notes.html#issue-2-1-5-nemotron-super-49b-nvfp4-tp8-api-limitations", "affects": ["json_schema", "reasoning_on", "chat"], "text": "2.1.5: the NVFP4 TP8 profile on B200, B300 and RTX PRO GPUs can give repetitive output, and response_format requests can return HTTP 500."},
+        {"url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/about-nim-llm/release-notes.html#issue-2-1-5-nemotron-super-49b-gb10-nvfp4-tp1-decode-latency", "affects": ["reasoning_on"], "text": "2.1.5: NVFP4 TP1 on GB10 can exceed client timeouts for large generations."}
+      ]
+    },
+    {
+      "id": "nemotron-nano-9b-v2",
+      "name": "NVIDIA Nemotron Nano 9B v2",
+      "match": {
+        "repos": [
+          "nim/nvidia/nvidia-nemotron-nano-9b-v2",
+          "nim/nvidia/nvidia-nemotron-nano-9b-v2-dgx-spark"
+        ],
+        "served_ids": ["nvidia/nvidia-nemotron-nano-9b-v2"],
+        "patterns": ["^nvidia/nvidia-nemotron-nano-9b-v2(-dgx-spark)?$"]
+      },
+      "status": "eos",
+      "kind": "llm",
+      "backend": "vllm",
+      "reasoning": {
+        "default": "on",
+        "on": {"method": "system", "value": "/think"},
+        "off": {"method": "system", "value": "/no_think"},
+        "sampling_on": {"temperature": 0.6, "top_p": 0.95},
+        "sampling_off": {"temperature": 0},
+        "max_tokens": 4096,
+        "where": ["reasoning", "inline_close_only"],
+        "prefills_off": true,
+        "sources": [
+          {"tier": "D", "url": "https://huggingface.co/nvidia/NVIDIA-Nemotron-Nano-9B-v2/blob/6533e8de2c68e4536bf7c411d7a3ce5734111476/README.md", "doc_version": "6533e8d", "quote": "Case 1: /think or no reasoning signal is provided in the system prompt, reasoning will be set to True"},
+          {"tier": "D", "url": "https://huggingface.co/nvidia/NVIDIA-Nemotron-Nano-9B-v2/blob/6533e8de2c68e4536bf7c411d7a3ce5734111476/README.md", "doc_version": "6533e8d", "quote": "Case 2: /no_think is provided, reasoning will be set to False"},
+          {"tier": "D", "url": "https://huggingface.co/nvidia/NVIDIA-Nemotron-Nano-9B-v2/blob/6533e8de2c68e4536bf7c411d7a3ce5734111476/README.md", "doc_version": "6533e8d", "quote": "We recommend setting temperature to 0.6, top_p to 0.95 for reasoning True and greedy search for reasoning False, and increase max_new_tokens to 1024 or higher for reasoning True."},
+          {"tier": "D", "url": "https://huggingface.co/nvidia/NVIDIA-Nemotron-Nano-9B-v2/blob/6533e8de2c68e4536bf7c411d7a3ce5734111476/tokenizer_config.json", "doc_version": "6533e8d", "quote": "{%- if ns.enable_thinking is defined and ns.enable_thinking is false -%}{{- '<think></think>' -}}{%- else -%}{{- '<think>\\n' -}}{%- endif -%}"}
+        ],
+        "notes": "The NIM docs describe budget control for this model but not the switch; the switch comes from the model card. The template pre-fills the think block."
+      },
+      "tools": {
+        "documented": "yes",
+        "default_on": {"1.x": true, "2.x": null},
+        "parser": "nemotron_json",
+        "parallel": "yes",
+        "stream": "no",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/function-calling.html#prerequisites", "doc_version": "1.15.0", "quote": "For LLM-specific NIMs, do not set tool calling environment variables externally. If an LLM-specific NIM container supports tool calling, it is enabled automatically."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/supported-models.html", "doc_version": "1.15.0", "quote": "NVIDIA-Nemotron-Nano-9B-v2 | NVIDIA | nvidia/nvidia-nemotron-nano-9b-v2 | 1.12.2 | No | Yes | Yes | No"},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/release-notes.html#all-current-known-issues-for-specific-models", "doc_version": "1.15.0", "quote": "NVIDIA-Nemotron-Nano-9B-v2-DGX-Spark ... Tool calling is not supported when the stream parameter is set to true."},
+          {"tier": "D", "url": "https://huggingface.co/nvidia/NVIDIA-Nemotron-Nano-9B-v2/blob/6533e8de2c68e4536bf7c411d7a3ce5734111476/nemotron_toolcall_parser_no_streaming.py", "doc_version": "6533e8d", "quote": "raise NotImplementedError(\"Tool calling is not supported in streaming mode!\")"}
+        ],
+        "notes": "stream no holds for every image: the model card's nemotron_json parser (nemotron_toolcall_parser_no_streaming.py) raises on streamed tool calls, and the release notes say the same for the DGX Spark variant."
+      },
+      "image": {
+        "documented": "no",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#x-nim-llm-models", "doc_version": "2.1.5", "quote": "For more information on version 1.x NIMs, refer to the 1.15 version of the NIM LLM Supported Models page."}
+        ]
+      },
+      "json_schema": {"documented": "engine"},
+      "stream": {"documented": "engine"},
+      "server_switches": {"tools": {"1.x": "LLM-specific 1.x NIMs turn tool calling on by themselves"}},
+      "overrides": [
+        {
+          "name": "DGX Spark 1.x variant image",
+          "ids": ["nvidia/nvidia-nemotron-nano-9b-v2-dgx-spark"],
+          "tools": {
+            "documented": "yes",
+            "default_on": {"1.x": false},
+            "sources": [
+              {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/supported-models.html", "doc_version": "1.15.0", "quote": "NVIDIA-Nemotron-Nano-9B-v2-DGX-Spark | NVIDIA | nvidia/nvidia-nemotron-nano-9b-v2-dgx-spark | 1.0.0-variant | No | Yes | Yes | No"},
+              {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.14.0/nim-container-variants.html#nvidia-nemotron-nano-9b-v2-dgx-spark", "doc_version": "1.14.0", "quote": "TOOL_CALL_PARSER: Set to 1 to turn tool calling on."},
+              {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/release-notes.html#all-current-known-issues-for-specific-models", "doc_version": "1.15.0", "quote": "NVIDIA-Nemotron-Nano-9B-v2-DGX-Spark ... Tool calling is not supported when the stream parameter is set to true."}
+            ],
+            "notes": "The 1.15.0 variants page sends readers of this 1.0.0-variant image to the 1.14.0 page, whose section for it makes tool calling opt-in with TOOL_CALL_PARSER=1."
+          },
+          "json_schema": {
+            "documented": "no",
+            "sources": [
+              {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.14.0/nim-container-variants.html#nvidia-nemotron-nano-9b-v2-dgx-spark", "doc_version": "1.14.0", "quote": "The following API features are not supported: ... Guided decoding (including guided_whitespace_pattern and structured_generation)"}
+            ]
+          },
+          "server_switches": {"tools": {"1.x": "TOOL_CALL_PARSER=1 (DGX Spark variant image)"}}
+        }
+      ]
+    },
+    {
+      "id": "nemotron-nano-12b-v2-vl",
+      "name": "NVIDIA Nemotron Nano 12B v2 VL",
+      "match": {
+        "repos": ["nim/nvidia/nemotron-nano-12b-v2-vl"],
+        "served_ids": ["nvidia/nemotron-nano-12b-v2-vl"],
+        "patterns": ["^nvidia/(nvidia-)?nemotron-nano-12b-v2-vl(-bf16|-fp8|-nvfp4)?$"]
+      },
+      "status": "eos",
+      "kind": "vlm",
+      "backend": "vllm",
+      "reasoning": {
+        "default": "off",
+        "on": {"method": "system", "value": "/think"},
+        "off": {"method": "system", "value": "/no_think"},
+        "sampling_off": {"temperature": 0},
+        "max_tokens": 4096,
+        "where": ["reasoning", "inline_close_only", "inline"],
+        "prefills_off": true,
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/1.6.0/examples/nemotron-nano-12b-v2-vl/api.html#reasoning", "doc_version": "1.6.0", "quote": "This model supports reasoning with text and image inputs. To turn on reasoning, add /think to the system prompt. For video inputs, reasoning is not supported."},
+          {"tier": "D", "url": "https://huggingface.co/nvidia/NVIDIA-Nemotron-Nano-12B-v2-VL-BF16/blob/ca9543b126e8bf3176916d3d305ccc415f89fd4d/chat_template.jinja", "doc_version": "ca9543b", "quote": "{%- elif '/no_think' in message['content'] -%} {%- set ns.enable_thinking = false -%}"}
+        ],
+        "notes": "Reasoning is off by default; /no_think is the template's off switch."
+      },
+      "tools": {
+        "documented": "yes",
+        "default_on": null,
+        "parallel": "unknown",
+        "stream": "unknown",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/1.6.0/examples/nemotron-nano-12b-v2-vl/api.html#function-tool-calling", "doc_version": "1.6.0", "quote": "You can connect NIM to external tools and services using function calling (also known as tool calling)."}
+        ],
+        "conflicts": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/2.1.2-variant/function-calling.html", "doc_version": "2.1.2-variant", "quote": "Function calling is not supported on some models."}
+        ],
+        "notes": "The model page has a tool-calling section but names no parser; a missing parser is reported as not enabled in this deployment."
+      },
+      "image": {
+        "documented": "yes",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/1.6.0/examples/nemotron-nano-12b-v2-vl/api.html#reasoning", "doc_version": "1.6.0", "quote": "This model supports reasoning with text and image inputs."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#additional-vlm-models", "doc_version": "2.1.5", "quote": "VLMs that were released prior to version 2.0.12 are documented on the NVIDIA NIM for Vision Language Models site."}
+        ]
+      },
+      "json_schema": {"documented": "engine"},
+      "stream": {"documented": "engine"}
+    },
+    {
+      "id": "nemotron-3",
+      "name": "Nemotron 3 (Nano 30B-A3B, Super 120B-A12B, Ultra 550B-A55B, Nano Omni 30B-A3B Reasoning)",
+      "match": {
+        "repos": [
+          "nim/nvidia/nemotron-3-nano",
+          "nim/nvidia/nemotron-3-nano-pb6",
+          "nim/nvidia/nemotron-3-super-120b-a12b",
+          "nim/nvidia/nemotron-3-ultra-550b-a55b",
+          "nim/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning"
+        ],
+        "served_ids": [
+          "nvidia/nemotron-3-nano",
+          "nvidia/nemotron-3-super-120b-a12b",
+          "nvidia/nemotron-3-ultra-550b-a55b",
+          "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+          "nvidia/nemotron-nano-3-30b-a3b"
+        ],
+        "patterns": [
+          "^nvidia/nemotron-3-nano(-pb[0-9a-z]+)?$",
+          "^nvidia/(nvidia-)?nemotron-3-(nano-30b-a3b|super-120b-a12b|ultra-550b-a55b)(-bf16|-fp8|-nvfp4)?$",
+          "^nvidia/nemotron-3-nano-omni-30b-a3b-reasoning(-bf16|-fp8|-nvfp4)?$"
+        ]
+      },
+      "status": "supported",
+      "kind": "llm",
+      "backend": "vllm",
+      "reasoning": {
+        "default": "on",
+        "on": {"method": "kwargs", "key": "enable_thinking", "value": true},
+        "off": {"method": "kwargs", "key": "enable_thinking", "value": false},
+        "sampling_on": {"temperature": 1.0, "top_p": 1.0},
+        "sampling_off": {"temperature": 0},
+        "max_tokens": 4096,
+        "where": ["reasoning", "inline_close_only"],
+        "prefills_off": true,
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/reasoning-model.html#chat-template-keyword-arguments", "doc_version": "1.15.0", "quote": "enable_thinking: Default is True. Generates long chain-of-thought style responses with explicit thinking tokens. Set to False to generate more concise responses without extended chain-of-thought or thinking tokens."},
+          {"tier": "D", "url": "https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16/blob/bf77c3174f68ad409e1c2aa60daeb46e32d1c606/README.md", "doc_version": "bf77c31", "quote": "temperature=1.0 and top_p=1.0 are recommended for reasoning tasks, while temperature=0.6 and top_p=0.95 are recommended for tool calling."},
+          {"tier": "D", "url": "https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16/blob/bf77c3174f68ad409e1c2aa60daeb46e32d1c606/chat_template.jinja", "doc_version": "bf77c31", "quote": "{{- '<|im_start|>assistant\\n<think></think>' }}"}
+        ],
+        "notes": "The template pre-fills <think></think> when thinking is off."
+      },
+      "tools": {
+        "documented": "yes",
+        "default_on": {"1.x": false, "2.x": null},
+        "parser": "qwen3_coder",
+        "parallel": "yes",
+        "stream": "unknown",
+        "mode": [
+          {"method": "kwargs", "key": "enable_thinking", "value": true},
+          {"method": "kwargs", "key": "force_nonempty_content", "value": true}
+        ],
+        "sampling": {"temperature": 0.6, "top_p": 0.95},
+        "max_tokens": 4096,
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/function-calling.html", "doc_version": "1.15.0", "quote": "Tool calling is supported in the following LLM-specific NIM containers and is automatically enabled for the following models:"},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/supported-models.html", "doc_version": "1.15.0", "quote": "NVIDIA Nemotron 3 Nano | NVIDIA | nvidia/nemotron-3-nano | 1.5.1-variant, 1.7.0-variant | No | Yes | Yes | No"},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/supported-models.html", "doc_version": "1.15.0", "quote": "Nemotron-3-Super-120B-A12B | NVIDIA | nvidia/nemotron-3-super-120b-a12b | 1.8.0-variant, 1.8.1-variant, 1.8.2-variant, 1.8.3-variant | Yes | Yes | Yes | No"},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/nim-container-variants.html#nemotron-3-nano", "doc_version": "1.15.0", "quote": "TOOL_CALL_PARSER: Set to 1 to turn tool calling on."},
+          {"tier": "D", "url": "https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-BF16/blob/main/README.md", "doc_version": "77df655", "quote": "when calling the chat completions endpoint with tools, you must set \"chat_template_kwargs\": {\"enable_thinking\": true, \"force_nonempty_content\": true} in the request body to parse both reasoning and tool calls correctly."}
+        ],
+        "notes": "1.x variant images turn tool calling on only with TOOL_CALL_PARSER=1. Tools are tested with thinking on and force_nonempty_content, as the model cards ask."
+      },
+      "image": {
+        "documented": "no",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#llms", "doc_version": "2.1.5", "quote": "The following section lists all of the supported LLMs."}
+        ]
+      },
+      "json_schema": {"documented": "engine"},
+      "stream": {"documented": "engine"},
+      "server_switches": {
+        "tools": {
+          "2.x-vllm": "--enable-auto-tool-choice --tool-call-parser qwen3_coder",
+          "1.x": "TOOL_CALL_PARSER=1 (1.x variant images)"
+        },
+        "reasoning": {
+          "2.x-vllm": "--reasoning-parser nemotron_v3",
+          "1.x": "REASONING_PARSER=1 (1.x variant images)"
+        }
+      },
+      "known_issues": [
+        {"url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/release-notes.html#new-issues-1-15-0", "affects": ["tools"], "text": "Nemotron 3 Nano 1.5.1-variant: tool calling may occasionally fail."}
+      ],
+      "overrides": [
+        {
+          "name": "Super 120B-A12B",
+          "ids": ["nvidia/nemotron-3-super-120b-a12b", "nvidia/nvidia-nemotron-3-super-120b-a12b"],
+          "patterns": ["^nvidia/(nvidia-)?nemotron-3-super-120b-a12b(-bf16|-fp8|-nvfp4)?$"],
+          "reasoning": {
+            "sampling_on": {"temperature": 1.0, "top_p": 0.95},
+            "sources": [
+              {"tier": "D", "url": "https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-BF16/blob/main/README.md", "doc_version": "2dc98e2", "quote": "Use temperature=1.0 and top_p=0.95 across all tasks and serving backends — reasoning, tool calling, and general chat alike."}
+            ]
+          },
+          "tools": {
+            "sampling": {"temperature": 1.0, "top_p": 0.95},
+            "named": "yes",
+            "sources": [
+              {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/release-notes.html#new-issues-1-15-0", "doc_version": "1.15.0", "quote": "For tool calling, the model supports setting tool_choice: \"required\", which forces the model to call a tool. The model also supports named tool calls, which let you specify a tool by name in tool_choice."}
+            ]
+          }
+        },
+        {
+          "name": "Ultra 550B-A55B",
+          "ids": ["nvidia/nemotron-3-ultra-550b-a55b", "nvidia/nvidia-nemotron-3-ultra-550b-a55b"],
+          "patterns": ["^nvidia/(nvidia-)?nemotron-3-ultra-550b-a55b(-bf16|-fp8|-nvfp4)?$"],
+          "reasoning": {"sampling_on": {"temperature": 1.0, "top_p": 0.95}},
+          "tools": {
+            "documented": "yes",
+            "default_on": {"1.x": null, "2.x": true},
+            "parallel": "unknown",
+            "sampling": {"temperature": 1.0, "top_p": 0.95},
+            "sources": [
+              {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.0.13/about-nim-llm/release-notes.html#issue-2-0-13-nemotron-ultra-reasoning-parser", "doc_version": "2.0.13", "quote": "Workaround: Set the following variable at startup. It preserves the default tool configuration; preserve any additional arguments required by your deployment."},
+              {"tier": "D", "url": "https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-BF16/blob/main/README.md", "doc_version": "77df655", "quote": "when calling the chat completions endpoint with tools, you must set \"chat_template_kwargs\": {\"enable_thinking\": true, \"force_nonempty_content\": true} in the request body to parse both reasoning and tool calls correctly."}
+            ]
+          }
+        },
+        {
+          "name": "Nano Omni 30B-A3B Reasoning",
+          "ids": ["nvidia/nemotron-3-nano-omni-30b-a3b-reasoning"],
+          "patterns": ["^nvidia/nemotron-3-nano-omni-30b-a3b-reasoning(-bf16|-fp8|-nvfp4)?$"],
+          "kind": "vlm",
+          "reasoning": {
+            "sampling_on": {"temperature": 0.6, "top_p": 0.95},
+            "sources": [
+              {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/1.7.0/examples/nemotron-3-nano-omni-30b-a3b-reasoning/api.html#reasoning", "doc_version": "1.7.0", "quote": "Thinking is enabled by default. To disable it for a specific request, pass \"chat_template_kwargs\": {\"enable_thinking\": false} in the request body."}
+            ]
+          },
+          "tools": {
+            "documented": "yes",
+            "default_on": null,
+            "parallel": "unknown",
+            "sources": [
+              {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/1.7.0/examples/nemotron-3-nano-omni-30b-a3b-reasoning/api.html#function-tool-calling", "doc_version": "1.7.0", "quote": "You can connect NIM to external tools and services using function calling (also known as tool calling)."}
+            ],
+            "notes": "The VLM pages of this model name no tool-call switch and do not say whether the image turns the parser on; TOOL_CALL_PARSER=1 is documented only for the LLM Nemotron 3 Nano 1.x variant, so it is not inherited here."
+          },
+          "server_switches": {
+            "tools": {"2.x-vllm": "--enable-auto-tool-choice --tool-call-parser qwen3_coder"},
+            "reasoning": {"2.x-vllm": "--reasoning-parser nemotron_v3"}
+          },
+          "image": {
+            "documented": "yes",
+            "sources": [
+              {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#vlms", "doc_version": "2.1.5", "quote": "The following section lists all of the supported VLMs."},
+              {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/1.7.0/examples/nemotron-3-nano-omni-30b-a3b-reasoning/api.html#reasoning", "doc_version": "1.7.0", "quote": "This model supports reasoning with text and vision inputs."}
+            ]
+          },
+          "known_issues": [
+            {"url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/about-nim-llm/release-notes.html#issue-2-1-5-nemotron-3-nano-omni-ga-b300-nvfp4-gpqa-liveness-restart", "affects": ["health", "reasoning_on"], "text": "2.1.5: under long reasoning load /v1/health/ready can take over 5 s on B300."}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "nemotron-3.5-super-vl",
+      "name": "Nemotron 3.5 Super VL 120B-A12B",
+      "match": {
+        "repos": ["nim/nvidia/nemotron-3.5-super-vl-120b-a12b"],
+        "served_ids": ["nvidia/nemotron-3.5-super-vl-120b-a12b"],
+        "patterns": ["^nvidia/(nvidia-)?nemotron-3-5-super-vl-120b-a12b(-bf16|-fp8|-nvfp4)?$"]
+      },
+      "status": "supported",
+      "kind": "vlm",
+      "backend": "vllm",
+      "reasoning": {
+        "default": "on",
+        "on": {"method": "effort", "value": "high"},
+        "off": {"method": "kwargs", "key": "enable_thinking", "value": false},
+        "max_tokens": 4096,
+        "where": ["reasoning"],
+        "prefills_off": false,
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.0.13/get-started/advanced/get-started-nemotron-3.5-super-vl.html#control-reasoning", "doc_version": "2.0.13", "quote": "\"chat_template_kwargs\": {\"enable_thinking\": false} | true (default), false | false turns reasoning off; the model answers directly."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.0.13/get-started/advanced/get-started-nemotron-3.5-super-vl.html#control-reasoning", "doc_version": "2.0.13", "quote": "\"low\" and \"medium\" select a shorter, efficient reasoning mode; \"high\" (or omitting the field) selects full reasoning."}
+        ]
+      },
+      "tools": {
+        "documented": "yes",
+        "default_on": {"2.x": true},
+        "parser": "qwen3_coder",
+        "parallel": "unknown",
+        "stream": "unknown",
+        "max_tokens": 4096,
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.0.13/get-started/advanced/get-started-nemotron-3.5-super-vl.html", "doc_version": "2.0.13", "quote": "Each packaged profile carries the full set of engine arguments validated for its GPU and precision: ... the nemotron_v3 reasoning parser, the qwen3_coder tool-call parser, the chat template,"}
+        ]
+      },
+      "image": {
+        "documented": "yes",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#vlms", "doc_version": "2.1.5", "quote": "The following section lists all of the supported VLMs."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.0.13/get-started/advanced/get-started-nemotron-3.5-super-vl.html", "doc_version": "2.0.13", "quote": "It accepts text, image, and video input and returns text; it does not accept audio input."}
+        ]
+      },
+      "json_schema": {"documented": "engine"},
+      "stream": {"documented": "engine"},
+      "server_switches": {
+        "tools": {"2.x-vllm": "--enable-auto-tool-choice --tool-call-parser qwen3_coder"},
+        "reasoning": {"2.x-vllm": "--reasoning-parser nemotron_v3"}
+      },
+      "known_issues": [
+        {"url": "https://docs.nvidia.com/nim/large-language-models/2.0.13/get-started/advanced/get-started-nemotron-3.5-super-vl.html#known-issues", "affects": ["tools"], "text": "A forced call to a tool whose parameters have no properties can return invented keys."},
+        {"url": "https://docs.nvidia.com/nim/large-language-models/2.0.13/get-started/advanced/get-started-nemotron-3.5-super-vl.html#known-issues", "affects": ["reasoning_on"], "text": "thinking_token_budget leaves content empty; the check never sends it."}
+      ]
+    },
+    {
+      "id": "qwen3",
+      "name": "Qwen3 hybrid thinking models (32B and others)",
+      "match": {
+        "repos": ["nim/qwen/qwen3-32b", "nim/qwen/qwen3-32b-dgx-spark", "nim/qwen/qwen3-235b-a22b-fp8"],
+        "served_ids": ["qwen/qwen3-32b"],
+        "patterns": ["^qwen/qwen3-(0-6b|1-7b|4b|8b|14b|32b|30b-a3b|235b-a22b)(-fp8|-awq|-dgx-spark)?$"]
+      },
+      "status": "eos",
+      "kind": "llm",
+      "backend": "either",
+      "reasoning": {
+        "default": "on",
+        "on": {"method": "kwargs", "key": "enable_thinking", "value": true},
+        "off": {"method": "kwargs", "key": "enable_thinking", "value": false},
+        "sampling_on": {"temperature": 0.6, "top_p": 0.95, "top_k": 20},
+        "sampling_off": {"temperature": 0.7, "top_p": 0.8, "top_k": 20},
+        "max_tokens": 4096,
+        "where": ["reasoning", "reasoning_content", "inline"],
+        "prefills_off": true,
+        "sources": [
+          {"tier": "D", "url": "https://docs.vllm.ai/en/v0.31.0/features/reasoning_outputs/", "doc_version": "0.31.0", "quote": "The reasoning feature for the Qwen3 series is enabled by default. To disable it, you must pass enable_thinking=False in your chat_template_kwargs."},
+          {"tier": "D", "url": "https://huggingface.co/Qwen/Qwen3-32B/blob/9216db5781bf21249d130ec9da846c4624c16137/README.md", "doc_version": "9216db5", "quote": "For thinking mode, use Temperature=0.6, TopP=0.95, TopK=20, and MinP=0 (the default setting in generation_config.json). DO NOT use greedy decoding, as it can lead to performance degradation and endless repetitions."},
+          {"tier": "D", "url": "https://huggingface.co/Qwen/Qwen3-32B/blob/9216db5781bf21249d130ec9da846c4624c16137/README.md", "doc_version": "9216db5", "quote": "For non-thinking mode, we suggest using Temperature=0.7, TopP=0.8, TopK=20, and MinP=0."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.14.0/nim-container-variants.html#qwen3-32b", "doc_version": "1.14.0", "quote": "REASONING_PARSER: Set to 1 to turn thinking on."}
+        ],
+        "notes": "1.x variant images parse reasoning only with REASONING_PARSER=1. The template pre-fills an empty think block when thinking is off."
+      },
+      "tools": {
+        "documented": "yes",
+        "default_on": {"1.x": false, "2.x": null},
+        "parser": "hermes",
+        "parallel": "yes",
+        "stream": "unknown",
+        "sampling": {"temperature": 0.6, "top_p": 0.95, "top_k": 20},
+        "max_tokens": 4096,
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/supported-models.html", "doc_version": "1.15.0", "quote": "Qwen3-32B | Alibaba Cloud | qwen/qwen3-32b | 1.0.0 | No | Yes | Yes | No"},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.14.0/nim-container-variants.html#qwen3-32b", "doc_version": "1.14.0", "quote": "TOOL_CALL_PARSER: Set to 1 to turn tool calling on."}
+        ]
+      },
+      "image": {
+        "documented": "no",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#x-nim-llm-models", "doc_version": "2.1.5", "quote": "For more information on version 1.x NIMs, refer to the 1.15 version of the NIM LLM Supported Models page."}
+        ]
+      },
+      "json_schema": {"documented": "engine"},
+      "stream": {"documented": "engine"},
+      "server_switches": {
+        "tools": {
+          "2.x-vllm": "--enable-auto-tool-choice --tool-call-parser hermes",
+          "1.x": "TOOL_CALL_PARSER=1 (1.x variant images)"
+        },
+        "reasoning": {
+          "2.x-vllm": "--reasoning-parser qwen3",
+          "1.x": "REASONING_PARSER=1 (1.x variant images)"
+        }
+      },
+      "notes": "The 1.14.0 variants page also lists guided decoding as not supported for the Qwen3-32B 1.0.0 image, but that image serves the same id as a Model-Free NIM running Qwen/Qwen3-32B, so json_schema stays an engine check for that id; only the DGX Spark image, matched by its own repository, is not applicable.",
+      "overrides": [
+        {
+          "name": "Qwen3-32B DGX Spark 1.x variant image",
+          "ids": ["qwen/qwen3-32b-dgx-spark"],
+          "json_schema": {
+            "documented": "no",
+            "sources": [
+              {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.14.0/nim-container-variants.html#qwen3-32b-nim-for-dgx-spark", "doc_version": "1.14.0", "quote": "The following API features are not supported: ... Guided decoding (including guided_whitespace_pattern and structured_generation)"}
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "qwen3-next-thinking",
+      "name": "Qwen3 Next 80B A3B Thinking",
+      "match": {
+        "repos": ["nim/qwen/qwen3-next-80b-a3b-thinking"],
+        "served_ids": ["qwen/qwen3-next-80b-a3b-thinking"],
+        "patterns": ["^qwen/qwen3-next-80b-a3b-thinking(-fp8)?$"]
+      },
+      "status": "eos",
+      "kind": "llm",
+      "backend": "sglang",
+      "reasoning": {
+        "default": "always",
+        "on": {"method": "default"},
+        "off_reason": "always_on",
+        "sampling_on": {"temperature": 0.6, "top_p": 0.95, "top_k": 20},
+        "max_tokens": 4096,
+        "where": ["reasoning_content", "reasoning", "inline_close_only"],
+        "sources": [
+          {"tier": "D", "url": "https://docs.sglang.io/docs/advanced_features/separate_reasoning", "doc_version": "unversioned (fetched 2026-11-11)", "quote": "Qwen3-Thinking (e.g., Qwen3-235B-A22B-Thinking-2507): Use qwen3 or qwen3-thinking parser, always thinks"},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/release-notes.html#all-current-known-issues-for-specific-models", "doc_version": "1.15.0", "quote": "Thinking budget is not supported because the origin model does not support this feature."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.14.0/nim-container-variants.html#qwen3-next-80b-a3b-thinking", "doc_version": "1.14.0", "quote": "REASONING_PARSER: Set to 1 to turn thinking on."}
+        ],
+        "notes": "The model always thinks; on the 1.0.0-variant image the reasoning parser is opt-in (REASONING_PARSER=1), so without it the thinking can arrive in content."
+      },
+      "tools": {
+        "documented": "yes",
+        "default_on": {"1.x": false, "2.x": null},
+        "named": "no",
+        "parallel": "no",
+        "stream": "unknown",
+        "sampling": {"temperature": 0.6, "top_p": 0.95, "top_k": 20},
+        "max_tokens": 4096,
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/supported-models.html", "doc_version": "1.15.0", "quote": "Qwen3 Next 80B A3B Thinking | Alibaba Cloud | qwen/qwen3-next-80b-a3b-thinking | 1.0.0-variant | No | Yes | No | No"},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/release-notes.html#all-current-known-issues-for-specific-models", "doc_version": "1.15.0", "quote": "For tool calling, we recommend that you use \"tool_choice\": \"auto\". Setting tool_choice to function causes endless token generation."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.14.0/nim-container-variants.html#qwen3-next-80b-a3b-thinking", "doc_version": "1.14.0", "quote": "TOOL_CALL_PARSER: Set to 1 to turn tool calling on."}
+        ],
+        "notes": "The 1.15.0 variants page sends readers of this 1.0.0-variant image to the 1.14.0 page, whose section for it makes tool calling opt-in with TOOL_CALL_PARSER=1."
+      },
+      "image": {
+        "documented": "no",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#x-nim-llm-models", "doc_version": "2.1.5", "quote": "For more information on version 1.x NIMs, refer to the 1.15 version of the NIM LLM Supported Models page."}
+        ]
+      },
+      "json_schema": {
+        "documented": "no",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.14.0/nim-container-variants.html#qwen3-next-80b-a3b-thinking", "doc_version": "1.14.0", "quote": "The following API features are not supported: ... Guided decoding (including guided_whitespace_pattern and structured_generation)"}
+        ]
+      },
+      "stream": {"documented": "engine"},
+      "server_switches": {
+        "tools": {"1.x": "TOOL_CALL_PARSER=1 (1.x variant image)"},
+        "reasoning": {"1.x": "REASONING_PARSER=1 (1.x variant image)"}
+      }
+    },
+    {
+      "id": "qwen3.5-vlm",
+      "name": "Qwen3.5, Qwen3.6 and Qwen3.8 VLMs",
+      "match": {
+        "repos": [
+          "nim/qwen/qwen3.5-122b-a10b",
+          "nim/qwen/qwen3.5-397b-a17b",
+          "nim/qwen/qwen3.5-35b-a3b",
+          "nim/qwen/qwen3.6-27b",
+          "nim/qwen/qwen3.6-35b-a3b",
+          "nim/qwen/qwen3.8-27b"
+        ],
+        "served_ids": [
+          "qwen/qwen3.5-122b-a10b",
+          "qwen/qwen3.5-397b-a17b",
+          "qwen/qwen3.5-35b-a3b",
+          "qwen/qwen3.6-27b",
+          "qwen/qwen3.6-35b-a3b",
+          "qwen/qwen3.8-27b"
+        ],
+        "patterns": ["^qwen/qwen3-(5|6|8)-[0-9]+b(-a[0-9]+b)?(-fp8|-nvfp4)?$"]
+      },
+      "status": "supported",
+      "kind": "vlm",
+      "backend": "vllm",
+      "reasoning": {
+        "default": "on",
+        "on": {"method": "kwargs", "key": "enable_thinking", "value": true},
+        "off": {"method": "kwargs", "key": "enable_thinking", "value": false},
+        "sampling_on": {"temperature": 0.6, "top_p": 0.95, "top_k": 20},
+        "max_tokens": 4096,
+        "where": ["reasoning"],
+        "prefills_off": true,
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/1.7.0/examples/qwen/api.html#reasoning", "doc_version": "1.7.0", "quote": "This model supports reasoning. It is on by default. To turn it off, add \"chat_template_kwargs\": { \"enable_thinking\": false } in the request body."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/1.7.0/examples/qwen3.6/api.html#reasoning", "doc_version": "1.7.0", "quote": "This model supports reasoning. It is on by default. To turn it off, add"},
+          {"tier": "D", "url": "https://huggingface.co/Qwen/Qwen3.5-122B-A10B/blob/dc4d348443bc740c68e2d77492492c11606384d5/chat_template.jinja", "doc_version": "dc4d348", "quote": "{%- if enable_thinking is defined and enable_thinking is false %} {{- '<think>\\n\\n</think>\\n\\n' }}"}
+        ]
+      },
+      "tools": {
+        "documented": "yes",
+        "default_on": null,
+        "parser": "qwen3_coder",
+        "parallel": "unknown",
+        "stream": "unknown",
+        "sampling": {"temperature": 0.6, "top_p": 0.95, "top_k": 20},
+        "max_tokens": 4096,
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/1.7.0/examples/qwen/api.html#function-tool-calling", "doc_version": "1.7.0", "quote": "You can connect NIM to external tools and services using function calling (also known as tool calling)."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/1.7.0/examples/qwen3.6/api.html#function-tool-calling", "doc_version": "1.7.0", "quote": "You can connect NIM to external tools and services using function calling (also known as tool calling)."}
+        ],
+        "notes": "Whether the qwen3.5 and qwen3.6 images turn the parser on by default is not documented; when the image is local, the image default decides."
+      },
+      "image": {
+        "documented": "yes",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#vlms", "doc_version": "2.1.5", "quote": "The following section lists all of the supported VLMs."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/about-nim-llm/release-notes.html#support-changes", "doc_version": "2.1.5", "quote": "qwen3.5-122b-a10b supports text and image input only in this release."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/1.7.0/examples/qwen/api.html#passing-images", "doc_version": "1.7.0", "quote": "NIM for VLMs follows the OpenAI specification to pass images as part of the HTTP payload in a user message."}
+        ],
+        "notes": "Video input is not supported; the skill never sends video."
+      },
+      "json_schema": {"documented": "engine"},
+      "stream": {"documented": "engine"},
+      "server_switches": {
+        "tools": {"2.x-vllm": "--enable-auto-tool-choice --tool-call-parser qwen3_coder"},
+        "reasoning": {"2.x-vllm": "--reasoning-parser qwen3"}
+      },
+      "known_issues": [
+        {"url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/about-nim-llm/release-notes.html#issue-2-1-5-qwen3-5-122b-a10b-forced-tool-choice-empty-tool-calls", "affects": ["tools"], "text": "qwen3.5-122b-a10b: forced tool calls can return HTTP 200 with empty tool_calls; auto is unaffected."},
+        {"url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/about-nim-llm/release-notes.html#issue-2-1-5-qwen3-5-397b-a17b-forced-tool-choice-empty-tool-calls", "affects": ["tools"], "text": "qwen3.5-397b-a17b: required or named tool calls can return empty tool_calls."},
+        {"url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/about-nim-llm/release-notes.html#issue-2-1-5-qwen3-5-397b-a17b-complex-sampling-reasoning-only", "affects": ["image"], "text": "qwen3.5-397b-a17b NVFP4 TP4 on B200 returned reasoning and no answer for an image request."}
+      ],
+      "overrides": [
+        {"name": "Qwen3.5 35B-A3B", "ids": ["qwen/qwen3-5-35b-a3b"], "status": "eos"},
+        {
+          "name": "Qwen3.8 27B",
+          "ids": ["qwen/qwen3-8-27b"],
+          "known_issues": [
+            {"url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/about-nim-llm/release-notes.html#issue-2-1-4-qwen3-8-27b-max-num-seqs-cap", "affects": ["tools_none", "tools"], "text": "qwen3.8-27b: a user NIM_PASSTHROUGH_ARGS replaces the image default, and without --exclude-tools-when-tool-choice-none tool_choice none returns empty content."}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qwen2.5",
+      "name": "Qwen2.5 Instruct (7B, 72B, Coder 32B)",
+      "match": {
+        "repos": [
+          "nim/qwen/qwen-2.5-7b-instruct",
+          "nim/qwen/qwen-2.5-72b-instruct",
+          "nim/qwen/qwen2.5-coder-32b-instruct"
+        ],
+        "served_ids": [
+          "qwen/qwen-2.5-7b-instruct",
+          "qwen/qwen-2.5-72b-instruct",
+          "qwen/qwen2.5-coder-32b-instruct"
+        ],
+        "patterns": ["^qwen/qwen-?2-5-(7b|72b|coder-32b)-instruct$"]
+      },
+      "status": "eos",
+      "kind": "llm",
+      "backend": "either",
+      "reasoning": {
+        "default": "none",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/reasoning-model.html#reasoning-mode", "doc_version": "1.15.0", "quote": "Select one of the following: ... Llama 3.3 Nemotron Super 49B V1 and Llama 3.1 Nemotron Ultra 253B V1 ... Llama 3.3 Nemotron Super 49B V1.5 ... MiMo-V2-Flash ... Nemotron 3 Nano ... Nemotron 3 Super"}
+        ],
+        "notes": "Not in the list of reasoning models the NIM docs describe."
+      },
+      "tools": {
+        "documented": "no",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/release-notes.html#all-current-known-issues-for-specific-models", "doc_version": "1.15.0", "quote": "Qwen2.5 7B Instruct ... The tool_choice parameter is not supported."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/release-notes.html#all-current-known-issues-for-specific-models", "doc_version": "1.15.0", "quote": "Qwen2.5 72B Instruct ... The tool_choice is not supported."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/supported-models.html", "doc_version": "1.15.0", "quote": "Qwen2.5 Coder 32B Instruct | Alibaba Cloud | qwen/qwen2.5-coder-32b-instruct | 1.8.5 | No | No | No | No"}
+        ],
+        "conflicts": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/function-calling.html", "doc_version": "1.15.0", "quote": "Qwen2.5 models"}
+        ],
+        "notes": "The 1.15.0 function-calling page lists Qwen2.5 models, but the release notes and the per-model table say no; two sources against one."
+      },
+      "image": {
+        "documented": "no",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#x-nim-llm-models", "doc_version": "2.1.5", "quote": "For more information on version 1.x NIMs, refer to the 1.15 version of the NIM LLM Supported Models page."}
+        ]
+      },
+      "json_schema": {"documented": "engine"},
+      "stream": {"documented": "engine"}
+    },
+    {
+      "id": "gemma-3-1b",
+      "name": "Gemma 3 1B Instruct",
+      "match": {
+        "repos": ["nim/google/gemma-3-1b-it"],
+        "served_ids": ["google/gemma-3-1b-it"],
+        "patterns": ["^google/gemma-3-1b-it$"]
+      },
+      "status": "eos",
+      "kind": "llm",
+      "backend": "vllm",
+      "reasoning": {
+        "default": "none",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/reasoning-model.html#reasoning-mode", "doc_version": "1.15.0", "quote": "Select one of the following: ... Llama 3.3 Nemotron Super 49B V1 and Llama 3.1 Nemotron Ultra 253B V1 ... Llama 3.3 Nemotron Super 49B V1.5 ... MiMo-V2-Flash ... Nemotron 3 Nano ... Nemotron 3 Super"}
+        ],
+        "notes": "Not in the list of reasoning models the NIM docs describe."
+      },
+      "tools": {
+        "documented": "yes",
+        "default_on": {"1.x": true},
+        "parallel": "no",
+        "stream": "unknown",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/function-calling.html#prerequisites", "doc_version": "1.15.0", "quote": "For LLM-specific NIMs, do not set tool calling environment variables externally. If an LLM-specific NIM container supports tool calling, it is enabled automatically."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/supported-models.html", "doc_version": "1.15.0", "quote": "Gemma 3 1B Instruct | Google | google/gemma-3-1b-it | 1.12.0 | No | Yes | No | No"}
+        ],
+        "notes": "The upstream chat template has no tools section and the hosted endpoint lists no capabilities; the NIM table says yes, so a failure is a real finding."
+      },
+      "image": {
+        "documented": "no",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#x-nim-llm-models", "doc_version": "2.1.5", "quote": "For more information on version 1.x NIMs, refer to the 1.15 version of the NIM LLM Supported Models page."}
+        ]
+      },
+      "json_schema": {"documented": "engine"},
+      "stream": {"documented": "engine"},
+      "known_issues": [
+        {"url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/release-notes.html#model-support-and-functionality", "affects": ["tools"], "text": "1.x: models of 8B or fewer can call tools but are highly inaccurate."}
+      ]
+    },
+    {
+      "id": "gemma-4",
+      "name": "Gemma 4 (26B-A4B, 31B)",
+      "match": {
+        "repos": ["nim/google/gemma-4-26b-a4b-it", "nim/google/gemma-4-31b-it"],
+        "served_ids": ["google/gemma-4-26b-a4b-it", "google/gemma-4-31b-it"],
+        "patterns": ["^google/gemma-4-(26b-a4b|31b)-it$"]
+      },
+      "status": "supported",
+      "kind": "vlm",
+      "backend": "vllm",
+      "reasoning": {
+        "default": "off",
+        "on": {"method": "kwargs", "key": "enable_thinking", "value": true},
+        "off": {"method": "kwargs", "key": "enable_thinking", "value": false},
+        "max_tokens": 4096,
+        "where": ["reasoning"],
+        "prefills_off": false,
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/1.7.0/examples/gemma-4-31b-it/api.html#reasoning", "doc_version": "1.7.0", "quote": "This model supports reasoning. Reasoning is off by default. To turn it on, add \"chat_template_kwargs\": { \"enable_thinking\": true } in the request body."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/1.7.0/examples/gemma-4-31b-it/api.html#reasoning", "doc_version": "1.7.0", "quote": "To explicitly disable reasoning, set \"chat_template_kwargs\": { \"enable_thinking\": false }."},
+          {"tier": "D", "url": "https://docs.vllm.ai/en/v0.31.0/features/reasoning_outputs/", "doc_version": "0.31.0", "quote": "Gemma 4 reasoning is disabled by default; to enable it, pass enable_thinking=True in your chat_template_kwargs or set reasoning_effort (which enables it automatically)."}
+        ]
+      },
+      "tools": {
+        "documented": "yes",
+        "default_on": null,
+        "parallel": "unknown",
+        "stream": "unknown",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/1.7.0/examples/gemma-4-31b-it/api.html#function-tool-calling", "doc_version": "1.7.0", "quote": "You can connect NIM to external tools and services using function calling (also known as tool calling)."}
+        ]
+      },
+      "image": {
+        "documented": "yes",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#vlms", "doc_version": "2.1.5", "quote": "The following section lists all of the supported VLMs."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/1.7.0/examples/gemma-4-31b-it/api.html#passing-images", "doc_version": "1.7.0", "quote": "The supported image formats are GIF, JPG, JPEG, and PNG."}
+        ]
+      },
+      "json_schema": {"documented": "engine"},
+      "stream": {"documented": "engine"}
+    },
+    {
+      "id": "gpt-oss",
+      "name": "gpt-oss (20B, 120B)",
+      "match": {
+        "repos": [
+          "nim/openai/gpt-oss-20b",
+          "nim/openai/gpt-oss-120b",
+          "nim/openai/gpt-oss-120b-pb6",
+          "nim/openai/gpt-oss-120b-turbo"
+        ],
+        "served_ids": ["openai/gpt-oss-20b", "openai/gpt-oss-120b"],
+        "patterns": ["^openai/gpt-oss-(20b|120b)(-pb[0-9a-z]+|-turbo)?$"]
+      },
+      "status": "supported",
+      "kind": "llm",
+      "backend": "vllm",
+      "reasoning": {
+        "default": "always",
+        "on": {"method": "effort", "value": "low"},
+        "off_reason": "always_on",
+        "max_tokens": 4096,
+        "where": ["reasoning", "reasoning_content"],
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/reasoning-model.html#reasoning-effort", "doc_version": "1.15.0", "quote": "low | Faster responses with less reasoning depth. | Quick questions or time-sensitive applications."},
+          {"tier": "D", "url": "https://huggingface.co/openai/gpt-oss-20b/blob/6cee5e81ee83917806bbde320786a8fb61efebee/README.md", "doc_version": "6cee5e8", "quote": "Configurable reasoning effort: Easily adjust the reasoning effort (low, medium, high) based on your specific use case and latency needs."},
+          {"tier": "D", "url": "https://docs.vllm.ai/projects/recipes/en/latest/OpenAI/GPT-OSS.html", "doc_version": "latest (fetched 2026-11-11)", "quote": "You can also set the parameter include_reasoning: false in request parameter to skip CoT being part of the output."}
+        ],
+        "notes": "There is no off level: low is the least effort, and include_reasoning false only hides the reasoning."
+      },
+      "tools": {
+        "documented": "yes",
+        "default_on": {"1.x": true, "2.x": null},
+        "parser": "openai",
+        "named": "no",
+        "none": "no",
+        "parallel": "no",
+        "stream": "yes",
+        "stream_retry": 1,
+        "max_tokens": 4096,
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/function-calling.html", "doc_version": "1.15.0", "quote": "Tool calling is supported in the following LLM-specific NIM containers and is automatically enabled for the following models:"},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/supported-models.html", "doc_version": "1.15.0", "quote": "GPT-OSS-20B | OpenAI | openai/gpt-oss-20b | 1.12.1, 1.12.3, 1.12.4, 1.5.2-variant, 1.6.1-variant | Yes | Yes | No | No"},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/release-notes.html#all-current-known-issues-for-specific-models", "doc_version": "1.15.0", "quote": "Tool calling is done sequentially (not in parallel) using the Chat Completions API."},
+          {"tier": "D", "url": "https://docs.vllm.ai/projects/recipes/en/latest/OpenAI/GPT-OSS.html", "doc_version": "latest (fetched 2026-11-11)", "quote": "For function calling, only tool_choice=\"auto\" is supported."},
+          {"tier": "D", "url": "https://docs.vllm.ai/projects/recipes/en/latest/OpenAI/GPT-OSS.html", "doc_version": "latest (fetched 2026-11-11)", "quote": "Chat Completion API with Streaming | ✅ | ✅ | ❌ | ❌ | ✅"}
+        ],
+        "notes": "Streamed tool calls get one retry: NIM 1.x documents an intermittent Harmony parser error with streaming."
+      },
+      "image": {
+        "documented": "no",
+        "sources": [
+          {"tier": "D", "url": "https://api.ngc.nvidia.com/v2/repos/nim/openai/gpt-oss-20b", "doc_version": "NGC description (2026-11-11)", "quote": "It operates strictly with text-only modalities for both input and output."}
+        ]
+      },
+      "json_schema": {"documented": "engine"},
+      "stream": {"documented": "engine"},
+      "server_switches": {
+        "tools": {
+          "2.x-vllm": "--enable-auto-tool-choice --tool-call-parser openai",
+          "1.x": "LLM-specific 1.x NIMs turn tool calling on by themselves; the multi-LLM NIM needs NIM_ENABLE_AUTO_TOOL_CHOICE=1 NIM_TOOL_CALL_PARSER=openai"
+        },
+        "reasoning": {"1.x": "NIM_REASONING_PARSER=openai_gptoss (multi-LLM NIM)"}
+      },
+      "known_issues": [
+        {"url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/about-nim-llm/release-notes.html#issue-2-1-5-gpt-oss-20b-chat-stop-in-reasoning", "affects": ["reasoning_on", "chat"], "text": "Stop strings can end the answer inside the reasoning; the check never sends stop."},
+        {"url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/about-nim-llm/release-notes.html#issue-2-1-5-gpt-oss-20b-lora-reasoning-format", "affects": ["chat", "reasoning_on"], "text": "LoRA profiles can leak control tokens such as <|constrain|> into content."},
+        {"url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/about-nim-llm/release-notes.html#issue-2-1-5-gpt-oss-20b-lora-harmony-errors", "affects": ["chat", "stream"], "text": "LoRA profiles can return HTTP 500 or empty streamed content."},
+        {"url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/release-notes.html#all-current-known-issues-for-specific-models", "affects": ["tools_stream"], "text": "1.x: a Harmony parser error occurs intermittently during streaming with tool calling."}
+      ]
+    },
+    {
+      "id": "mistral-7b-v0.3",
+      "name": "Mistral 7B Instruct v0.3",
+      "match": {
+        "repos": ["nim/mistralai/mistral-7b-instruct-v0.3"],
+        "served_ids": ["mistralai/mistral-7b-instruct-v0.3"],
+        "patterns": ["^mistralai/mistral-7b-instruct-v0-3$"]
+      },
+      "status": "eos",
+      "kind": "llm",
+      "backend": "either",
+      "reasoning": {
+        "default": "none",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/reasoning-model.html#reasoning-mode", "doc_version": "1.15.0", "quote": "Select one of the following: ... Llama 3.3 Nemotron Super 49B V1 and Llama 3.1 Nemotron Ultra 253B V1 ... Llama 3.3 Nemotron Super 49B V1.5 ... MiMo-V2-Flash ... Nemotron 3 Nano ... Nemotron 3 Super"}
+        ],
+        "notes": "Not in the list of reasoning models the NIM docs describe."
+      },
+      "tools": {
+        "documented": "yes",
+        "default_on": {"1.x": true},
+        "parser": "mistral",
+        "parallel": "no",
+        "stream": "unknown",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/function-calling.html", "doc_version": "1.15.0", "quote": "Tool calling is supported in the following LLM-specific NIM containers and is automatically enabled for the following models:"},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/supported-models.html", "doc_version": "1.15.0", "quote": "Mistral 7B Instruct V0.3 | Mistral | mistralai/mistral-7b-instruct-v0.3 | 1.0, 1.1, 1.1.2, 1.3, 1.8.4, 1.12.0 | Yes | Yes | No | No"}
+        ],
+        "conflicts": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.8.0/function-calling.html#supported-models", "doc_version": "1.8.0", "quote": "Mistral 7B Instruct v0.3 | Yes | 1.1.2"}
+        ],
+        "notes": "NIM 1.8 listed parallel calls up to NIM 1.1.2; 1.15.0 says No, and the newer statement wins."
+      },
+      "image": {
+        "documented": "no",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#x-nim-llm-models", "doc_version": "2.1.5", "quote": "For more information on version 1.x NIMs, refer to the 1.15 version of the NIM LLM Supported Models page."}
+        ]
+      },
+      "json_schema": {"documented": "engine"},
+      "stream": {"documented": "engine"},
+      "known_issues": [
+        {"url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/release-notes.html#all-current-known-issues-for-specific-models", "affects": ["tools"], "text": "Mistral 7B Instruct v0.3: multi-turn tool calling is not supported (the check is single-turn)."}
+      ]
+    },
+    {
+      "id": "mistral-small-24b-2501",
+      "name": "Mistral Small 24B Instruct 2501",
+      "match": {
+        "repos": ["nim/mistralai/mistral-small-24b-instruct-2501"],
+        "served_ids": ["mistralai/mistral-small-24b-instruct-2501"],
+        "patterns": ["^mistralai/mistral-small-24b-instruct-2501$"]
+      },
+      "status": "eos",
+      "kind": "llm",
+      "backend": "either",
+      "reasoning": {
+        "default": "none",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/reasoning-model.html#reasoning-mode", "doc_version": "1.15.0", "quote": "Select one of the following: ... Llama 3.3 Nemotron Super 49B V1 and Llama 3.1 Nemotron Ultra 253B V1 ... Llama 3.3 Nemotron Super 49B V1.5 ... MiMo-V2-Flash ... Nemotron 3 Nano ... Nemotron 3 Super"}
+        ],
+        "notes": "Not in the list of reasoning models the NIM docs describe."
+      },
+      "tools": {
+        "documented": "no",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/release-notes.html#all-current-known-issues-for-specific-models", "doc_version": "1.15.0", "quote": "Mistral Small 24b Instruct 2501 ... Tool calling is not supported."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/supported-models.html", "doc_version": "1.15.0", "quote": "Mistral Small 24b Instruct 2501 | Mistral | mistralai/mistral-small-24b-instruct-2501 | 1.8.4 | No | No | No | No"}
+        ]
+      },
+      "image": {
+        "documented": "no",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#x-nim-llm-models", "doc_version": "2.1.5", "quote": "For more information on version 1.x NIMs, refer to the 1.15 version of the NIM LLM Supported Models page."}
+        ]
+      },
+      "json_schema": {"documented": "engine"},
+      "stream": {"documented": "engine"}
+    },
+    {
+      "id": "mistral-nemo-12b",
+      "name": "Mistral NeMo 12B Instruct",
+      "match": {
+        "repos": ["nim/nv-mistralai/mistral-nemo-12b-instruct"],
+        "served_ids": ["nv-mistralai/mistral-nemo-12b-instruct"],
+        "patterns": ["^(nv-mistralai/mistral-nemo-12b-instruct|mistralai/mistral-nemo-instruct-2407)$"]
+      },
+      "status": "eos",
+      "kind": "llm",
+      "backend": "either",
+      "reasoning": {
+        "default": "none",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/reasoning-model.html#reasoning-mode", "doc_version": "1.15.0", "quote": "Select one of the following: ... Llama 3.3 Nemotron Super 49B V1 and Llama 3.1 Nemotron Ultra 253B V1 ... Llama 3.3 Nemotron Super 49B V1.5 ... MiMo-V2-Flash ... Nemotron 3 Nano ... Nemotron 3 Super"}
+        ],
+        "notes": "Not in the list of reasoning models the NIM docs describe."
+      },
+      "tools": {
+        "documented": "unknown",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/supported-models.html", "doc_version": "1.15.0", "quote": "Mistral NeMo 12B Instruct | Mistral | nv-mistralai/mistral-nemo-12b-instruct | 1.0, 1.2, 1.2.3 | - | - | - | No"},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.8.0/function-calling.html#supported-models", "doc_version": "1.8.0", "quote": "Mistral NeMo 12B Instruct | Yes | 1.1.2"}
+        ],
+        "notes": "NIM 1.8 lists tool calling up to NIM 1.1.2 only; the 1.15.0 table has no entry for the later images. Not documented for the current images."
+      },
+      "image": {
+        "documented": "no",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#x-nim-llm-models", "doc_version": "2.1.5", "quote": "For more information on version 1.x NIMs, refer to the 1.15 version of the NIM LLM Supported Models page."}
+        ]
+      },
+      "json_schema": {"documented": "engine"},
+      "stream": {"documented": "engine"}
+    },
+    {
+      "id": "mistral-small-3.2-24b-2506",
+      "name": "Mistral Small 3.2 24B Instruct 2506",
+      "match": {
+        "repos": ["nim/mistralai/mistral-small-3.2-24b-instruct-2506"],
+        "served_ids": ["mistralai/mistral-small-3.2-24b-instruct-2506"],
+        "patterns": ["^mistralai/mistral-small-3-2-24b-instruct-2506$"]
+      },
+      "status": "eos",
+      "kind": "vlm",
+      "backend": "vllm",
+      "reasoning": {
+        "default": "none",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/reasoning-model.html#reasoning-mode", "doc_version": "1.15.0", "quote": "Select one of the following: ... Llama 3.3 Nemotron Super 49B V1 and Llama 3.1 Nemotron Ultra 253B V1 ... Llama 3.3 Nemotron Super 49B V1.5 ... MiMo-V2-Flash ... Nemotron 3 Nano ... Nemotron 3 Super"}
+        ],
+        "notes": "Not in the list of reasoning models the NIM docs describe."
+      },
+      "tools": {
+        "documented": "unknown",
+        "notes": "Only the upstream model card describes tool calling (tier D); no NIM page does."
+      },
+      "image": {
+        "documented": "yes",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#additional-vlm-models", "doc_version": "2.1.5", "quote": "VLMs that were released prior to version 2.0.12 are documented on the NVIDIA NIM for Vision Language Models site."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/2.1.2-variant/introduction.html#model-support", "doc_version": "2.1.2-variant", "quote": "Mistral Small 3.2 24B Instruct 2506 | 1.3.1 | Release Notes for 1.3.1"}
+        ],
+        "notes": "The VLM model support table lists it with VLM NIM 1.3.1 as its latest release."
+      },
+      "json_schema": {"documented": "engine"},
+      "stream": {"documented": "engine"}
+    },
+    {
+      "id": "mistral-small-4",
+      "name": "Mistral Small 4 119B 2603",
+      "match": {
+        "repos": ["nim/mistralai/mistral-small-4-119b-2603"],
+        "served_ids": ["mistralai/mistral-small-4-119b-2603"],
+        "patterns": ["^mistralai/mistral-small-4-119b-2603$"]
+      },
+      "status": "supported",
+      "kind": "vlm",
+      "backend": "vllm",
+      "reasoning": {
+        "default": "off",
+        "on": {"method": "effort", "value": "high"},
+        "off": {"method": "effort", "value": "none"},
+        "max_tokens": 4096,
+        "where": ["reasoning"],
+        "prefills_off": false,
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/1.7.0/examples/mistral-small-4-119b-2603/api.html#reasoning", "doc_version": "1.7.0", "quote": "The reasoning_effort request parameter controls reasoning behavior: ... \"high\" — Enable reasoning. ... \"none\" — Disable reasoning (default)."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/about-nim-llm/release-notes.html#issue-2-1-5-mistral-small-4-119b-mistral-tokenizer-requests", "doc_version": "2.1.5", "quote": "For mistral-small-4-119b-2603, /v1/chat/completions requests return HTTP 400 when they specify chat_template or chat_template_kwargs, including enable_thinking."}
+        ],
+        "notes": "Never send chat_template_kwargs to this model."
+      },
+      "tools": {
+        "documented": "yes",
+        "default_on": null,
+        "parser": "mistral",
+        "named": "unknown",
+        "parallel": "unknown",
+        "stream": "unknown",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/1.7.0/examples/mistral-small-4-119b-2603/api.html#function-tool-calling", "doc_version": "1.7.0", "quote": "You can connect NIM to external tools and services using function calling (also known as tool calling)."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/about-nim-llm/release-notes.html#issue-2-1-5-mistral-small-4-119b-forced-tool-choice", "doc_version": "2.1.5", "quote": "Requests with tool_choice set to \"auto\" or \"none\" passed in testing."}
+        ],
+        "notes": "Forced tool calls can answer in text, so no named diagnostic is sent."
+      },
+      "image": {
+        "documented": "yes",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#vlms", "doc_version": "2.1.5", "quote": "The following section lists all of the supported VLMs."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/1.7.0/examples/mistral-small-4-119b-2603/api.html#passing-images", "doc_version": "1.7.0", "quote": "NIM for VLMs follows the OpenAI specification to pass images as part of the HTTP payload in a user message."}
+        ]
+      },
+      "json_schema": {"documented": "engine"},
+      "stream": {"documented": "engine"},
+      "server_switches": {"tools": {"2.x-vllm": "--tool-call-parser mistral --enable-auto-tool-choice"}},
+      "known_issues": [
+        {"url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/about-nim-llm/release-notes.html#issue-2-1-5-mistral-small-4-119b-forced-tool-choice", "affects": ["tools"], "text": "Forced tool calls (required or named) can return HTTP 200 with a text answer."},
+        {"url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/about-nim-llm/release-notes.html#issue-2-1-5-mistral-small-4-119b-mistral-tokenizer-requests", "affects": ["tools", "reasoning_on", "reasoning_off"], "text": "chat_template_kwargs returns HTTP 400; tool-call ids in history must be 9 alphanumeric characters."},
+        {"url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/about-nim-llm/release-notes.html#issue-2-1-5-mistral-small-4-119b-json-object-array", "affects": ["json_schema"], "text": "json_object can return an array; the check uses json_schema."},
+        {"url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/about-nim-llm/release-notes.html#issue-2-1-5-mistral-small-4-119b-health-ready-long-generation-load", "affects": ["health", "concurrency"], "text": "Under sustained load /v1/health/ready can take longer than 5 s."}
+      ]
+    },
+    {
+      "id": "deepseek-r1",
+      "name": "DeepSeek-R1, R1-0528 and R1 distills",
+      "match": {
+        "repos": [
+          "nim/deepseek-ai/deepseek-r1",
+          "nim/deepseek-ai/deepseek-r1-0528",
+          "nim/deepseek-ai/deepseek-r1-distill-llama-8b",
+          "nim/deepseek-ai/deepseek-r1-distill-llama-70b",
+          "nim/deepseek-ai/deepseek-r1-distill-qwen-7b",
+          "nim/deepseek-ai/deepseek-r1-distill-qwen-14b",
+          "nim/deepseek-ai/deepseek-r1-distill-qwen-32b"
+        ],
+        "served_ids": [
+          "deepseek-ai/deepseek-r1",
+          "deepseek-ai/deepseek-r1-0528",
+          "deepseek-ai/deepseek-r1-distill-llama-8b",
+          "deepseek-ai/deepseek-r1-distill-llama-70b",
+          "deepseek-ai/deepseek-r1-distill-qwen-7b",
+          "deepseek-ai/deepseek-r1-distill-qwen-14b",
+          "deepseek-ai/deepseek-r1-distill-qwen-32b"
+        ],
+        "patterns": [
+          "^deepseek-ai/deepseek-r1(-0528)?$",
+          "^deepseek-ai/deepseek-r1-distill-(llama-(8b|70b)|qwen-(1-5b|7b|14b|32b))$"
+        ]
+      },
+      "status": "eos",
+      "kind": "llm",
+      "backend": "either",
+      "reasoning": {
+        "default": "always",
+        "on": {"method": "default"},
+        "off_reason": "always_on",
+        "sampling_on": {"temperature": 0.6},
+        "max_tokens": 4096,
+        "where": ["reasoning", "reasoning_content", "inline", "inline_close_only"],
+        "sources": [
+          {"tier": "D", "url": "https://huggingface.co/deepseek-ai/DeepSeek-R1/blob/56d4cbbb4d29f4355bab4b9a39ccb717a14ad5ad/README.md", "doc_version": "56d4cbb", "quote": "Set the temperature within the range of 0.5-0.7 (0.6 is recommended) to prevent endless repetitions or incoherent outputs."},
+          {"tier": "D", "url": "https://huggingface.co/deepseek-ai/DeepSeek-R1/blob/56d4cbbb4d29f4355bab4b9a39ccb717a14ad5ad/README.md", "doc_version": "56d4cbb", "quote": "Avoid adding a system prompt; all instructions should be contained within the user prompt."},
+          {"tier": "D", "url": "https://docs.sglang.io/docs/advanced_features/separate_reasoning", "doc_version": "unversioned (fetched 2026-11-11)", "quote": "DeepSeek-R1: No <think> start tag, jumps directly to thinking content"}
+        ],
+        "notes": "No off switch is documented. The models can skip thinking on easy prompts."
+      },
+      "tools": {
+        "documented": "no",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/release-notes.html#model-support-and-functionality", "doc_version": "1.15.0", "quote": "DeepSeek models do not support tool calling."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/supported-models.html", "doc_version": "1.15.0", "quote": "DeepSeek R1 | DeepSeek | deepseek-ai/deepseek-r1 | 1.7, 1.7.3 | No | No | No | Yes"},
+          {"tier": "D", "url": "https://docs.vllm.ai/en/v0.31.0/features/reasoning_outputs/", "doc_version": "0.31.0", "quote": "DeepSeek R1 series | deepseek_r1 | json, regex | ❌"}
+        ]
+      },
+      "image": {
+        "documented": "no",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#x-nim-llm-models", "doc_version": "2.1.5", "quote": "For more information on version 1.x NIMs, refer to the 1.15 version of the NIM LLM Supported Models page."}
+        ]
+      },
+      "json_schema": {"documented": "engine"},
+      "stream": {"documented": "engine"},
+      "known_issues": [
+        {"url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/release-notes.html#all-current-known-issues-for-specific-models", "affects": ["json_schema"], "text": "R1 Distill Qwen 32B: structured generation behaves unexpectedly because of the chain of thought."}
+      ]
+    },
+    {
+      "id": "deepseek-v3.1-v3.2",
+      "name": "DeepSeek V3.1 Terminus and V3.2 Exp",
+      "match": {
+        "repos": [
+          "nim/deepseek-ai/deepseek-v3.1-terminus",
+          "nim/deepseek-ai/deepseek-v32-exp-nim",
+          "nim/deepseek-ai/deepseek-v31"
+        ],
+        "served_ids": [
+          "deepseek-ai/deepseek-v3.1-terminus",
+          "deepseek-ai/deepseek-v3.1",
+          "deepseek-ai/deepseek-v3.2-exp"
+        ],
+        "patterns": ["^deepseek-ai/deepseek-v3-?1(-terminus)?$", "^deepseek-ai/deepseek-v3-?2-exp(-nim)?$"]
+      },
+      "status": "eos",
+      "kind": "llm",
+      "backend": "either",
+      "reasoning": {
+        "default": "off",
+        "on": {"method": "kwargs", "key": "thinking", "value": true},
+        "off": {"method": "kwargs", "key": "thinking", "value": false},
+        "max_tokens": 4096,
+        "where": ["reasoning", "reasoning_content"],
+        "prefills_off": false,
+        "sources": [
+          {"tier": "D", "url": "https://docs.vllm.ai/en/v0.31.0/features/reasoning_outputs/", "doc_version": "0.31.0", "quote": "IBM Granite 3.2 and DeepSeek-V3.1 reasoning is disabled by default; to enable it, you must also pass thinking=True in your chat_template_kwargs."},
+          {"tier": "D", "url": "https://docs.sglang.io/docs/advanced_features/separate_reasoning", "doc_version": "unversioned (fetched 2026-11-11)", "quote": "DeepSeek-V3.1/V3.2: Hybrid model supporting both thinking and non-thinking modes, use the deepseek-v3 parser and thinking parameter (NOTE: not enable_thinking)"}
+        ],
+        "notes": "The key is thinking, not enable_thinking; a wrong key is ignored silently."
+      },
+      "tools": {
+        "documented": "conflict",
+        "default_on": null,
+        "parallel": "unknown",
+        "stream": "unknown",
+        "mode": [{"method": "kwargs", "key": "thinking", "value": false}],
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/function-calling.html", "doc_version": "1.15.0", "quote": "DeepSeek-V3.1-Terminus and DeepSeek-V3.2-Exp"},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/supported-models.html", "doc_version": "1.15.0", "quote": "DeepSeek-V3.1-Terminus | DeepSeek | deepseek-ai/deepseek-v3.1-terminus | 1.5.0-variant, 1.10.0-variant | No | Yes | Yes | Yes"},
+          {"tier": "D", "url": "https://docs.vllm.ai/en/v0.31.0/features/reasoning_outputs/", "doc_version": "0.31.0", "quote": "DeepSeek-V3.1 tool calling is supported in non-thinking mode."}
+        ],
+        "conflicts": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/release-notes.html#model-support-and-functionality", "doc_version": "1.15.0", "quote": "DeepSeek models do not support tool calling."}
+        ],
+        "notes": "The per-model list and table say yes; the general known issue says no. Tested, with both sources reported."
+      },
+      "image": {
+        "documented": "no",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#x-nim-llm-models", "doc_version": "2.1.5", "quote": "For more information on version 1.x NIMs, refer to the 1.15 version of the NIM LLM Supported Models page."}
+        ]
+      },
+      "json_schema": {"documented": "engine"},
+      "stream": {"documented": "engine"}
+    },
+    {
+      "id": "deepseek-v4-pro",
+      "name": "DeepSeek V4 Pro (0813 and the 1.x variant)",
+      "match": {
+        "repos": ["nim/deepseek-ai/deepseek-v4-pro-0813", "nim/deepseek-ai/deepseek-v4-pro"],
+        "served_ids": ["deepseek-ai/deepseek-v4-pro-0813", "deepseek-ai/deepseek-v4-pro"],
+        "patterns": ["^deepseek-ai/deepseek-v4-pro(-0813)?$"]
+      },
+      "status": "supported",
+      "kind": "llm",
+      "backend": "sglang",
+      "reasoning": {
+        "default": "unknown",
+        "on": {"method": "effort", "value": "high"},
+        "off_reason": "no_documented_switch",
+        "max_tokens": 4096,
+        "where": ["reasoning_content"],
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.0.13/get-started/advanced/get-started-deepseek-v4-pro-0813.html#control-reasoning-effort", "doc_version": "2.0.13", "quote": "reasoning_effort controls how much deliberation the model spends before answering (low, high, or max)."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.0.13/get-started/advanced/get-started-deepseek-v4-pro-0813.html#send-a-chat-completion-request", "doc_version": "2.0.13", "quote": "The field can be empty or null when the request uses a low reasoning effort and the model emits little or no reasoning."}
+        ],
+        "notes": "The 0813 guide documents no way to turn reasoning off; reasoning on uses effort high because low can give no reasoning."
+      },
+      "tools": {
+        "documented": "yes",
+        "default_on": {"2.x": true},
+        "parallel": "unknown",
+        "stream": "unknown",
+        "max_tokens": 4096,
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.0.13/get-started/advanced/get-started-deepseek-v4-pro-0813.html#notes", "doc_version": "2.0.13", "quote": "For this model, auto resolves to the DeepSeek V4 parsers (deepseek-v4 and deepseekv4) and both parsers are enabled by default."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.0.13/get-started/advanced/get-started-deepseek-v4-pro-0813.html#enable-tool-calling-and-mcp-workflows", "doc_version": "2.0.13", "quote": "You do not add parser flags for OpenAI-compatible tool calling."}
+        ]
+      },
+      "image": {
+        "documented": "no",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#llms", "doc_version": "2.1.5", "quote": "The following section lists all of the supported LLMs."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.0.13/get-started/advanced/get-started-deepseek-v4-pro-0813.html", "doc_version": "2.0.13", "quote": "It is a text-only mixture-of-experts (MoE) model with 1.6 trillion total parameters and 49 billion activated parameters per token."}
+        ]
+      },
+      "json_schema": {
+        "documented": "engine",
+        "switch": {"method": "effort", "value": "low"},
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.0.13/get-started/advanced/get-started-deepseek-v4-pro-0813.html#structured-json-output", "doc_version": "2.0.13", "quote": "For structured-output use cases, keep reasoning_effort at low so the max_tokens budget produces the JSON payload rather than a long reasoning trace followed by truncated JSON."}
+        ]
+      },
+      "stream": {"documented": "engine"},
+      "server_switches": {
+        "tools": {"2.x-sglang": "--tool-call-parser auto (the image default; do not replace it)"}
+      },
+      "overrides": [
+        {
+          "name": "DeepSeek V4 Pro 1.x variant",
+          "ids": ["deepseek-ai/deepseek-v4-pro"],
+          "backend": "either",
+          "reasoning": {
+            "default": "off",
+            "on": {"method": "kwargs", "key": "thinking", "value": true},
+            "off": {"method": "kwargs", "key": "thinking", "value": false},
+            "off_reason": null,
+            "where": ["reasoning", "reasoning_content"],
+            "sources": [
+              {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/nim-container-variants.html#deepseek-v4-pro", "doc_version": "1.15.0", "quote": "Non-think | Fast, intuitive responses; Chat mode without reasoning | Default, or chat_template_kwargs: {\"thinking\": false}"},
+              {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/nim-container-variants.html#deepseek-v4-pro", "doc_version": "1.15.0", "quote": "Think High | Standard thinking mode; deliberate logical analysis, slower but more accurate | chat_template_kwargs: {\"thinking\": true}"}
+            ]
+          },
+          "tools": {
+            "documented": "yes",
+            "default_on": null,
+            "sources": [
+              {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/supported-models.html", "doc_version": "1.15.0", "quote": "DeepSeek-V4-Pro | DeepSeekAI | deepseek-ai/deepseek-v4-pro | 1.10.0-variant | No | Yes | No | No"}
+            ]
+          },
+          "json_schema": {"switch": null}
+        }
+      ]
+    },
+    {
+      "id": "deepseek-v4.1-flash",
+      "name": "DeepSeek V4.1 Flash",
+      "match": {
+        "repos": ["nim/deepseek-ai/deepseek-v4.1-flash"],
+        "served_ids": ["deepseek-ai/deepseek-v4.1-flash"],
+        "patterns": ["^deepseek-ai/deepseek-v4-1-flash$"]
+      },
+      "status": "supported",
+      "kind": "vlm",
+      "backend": "vllm",
+      "reasoning": {
+        "default": "on",
+        "on": {"method": "effort", "value": "high"},
+        "off": {"method": "effort", "value": "none"},
+        "max_tokens": 4096,
+        "where": ["reasoning"],
+        "prefills_off": false,
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.4/get-started/advanced/model-specific-deployment-considerations.html#reasoning", "doc_version": "2.1.4", "quote": "Reasoning is on by default, with effort high. The response returns the reasoning separately from the answer: in message.reasoning for non-streaming responses and in delta.reasoning for streaming responses."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.4/get-started/advanced/model-specific-deployment-considerations.html#reasoning", "doc_version": "2.1.4", "quote": "Turn reasoning off with \"reasoning_effort\": \"none\" or \"chat_template_kwargs\": {\"thinking\": false}."}
+        ]
+      },
+      "tools": {
+        "documented": "yes",
+        "default_on": {"2.x": true},
+        "parser": "deepseek_v41",
+        "parallel": "unknown",
+        "stream": "unknown",
+        "max_tokens": 4096,
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.4/get-started/advanced/model-specific-deployment-considerations.html#tool-calling", "doc_version": "2.1.4", "quote": "The container already sets the parser flags for this model in NIM_PASSTHROUGH_ARGS: --tokenizer-mode deepseek_v41 --reasoning-parser deepseek_v41 --tool-call-parser deepseek_v41 --enable-auto-tool-choice. Tool calling works without additional flags."}
+        ]
+      },
+      "image": {
+        "documented": "yes",
+        "text_only_profiles": [
+          "06fcf7c1ee59efbe08a000038172357db612b3f00d35a0f293f7691f93cf580f",
+          "33a4f33df4a3e23afca9aa08794e1c096903c164ab12062747edb584842a5aec",
+          "9f34efd50f49c2ff891db2deb4d51a666580bbbf4053d59e0a3ca7a0c33c2cf6"
+        ],
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#deepseek-v4-1-flash", "doc_version": "2.1.5", "quote": "The optimized FP8 profiles on NVIDIA B200, GB200, and H200, which the container selects by default on those GPUs, accept text input only;"},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.4/get-started/advanced/model-specific-deployment-considerations.html#profiles-and-image-input", "doc_version": "2.1.4", "quote": "A request that includes an image returns HTTP 400 with At most 0 image(s) may be provided in one prompt. (parameter=image)."}
+        ],
+        "notes": "The text-only profiles are the FP8 optimized profiles of B200, GB200 and H200 (support matrix, Input column Text)."
+      },
+      "json_schema": {"documented": "engine"},
+      "stream": {"documented": "engine"},
+      "server_switches": {
+        "tools": {
+          "2.x-vllm": "--tokenizer-mode deepseek_v41 --reasoning-parser deepseek_v41 --tool-call-parser deepseek_v41 --enable-auto-tool-choice (keep them when setting NIM_PASSTHROUGH_ARGS)"
+        },
+        "reasoning": {"2.x-vllm": "--reasoning-parser deepseek_v41"}
+      }
+    },
+    {
+      "id": "glm-5.2",
+      "name": "GLM-5.2",
+      "match": {
+        "repos": ["nim/zai-org/glm-5.2"],
+        "served_ids": ["zai-org/glm-5.2"],
+        "patterns": ["^(zai-org|z-ai)/glm-5-2(-fp8|-nvfp4)?$"]
+      },
+      "status": "supported",
+      "kind": "llm",
+      "backend": "sglang",
+      "reasoning": {
+        "default": "unknown",
+        "on": {"method": "kwargs", "key": "enable_thinking", "value": true},
+        "off": {"method": "kwargs", "key": "enable_thinking", "value": false},
+        "max_tokens": 4096,
+        "where": ["reasoning_content"],
+        "prefills_off": false,
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.0.13/get-started/advanced/get-started-glm-5-2.html#notes", "doc_version": "2.0.13", "quote": "Thinking mode: Use chat_template_kwargs.enable_thinking to control thinking for a request."}
+        ]
+      },
+      "tools": {
+        "documented": "yes",
+        "default_on": {"2.x": true},
+        "parser": "glm47",
+        "parallel": "unknown",
+        "stream": "unknown",
+        "mode": [{"method": "kwargs", "key": "enable_thinking", "value": false}],
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.0.13/get-started/advanced/get-started-glm-5-2.html#notes", "doc_version": "2.0.13", "quote": "Reasoning and tool calling: Profiles configure the glm45 reasoning parser and the glm47 tool-call parser. The standard launch does not need additional parser flags."}
+        ],
+        "notes": "The guide's tool example turns thinking off; the check does the same."
+      },
+      "image": {
+        "documented": "no",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#llms", "doc_version": "2.1.5", "quote": "The following section lists all of the supported LLMs."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.0.13/get-started/advanced/get-started-glm-5-2.html", "doc_version": "2.0.13", "quote": "GLM-5.2 is a text model for reasoning, coding, and tool calling."}
+        ]
+      },
+      "json_schema": {"documented": "engine"},
+      "stream": {"documented": "engine"},
+      "server_switches": {
+        "tools": {"2.x-sglang": "--tool-call-parser glm47"},
+        "reasoning": {"2.x-sglang": "--reasoning-parser glm45"}
+      },
+      "known_issues": [
+        {"url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/about-nim-llm/release-notes.html#issue-2-1-5-glm-5-2-json-schema-whitespace", "affects": ["json_schema"], "text": "json_schema can return incomplete JSON (whitespace until max_tokens) on sglang-nvfp4-tp4-pp1 on B300."}
+      ]
+    },
+    {
+      "id": "glm-5.3-flash",
+      "name": "GLM-5.3-Flash",
+      "match": {
+        "repos": ["nim/zai-org/glm-5.3-flash"],
+        "served_ids": ["zai-org/glm-5.3-flash", "z-ai/glm-5.3-flash"],
+        "patterns": ["^(zai-org|z-ai)/glm-5-3-flash(-fp8|-nvfp4|-bf16)?$"]
+      },
+      "status": "supported",
+      "kind": "vlm",
+      "backend": "sglang",
+      "reasoning": {
+        "default": "always",
+        "on": {"method": "effort", "value": "low"},
+        "off_reason": "always_on",
+        "max_tokens": 8192,
+        "where": ["reasoning_content"],
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.4/get-started/advanced/get-started-glm-5.3-flash.html#control-reasoning", "doc_version": "2.1.4", "quote": "Reasoning cannot be turned off. The default reasoning effort is max. For shorter reasoning and faster answers, set reasoning_effort to low or high."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/about-nim-llm/release-notes.html#issue-2-1-4-glm-5-3-flash-reasoning-off", "doc_version": "2.1.5", "quote": "At the default effort, use a max_tokens of at least 8192."}
+        ]
+      },
+      "tools": {
+        "documented": "yes",
+        "default_on": {"2.x": true},
+        "parser": "glm47",
+        "parallel": "unknown",
+        "stream": "unknown",
+        "max_tokens": 8192,
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.4/get-started/advanced/get-started-glm-5.3-flash.html", "doc_version": "2.1.4", "quote": "It accepts text and image input, returns reasoning output, and supports tool calling."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.4/get-started/advanced/get-started-glm-5.3-flash.html", "doc_version": "2.1.4", "quote": "The GLM reasoning parser (glm45) and tool-call parser (glm47), enabled by default."}
+        ]
+      },
+      "image": {
+        "documented": "yes",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.4/get-started/advanced/get-started-glm-5.3-flash.html", "doc_version": "2.1.4", "quote": "It accepts text and image input, returns reasoning output, and supports tool calling."}
+        ]
+      },
+      "json_schema": {"documented": "engine"},
+      "stream": {"documented": "engine"},
+      "server_switches": {"tools": {"2.x-sglang": "--tool-call-parser glm47"}},
+      "known_issues": [
+        {"url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/about-nim-llm/release-notes.html#issue-2-1-4-glm-5-3-flash-stop-in-reasoning", "affects": ["chat"], "text": "Stop sequences also match text in the reasoning; the check never sends stop."}
+      ]
+    },
+    {
+      "id": "kimi-k2",
+      "name": "Kimi K2.5 and K2.6",
+      "match": {
+        "repos": ["nim/moonshotai/kimi-k2.5", "nim/moonshotai/kimi-k2.6"],
+        "served_ids": ["moonshotai/kimi-k2.5", "moonshotai/kimi-k2.6"],
+        "patterns": ["^moonshotai/kimi-k2-(5|6)$"]
+      },
+      "status": "supported",
+      "kind": "vlm",
+      "backend": "either",
+      "reasoning": {
+        "default": "on",
+        "on": {"method": "default"},
+        "off": {"method": "kwargs", "key": "thinking", "value": false},
+        "max_tokens": 4096,
+        "where": ["reasoning", "reasoning_content"],
+        "prefills_off": false,
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/1.7.0/examples/kimi-k2.6/api.html#reasoning", "doc_version": "1.7.0", "quote": "This model supports reasoning with text and image inputs. It is turned on by default. To turn off reasoning, add \"chat_template_kwargs\": { \"thinking\": false } in the request body."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/1.7.0/examples/kimi-k2.5/api.html#reasoning", "doc_version": "1.7.0", "quote": "This model supports reasoning with text and image inputs. It is turned on by default."}
+        ]
+      },
+      "tools": {
+        "documented": "yes",
+        "default_on": null,
+        "parallel": "unknown",
+        "stream": "unknown",
+        "max_tokens": 4096,
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/1.7.0/examples/kimi-k2.6/api.html#function-tool-calling", "doc_version": "1.7.0", "quote": "You can connect NIM to external tools and services using function calling (also known as tool calling)."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/1.7.0/examples/kimi-k2.5/api.html#function-tool-calling", "doc_version": "1.7.0", "quote": "You can connect NIM to external tools and services using function calling (also known as tool calling)."}
+        ]
+      },
+      "image": {
+        "documented": "yes",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#vlms", "doc_version": "2.1.5", "quote": "The following section lists all of the supported VLMs."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/about-nim-llm/release-notes.html#issue-2-1-5-kimi-k26-video-input-unsupported", "doc_version": "2.1.5", "quote": "kimi-k2.6 supports text and image input only."}
+        ]
+      },
+      "json_schema": {"documented": "engine"},
+      "stream": {"documented": "engine"},
+      "overrides": [{"name": "Kimi K2.5", "ids": ["moonshotai/kimi-k2-5"], "status": "eos"}]
+    },
+    {
+      "id": "kimi-k3.1-pro",
+      "name": "Kimi K3.1 Pro (experimental vLLM model-free NIM)",
+      "match": {
+        "repos": [],
+        "served_ids": ["moonshotai/kimi-k3.1-pro"],
+        "patterns": ["^moonshotai/kimi-k3-1-pro$"]
+      },
+      "status": "supported",
+      "kind": "vlm",
+      "backend": "vllm",
+      "reasoning": {
+        "default": "on",
+        "on": {"method": "default"},
+        "off_reason": "no_documented_switch",
+        "parser_default_on": false,
+        "max_tokens": 8192,
+        "where": ["reasoning"],
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/get-started/advanced/model-specific-deployment-considerations.html#check-readiness-and-send-a-request", "doc_version": "2.1.5", "quote": "Reasoning can consume output tokens before an answer is returned. Allow enough output tokens for both reasoning and the answer."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/get-started/advanced/model-specific-deployment-considerations.html#check-readiness-and-send-a-request", "doc_version": "2.1.5", "quote": "Tool calling and parsed reasoning output require the --reasoning-parser, --tool-call-parser, and --enable-auto-tool-choice arguments on every node."}
+        ],
+        "notes": "The serving recipes do not set the parsers. Reasoning on is tested only when the deployment's arguments show --reasoning-parser."
+      },
+      "tools": {
+        "documented": "yes",
+        "default_on": {"2.x": false},
+        "parser": "kimi_k3",
+        "parallel": "unknown",
+        "stream": "unknown",
+        "max_tokens": 8192,
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/get-started/advanced/model-specific-deployment-considerations.html#check-readiness-and-send-a-request", "doc_version": "2.1.5", "quote": "The release also supports /v1/responses, /v1/messages, tool calling, and guided decoding."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/get-started/advanced/model-specific-deployment-considerations.html#h20-3e-two-or-four-nodes", "doc_version": "2.1.5", "quote": "The serving recipes do not configure the Kimi K3 parsers, so pass the three arguments after nim-serve on every node."}
+        ]
+      },
+      "image": {
+        "documented": "yes",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/get-started/advanced/model-specific-deployment-considerations.html#kimi-k3-1-pro", "doc_version": "2.1.5", "quote": "accepts text and image input and uses the vLLM backend."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#kimi-k3-1-pro", "doc_version": "2.1.5", "quote": "Text and image input are supported."}
+        ]
+      },
+      "json_schema": {"documented": "engine"},
+      "stream": {"documented": "engine"},
+      "server_switches": {
+        "tools": {"2.x-vllm": "--tool-call-parser kimi_k3 --enable-auto-tool-choice"},
+        "reasoning": {"2.x-vllm": "--reasoning-parser kimi_k3"}
+      },
+      "known_issues": [
+        {"url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/get-started/advanced/model-specific-deployment-considerations.html#h20-3e-two-or-four-nodes", "affects": ["chat", "image"], "text": "Without the parser arguments, chat and image answers contain raw Kimi control tokens such as <|close|>."},
+        {"url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/about-nim-llm/release-notes.html#issue-kimi-k3-1-pro-readiness-metrics", "affects": ["health"], "text": "A readiness GET with a JSON body can break the next /v1/metrics call; the check sends no body."}
+      ]
+    },
+    {
+      "id": "inkling",
+      "name": "Inkling and Inkling Small",
+      "match": {
+        "repos": ["nim/thinkingmachines/inkling", "nim/thinkingmachines/inkling-small"],
+        "served_ids": [
+          "thinkingmachines/inkling-nvfp4",
+          "thinkingmachines/inkling",
+          "thinkingmachines/inkling-small"
+        ],
+        "patterns": ["^thinkingmachines/inkling(-small)?(-nvfp4)?$"]
+      },
+      "status": "supported",
+      "kind": "vlm",
+      "backend": "sglang",
+      "reasoning": {
+        "default": "on",
+        "on": {"method": "default"},
+        "off_reason": "no_documented_switch",
+        "max_tokens": 4096,
+        "where": ["reasoning_content"],
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/about-nim-llm/release-notes.html#issue-2-1-5-inkling-thinking-mode-reasoning", "doc_version": "2.1.5", "quote": "For inkling, reasoning is enabled by default, with a default reasoning_effort of 0.9."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/about-nim-llm/release-notes.html#issue-2-1-5-inkling-thinking-mode-reasoning", "doc_version": "2.1.5", "quote": "The chat_template_kwargs.enable_thinking and include_reasoning fields do not disable reasoning or suppress reasoning_content."}
+        ],
+        "notes": "No source says inkling's reasoning cannot be turned off, and none names an off switch: the release note says only that enable_thinking and include_reasoning do not turn it off, and the 2.0.13 guide offers reasoning_effort \"none\" as a remedy for an answer cut by max_tokens without saying it turns reasoning off. So reasoning off is not applicable for want of a documented switch; --reasoning-off can supply one from the docs."
+      },
+      "tools": {
+        "documented": "yes",
+        "default_on": {"2.x": true},
+        "parser": "inkling",
+        "parallel": "unknown",
+        "stream": "unknown",
+        "max_tokens": 4096,
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.0.13/get-started/advanced/get-started-inkling.html#notes", "doc_version": "2.0.13", "quote": "Reasoning and tool calling: The container configures both --reasoning-parser inkling and --tool-call-parser inkling. The standard launch does not need additional parser flags."}
+        ]
+      },
+      "image": {
+        "documented": "yes",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#vlms", "doc_version": "2.1.5", "quote": "The following section lists all of the supported VLMs."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.0.13/get-started/advanced/get-started-inkling.html#notes", "doc_version": "2.0.13", "quote": "Image requests use image_url content parts in Chat Completions messages."}
+        ]
+      },
+      "json_schema": {"documented": "engine"},
+      "stream": {"documented": "engine"},
+      "server_switches": {"tools": {"2.x-sglang": "--tool-call-parser inkling"}},
+      "known_issues": [
+        {"url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/about-nim-llm/release-notes.html#issue-2-1-5-inkling-json-schema-whitespace-runaway", "affects": ["json_schema"], "text": "json_schema can return incomplete JSON with long whitespace and finish_reason length."},
+        {"url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/about-nim-llm/release-notes.html#issue-2-1-5-inkling-invalid-response-format-500", "affects": ["json_schema"], "text": "A response_format that is not a JSON object returns HTTP 500."},
+        {"url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/about-nim-llm/release-notes.html#issue-2-1-5-inkling-invalid-image-url-500", "affects": ["image"], "text": "Bad image URLs return HTTP 500 instead of 400; the check sends an inline PNG."},
+        {"url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/about-nim-llm/release-notes.html#issue-2-1-5-inkling-api-request-validation-edge-cases", "affects": ["tools"], "text": "Chat requests accept a tools[].type other than function."}
+      ],
+      "overrides": [
+        {
+          "name": "Inkling Small",
+          "ids": ["thinkingmachines/inkling-small"],
+          "patterns": ["^thinkingmachines/inkling-small(-nvfp4)?$"],
+          "backend": "vllm",
+          "reasoning": {
+            "default": "on",
+            "off": {"method": "effort", "value": "none"},
+            "off_reason": null,
+            "max_tokens": 4096,
+            "where": ["reasoning"],
+            "sources": [
+              {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.4/get-started/advanced/model-specific-deployment-considerations.html#inkling-small", "doc_version": "2.1.4", "quote": "Reasoning: Reasoning is on by default. Reasoning tokens count against max_tokens, and the reasoning text is returned in message.reasoning (delta.reasoning when streaming), not in reasoning_content. To turn reasoning off for a request, set \"reasoning_effort\": \"none\"."}
+            ]
+          },
+          "tools": {
+            "sources": [
+              {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.4/get-started/advanced/model-specific-deployment-considerations.html#inkling-small", "doc_version": "2.1.4", "quote": "Default passthrough arguments: The image sets NIM_PASSTHROUGH_ARGS=\"--tokenizer-mode inkling --reasoning-parser inkling --tool-call-parser inkling --enable-auto-tool-choice"}
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "phi-4-mini",
+      "name": "Phi 4 Mini Instruct",
+      "match": {
+        "repos": ["nim/microsoft/phi-4-mini-instruct"],
+        "served_ids": ["microsoft/phi-4-mini-instruct"],
+        "patterns": ["^microsoft/phi-4-mini-instruct$"]
+      },
+      "status": "eos",
+      "kind": "llm",
+      "backend": "either",
+      "reasoning": {
+        "default": "unknown",
+        "detectable": false,
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/release-notes.html#all-current-known-issues-for-specific-models", "doc_version": "1.15.0", "quote": "When reasoning mode is enabled, the thinking results are returned in the response without <think> and </think> markers."}
+        ]
+      },
+      "tools": {
+        "documented": "yes",
+        "default_on": {"1.x": true},
+        "parallel": "yes",
+        "stream": "unknown",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/function-calling.html#prerequisites", "doc_version": "1.15.0", "quote": "For LLM-specific NIMs, do not set tool calling environment variables externally. If an LLM-specific NIM container supports tool calling, it is enabled automatically."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/supported-models.html", "doc_version": "1.15.0", "quote": "Phi 4 Mini Instruct | Microsoft | microsoft/phi-4-mini-instruct | 1.12.0 | No | Yes | Yes | No"}
+        ]
+      },
+      "image": {
+        "documented": "no",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#x-nim-llm-models", "doc_version": "2.1.5", "quote": "For more information on version 1.x NIMs, refer to the 1.15 version of the NIM LLM Supported Models page."}
+        ]
+      },
+      "json_schema": {"documented": "engine"},
+      "stream": {"documented": "engine"},
+      "known_issues": [
+        {"url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/release-notes.html#model-support-and-functionality", "affects": ["tools"], "text": "1.x: models of 8B or fewer can call tools but are highly inaccurate."}
+      ]
+    },
+    {
+      "id": "cosmos-reason2",
+      "name": "Cosmos Reason2 (2B, 8B)",
+      "match": {
+        "repos": ["nim/nvidia/cosmos-reason2-2b", "nim/nvidia/cosmos-reason2-8b"],
+        "served_ids": ["nvidia/cosmos-reason2-2b", "nvidia/cosmos-reason2-8b"],
+        "patterns": ["^nvidia/cosmos-reason2-(2b|8b)$"]
+      },
+      "status": "supported",
+      "kind": "vlm",
+      "backend": "vllm",
+      "reasoning": {
+        "default": "prompt",
+        "on": {
+          "method": "user_suffix",
+          "value": " Answer the question in the following format: <think>\nyour reasoning\n</think>\n\n<answer>\nyour answer\n</answer>."
+        },
+        "off": {"method": "default"},
+        "max_tokens": 4096,
+        "where": ["inline"],
+        "prefills_off": false,
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/1.7.0/examples/cosmos-reason2/api.html#reasoning", "doc_version": "1.7.0", "quote": "To enable reasoning and encourage a chain-of-thought response, append the following to the user prompt:"}
+        ],
+        "notes": "Reasoning is asked for in the prompt; reasoning off leaves the format out."
+      },
+      "tools": {
+        "documented": "unknown",
+        "sources": [],
+        "notes": "The model page has no tool-calling section."
+      },
+      "image": {
+        "documented": "yes",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#additional-vlm-models", "doc_version": "2.1.5", "quote": "VLMs that were released prior to version 2.0.12 are documented on the NVIDIA NIM for Vision Language Models site."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/1.7.0/examples/cosmos-reason2/api.html#passing-images", "doc_version": "1.7.0", "quote": "NIM for VLMs follows the OpenAI specification to pass images as part of the HTTP payload in a user message."}
+        ]
+      },
+      "json_schema": {"documented": "engine"},
+      "stream": {"documented": "engine"}
+    },
+    {
+      "id": "muse-glimmer",
+      "name": "Muse Glimmer",
+      "match": {
+        "repos": ["nim/meta/muse-glimmer"],
+        "served_ids": ["meta/muse-glimmer"],
+        "patterns": ["^meta/muse-glimmer$"]
+      },
+      "status": "supported",
+      "kind": "vlm",
+      "backend": "sglang",
+      "reasoning": {
+        "default": "always",
+        "on": {"method": "default"},
+        "off_reason": "always_on",
+        "max_tokens": 4096,
+        "where": ["reasoning_content", "reasoning"],
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#muse-glimmer", "doc_version": "2.1.5", "quote": "This model reasons before it answers and requires the cache-permission step during deployment."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.4/get-started/advanced/model-specific-deployment-considerations.html#muse-glimmer-always-on-reasoning", "doc_version": "2.1.4", "quote": "Reasoning cannot be turned off. chat_template_kwargs.enable_thinking, thinking, and reasoning_effort: \"none\" have no effect on this model."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.4/get-started/advanced/model-specific-deployment-considerations.html#muse-glimmer-always-on-reasoning", "doc_version": "2.1.4", "quote": "For /v1/chat/completions, read reasoning text from message.reasoning_content, or from delta.reasoning_content when streaming, and read the answer from message.content."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.4/get-started/advanced/model-specific-deployment-considerations.html#muse-glimmer-token-budget", "doc_version": "2.1.4", "quote": "Use a max_tokens value of at least 1024 for chat and Messages requests, or lower reasoning_strength when the budget must stay small."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/nim-container-variants.html#muse-glimmer", "doc_version": "1.15.0", "quote": "This model does not support disabling thinking. ... Chain-of-thought content is returned in the message.reasoning field."}
+        ],
+        "notes": "The 2.1.1-variant image returned reasoning in message.reasoning, the 2.1.4 image in reasoning_content (SGLang); both fields are accepted."
+      },
+      "tools": {
+        "documented": "yes",
+        "default_on": null,
+        "parallel": "yes",
+        "stream": "unknown",
+        "max_tokens": 4096,
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/supported-models.html", "doc_version": "1.15.0", "quote": "Muse Glimmer | Meta | meta/muse-glimmer | 2.1.1-variant | No | Yes | Yes | No"},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/nim-container-variants.html#muse-glimmer", "doc_version": "1.15.0", "quote": "For the max_tokens field, use at least 512 for typical chat requests and at least 4096 for tool-calling requests."}
+        ],
+        "notes": "No page says whether the image turns the tool parser on by default."
+      },
+      "image": {
+        "documented": "yes",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#vlms", "doc_version": "2.1.5", "quote": "The following section lists all of the supported VLMs."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#muse-glimmer", "doc_version": "2.1.5", "quote": "The following table lists the supported profile configurations for meta/muse-glimmer:"}
+        ],
+        "notes": "Listed in the VLMs section of the 2.1.5 support matrix; no page lists its input types."
+      },
+      "json_schema": {"documented": "engine"},
+      "stream": {"documented": "engine"},
+      "known_issues": [
+        {"url": "https://docs.nvidia.com/nim/large-language-models/1.15.0/nim-container-variants.html#muse-glimmer", "affects": ["tools_parallel"], "text": "Parallel tool calls can fall back to a single sequential call (about 20% of cases in testing)."},
+        {"url": "https://docs.nvidia.com/nim/large-language-models/2.1.4/get-started/advanced/model-specific-deployment-considerations.html#muse-glimmer-token-budget", "affects": ["json_schema"], "text": "Constrained output has its own limitations with this model (its release-note entries)."},
+        {"url": "https://docs.nvidia.com/nim/large-language-models/2.1.4/get-started/advanced/model-specific-deployment-considerations.html#muse-glimmer-token-budget", "affects": ["chat"], "text": "A stop sequence also matches text in the reasoning; the check never sends stop."}
+      ]
+    },
+    {
+      "id": "nemotron-3.5-bolt-e4b",
+      "name": "Nemotron 3.5 Bolt E4B 4GB",
+      "match": {
+        "repos": ["nim/nvidia/nemotron-3.5-bolt-e4b-4gb"],
+        "served_ids": ["nvidia/nemotron-3.5-bolt-e4b-4gb"],
+        "patterns": ["^nvidia/nemotron-3-5-bolt-e4b(-4gb)?$"]
+      },
+      "status": "supported",
+      "kind": "vlm",
+      "backend": "vllm",
+      "reasoning": {
+        "default": "on",
+        "on": {"method": "kwargs", "key": "enable_thinking", "value": true},
+        "off": {"method": "kwargs", "key": "enable_thinking", "value": false},
+        "max_tokens": 4096,
+        "where": ["reasoning"],
+        "prefills_off": false,
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.4/get-started/advanced/model-specific-deployment-considerations.html#nemotron-3-5-bolt-e4b", "doc_version": "2.1.4", "quote": "The nvcr.io/nim/nvidia/nemotron-3.5-bolt-e4b-4gb:2.1.4 image sets NIM_PASSTHROUGH_ARGS to the following value, which turns on tool calling, reasoning parsing, and reasoning by default:"},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.4/get-started/advanced/model-specific-deployment-considerations.html#nemotron-3-5-bolt-e4b", "doc_version": "2.1.4", "quote": "To turn off reasoning for a request, set \"chat_template_kwargs\": {\"enable_thinking\": false}."}
+        ],
+        "notes": "The image turns reasoning on with --default-chat-template-kwargs; the reasoning parser is gemma4."
+      },
+      "tools": {
+        "documented": "yes",
+        "default_on": {"2.x": true},
+        "parser": "gemma4",
+        "parallel": "unknown",
+        "stream": "unknown",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.4/get-started/advanced/model-specific-deployment-considerations.html#nemotron-3-5-bolt-e4b", "doc_version": "2.1.4", "quote": "The nvcr.io/nim/nvidia/nemotron-3.5-bolt-e4b-4gb:2.1.4 image sets NIM_PASSTHROUGH_ARGS to the following value, which turns on tool calling, reasoning parsing, and reasoning by default:"},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.4/get-started/advanced/model-specific-deployment-considerations.html#nemotron-3-5-bolt-e4b", "doc_version": "2.1.4", "quote": "If you set NIM_PASSTHROUGH_ARGS, your value replaces this one. Include these flags in your value to keep these features."}
+        ]
+      },
+      "image": {
+        "documented": "yes",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#vlms", "doc_version": "2.1.5", "quote": "The following section lists all of the supported VLMs."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#nemotron-3-5-bolt-e4b", "doc_version": "2.1.5", "quote": "The following table lists the supported GPU configurations for nvidia/nemotron-3.5-bolt-e4b-4gb."}
+        ],
+        "notes": "Listed in the VLMs section of the 2.1.5 support matrix; the skill sends no audio."
+      },
+      "json_schema": {"documented": "engine"},
+      "stream": {"documented": "engine"},
+      "server_switches": {
+        "tools": {"2.x-vllm": "--enable-auto-tool-choice --tool-call-parser gemma4 (the image default; keep it when setting NIM_PASSTHROUGH_ARGS)"},
+        "reasoning": {"2.x-vllm": "--reasoning-parser gemma4"}
+      }
+    },
+    {
+      "id": "step-3.7-flash",
+      "name": "Step 3.7 Flash",
+      "match": {
+        "repos": ["nim/stepfun-ai/step-3.7-flash"],
+        "served_ids": ["stepfun-ai/step-3.7-flash"],
+        "patterns": ["^stepfun-ai/step-3-7-flash$"]
+      },
+      "status": "supported",
+      "kind": "vlm",
+      "backend": "vllm",
+      "reasoning": {
+        "default": "on",
+        "on": {"method": "default"},
+        "off": {"method": "kwargs", "key": "thinking", "value": false},
+        "max_tokens": 4096,
+        "where": ["reasoning", "reasoning_content"],
+        "prefills_off": false,
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/1.7.0/examples/step-3.7-flash/api.html#reasoning", "doc_version": "1.7.0", "quote": "This model supports reasoning with text and image inputs. It is turned on by default. To turn off reasoning, add \"chat_template_kwargs\": { \"thinking\": false } in the request body."}
+        ]
+      },
+      "tools": {
+        "documented": "yes",
+        "default_on": null,
+        "parallel": "unknown",
+        "stream": "unknown",
+        "max_tokens": 4096,
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/1.7.0/examples/step-3.7-flash/api.html#function-tool-calling", "doc_version": "1.7.0", "quote": "You can connect NIM to external tools and services using function calling (also known as tool calling)."}
+        ]
+      },
+      "image": {
+        "documented": "yes",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/1.7.0/examples/step-3.7-flash/api.html#reasoning", "doc_version": "1.7.0", "quote": "This model supports reasoning with text and image inputs."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/1.7.0/examples/step-3.7-flash/api.html#passing-images", "doc_version": "1.7.0", "quote": "NIM for VLMs follows the OpenAI specification to pass images as part of the HTTP payload in a user message."}
+        ],
+        "notes": "Video input is not supported (VLM 1.7.0 release notes); the skill never sends video."
+      },
+      "json_schema": {"documented": "engine"},
+      "stream": {"documented": "engine"}
+    },
+    {
+      "id": "ministral-3-14b",
+      "name": "Ministral 3 14B Instruct 2512",
+      "match": {
+        "repos": ["nim/mistralai/ministral-3-14b-instruct-2512"],
+        "served_ids": ["mistralai/ministral-3-14b-instruct-2512"],
+        "patterns": ["^mistralai/ministral-3-14b-instruct-2512$"]
+      },
+      "status": "supported",
+      "kind": "vlm",
+      "backend": "vllm",
+      "reasoning": {
+        "default": "none",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/1.7.0/examples/ministral-14b-instruct-2512/api.html#openai-chat-completion-request", "doc_version": "1.7.0", "quote": "\"reasoning_content\":null"}
+        ],
+        "notes": "The instruct model: its VLM 1.7.0 page has no reasoning section, unlike the pages of the reasoning VLMs, and its example answer has no reasoning."
+      },
+      "tools": {
+        "documented": "yes",
+        "default_on": null,
+        "parallel": "unknown",
+        "stream": "unknown",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/1.7.0/examples/ministral-14b-instruct-2512/api.html#function-tool-calling", "doc_version": "1.7.0", "quote": "You can connect NIM to external tools and services using function calling (also known as tool calling)."}
+        ]
+      },
+      "image": {
+        "documented": "yes",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/1.7.0/examples/ministral-14b-instruct-2512/api.html#text-only-queries", "doc_version": "1.7.0", "quote": "Many VLMs such as mistralai/ministral-3-14b-instruct-2512 support text-only queries, where a VLM behaves exactly like a (text-only) LLM."},
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/1.7.0/examples/ministral-14b-instruct-2512/api.html#passing-images", "doc_version": "1.7.0", "quote": "NIM for VLMs follows the OpenAI specification to pass images as part of the HTTP payload in a user message."}
+        ]
+      },
+      "json_schema": {"documented": "engine"},
+      "stream": {"documented": "engine"}
+    },
+    {
+      "id": "nemotron-parse",
+      "name": "Nemotron Parse and NeMo Retriever Parse (document parsers)",
+      "match": {
+        "repos": [
+          "nim/nvidia/nemotron-parse",
+          "nim/nvidia/nemotron-parse-v1.2",
+          "nim/nvidia/nemotron-parse-v2.0",
+          "nim/nvidia/nemoretriever-parse"
+        ],
+        "served_ids": ["nvidia/nemotron-parse", "nvidia/nemoretriever-parse", "nvidia/nemotron-parse-2.0"],
+        "patterns": ["^nvidia/(nemotron-parse(-v?[0-9]+(-[0-9]+)?)?|nemoretriever-parse)$"]
+      },
+      "status": "out_of_scope",
+      "kind": "vlm",
+      "backend": "vllm",
+      "out_of_scope_reason": "a document parser, not a chat model: it takes no text input and does not stream",
+      "reasoning": {"default": "none"},
+      "tools": {"documented": "no"},
+      "image": {
+        "documented": "yes",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/reference/support-matrix.html#vlms", "doc_version": "2.1.5", "quote": "The following section lists all of the supported VLMs."}
+        ]
+      },
+      "json_schema": {"documented": "engine"},
+      "stream": {
+        "documented": "no",
+        "sources": [
+          {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/1.6.0/release-notes.html#release-1-5-0", "doc_version": "1.6.0", "quote": "Nemotron Parse ... Only one image per request is supported. Text input is not supported. System messages are not supported. Output streaming is not supported."}
+        ]
+      },
+      "known_issues": [
+        {"url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/about-nim-llm/release-notes.html#issue-2-1-5-nemotron-parse-v2-ocr-blank-image", "affects": ["image"], "text": "A blank image can return invented document content with HTTP 200."}
+      ],
+      "out_of_scope_sources": [
+        {"tier": "A", "url": "https://docs.nvidia.com/nim/vision-language-models/1.6.0/release-notes.html#release-1-5-0", "doc_version": "1.6.0", "quote": "Nemotron Parse ... Only one image per request is supported. Text input is not supported. System messages are not supported. Output streaming is not supported."}
+      ]
+    },
+    {
+      "id": "safety-classifiers",
+      "name": "Content safety, safety guard and topic control classifiers",
+      "match": {
+        "repos": [
+          "nim/nvidia/nemotron-3.5-content-safety",
+          "nim/nvidia/nemotron-3-content-safety",
+          "nim/nvidia/llama-3.1-nemoguard-8b-content-safety",
+          "nim/nvidia/llama-3.1-nemoguard-8b-topic-control",
+          "nim/nvidia/llama-3.1-nemotron-safety-guard-8b-v3",
+          "nim/nvidia/nemotron-content-safety-reasoning-4b-experimental"
+        ],
+        "served_ids": [
+          "nvidia/nemotron-3.5-content-safety",
+          "nvidia/nemotron-3-content-safety",
+          "nvidia/llama-3.1-nemoguard-8b-content-safety",
+          "nvidia/llama-3.1-nemoguard-8b-topic-control",
+          "nvidia/llama-3.1-nemotron-safety-guard-8b-v3",
+          "nvidia/nemotron-content-safety-reasoning-4b"
+        ],
+        "patterns": [
+          "^nvidia/nemotron-3(-5)?-content-safety$",
+          "^nvidia/llama-3-1-nemoguard-8b-(content-safety|topic-control)$",
+          "^nvidia/llama-3-1-nemotron-safety-guard-8b-v3$",
+          "^nvidia/nemotron-content-safety-reasoning-4b(-experimental)?$"
+        ]
+      },
+      "status": "out_of_scope",
+      "kind": "llm",
+      "backend": "vllm",
+      "out_of_scope_reason": "a safety classifier: it labels prompts and answers instead of chatting",
+      "reasoning": {"default": "none"},
+      "tools": {"documented": "no"},
+      "image": {"documented": "unknown"},
+      "json_schema": {"documented": "engine"},
+      "stream": {"documented": "engine"},
+      "known_issues": [
+        {"url": "https://docs.nvidia.com/nim/large-language-models/2.1.5/about-nim-llm/release-notes.html#issue-2-1-5-nemotron-3-5-content-safety-image-chat-500", "affects": ["image"], "text": "nemotron-3.5-content-safety returns HTTP 500 for two or more images, or an image without text."}
+      ],
+      "notes": "Sources: the NGC descriptions of these NIMs.",
+      "out_of_scope_sources": [
+        {"tier": "D", "url": "https://api.ngc.nvidia.com/v2/repos/nim/nvidia/llama-3.1-nemotron-safety-guard-8b-v3", "doc_version": "NGC description (2026-11-11)", "quote": "This container houses the Llama-3.1-Nemotron-Safety-Guard-8B-v3, which is a multilingual content safety model that moderates human-LLM interaction content and classifies user prompts and LLM responses as safe or unsafe."},
+        {"tier": "D", "url": "https://api.ngc.nvidia.com/v2/repos/nim/nvidia/nemotron-content-safety-reasoning-4b-experimental", "doc_version": "NGC description (2026-11-11)", "quote": "Nemotron Content Safety Reasoning 4B is a Large Language Model (LLM) classifier designed to function as a dynamic and adaptable guardrail for content safety and dialogue moderation (topic-following)."},
+        {"tier": "D", "url": "https://api.ngc.nvidia.com/v2/repos/nim/nvidia/nemotron-3.5-content-safety", "doc_version": "NGC description (2026-11-11)", "quote": "is fine-tuned by NVIDIA on multimodal, multilingual, and reasoning-oriented content-safety datasets."}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,219 @@
+{
+  "best_unconfirmed": null,
+  "environment_summary": {
+    "captured_at": "2026-10-23T00:00:00Z",
+    "conditions": [],
+    "context": null,
+    "driver_version": "580.126.09",
+    "gpus_known": true,
+    "groups": [
+      {
+        "compute_capability": "9.0",
+        "count": 8,
+        "idle": 8,
+        "idle_indices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "memory_gb": 100.48,
+        "name": "NVIDIA H100 NVL",
+        "pci_device_id": "2321:10de"
+      }
+    ],
+    "namespace": null,
+    "target": "host"
+  },
+  "group": {
+    "available_gpus": 8,
+    "compute_capability": "9.0",
+    "count": 8,
+    "driver_version": "580.126.09",
+    "idle": 8,
+    "idle_indices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "indices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "memory_gb": 100.48,
+    "memory_mib": 95830,
+    "name": "NVIDIA H100 NVL",
+    "node_count": 1,
+    "pci_device_id": "2321:10de",
+    "pci_device_ids": [
+      "2321:10de"
+    ],
+    "pci_source": "nvidia-smi",
+    "unified_memory": false
+  },
+  "groups": [
+    {
+      "available_gpus": 8,
+      "count": 8,
+      "fits": 1,
+      "name": "NVIDIA H100 NVL",
+      "pci_device_id": "2321:10de",
+      "unknown": 0
+    }
+  ],
+  "handoff": {
+    "confirm_with": "list-model-profiles",
+    "gpu_count": 1,
+    "gpu_ids": [
+      0
+    ],
+    "gpu_name": "NVIDIA H100 NVL",
+    "gpus": "device=0",
+    "image": "nvcr.io/nim/meta/llama-3.1-8b-instruct:2.1.4",
+    "model": "meta/llama-3.1-8b-instruct",
+    "model_profile": "092ed4213624e774d24cdaf84e3b6222839bab2008a21d3c214ab46626366f90",
+    "verdict": "fits"
+  },
+  "image": "nvcr.io/nim/meta/llama-3.1-8b-instruct:2.1.4",
+  "image_choice": {
+    "image": "nvcr.io/nim/meta/llama-3.1-8b-instruct:2.1.4",
+    "kind": "newest",
+    "reason": "newest version that fits"
+  },
+  "images_considered": [
+    {
+      "error": null,
+      "error_code": null,
+      "gpus": 1,
+      "image": "nvcr.io/nim/meta/llama-3.1-8b-instruct:2.1.4",
+      "kind": "newest",
+      "metadata": "published",
+      "profile_id": "092ed4213624e774d24cdaf84e3b6222839bab2008a21d3c214ab46626366f90",
+      "rejected_counts": {},
+      "resource_id": "nim/meta/llama-3.1-8b-instruct",
+      "tag": "2.1.4",
+      "verdict": "fits"
+    },
+    {
+      "error": null,
+      "error_code": null,
+      "gpus": null,
+      "image": "nvcr.io/nim/meta/llama-3.1-8b-instruct-dgx-spark:1.0.0-variant",
+      "kind": "variant",
+      "metadata": "published",
+      "profile_id": null,
+      "rejected_counts": {
+        "gpu_mismatch": 1
+      },
+      "resource_id": "nim/meta/llama-3.1-8b-instruct-dgx-spark",
+      "tag": "1.0.0-variant",
+      "verdict": "does_not_fit"
+    },
+    {
+      "error": null,
+      "error_code": null,
+      "gpus": 1,
+      "image": "nvcr.io/nim/meta/llama-3.1-8b-instruct:2.0.13",
+      "kind": "older",
+      "metadata": "published",
+      "profile_id": "092ed4213624e774d24cdaf84e3b6222839bab2008a21d3c214ab46626366f90",
+      "rejected_counts": {},
+      "resource_id": "nim/meta/llama-3.1-8b-instruct",
+      "tag": "2.0.13",
+      "verdict": "fits"
+    },
+    {
+      "error": null,
+      "error_code": null,
+      "gpus": null,
+      "image": "nvcr.io/nim/meta/llama-3.1-8b-instruct:1.15.5",
+      "kind": "older",
+      "metadata": "not_published",
+      "profile_id": null,
+      "rejected_counts": {},
+      "resource_id": "nim/meta/llama-3.1-8b-instruct",
+      "tag": "1.15.5",
+      "verdict": null
+    }
+  ],
+  "mapping": "exact",
+  "metadata": "published",
+  "model": "meta/llama-3.1-8b-instruct",
+  "not_recorded": [
+    "disk_space_per_device_gb",
+    "max_gpu_count",
+    "min_cpu_count",
+    "min_driver_version",
+    "release_details.architecture",
+    "system_memory_per_device_gb"
+  ],
+  "notes": [
+    "Production-branch images were not considered automatically: nim/meta/llama-3.1-8b-instruct-pb25h2, nim/meta/llama-3.1-8b-instruct-pb6. Name one with select or fit to check it."
+  ],
+  "profiles_total": 1,
+  "recommended": {
+    "backend": "vllm",
+    "feat_lora": null,
+    "gpu": null,
+    "gpus_required": 1,
+    "min_vram_per_device_gb": 20.0,
+    "pp": 1,
+    "precision": "fp8",
+    "profile_id": "092ed4213624e774d24cdaf84e3b6222839bab2008a21d3c214ab46626366f90",
+    "reasons": [],
+    "tier": "direct",
+    "tp": 1,
+    "verdict": "fits",
+    "why": [
+      "Built for this GPU (2321:10de)",
+      "Needs 20 GB per GPU; each GPU has 100.48 GB",
+      "Needs 1 GPU; 8 are available"
+    ]
+  },
+  "rejected": {
+    "counts": {},
+    "examples": [],
+    "total": 0
+  },
+  "resource_id": "nim/meta/llama-3.1-8b-instruct",
+  "shortlist": [
+    {
+      "backend": "vllm",
+      "feat_lora": null,
+      "gpu": null,
+      "gpus_required": 1,
+      "min_vram_per_device_gb": 20.0,
+      "pp": 1,
+      "precision": "fp8",
+      "profile_id": "092ed4213624e774d24cdaf84e3b6222839bab2008a21d3c214ab46626366f90",
+      "reasons": [],
+      "tier": "direct",
+      "tp": 1,
+      "verdict": "fits",
+      "why": [
+        "Built for this GPU (2321:10de)",
+        "Needs 20 GB per GPU; each GPU has 100.48 GB",
+        "Needs 1 GPU; 8 are available"
+      ]
+    }
+  ],
+  "tag": "2.1.4",
+  "unconfirmed": [],
+  "verdict": "fits",
+  "warnings": []
+}

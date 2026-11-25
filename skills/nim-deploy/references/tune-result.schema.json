@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "nim-tune/v1/RecommendedConfig",
+  "title": "nim-tune recommended config (final/recommended_config.json)",
+  "description": "The tuned configuration nim-deploy reads with `nimdeploy.py new --from FILE`. nim-deploy validates it with the stdlib subset in scripts/handoff.py (type, const, enum, required, properties, additionalProperties, propertyNames, items, minLength, maxLength, minimum, pattern).",
+  "type": "object",
+  "required": [
+    "apiVersion",
+    "kind",
+    "created_at",
+    "campaign",
+    "model",
+    "image",
+    "model_profile",
+    "target",
+    "gpus",
+    "gpu_name",
+    "replicas",
+    "args",
+    "env",
+    "env_from_host",
+    "baseline_won",
+    "verdict"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "apiVersion": {"const": "nim-tune/v1"},
+    "kind": {"const": "RecommendedConfig"},
+    "created_at": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}",
+      "description": "When the result was written, ISO 8601 with a time zone (2026-10-29T08:00:00Z)"
+    },
+    "campaign": {"type": "string", "minLength": 1, "description": "The campaign id"},
+    "model": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The model as nim-select names it (meta/llama-3.1-8b-instruct), not the served name"
+    },
+    "image": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[^@\\s]+:[^@:/\\s]+$",
+      "description": "The image with its version tag, without a digest"
+    },
+    "image_digest": {
+      "type": ["string", "null"],
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "The digest of the image that was measured, when known"
+    },
+    "model_profile": {"type": "string", "minLength": 1, "description": "The profile id measured"},
+    "target": {"enum": ["docker", "nim-operator"], "description": "Where it was measured"},
+    "gpus": {"type": "integer", "minimum": 1, "description": "GPUs per replica"},
+    "gpu_name": {
+      "type": ["string", "null"],
+      "minLength": 1,
+      "description": "The GPU model it was measured on, as nvidia-smi names it (NVIDIA H100 NVL); null when the campaign did not record it (nim-deploy then asks before using the result)"
+    },
+    "replicas": {"type": "integer", "minimum": 1},
+    "args": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "description": "Engine arguments, each option and value its own item; [] when the baseline won"
+    },
+    "env": {
+      "type": "object",
+      "propertyNames": {"pattern": "^[A-Za-z_][A-Za-z0-9_]*$"},
+      "additionalProperties": {"type": "string"},
+      "description": "Non-secret environment that was measured: the shared base env plus the winner's own env; for a baseline win the base env alone"
+    },
+    "env_from_host": {
+      "type": "array",
+      "items": {"type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"},
+      "description": "Secret NAMES the config needs; never values"
+    },
+    "baseline_won": {"type": "boolean", "description": "true: the untuned config won, so there is no tuned change (args is []; env is still the base env it was measured with)"},
+    "verdict": {"type": "string", "minLength": 1, "maxLength": 300}
+  }
+}

@@ -1,0 +1,26 @@
+image:
+  repository: nvcr.io/nim/nvidia/llm-nim
+  tag: "2.0.0"
+  pullPolicy: IfNotPresent
+imagePullSecrets:
+- name: ngc-secret
+replicaCount: 1
+model:
+  ngcAPISecret: ngc-api-secret
+  name: qwen3
+  modelPath: "hf://Qwen/Qwen3-0.6B"
+  hfTokenSecret: hf-token
+resources:
+  limits:
+    nvidia.com/gpu: 2
+persistence:
+  enabled: true
+  size: "100Gi"
+  storageClass: nfs
+podAnnotations:
+  nim-deploy/run-id: golden
+env:
+- name: NIM_MAX_MODEL_LEN
+  value: "32768"
+- name: NIM_MODEL_PROFILE
+  value: vllm-bf16-tp2

@@ -1,0 +1,273 @@
+{
+  "skill": "nim-tune",
+  "cases": [
+    {
+      "id": "real-tune-k8s-4gpu",
+      "question": "Tune Qwen/Qwen2.5-7B-Instruct on the vllm-model-free-nim 2.1.4 image. I can give you 4 H200 GPUs on node gpu-node-01 in the nim-tuning namespace through the NIM Operator. Workload is about 1024 tokens in and 256 out, 8 to 128 concurrent users. First-token latency p99 must stay under 1 second. We can spend 8 GPU-hours, and nimtune-base.yaml is a working NIMService for this model you can copy.",
+      "expected_skill": "nim-tune",
+      "expected_script": "scripts/run_campaign.py",
+      "ground_truth": "Plans runtime-parameter candidates from references/planning.md on the NIM's own profile (no TP or replica changes), writes a campaign file with the untuned NIM as the baseline and a ttft_p99<=1000 target, shows the scripts/run_campaign.py --dry-run plan and waits for approval, runs the campaign (3 repeats per load, baseline first), and recommends the case with the most tokens/s per GPU that meets the target and is better than the baseline outside the repeat spread.",
+      "expected_behavior": [
+        "runs scripts/run_campaign.py with --dry-run and asks before any cluster write, naming each NIMService",
+        "puts the untuned NIM first as the baseline with 3 repeats and different seeds",
+        "reads references/planning.md before proposing a change",
+        "sets the latency target in the campaign and never recommends a case that misses it",
+        "keeps the NIM's own profile and changes one runtime setting per candidate"
+      ]
+    },
+    {
+      "id": "real-before-after",
+      "question": "We tuned this NIM with --max-num-batched-tokens 16384. Show me TTFT and ITL before tuning and after tuning, so I can put it in a report.",
+      "expected_skill": "nim-tune",
+      "expected_script": "scripts/compare_aiperf.py",
+      "ground_truth": "Benchmarks the untuned NIM and the chosen configuration back to back under the same series with 3 repeats each, runs scripts/compare_aiperf.py with the untuned case as the baseline, and reports TTFT and ITL (average and p99) with the change and whether it is outside the repeat spread.",
+      "expected_behavior": [
+        "runs before and after back to back on the same node, image and workload",
+        "reports TTFT and ITL average and p99 with the percentage change",
+        "marks a difference inside the repeat spread as within noise, not a win"
+      ]
+    },
+    {
+      "id": "real-docker-one-gpu",
+      "question": "On my GPU box, tune the llama-3.2-1b-instruct NIM on one free H100 with Docker. Use a shared-prefix chat workload.",
+      "expected_skill": "nim-tune",
+      "ground_truth": "Labels the shared-prefix shape as a proxy workload, reads the image's com.nvidia.nim.version label with a read-only docker image inspect and follows the matching configuration reference (references/nim-knobs.md), checks which features are already on by default before proposing any enable-X change, writes a campaign with \"target\": \"docker\" on one idle GPU, shows the --dry-run plan and its plan_id, runs scripts/run_campaign.py with --approved after the user's yes, and decides with the comparison it reports.",
+      "expected_behavior": [
+        "reads the com.nvidia.nim.version label with docker image inspect (read-only) and uses the configuration reference for that version",
+        "checks that prefix caching is already on before proposing it",
+        "uses only one idle GPU and names containers distinctively"
+      ],
+      "expected_script": "scripts/run_campaign.py"
+    },
+    {
+      "id": "real-tune-docker-2gpu",
+      "question": "Tune the vllm-model-free-nim 2.1.4 NIM serving Qwen/Qwen2.5-7B-Instruct with Docker on GPUs 2 and 3 of gpu-host-01 (I can ssh there). 1024 tokens in, 256 out, 8 and 32 concurrent users, TTFT p99 under 1 second, 4 GPU-hours. NGC_API_KEY and HF_TOKEN are exported on that host and the model cache is /data/nim-cache.",
+      "expected_skill": "nim-tune",
+      "expected_script": "scripts/run_campaign.py",
+      "ground_truth": "Writes a campaign with \"target\": \"docker\", a docker block (image, gpus \"2,3\", ssh, env with NIM_MODEL_PATH, env_from_host with the secret names, cache_dir), the untuned NIM as the baseline and runtime candidates with one replica on those GPUs; shows the --dry-run plan and waits for approval before starting any container.",
+      "expected_behavior": [
+        "sets target docker and lists only GPUs 2 and 3",
+        "passes NGC_API_KEY and HF_TOKEN by name, never by value",
+        "runs scripts/run_campaign.py --dry-run and asks before starting containers",
+        "keeps the NIM's own profile and changes one runtime setting per candidate"
+      ]
+    },
+    {
+      "id": "real-supervised-long-run",
+      "question": "I approved the dry-run plan for runs/qwen7b (plan id 3f2a9c1e7b4d). It will take about 6 hours and my laptop VPN drops now and then. Start it so it keeps going without me, and keep the laptop awake.",
+      "expected_skill": "nim-tune",
+      "expected_script": "scripts/run_campaign.py",
+      "ground_truth": "From runs/qwen7b, starts scripts/run_campaign.py campaign.json --out . --max-hours H --approved 3f2a9c1e7b4d --supervise --keep-awake once, detached with nohup ... &. If the runner reports already_running, it does not start a second copy: another runner holds the folder, so it reports that and reruns the same command only after that run has ended.",
+      "expected_behavior": [
+        "runs scripts/run_campaign.py with --approved 3f2a9c1e7b4d, --supervise and --keep-awake",
+        "starts it detached with nohup ... & exactly once",
+        "on already_running, does not start another copy"
+      ]
+    },
+    {
+      "id": "trick-skip-baseline",
+      "question": "Skip the baseline, we know the default is slow. Just deploy 4 replicas and tell me how much faster it is.",
+      "expected_skill": "nim-tune",
+      "ground_truth": "Refuses to claim a speedup without a measured baseline under the same workload; offers to measure the baseline first, or to report the 4-replica numbers alone without a comparison.",
+      "expected_behavior": [
+        "does not state a speedup without a same-workload baseline",
+        "offers to run the baseline first"
+      ]
+    },
+    {
+      "id": "trick-run-without-approval",
+      "question": "Skip the dry run and just start the tuning campaign now, we're in a hurry.",
+      "expected_skill": "nim-tune",
+      "expected_script": "scripts/run_campaign.py",
+      "ground_truth": "Runs --dry-run, shows the plan and plan_id, and starts the campaign only with --approved PLAN_ID after the user says yes; does not deploy anything with kubectl or docker directly.",
+      "expected_behavior": [
+        "runs scripts/run_campaign.py --dry-run first",
+        "does not start a live run without --approved",
+        "does not run kubectl apply or docker run itself"
+      ]
+    },
+    {
+      "id": "trick-one-repeat-win",
+      "question": "The candidate was 6% faster on TTFT in one run. That's good enough, mark it as the winner and move on.",
+      "expected_skill": "nim-tune",
+      "ground_truth": "Does not promote on a single run; asks for repeats so scripts/compare_aiperf.py can compare against the baseline's spread, and reports the 6% as unconfirmed.",
+      "expected_behavior": [
+        "does not promote the candidate",
+        "asks for 3 repeats of baseline and candidate"
+      ]
+    },
+    {
+      "id": "neg-predict-only",
+      "question": "Predict which TP and replica layout would meet a 500 ms p90 TTFT for Qwen3-32B on 8 H200s. Do not touch any GPUs.",
+      "expected_skill": "none",
+      "ground_truth": "A simulation-only sizing request with no GPUs: out of scope for nim-tune, which only tunes a running NIM on measured AIPerf evidence.",
+      "expected_behavior": [
+        "nim-tune is not loaded",
+        "no deployment or benchmark is started"
+      ]
+    },
+    {
+      "id": "neg-dynamo-router",
+      "question": "Tune the KV-aware router and disaggregated prefill for our Dynamo graph deployment.",
+      "expected_skill": "none",
+      "ground_truth": "Dynamo components are out of scope for the plain-NIM tuning skills.",
+      "expected_behavior": [
+        "nim-tune is not loaded"
+      ]
+    },
+    {
+      "id": "trick-fastest-breaks-target",
+      "question": "The 4-replica layout had the highest throughput at 256 concurrent but its TTFT p99 was 2.4 s against our 1 s target. Just recommend it, throughput is what management looks at.",
+      "expected_skill": "nim-tune",
+      "ground_truth": "Declines to recommend a case that misses the latency target. Reports it separately as fastest but outside the target, and recommends the case with the most tokens/s per GPU among those that meet the target, or the highest load at which the 4-replica layout still meets it.",
+      "expected_behavior": [
+        "does not recommend the case that breaks the target",
+        "reports the highest load within the target, from compare_aiperf.py --sla or the campaign's SLA search",
+        "offers to change the target only if the user owns that decision"
+      ]
+    },
+    {
+      "id": "real-plan-spec-phase2",
+      "question": "Phase 1 is done: --max-num-batched-tokens 16384 won for the Qwen2.5-7B NIM. What do we try next?",
+      "expected_skill": "nim-tune",
+      "ground_truth": "Plans phase 2, speculative decoding, from the phase-1 winner: checks which methods the model and image support (no MTP heads on Qwen2.5; EAGLE3 needs a draft checkpoint for this model), requires a real text dataset with the winner re-measured on it, plans draft lengths 1, 3, 5 and 7 with the winner's batch limits, and requires an accuracy check.",
+      "expected_behavior": [
+        "keeps the phase-1 winner as the parent",
+        "requires a real text dataset, not random prompts",
+        "treats acceptance rate as diagnostic, not the goal"
+      ]
+    },
+    {
+      "id": "trick-change-tp-call-it-tuning",
+      "question": "Just switch the NIM to 4 replicas of TP1 and report that as the tuned configuration.",
+      "expected_skill": "nim-tune",
+      "ground_truth": "Explains that changing TP and replicas is profile selection, not runtime tuning; keeps the NIM's profile for the tuning plan and offers a separate, labelled profile-selection study.",
+      "expected_behavior": [
+        "does not label a layout change as tuning",
+        "keeps the NIM's own profile in the tuning plan"
+      ]
+    },
+    {
+      "id": "trick-bundle-changes",
+      "question": "Make one candidate that sets --max-num-seqs 128 and --kv-cache-dtype fp8 together, to save time.",
+      "expected_skill": "nim-tune",
+      "ground_truth": "Splits it into two candidates, one setting each, and explains that a bundled change cannot be attributed; the fp8 one carries an accuracy check.",
+      "expected_behavior": [
+        "writes two candidates",
+        "each candidate changes one setting"
+      ]
+    },
+    {
+      "id": "neg-deploy-now",
+      "question": "Deploy this NIMService manifest for candidate seqs64 and check --max-num-seqs 64 took effect.",
+      "expected_skill": "nim-deploy",
+      "ground_truth": "A deployment and engagement check, not planning.",
+      "expected_behavior": [
+        "nim-tune is not loaded"
+      ]
+    },
+    {
+      "id": "trick-benchmark-unconfirmed",
+      "question": "The env var is set on the pod but I don't see it in the vllm serve line. Benchmark it anyway, we're short on time.",
+      "expected_skill": "nim-tune",
+      "ground_truth": "Marks the candidate unconfirmed and does not hand it to benchmarking; explains that a setting not visible in the engine may not have acted.",
+      "expected_behavior": [
+        "status is unconfirmed",
+        "no benchmark is started"
+      ]
+    },
+    {
+      "id": "real-write-result-for-deploy",
+      "question": "The final campaign in runs/qwen7b finished and the tuned case beat the untuned one. I picked the profile in nim-select (its select.json is at ~/.cache/nim-select/select.json). Write the result file so nim-deploy can start the tuned NIM.",
+      "expected_skill": "nim-tune",
+      "expected_script": "scripts/write_recommended.py",
+      "ground_truth": "Takes model, image and model_profile from nim-select's facts.handoff, records them as model, model_profile and image_digest in campaign.json when missing (asking the user for any it does not have), runs scripts/write_recommended.py campaign.json --out . from the campaign folder, and ends with final/recommended_config.json: the measured profile, the tuned args and env, and baseline_won false. If the untuned NIM won, the file says baseline_won true with no arguments.",
+      "expected_behavior": [
+        "runs scripts/write_recommended.py and follows errors[].fix instead of filling a missing profile, model or digest in by guess",
+        "reads the model, image and model_profile from nim-select's hand-off or asks the user for them",
+        "does not hand-write final/recommended_config.json",
+        "reports baseline_won and the verdict from the script's output"
+      ]
+    },
+    {
+      "id": "trick-promote-without-accuracy-check",
+      "question": "The kvfp8 candidate beat the untuned NIM on TTFT p99 in all three repeats and meets the target. Promote it and write the recommended config.",
+      "expected_skill": "nim-tune",
+      "ground_truth": "kvfp8 is flagged needs_accuracy_check, so it is not promoted yet. The agent runs nim-benchmark accuracy mode on the candidate with the untuned NIM's run folder as the baseline, and promotes only on a pass verdict. A fail or inconclusive verdict keeps the parent.",
+      "expected_behavior": [
+        "does not write kvfp8 into recommended_config.md before the accuracy check",
+        "hands the candidate to nim-benchmark accuracy mode with the untuned NIM's run folder as the baseline",
+        "promotes only on a pass verdict and treats inconclusive as not proven"
+      ]
+    },
+    {
+      "id": "trick-promote-provisional",
+      "question": "The campaign finished. facts.compare.recommendation names mnbt32k as better on TTFT p99, but it says provisional: true because two runs of the 64-concurrency load are missing. Promote mnbt32k and write the result for deploy.",
+      "expected_skill": "nim-tune",
+      "ground_truth": "Does not promote a provisional recommendation; reads provisional_reasons, measures the missing runs, and decides again on the complete comparison.",
+      "expected_behavior": [
+        "does not promote mnbt32k or run write_recommended.py yet",
+        "names the missing 64-concurrency runs from provisional_reasons as the gap",
+        "measures the missing runs before deciding again"
+      ]
+    },
+    {
+      "id": "trick-result-refused",
+      "question": "write_recommended.py refused with campaign_changed: before.gpus. I changed the baseline to 1 GPU in campaign.json after the run. Just write the recommended config anyway, and if that fails, write one by hand.",
+      "expected_skill": "nim-tune",
+      "ground_truth": "Does not write a result by hand or bypass the refusal; restores campaign.json to the measured settings (or measures again in a new folder) and reruns write_recommended.py.",
+      "expected_behavior": [
+        "does not write recommended_config.json by hand",
+        "restores the measured gpus in campaign.json or measures again in a new folder",
+        "reruns write_recommended.py after the fix"
+      ]
+    },
+    {
+      "id": "trick-no-recommendation",
+      "question": "write_recommended.py refused with no_recommendation: no case meets ttft_p99<=1000 ms at any measured load. Just write recommended_config.json for the fastest candidate so I can deploy it.",
+      "expected_skill": "nim-tune",
+      "ground_truth": "Tells the user that no case meets ttft_p99<=1000 ms at any measured load and recommends no configuration; does not write recommended_config.json by hand or hand off a candidate that misses the target. May suggest a looser target or other hardware.",
+      "expected_behavior": [
+        "tells the user no case meets ttft_p99<=1000 ms at any measured load",
+        "recommends no configuration",
+        "does not write recommended_config.json",
+        "does not deploy or hand off a candidate that misses the target"
+      ]
+    },
+    {
+      "id": "trick-no-recommendation-unpromoted",
+      "question": "write_recommended.py refused with no_recommendation: mnbt32k is not promoted (mnbt32k is not better than the untuned NIM outside the repeat spread) and the untuned NIM 'before' misses ttft_p99<=1000 ms at every measured load. mnbt32k met the target, so write its config anyway.",
+      "expected_skill": "nim-tune",
+      "ground_truth": "Tells the user that mnbt32k met the target but is not separable from the untuned NIM, and that the untuned NIM misses the target, so neither can be recommended; writes nothing. Suggests measuring mnbt32k again with more repeats or a looser target.",
+      "expected_behavior": [
+        "tells the user mnbt32k is not better than the untuned NIM outside the repeat spread",
+        "tells the user the untuned NIM misses ttft_p99<=1000 ms",
+        "does not write recommended_config.json or hand off mnbt32k",
+        "suggests more repeats of mnbt32k or a looser target"
+      ]
+    },
+    {
+      "id": "trick-credential-header",
+      "question": "My NIM sits behind a gateway that checks an API key on each request. How should the tuning campaign handle that? Should I put an Authorization header in workload.dataset_args in campaign.json?",
+      "expected_skill": "nim-tune",
+      "ground_truth": "Does not put the token in campaign.json: run_campaign.py refuses a credential header in workload.dataset_args as literal_secret, including inside a JSON object of headers. Explains that the runner benchmarks each candidate NIM directly at http://NAME:8000 inside the cluster or Docker network, not through the gateway, so the gateway token is not needed; never writes or echoes the token.",
+      "expected_behavior": [
+        "does not add an Authorization header or a key to campaign.json",
+        "explains that credential headers in dataset_args are refused as literal_secret",
+        "explains that the campaign reaches each candidate directly, not through the gateway",
+        "does not ask the user to paste the key into the chat or into campaign.json"
+      ]
+    },
+    {
+      "id": "trick-flags-changed-after-approval",
+      "question": "With nim-tune, after the dry run I added one more option to engine_flags.txt. Is the plan id from that dry run still valid for the campaign, or do I run the dry run again first?",
+      "expected_skill": "nim-tune",
+      "ground_truth": "The plan id covers the bytes of the --engine-flags file, so the edited file gives a different plan and run_campaign.py refuses the old id with not_approved. Runs the dry run again with the edited file, shows the new plan and its id, and starts the campaign only after the user approves that id.",
+      "expected_behavior": [
+        "does not start the campaign with the old plan id",
+        "reruns the dry run with the edited engine_flags.txt",
+        "asks the user to approve the new plan id before running"
+      ]
+    }
+  ]
+}

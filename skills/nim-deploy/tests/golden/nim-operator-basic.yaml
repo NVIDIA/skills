@@ -1,0 +1,86 @@
+apiVersion: apps.nvidia.com/v1alpha1
+kind: NIMCache
+metadata:
+  name: llama-31-8b
+  namespace: nim-service
+  labels:
+    app.kubernetes.io/managed-by: nim-deploy
+  annotations:
+    nim-deploy/run-id: golden
+spec:
+  source:
+    ngc:
+      modelPuller: "nvcr.io/nim/meta/llama-3.1-8b-instruct:1.8"
+      pullSecret: ngc-secret
+      authSecret: ngc-api-secret
+      model:
+        tensorParallelism: "1"
+  storage:
+    pvc:
+      create: true
+      storageClass: ""
+      size: "50Gi"
+      volumeAccessMode: ReadWriteOnce
+---
+apiVersion: apps.nvidia.com/v1alpha1
+kind: NIMService
+metadata:
+  name: llama-31-8b
+  namespace: nim-service
+  labels:
+    app.kubernetes.io/managed-by: nim-deploy
+  annotations:
+    nim-deploy/run-id: golden
+spec:
+  image:
+    repository: nvcr.io/nim/meta/llama-3.1-8b-instruct
+    tag: "1.8"
+    pullPolicy: IfNotPresent
+    pullSecrets:
+    - ngc-secret
+  authSecret: ngc-api-secret
+  storage:
+    nimCache:
+      name: llama-31-8b
+      profile: ""
+  replicas: 1
+  resources:
+    limits:
+      nvidia.com/gpu: 1
+  expose:
+    service:
+      type: ClusterIP
+      port: 8000
+  startupProbe:
+    enabled: true
+    probe:
+      httpGet:
+        path: /v1/health/ready
+        port: api
+      initialDelaySeconds: 30
+      timeoutSeconds: 1
+      periodSeconds: 10
+      successThreshold: 1
+      failureThreshold: 120
+  readinessProbe:
+    enabled: true
+    probe:
+      httpGet:
+        path: /v1/health/ready
+        port: api
+      initialDelaySeconds: 15
+      timeoutSeconds: 1
+      periodSeconds: 10
+      successThreshold: 1
+      failureThreshold: 3
+  livenessProbe:
+    enabled: true
+    probe:
+      httpGet:
+        path: /v1/health/live
+        port: api
+      initialDelaySeconds: 15
+      timeoutSeconds: 1
+      periodSeconds: 10
+      successThreshold: 1
+      failureThreshold: 3

@@ -1,0 +1,1 @@
+helm upgrade --install llama-31-8b nim/nim-llm --kube-context prod-east -n nim-service -f values.yaml

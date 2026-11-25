@@ -1,0 +1,58 @@
+{
+  "arch": "amd64",
+  "captured_at": "2026-10-23T00:00:00Z",
+  "conditions": [],
+  "context": null,
+  "cpu_count": 256,
+  "disk_free_gb": 500.0,
+  "docker": {
+    "cdi": true,
+    "nvidia_runtime": true,
+    "present": true
+  },
+  "driver_version": "580.126.09",
+  "gpu_quota": null,
+  "gpus_known": true,
+  "groups": [
+    {
+      "compute_capability": "9.0",
+      "count": 8,
+      "driver_version": "580.126.09",
+      "idle": 8,
+      "idle_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "memory_gb": 100.48,
+      "memory_mib": 95830,
+      "name": "NVIDIA H100 NVL",
+      "node_count": 1,
+      "pci_device_id": "2321:10de",
+      "pci_device_ids": [
+        "2321:10de"
+      ],
+      "pci_source": "nvidia-smi",
+      "unified_memory": false
+    }
+  ],
+  "memory_gb": 2434.7,
+  "namespace": null,
+  "schema": "nim-select/environment/v1",
+  "target": "host"
+}

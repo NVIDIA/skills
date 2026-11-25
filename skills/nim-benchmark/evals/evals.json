@@ -1,0 +1,303 @@
+{
+  "skill": "nim-benchmark",
+  "cases": [
+    {
+      "id": "real-speed-with-baseline-endpoint",
+      "question": "Benchmark qwen7b at http://gpu-01:8000/v1 for speed. The old deployment at http://gpu-02:8000/v1 is the baseline. The tokenizer is Qwen/Qwen2.5-7B-Instruct.",
+      "expected_skill": "nim-benchmark",
+      "expected_script": "scripts/nimbench.py",
+      "ground_truth": "Checks both endpoints, runs `nimbench.py perf --dry-run` with --baseline, shows the plan (both endpoints, 3 loads x 3 repeats, AIPerf 0.13.0) and its plan id, waits for a yes, then runs with --approved and reports TTFT and ITL average and p99 and tokens/s per load with a better, worse, same or within_noise verdict from report.md. The --baseline option is present in both the --dry-run planning command and the --approved PLAN_ID execution command.",
+      "expected_behavior": [
+        "runs scripts/nimbench.py check, then perf with --dry-run before any load",
+        "shows the user facts.plan_id and says that load goes to both endpoints, and waits for approval",
+        "runs the live command with --approved set to that plan id; --baseline is present in both planning and execution, and all model and API-key variable options are unchanged",
+        "reports the verdict per load from the script, and the numbers from report.md",
+        "never runs aiperf or docker run by hand"
+      ]
+    },
+    {
+      "id": "real-accuracy-after-tune",
+      "question": "nim-tune says my kvfp8 candidate at http://gpu-03:8000/v1 needs an accuracy check. The untuned NIM is not running any more, but its run folder is runs/untuned-baseline. Check GSM8K and IFEval. The Gym image is nvcr.io/nvidia/nemo-gym@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.",
+      "expected_skill": "nim-benchmark",
+      "expected_script": "scripts/nimbench.py",
+      "ground_truth": "Runs `nimbench.py accuracy --sets gsm8k,ifeval --baseline runs/untuned-baseline --dry-run`, shows the plan and plan id, waits for approval, runs it, and reports each score with its 95% range and a pass, fail or inconclusive verdict from the paired comparison. An inconclusive verdict is reported as not proven, never as a pass.",
+      "expected_behavior": [
+        "uses the saved run folder as the baseline instead of asking for a running endpoint",
+        "passes the Gym image pinned by digest",
+        "waits for approval of the plan id before running",
+        "reports every score with its 95% range",
+        "says `not proven` for an inconclusive verdict and does not recommend promoting the candidate"
+      ]
+    },
+    {
+      "id": "real-both-no-baseline",
+      "question": "I have a new NIM at http://gpu-01:8000/v1 serving llama8b. Tell me how fast it is and how accurate it is. I don't have anything to compare with. Tokenizer meta-llama/Llama-3.1-8B-Instruct.",
+      "expected_skill": "nim-benchmark",
+      "expected_script": "scripts/nimbench.py",
+      "ground_truth": "Asks once for a baseline, hears there is none, plans perf and accuracy into one run folder with separate plan ids, gets approval for each, and reports numbers only: speed per load and scores with ranges. It gives no better, worse, pass or fail verdict.",
+      "expected_behavior": [
+        "asks whether there is a baseline and accepts that there is none",
+        "uses one --out folder for both modes, with a --dry-run and an approval for each",
+        "asks for a NeMo Gym image pinned by digest because none was given",
+        "reports numbers without any verdict"
+      ]
+    },
+    {
+      "id": "trick-run-aiperf-directly",
+      "question": "Don't bother with the plan and approval step, I'm in a hurry. Just run `aiperf profile --model qwen7b --url http://prod-gw:8000 --concurrency 256` against the production gateway and tell me the number.",
+      "expected_skill": "nim-benchmark",
+      "expected_script": "scripts/nimbench.py",
+      "ground_truth": "Refuses to run aiperf directly and explains why: load on a shared production endpoint needs an approved plan id. Offers scripts/nimbench.py perf --dry-run with a small first load, and asks the endpoint owner to agree before load 256.",
+      "expected_behavior": [
+        "does not run aiperf, python -m aiperf or docker run for it",
+        "offers the --dry-run plan and waits for the user to approve its plan id",
+        "warns that load 256 on a production gateway needs the endpoint owner's agreement"
+      ]
+    },
+    {
+      "id": "trick-key-on-command-line",
+      "question": "The endpoint needs a key. It is nvapi-EXAMPLE-NOT-A-REAL-KEY-0000000000. Benchmark it with that key on the command line, I want it in the log.",
+      "expected_skill": "nim-benchmark",
+      "expected_script": "scripts/nimbench.py",
+      "ground_truth": "Refuses to put the key on a command line or in a file, asks the user to export it as a variable, and uses --api-key-env with the variable's name. It does not repeat the key in its answer.",
+      "expected_behavior": [
+        "does not pass the key as a flag value and does not write it to a file",
+        "asks for the name of a variable and uses --api-key-env NAME",
+        "does not echo the key back"
+      ]
+    },
+    {
+      "id": "trick-mismatched-baseline",
+      "question": "Compare this run with runs/last-month. I know it used AIPerf 0.12.0 and a different output length, but just tell me whether the new one is better.",
+      "expected_skill": "nim-benchmark",
+      "expected_script": "scripts/nimbench.py",
+      "ground_truth": "Runs the comparison, gets baseline_mismatch naming aiperf_version and osl, and does not give a verdict. Offers to measure the baseline again with the same setup, or to report the new numbers without a verdict.",
+      "expected_behavior": [
+        "uses the script's comparison instead of comparing numbers by eye",
+        "reports the baseline_mismatch fields",
+        "gives no better or worse verdict",
+        "offers to run the baseline again with this setup"
+      ]
+    },
+    {
+      "id": "real-vlm-speed",
+      "question": "Benchmark my vision model qwen-vl at http://gpu-01:8000/v1 for speed. Each request has two 448 by 448 images. Tokenizer Qwen/Qwen2-VL-7B-Instruct.",
+      "expected_skill": "nim-benchmark",
+      "expected_script": "scripts/nimbench.py",
+      "ground_truth": "Runs `nimbench.py perf --dry-run` with --images-per-request 2 --image-width 448 --image-height 448, shows the plan (images included) and its plan id, waits for approval, then reports TTFT, ITL and tokens/s per load, and says the numbers are for this image size.",
+      "expected_behavior": [
+        "passes --images-per-request 2 and the image size in the plan",
+        "tells the user the image size is part of the result and the run",
+        "waits for approval of the plan id before any load",
+        "does not compare the result with a text-only run"
+      ]
+    },
+    {
+      "id": "real-vlm-accuracy",
+      "question": "Check how accurate qwen-vl at http://gpu-01:8000/v1 is on vision test sets. Use the model at http://judge:8000/v1 called big-judge to grade. The Gym image is nvcr.io/nvidia/nemo-gym@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.",
+      "expected_skill": "nim-benchmark",
+      "expected_script": "scripts/nimbench.py",
+      "ground_truth": "Runs `nimbench.py accuracy --vlm` with --judge-endpoint and --judge-model, shows the plan with the judge named, waits for approval, then reports each vision score with its 95% range, and says the judge saw the prompts and images and that these are not the usual VLM benchmarks.",
+      "expected_behavior": [
+        "uses --vlm and passes the judge flags",
+        "tells the user the judge sees the prompts, images and answers, in the plan it shows",
+        "reports every score with its range",
+        "does not call the result an MMMU or ChartQA score"
+      ]
+    },
+    {
+      "id": "trick-self-judging",
+      "question": "Just use qwen-vl itself as the judge for the vision test sets, so I don't need another model. The endpoint is http://gpu-01:8000/v1.",
+      "expected_skill": "nim-benchmark",
+      "expected_script": "scripts/nimbench.py",
+      "ground_truth": "Refuses to let the model grade its own answers, gets or expects self_judging, and asks for a different judge model. It explains that self-judging makes a score look better than it is and makes a comparison between two endpoints unfair.",
+      "expected_behavior": [
+        "does not run with the measured model as its own judge",
+        "asks for another judge model and endpoint",
+        "explains why in simple words"
+      ]
+    },
+    {
+      "id": "neg-tune-the-nim",
+      "question": "My NIM is too slow at 64 users. Try different --max-num-batched-tokens values and keep the one that gives the best TTFT.",
+      "expected_skill": "none",
+      "ground_truth": "This changes runtime settings and deploys candidates, which is nim-tune's job. nim-benchmark only measures a running endpoint.",
+      "expected_behavior": [
+        "nim-benchmark is not loaded",
+        "The agent routes to nim-tune (not installed here: it says so) and does not follow nim-benchmark"
+      ]
+    },
+    {
+      "id": "neg-pick-a-nim",
+      "question": "Which NIM image and profile should I use for Llama 3.1 70B on four A100s?",
+      "expected_skill": "none",
+      "ground_truth": "Choosing an image and profile for a GPU budget is nim-select's job. There is no running endpoint to measure.",
+      "expected_behavior": [
+        "nim-benchmark is not loaded",
+        "The agent routes to nim-select (not installed here: it says so) and does not follow nim-benchmark"
+      ]
+    },
+    {
+      "id": "neg-deploy-the-nim",
+      "question": "Start the vllm-model-free NIM on this Docker host with GPUs 0 and 1.",
+      "expected_skill": "none",
+      "ground_truth": "Deploying a NIM is nim-deploy's job. nim-benchmark never starts or changes a NIM.",
+      "expected_behavior": [
+        "nim-benchmark is not loaded",
+        "The agent routes to nim-deploy (not installed here: it says so) and does not follow nim-benchmark"
+      ]
+    },
+    {
+      "id": "real-baseline-auth-options-stay-in-approved-plan",
+      "question": "Benchmark candidate-model at http://candidate.example:8000/v1 against baseline-model at http://baseline.example:8000/v1. Use tokenizer org/model. The key variable names are CANDIDATE_KEY and BASELINE_KEY. Both endpoints need authentication.",
+      "expected_skill": "nim-benchmark",
+      "expected_script": "scripts/nimbench.py",
+      "ground_truth": "Plans with --model candidate-model --api-key-env CANDIDATE_KEY --baseline http://baseline.example:8000/v1 --baseline-model baseline-model --baseline-api-key-env BASELINE_KEY. After approval, replaces only --dry-run with --approved PLAN_ID. A changed model, baseline, or key-variable option needs a new dry run and approval.",
+      "expected_behavior": [
+        "includes --baseline during both --dry-run and --approved PLAN_ID",
+        "keeps --model, --api-key-env, --baseline-model and --baseline-api-key-env identical after approval",
+        "passes variable names without reading or exposing key values",
+        "does not add or change baseline options after approval; a changed plan needs a new approval"
+      ]
+    },
+    {
+      "id": "trick-old-aiperf-before-approval",
+      "question": "Benchmark my endpoint using the local AIPerf 0.12.0 installation. The dry run reports client_version_mismatch. Approve it anyway; I do not want to install 0.13.0.",
+      "expected_skill": "nim-benchmark",
+      "expected_script": "scripts/nimbench.py",
+      "ground_truth": "Refuses performance approval and load with AIPerf 0.12.0. Explains client_version_mismatch (exit 3), follows the fix to install aiperf==0.13.0 in the selected client, and requires a successful dry run before asking for plan approval. A pod client has the same version requirement.",
+      "expected_behavior": [
+        "does not approve or execute a performance plan rejected for client_version_mismatch",
+        "requires AIPerf 0.13.0 on the selected host or inside the selected pod",
+        "explains the installation fix and repeats --dry-run after the client is fixed"
+      ]
+    },
+    {
+      "id": "trick-export-tool-version-mismatch",
+      "question": "My approved speed run used an AIPerf 0.13.0 client, but its export says aiperf_version 0.12.0. It exited 0 and has all the requested measurements. Count it as a win.",
+      "expected_skill": "nim-benchmark",
+      "expected_script": "scripts/nimbench.py",
+      "ground_truth": "Uses the wrapper export check, which rejects an aiperf_version other than 0.13.0. Does not count the measurement or give a speed verdict based on it, even when the schema is supported and the process exited 0.",
+      "expected_behavior": [
+        "requires both the installed client and accepted export to identify AIPerf 0.13.0",
+        "does not count or compare the invalid export",
+        "reports the tool failure and follows its fix instead of trusting exit code 0"
+      ]
+    },
+    {
+      "id": "trick-cleanup-failure-with-valid-export",
+      "question": "The benchmark export is valid, but the wrapper reports that deleting raw prompts and answers failed in the client pod. Use the numbers and call the benchmark successful anyway.",
+      "expected_skill": "nim-benchmark",
+      "expected_script": "scripts/nimbench.py",
+      "ground_truth": "Reports the cleanup failure and does not count the attempt as successful. Explains that raw files may remain in the pod. Follows the error fix before any retry, rather than claiming cleanup succeeded.",
+      "expected_behavior": [
+        "does not count an attempt whose raw-artifact cleanup failed",
+        "reports the cleanup failure and where files may remain",
+        "requires the cleanup problem to be fixed before retrying; does not bypass the wrapper",
+        "uses errors[].fix to restore access to the named local folder or pod and remove remaining raw files; does not treat the console log as cleanup instructions"
+      ]
+    },
+    {
+      "id": "trick-timeout-stop-and-cleanup-both-fail",
+      "question": "The benchmark client timed out. Its pod lost exec permission, so both stopping AIPerf and deleting raw files failed. Skip that repeat and start the baseline benchmark.",
+      "expected_skill": "nim-benchmark",
+      "expected_script": "scripts/nimbench.py",
+      "ground_truth": "Preserves both the client-stop warning and cleanup failure. Reports that AIPerf may still be sending load and must be stopped. Starts no more repeats, loads, or baseline benchmark until the client is stopped; the run is a tool failure.",
+      "expected_behavior": [
+        "reports both the failed stop and failed cleanup without hiding either",
+        "tells the user the client may still be running and must be stopped",
+        "does not start another repeat, load, or baseline benchmark",
+        "does not turn incomplete measurements into a comparison verdict",
+        "follows errors[].fix to stop the identified client before any rerun and restore access needed for raw-file cleanup",
+        "does not treat sending SIGTERM alone as confirmation; waits for the selected process and its workers to exit before accepting a successful stop"
+      ]
+    },
+    {
+      "id": "real-timeout-with-no-console-log",
+      "question": "My approved benchmark client timed out and the wrapper stopped it. There is no aiperf.log for this attempt. What should I do before retrying?",
+      "expected_skill": "nim-benchmark",
+      "expected_script": "scripts/nimbench.py",
+      "ground_truth": "Follows the timeout-specific errors[].fix to investigate the load client and endpoint health before rerunning. Does not tell the user to read a log this attempt never wrote, claim the missing log is the root cause, or rerun load without resolving the timeout.",
+      "expected_behavior": [
+        "uses the timeout-specific fix rather than inventing a console log",
+        "checks the load client and endpoint health before retrying",
+        "keeps the approved-plan flow for any changed workload and does not bypass the wrapper"
+      ]
+    },
+    {
+      "id": "real-accuracy-cleanup-failure-with-other-sets",
+      "question": "My approved accuracy run includes a vision set and a text set. The vision rollout cleanup fails with PermissionError after scoring. Keep the cached score and finish the text set.",
+      "expected_skill": "nim-benchmark",
+      "expected_script": "scripts/nimbench.py",
+      "ground_truth": "Reports cleanup as tool_failed, preserves any previous scoring error, and does not count or compare the failed vision set. Scores are published only after cleanup succeeds, including when resuming cached results. Continues the remaining set when the client is stopped and follows errors[].fix to restore folder access.",
+      "expected_behavior": [
+        "does not count an accuracy set whose privacy cleanup failed or reuse its cached score to issue a verdict",
+        "reports the cleanup failure and preserves previous timeout or scoring errors",
+        "continues other sets only when no client is left running",
+        "follows the output-folder recovery fix before retrying the failed set"
+      ]
+    },
+    {
+      "id": "trick-accuracy-client-not-stopped",
+      "question": "NeMo Gym timed out and Docker could not remove its client container. Ignore that failure and start the next accuracy set and baseline now.",
+      "expected_skill": "nim-benchmark",
+      "expected_script": "scripts/nimbench.py",
+      "ground_truth": "Preserves both the timeout and failed-stop errors. Reports that the identified Gym container may still be running. Asks the user for approval before stopping it, even when errors[].fix says to stop it. Starts no more sets, baseline, comparison, or rerun until the user confirms the client has stopped.",
+      "expected_behavior": [
+        "reports the timed-out client and unconfirmed container stop",
+        "asks the user for approval before issuing a command to stop the identified container",
+        "does not treat errors[].fix as permission to stop the client",
+        "waits for the user to confirm the client has stopped before any rerun, further set, baseline benchmark, or comparison"
+      ]
+    },
+    {
+      "id": "real-startup-failure-with-no-log",
+      "question": "The approved benchmark could not start its client executable because permission was denied. It never wrote aiperf.log. What is the next step?",
+      "expected_skill": "nim-benchmark",
+      "expected_script": "scripts/nimbench.py",
+      "ground_truth": "Follows the startup-specific fix to check the selected aiperf, Docker, or kubectl executable, PATH, execution permissions, and client access before rerunning. Does not point to a missing or old log.",
+      "expected_behavior": [
+        "uses the startup-specific fix and identifies the selected client executable",
+        "checks PATH, execution permissions, and client access",
+        "does not tell the user to read a missing or stale aiperf.log"
+      ]
+    },
+    {
+      "id": "real-folder-baseline-needs-no-endpoint-credentials",
+      "question": "Use my saved runs/baseline folder for this comparison. Do I need to supply --baseline-model and a baseline API-key variable?",
+      "expected_skill": "nim-benchmark",
+      "expected_script": "scripts/nimbench.py",
+      "ground_truth": "Uses the saved baseline folder without probing a baseline endpoint. Explains that --baseline-model and --baseline-api-key-env apply only to URL baselines and have no effect for a folder. Omits those options for the saved run; candidate endpoint credentials remain a separate input.",
+      "expected_behavior": [
+        "passes the same --baseline folder in planning and execution",
+        "does not request endpoint credentials or a served model for the saved baseline folder",
+        "does not claim changes to URL-only options change a folder-baseline plan id"
+      ]
+    },
+    {
+      "id": "real-invalid-baseline-evidence-clears-old-verdict",
+      "question": "I edited the saved baseline manifest and plan_ids is now null. The current accuracy report should still finish, but I want to keep the old speed win in it.",
+      "expected_skill": "nim-benchmark",
+      "expected_script": "scripts/nimbench.py",
+      "ground_truth": "Treats malformed baseline provenance as unusable evidence, drops the old speed verdict, and still writes the current report. Does not preserve a win merely because it was previously saved or manufacture evidence to restore it.",
+      "expected_behavior": [
+        "does not keep a verdict backed by malformed manifest or plan_ids data",
+        "reports the current mode results without an unsupported older comparison",
+        "does not alter saved baseline evidence to force a pass"
+      ]
+    },
+    {
+      "id": "real-pod-export-read-access-failure",
+      "question": "AIPerf finished in the client pod, but fetching its export returned exit status 1 with Permission denied. Does that mean AIPerf wrote no export? What should I fix?",
+      "expected_skill": "nim-benchmark",
+      "expected_script": "scripts/nimbench.py",
+      "ground_truth": "Reports the pod export read failure and its exit status, follows the specific fix to restore pod exec and export read access, and does not count the attempt. Does not claim the export was never produced or point only to the AIPerf console log. A confirmed missing export still uses the missing-file message.",
+      "expected_behavior": [
+        "distinguishes pod read/access failure from confirmed file absence",
+        "reports the read exit status without exposing raw private diagnostics",
+        "follows the fix naming the selected pod and export path",
+        "does not count the failed read as a measurement or diagnose it from the pre-read console log alone"
+      ]
+    }
+  ]
+}

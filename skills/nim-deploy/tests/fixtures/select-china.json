@@ -1,0 +1,74 @@
+{
+  "best_unconfirmed": null,
+  "environment_summary": {
+    "captured_at": "2026-10-23T00:00:00Z",
+    "conditions": [],
+    "context": null,
+    "driver_version": "580.126.09",
+    "gpus_known": true,
+    "groups": [
+      {
+        "compute_capability": "9.0",
+        "count": 8,
+        "idle": 8,
+        "idle_indices": [0, 1, 2, 3, 4, 5, 6, 7],
+        "memory_gb": 100.48,
+        "name": "NVIDIA H100 NVL",
+        "pci_device_id": "2321:10de"
+      }
+    ],
+    "namespace": null,
+    "target": "host"
+  },
+  "handoff": {
+    "confirm_with": "list-model-profiles",
+    "gpu_count": 1,
+    "gpu_ids": [0],
+    "gpu_name": "NVIDIA H100 NVL",
+    "gpus": "device=0",
+    "image": "io.chancloud.com/cnd/qwen/qwen3.5-35b-a3b:1.0.0",
+    "model": "qwen/qwen3.5-35b-a3b",
+    "model_profile": "fits-here",
+    "ngc_image": "nvcr.io/nim/qwen/qwen3.5-35b-a3b:1.7.0-variant",
+    "verdict": "fits"
+  },
+  "image": "nvcr.io/nim/qwen/qwen3.5-35b-a3b:1.7.0-variant",
+  "image_choice": {
+    "image": "nvcr.io/nim/qwen/qwen3.5-35b-a3b:1.7.0-variant",
+    "kind": "requested",
+    "reason": "the tag you asked for; it fits"
+  },
+  "mapping": "version_label",
+  "metadata": "published",
+  "model": "qwen/qwen3.5-35b-a3b",
+  "ngc_tag": "1.7.0-variant",
+  "recommended": {
+    "backend": null,
+    "feat_lora": null,
+    "gpu": null,
+    "gpus_required": 1,
+    "min_vram_per_device_gb": 20.0,
+    "pp": 1,
+    "precision": "fp8",
+    "profile_id": "fits-here",
+    "reasons": [],
+    "tier": "direct",
+    "tp": 1,
+    "verdict": "fits",
+    "why": [
+      "Built for this GPU (2321:10de)",
+      "Needs 20 GB per GPU; each GPU has 100.48 GB",
+      "Needs 1 GPU; 8 are available"
+    ]
+  },
+  "registry_image": "io.chancloud.com/cnd/qwen/qwen3.5-35b-a3b:1.0.0",
+  "registry_tag": "1.0.0",
+  "resource_id": "nim/qwen/qwen3.5-35b-a3b",
+  "shortlist": [],
+  "source_registry": "io.chancloud.com",
+  "tag": "1.7.0-variant",
+  "verdict": "fits",
+  "warnings": [
+    "This image comes from io.chancloud.com; its fit uses the NGC metadata of nim/qwen/qwen3.5-35b-a3b:1.7.0-variant, the NGC image its labels name."
+  ]
+}
