@@ -1,0 +1,350 @@
+{
+  "skill_name": "nemo-gym-analyzing-results",
+  "evals": [
+    {
+      "id": "is-candidate-better-interval-contains-zero",
+      "prompt": "I compared a baseline and a candidate checkpoint on our 24-question multiple-choice set in NeMo Gym, 8 repeats each, with `gym eval compare`. The report is in /workspace/input/compare_base_cand/, and each run's coverage and health files are in /workspace/input/base/ and /workspace/input/cand/. The candidate scores higher. Can I say the candidate is better?",
+      "expected_output": "No. The candidate's mean reward is 0.6146 against the baseline's 0.5729, a difference of +0.042, but the 95% interval for the difference, about [-0.049, +0.132], contains 0, so the comparison shows neither an improvement nor a regression (and does not show the two are equivalent either). Both runs are complete, with all 192 planned rollouts measured and no failures, so the interval is not distorted by missing rollouts. The flipped tasks (task 18 down from 5 to 3 passes of 8, task 20 up from 2 to 5) sometimes pass in both runs, which fits noise. Telling a gap this small from noise needs many more repeats per side.",
+      "assertions": [
+        "States that the 95% confidence interval for the difference contains 0, about -0.049 to +0.132",
+        "Concludes that the comparison does not show the candidate is better",
+        "States that both runs are complete, with all 192 planned rollouts measured",
+        "Suggests more repeats to resolve a difference this small"
+      ],
+      "expected_skill": "nemo-gym-analyzing-results",
+      "files": [
+        "evals/files/compare_base_cand/compare_report.json",
+        "evals/files/base/rollouts_coverage.json",
+        "evals/files/base/quality_summary.json",
+        "evals/files/cand/rollouts_coverage.json",
+        "evals/files/cand/quality_summary.json"
+      ]
+    },
+    {
+      "id": "flipped-task-is-noise",
+      "prompt": "The NeMo Gym comparison report in /workspace/input/compare_base_cand/ shows task 18 going from pass to fail in the candidate, and the baseline's metrics are in /workspace/input/base/. What caused the candidate to regress on task 18?",
+      "expected_output": "There is no evidence of a regression on task 18. It passes 5 of 8 repeats in the baseline and 3 of 8 in the candidate, so it sometimes passes in both runs; the flips table calls a task passing when its mean over repeats is above 0.5, so a change of two repeats across that line flips it. The same report shows task 20 flipping the other way (2 of 8 to 5 of 8), and the interval for the overall difference contains 0. The flip fits repeat-to-repeat noise. Finding a cause would need task 18's rollouts, which the comparison does not include.",
+      "assertions": [
+        "States that task 18 passes in some repeats of both runs, 5 of 8 in the baseline and 3 of 8 in the candidate",
+        "Concludes that the flip fits repeat-to-repeat noise rather than showing a regression",
+        "Says that explaining a cause would need the task's rollouts rather than the comparison report"
+      ],
+      "expected_skill": "nemo-gym-analyzing-results",
+      "files": [
+        "evals/files/compare_base_cand/compare_report.json",
+        "evals/files/base/rollouts_aggregate_metrics.json"
+      ]
+    },
+    {
+      "id": "failed-rollouts-inflate-candidate",
+      "prompt": "`gym eval compare` says our candidate's mean reward is 8 points above the baseline (report in /workspace/input/compare_base_candfail/; the NeMo Gym run files are in /workspace/input/base/ and /workspace/input/candfail/). The candidate's health summary says the run is healthy. Can we trust the 8-point gain?",
+      "expected_output": "No. The candidate measured only 173 of its 192 planned rollouts: 19 failed with model_request_error (HTTP 500 from the model endpoint), and failed rollouts are left out of mean/reward. All 19 are on tasks 8, 9, 10 and 11, which never pass in the baseline (mean reward 0 over 8 repeats each), so leaving them out raises the candidate's mean. Counted as zeros, the candidate would be about 113 of 192, about 0.59, against the baseline's 0.573: a gain of about 1.6 points. The report's pass@1[avg-of-8]/accuracy row (57.29 to 58.85) weights each task equally and agrees here only because those tasks score 0 either way. The interval for the mean/reward difference, about [-0.009, +0.172], contains 0 anyway. healthy: true only means nothing is missing or duplicated and no failure limit was set; the coverage file shows complete: false with 19 open rollouts. The failures are not final, so resume the candidate run and compare again.",
+      "assertions": [
+        "Reports that 19 of the candidate's 192 planned rollouts failed and are left out of its score",
+        "Identifies that the failures fall on tasks 8 to 11, which never pass in the baseline, so leaving them out raises the candidate's mean",
+        "Estimates that with the failed rollouts counted as zero the gain shrinks to about 1 to 2 points",
+        "Explains that the healthy status does not mean the run had no failures",
+        "Recommends resuming or rerunning the failed rollouts before comparing again"
+      ],
+      "expected_skill": "nemo-gym-analyzing-results",
+      "files": [
+        "evals/files/compare_base_candfail/compare_report.json",
+        "evals/files/base/rollouts_coverage.json",
+        "evals/files/base/rollouts_aggregate_metrics.json",
+        "evals/files/candfail/rollouts_coverage.json",
+        "evals/files/candfail/quality_summary.json",
+        "evals/files/candfail/rollouts_failures.jsonl"
+      ]
+    },
+    {
+      "id": "baseline-counted-failures-as-zero",
+      "prompt": "Our new checkpoint scores 10 points above last week's baseline on the same NeMo Gym task set, and the interval from `gym eval compare` is above zero. The report is in /workspace/input/compare_base_zero_cand/, the baseline run's files are in /workspace/input/base_zero/ and the new checkpoint's in /workspace/input/cand/. Is the improvement real?",
+      "expected_output": "Mostly not. The baseline run counted 16 failed rollouts as zeros (count_failure_classes_as_zero: [model_request_error] in its resolved config, failures_counted_as_zero: 16 in its coverage file), while the new checkpoint had no failures. The 16 failures are HTTP 500 errors from the model endpoint on tasks 0 to 3 (6, 3, 3 and 4 of them), and the baseline's per-task means for those tasks (0.25, 0.625, 0.625 and 0.5 over 8 rows) show that every repeat that ran passed, so these are infrastructure failures, not wrong answers; task 0 shows as a fail-to-pass flip only because 6 of its 8 baseline repeats are these zeros. Had those rollouts run, the baseline would be about 114 of 192 (0.594) and the gap about 2 points, within run-to-run noise. Leaving the failures out instead would not fix it either, because they remove passes from easy tasks only. Resume or rerun the 16 rollouts, then compare again.",
+      "assertions": [
+        "Finds that the baseline counted 16 failed rollouts as zeros (count_failure_classes_as_zero) while the new checkpoint had no failures",
+        "Identifies the failures as model endpoint errors (HTTP 500) on tasks 0 to 3, which pass on the repeats that ran",
+        "Concludes that most of the 10-point gain comes from this accounting difference rather than the model",
+        "Recommends resuming or rerunning the 16 failed baseline rollouts before comparing again"
+      ],
+      "expected_skill": "nemo-gym-analyzing-results",
+      "files": [
+        "evals/files/compare_base_zero_cand/compare_report.json",
+        "evals/files/base_zero/rollouts_aggregate_metrics.json",
+        "evals/files/base_zero/rollouts_resolved_config.yaml",
+        "evals/files/base_zero/rollouts_coverage.json",
+        "evals/files/base_zero/quality_summary.json",
+        "evals/files/base_zero/rollouts_failures.jsonl",
+        "evals/files/cand/rollouts_coverage.json"
+      ]
+    },
+    {
+      "id": "different-task-sets",
+      "prompt": "`gym eval compare` puts our candidate 11 points above the baseline with an interval above zero (report in /workspace/input/compare_base_limit/; the NeMo Gym run files are in /workspace/input/base/ and /workspace/input/limit/). Is the candidate better?",
+      "expected_output": "The comparison is not like for like. The candidate ran 18 tasks (limit: 18 in its resolved config, 144 planned rollouts) while the baseline ran 24 (192), so the candidate's score leaves out tasks 18 to 23, which are harder than average in the baseline (mean 0.44 against 0.57 overall). On the 18 shared tasks the baseline scores 0.618 against the candidate's 0.6875, about +7 points, with no interval of its own; the reported interval does not measure it. Rerun the candidate on all 24 tasks, or compare both runs on the same 18, before deciding.",
+      "assertions": [
+        "Notices that the candidate ran 18 tasks while the baseline ran 24",
+        "Explains that the reported difference and its interval mix different task sets, so they do not show the candidate is better",
+        "Recommends rerunning the candidate on the same 24 tasks or comparing only the shared tasks"
+      ],
+      "expected_skill": "nemo-gym-analyzing-results",
+      "files": [
+        "evals/files/compare_base_limit/compare_report.json",
+        "evals/files/base/rollouts_coverage.json",
+        "evals/files/base/rollouts_aggregate_metrics.json",
+        "evals/files/limit/rollouts_resolved_config.yaml",
+        "evals/files/limit/rollouts_coverage.json",
+        "evals/files/limit/quality_summary.json"
+      ]
+    },
+    {
+      "id": "single-repeat-no-interval",
+      "prompt": "The NeMo Gym comparison in /workspace/input/compare_single/ shows the candidate 4 points above the baseline, but no confidence interval. Why is there no interval, and is the 4-point gain real?",
+      "expected_output": "Each run has a single repeat, and the interval needs at least 2 per-repeat scores on each side, so none can be computed. With 24 tasks at a pass rate near 0.65, one run's standard error is up to about 10 points (sqrt(0.65 x 0.35 / 24) is about 0.097), so a 4-point gap (0.625 to 0.667, one task net) cannot be told from noise, and the three flipped tasks are single outcomes. Collect at least 2, and preferably more, repeats per side and compare again.",
+      "assertions": [
+        "Explains that there is no interval because each run has only one repeat and at least two are needed",
+        "Concludes that the 4-point gain cannot be told apart from run-to-run noise",
+        "Recommends collecting more repeats for both runs before comparing"
+      ],
+      "expected_skill": "nemo-gym-analyzing-results",
+      "files": [
+        "evals/files/compare_single/compare_report.json",
+        "evals/files/single_a/rollouts_coverage.json",
+        "evals/files/single_b/rollouts_coverage.json"
+      ]
+    },
+    {
+      "id": "gap-to-published-number",
+      "prompt": "Our NeMo Gym run of a 24-question multiple-choice set scored 0.33 (files in /workspace/input/trunc/), but the model card reports 58% on the same questions with 8 repeats. What explains the gap?",
+      "expected_output": "The run capped model output at 512 tokens (responses_create_params.max_output_tokens: 512 in its resolved config). Every rollout of tasks 12 to 23 (96 of 192) used exactly 512 output tokens, got no extracted answer (no_answer is 50%) and scored 0, so they were cut off at the limit; tasks 0 to 11 used 10 tokens, with tasks 0 to 7 passing every repeat and tasks 8 to 11 never passing. The numbers are not comparable; the gap comes from the token limit, not the model. Rerun with the output limit the model card used, or a much larger one, and compare again. The health checks do not flag this, because every rollout is unobserved: no model calls were captured.",
+      "assertions": [
+        "Finds that the run capped model output at 512 tokens",
+        "Reports that all repeats of tasks 12 to 23 (half of the rollouts) hit the 512-token limit without an answer and scored 0",
+        "Recommends rerunning with a larger output limit, matching the model card's settings, before comparing"
+      ],
+      "expected_skill": "nemo-gym-analyzing-results",
+      "files": [
+        "evals/files/trunc/rollouts_aggregate_metrics.json",
+        "evals/files/trunc/rollouts_resolved_config.yaml",
+        "evals/files/trunc/rollouts_coverage.json",
+        "evals/files/trunc/quality_summary.json"
+      ]
+    },
+    {
+      "id": "tasks-that-never-pass",
+      "prompt": "Which tasks never pass in the NeMo Gym run in /workspace/input/diag/, and why? Is it the model's knowledge?",
+      "expected_output": "Five tasks never pass in 8 repeats: 8, 9, 10, 11 and 20. Tasks 8 and 9 are not a knowledge problem: every repeat picks the correct letter (D for task 8, B for task 9) but writes 'Answer: D' instead of \\boxed{D}, so the strict grader extracts nothing (extracted_answer is null) and scores 0. Fix the prompt or answer format, or re-score the saved answers with a grading mode that accepts 'Answer: X', for example with gym eval reverify. Tasks 10, 11 and 20 give boxed wrong letters that change between repeats, which points to a knowledge gap once the labels are checked.",
+      "assertions": [
+        "Lists tasks 8, 9, 10, 11 and 20 as never passing",
+        "Identifies that tasks 8 and 9 give the correct letter in an 'Answer: X' format that the grader does not extract, a format or verifier problem rather than a knowledge gap",
+        "Identifies tasks 10, 11 and 20 as wrong answers that change across repeats"
+      ],
+      "expected_skill": "nemo-gym-analyzing-results",
+      "files": [
+        "evals/files/diag/rollouts.jsonl",
+        "evals/files/diag/rollouts_coverage.json",
+        "evals/files/diag/quality_summary.json"
+      ]
+    },
+    {
+      "id": "tasks-that-sometimes-pass",
+      "prompt": "In the NeMo Gym run in /workspace/input/diag/, tasks 16 to 19 pass only some of the time. Why do they fail on the other repeats, and what should we fix?",
+      "expected_output": "They pass 5, 5, 5 and 2 of 8 repeats. Every failing repeat (15 rollouts: task 16 repeats 2, 5 and 7; task 17 repeats 1, 4 and 6; task 18 repeats 1, 2 and 4; task 19 repeats 1, 3, 4, 5, 6 and 7) has no final message, only reasoning that holds the correct boxed letter; the agent marked these responses incomplete with ng_termination_reason incomplete_reasoning. The grader reads only the final message, so it extracts nothing and scores 0. The model reaches the right answer, so this is where the answer is written (output format: reasoning parser, chat template or prompt), not knowledge. Fix that so the final answer lands in the message, then rerun these tasks and compare.",
+      "assertions": [
+        "Finds that in the failing repeats there is no final message and the correct answer appears only in the reasoning",
+        "Concludes that the failures are not a knowledge gap, since the model reaches the correct answer",
+        "Recommends a fix so that the final answer lands in the message, such as the reasoning parser, chat template or prompt"
+      ],
+      "expected_skill": "nemo-gym-analyzing-results",
+      "files": [
+        "evals/files/diag/rollouts.jsonl",
+        "evals/files/diag/rollouts_coverage.json"
+      ]
+    },
+    {
+      "id": "pass-at-k-drops-tasks",
+      "prompt": "In our `gym eval compare` report (/workspace/input/compare_base_candfail/compare_report.json) the candidate's pass@8 is 100% against the baseline's 83%, so it now solves every task at least once. Can we report that? The candidate's NeMo Gym run files are in /workspace/input/candfail/ and the baseline's metrics in /workspace/input/base/.",
+      "expected_output": "No. Gym computes pass@k only over tasks with at least k measured rollouts. The candidate lost 19 rollouts to model_request_error failures, all on tasks 8, 9, 10 and 11 (5, 2, 5 and 7 of them), so none of those four tasks has 8 measured rollouts and all four drop out of its pass@8, which covers only the other 20 tasks. The baseline's 83.3% is over all 24 tasks, and tasks 8 to 11 never pass there. The two pass@8 numbers are not comparable, and the candidate's 100% says nothing about tasks 8 to 11. Resume the candidate run so those rollouts are measured, then compare again.",
+      "assertions": [
+        "Explains that pass@8 counts only tasks with at least 8 measured rollouts, so tasks that lost rollouts drop out of it",
+        "Finds that the candidate's failed rollouts are on tasks 8 to 11, so those tasks are missing from its pass@8",
+        "Advises against reporting the 100% pass@8 and recommends completing the candidate run before comparing"
+      ],
+      "expected_skill": "nemo-gym-analyzing-results",
+      "files": [
+        "evals/files/compare_base_candfail/compare_report.json",
+        "evals/files/candfail/rollouts_coverage.json",
+        "evals/files/candfail/rollouts_failures.jsonl",
+        "evals/files/base/rollouts_aggregate_metrics.json"
+      ]
+    },
+    {
+      "id": "healthy-but-unchecked",
+      "prompt": "The health check of our NeMo Gym run in /workspace/input/trunc/ says the run is healthy, with 0 unhealthy rollouts. Can we trust its score of 0.33?",
+      "expected_output": "Not on the strength of the health check. Every one of the 192 rollouts is unobserved, not healthy: no model calls were captured, so checks such as model_call_runaway_generation evaluated 0 rollouts, and healthy: true only means no rollout is missing or recorded twice. The metrics show the problem the checks could not: half the rollouts have no extracted answer (no_answer is 50%), and every rollout of tasks 12 to 23 used exactly 512 output tokens and scored 0, which is the run's max_output_tokens. Those answers were cut off, so the 0.33 understates the model. Raise the output limit and rerun before trusting the score.",
+      "assertions": [
+        "Explains that all rollouts are unobserved, so the health checks did not actually evaluate them",
+        "Explains that the healthy status only covers missing or duplicated rollouts, not answer quality",
+        "Finds that the rollouts of tasks 12 to 23 hit the 512-token output limit without an answer",
+        "Recommends rerunning with a larger output limit before trusting the score"
+      ],
+      "expected_skill": "nemo-gym-analyzing-results",
+      "files": [
+        "evals/files/trunc/quality_summary.json",
+        "evals/files/trunc/rollouts_coverage.json",
+        "evals/files/trunc/rollouts_aggregate_metrics.json",
+        "evals/files/trunc/rollouts_resolved_config.yaml"
+      ]
+    },
+    {
+      "id": "judge-failures-in-score",
+      "prompt": "My HLE run in NeMo Gym finished, but its rollouts_failures.jsonl has 37 rows with `_ng_failure_class: judge_failed`. Are those counted as wrong answers in my score, and what should I do about them?",
+      "expected_output": "Says the judge_failed rows are not counted as wrong answers: they are left out of the score, so the score covers fewer rollouts than were planned and should be reported with that coverage. Says to find out why the judge failed first, from the failure reason in the failures file (for example a bad API key or an unreachable or rate-limited judge endpoint; on HLE a verdict the grader cannot read counts as a wrong answer, not as judge_failed), and then to grade those rollouts again from their saved answers with `gym eval reverify --judge-failed-only`, which makes no new policy model calls.",
+      "assertions": [
+        "States that the judge_failed rows are left out of the score rather than counted as wrong answers",
+        "Recommends gym eval reverify with --judge-failed-only to grade them again from the saved answers",
+        "Advises checking why the judge failed, such as the failure reason, API key, endpoint or rate limits"
+      ],
+      "expected_skill": "nemo-gym-analyzing-results",
+      "files": []
+    },
+    {
+      "id": "managed-run-selected-attempts",
+      "prompt": "Our NeMo Gym run in /workspace/input/managed/ retried some rollouts. Grouping the rows of rollouts.jsonl by task, I get: task 0 passes 2 of 2 repeats, task 1 passes 1 of 2, and tasks 2 and 3 never pass, so the mean reward is 3/8 = 0.375. Is that right?",
+      "expected_output": "No. The run has a manifest (rollouts_manifest.json), so rollouts.jsonl keeps every saved attempt, and Gym counts only each rollout's latest reserved attempt (next_attempt in the manifest). Task 1, repeat 1 was retried: attempt 1 scored 0, and a late result of attempt 0 with reward 1 was saved after it. Gym counts attempt 1, so task 1 never passes (0 of 2). Task 0, repeat 1 has a reward-1 row from attempt 0, but attempt 1 was reserved and never answered, so that rollout is not measured: task 0 passes on its 1 measured repeat. Tasks 2 and 3 never pass. The coverage file agrees: 7 of 8 planned rollouts measured, 1 missing, complete false. The score over the measured rollouts is 1 of 7, about 0.14, not 0.375. Read the selection with nemo-gym (RolloutStore, as in the skill's outcome-groups snippet) instead of grouping raw rows, and resume the run to finish the open retry before reporting a score.",
+      "assertions": [
+        "Explains that the run's manifest means rollouts.jsonl can hold more than one attempt of a rollout, and Gym counts only the attempt it selected (the latest reserved one)",
+        "States that task 1 never passes: its repeat 1 counts the retry's reward 0, not the late reward-1 row from attempt 0",
+        "States that task 0's repeat 1 is not measured because its retry was reserved but never answered, so task 0 has one measured repeat, which passes",
+        "Reports 7 of 8 planned rollouts measured and a score of 1 of 7 (about 0.14), not 3 of 8"
+      ],
+      "expected_skill": "nemo-gym-analyzing-results",
+      "files": [
+        "evals/files/managed/rollouts.jsonl",
+        "evals/files/managed/rollouts_failures.jsonl",
+        "evals/files/managed/rollouts_manifest.json",
+        "evals/files/managed/rollouts_materialized_inputs.jsonl",
+        "evals/files/managed/rollouts_coverage.json"
+      ]
+    },
+    {
+      "id": "negative-run-a-benchmark",
+      "prompt": "How do I run GPQA-Diamond in NeMo Gym against my OpenAI-compatible model endpoint with 8 repeats?",
+      "expected_output": "Explains how to run the evaluation: put the endpoint URL, API key and model name in the model server configuration (for example env.yaml), then run the benchmark with `gym eval run` (starting the servers with `gym env start` when needed) and 8 repeats, for example `--num-repeats 8`. The outputs are written next to the output file. This is running an evaluation, not analyzing its results.",
+      "assertions": [
+        "Gives a NeMo Gym command that runs the evaluation with 8 repeats",
+        "Says where to configure the model endpoint URL, API key or model name"
+      ],
+      "expected_skill": null,
+      "should_trigger": false,
+      "files": []
+    },
+    {
+      "id": "negative-choose-training-tasks",
+      "prompt": "How should I decide which tasks to keep for GRPO training from the `gym eval profile` output of my NeMo Gym environment?",
+      "expected_output": "Keep tasks whose reward varies across repeats, since those give a learning signal; drop or deprioritize tasks that pass on every repeat or fail on every repeat; check never-pass tasks for label or verifier problems before dropping them; and account for tasks with missing rollouts. This is choosing RL training tasks from a reward profile.",
+      "assertions": [
+        "Recommends keeping tasks whose reward varies across repeats",
+        "Recommends dropping or deprioritizing tasks that always pass or never pass"
+      ],
+      "expected_skill": null,
+      "should_trigger": false,
+      "files": []
+    },
+    {
+      "id": "negative-plan-repeats-in-advance",
+      "prompt": "Before we start, how many repeats should we plan per benchmark to detect a 1-point drop between our baseline and three candidate checkpoints across five NeMo Gym benchmarks?",
+      "expected_output": "Says the repeat count depends on each benchmark's run-to-run standard deviation of a complete pass, the margin to detect, the desired power and the significance level, and gives a way to compute it: a formula based on those inputs, or NeMo Gym's `gym eval plan-repeats` with a planning YAML. This is planning an experiment before running it.",
+      "assertions": [
+        "Says the answer depends on the run-to-run standard deviation, the margin, and the power or significance level",
+        "Gives a way to compute the repeat count, such as a formula or gym eval plan-repeats"
+      ],
+      "expected_skill": null,
+      "should_trigger": false,
+      "files": []
+    },
+    {
+      "id": "negative-run-cannot-connect",
+      "prompt": "`gym eval run` stops right away with `ClientConnectorError: Cannot connect to host 127.0.0.1:12345` and writes no rollouts. What is wrong?",
+      "expected_output": "A server or endpoint the run needs is not running or not reachable at that address. Check that the Gym servers were started and are healthy (for example with `gym env status`), that the host and port match the configuration, and read the server logs; then rerun. This is debugging a failed run, not analyzing results.",
+      "assertions": [
+        "Says a server or endpoint the run needs is not running or not reachable",
+        "Suggests checking that the servers are started and healthy, for example with gym env status or the server logs"
+      ],
+      "expected_skill": null,
+      "should_trigger": false,
+      "files": []
+    },
+    {
+      "id": "negative-add-public-benchmark",
+      "prompt": "What is the right way to add the OSWorld benchmark to NeMo Gym so that its score matches the published one?",
+      "expected_output": "Describes how to bring the benchmark into NeMo Gym, for example as task folders, through an existing harness, or as a resources server with a verifier, and how to check the integration: run it on known tasks, compare rewards with the original implementation, and reproduce the published score within a tolerance. This is adding a benchmark, not analyzing results.",
+      "assertions": [
+        "Describes a way to integrate the benchmark into NeMo Gym, such as task folders, a harness or a resources server",
+        "Mentions checking the integration against the original implementation or the published score"
+      ],
+      "expected_skill": null,
+      "should_trigger": false,
+      "files": []
+    },
+    {
+      "id": "negative-custom-metric",
+      "prompt": "How do I make my NeMo Gym environment report pass@4 and accuracy per question category in its results, next to mean/reward?",
+      "expected_output": "Compute them in the environment's own metric code: the resources server can override a metrics hook (compute_metrics, which receives every task's verification results grouped by task) to return pass@4, from 4 or more rollouts per task, and accuracy grouped by each task's category, and choose headline numbers with get_key_metrics. Collect with at least 4 repeats so pass@4 exists. This is building the environment's metrics, not analyzing finished results.",
+      "assertions": [
+        "Says to compute the new metrics in the environment's or resources server's metric code rather than by hand after each run",
+        "Explains that pass@4 needs at least 4 rollouts per task, or how the per-category accuracy is grouped"
+      ],
+      "expected_skill": null,
+      "should_trigger": false,
+      "files": []
+    },
+    {
+      "id": "negative-training-reward-flat",
+      "prompt": "My GRPO training run with NeMo RL on a Gym environment has had a flat reward of about 0.2 for 300 steps. What should I look at?",
+      "expected_output": "Training diagnostics: check whether the tasks give a learning signal (tasks that always or never pass give none, so filter them using repeated rollouts or a reward profile), check the reward function, and check training settings such as learning rate, group size, KL penalty, batch size and generation length.",
+      "assertions": [
+        "Suggests checking whether the tasks give a learning signal, for example by filtering tasks that always or never pass",
+        "Suggests checking training settings such as learning rate, group size or KL penalty"
+      ],
+      "expected_skill": null,
+      "should_trigger": false,
+      "files": []
+    },
+    {
+      "id": "negative-welch-function",
+      "prompt": "Write a Python function that returns a 95% Welch confidence interval for the difference between the means of two lists of numbers.",
+      "expected_output": "A function that computes the difference of the means, the standard error from each list's sample variance divided by its size, the Welch–Satterthwaite degrees of freedom, and the 97.5% t quantile (for example from scipy.stats.t), and returns the lower and upper bounds.",
+      "assertions": [
+        "Uses the Welch–Satterthwaite degrees of freedom or another unequal-variance method",
+        "Returns the lower and upper bounds of the interval for the difference of means"
+      ],
+      "expected_skill": null,
+      "should_trigger": false,
+      "files": []
+    },
+    {
+      "id": "negative-slow-evaluation",
+      "prompt": "In general, how do I find out whether the model server or the environment is the bottleneck when a NeMo Gym evaluation runs slowly?",
+      "expected_output": "Measure where the time goes: model call latency and throughput against time in the environment, tools or sandbox, for example from timing data in the rollouts, the health report's time split or the server logs, and check concurrency settings and serving capacity. This is performance debugging, not analyzing results.",
+      "assertions": [
+        "Suggests measuring time spent in model calls versus the environment, tools or sandbox",
+        "Mentions concurrency or serving capacity settings"
+      ],
+      "expected_skill": null,
+      "should_trigger": false,
+      "files": []
+    },
+    {
+      "id": "negative-resume-killed-run",
+      "prompt": "My `gym eval run` job was killed halfway through. How do I continue it without redoing the rollouts that already finished?",
+      "expected_output": "Rerun the same `gym eval run` command, with the same output path, adding `--resume`: saved rollouts are kept and only unfinished (and retryable failed) rollouts run again. Then check coverage before using the score. This is resuming a run.",
+      "assertions": [
+        "Says to rerun the same gym eval run command with --resume",
+        "Says finished rollouts are kept and only unfinished ones run again"
+      ],
+      "expected_skill": null,
+      "should_trigger": false,
+      "files": []
+    }
+  ]
+}

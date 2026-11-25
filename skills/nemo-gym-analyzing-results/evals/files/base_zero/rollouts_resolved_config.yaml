@@ -1,0 +1,31 @@
+agent_name: mcqa_simple_agent
+input_jsonl_fpath: data/tasks.jsonl
+output_jsonl_fpath: results/base_zero/rollouts.jsonl
+num_repeats: 8
+num_samples_in_parallel: 1
+route_failures_to_sidecar: true
+count_failure_classes_as_zero:
+- model_request_error
+use_absolute_ip: false
+port_range_low: 10001
+port_range_high: 20000
+head_server:
+  host: 127.0.0.1
+  port: 11000
+disallowed_ports:
+- 11000
+head_server_constraints: []
+allow_openai_version_skew: false
+head_server_deps:
+- openai==2.45.0
+python_version: 3.13.14
+skip_venv_if_present: false
+dry_run: false
+server_spinup_timeout_seconds: 600
+server_shutdown_timeout_seconds: 1
+model_endpoint_readiness_timeout_seconds: 600
+results_dir: results
+cache_dir: cache
+uv_cache_dir: cache/uv
+uv_lock_timeout_seconds: 1800
+uv_venv_dir: .
