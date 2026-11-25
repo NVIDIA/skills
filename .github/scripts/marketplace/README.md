@@ -120,7 +120,7 @@ Defined in
 | --- | --- | --- |
 | `pull_request` (paths: `skills/**`, metadata config, generator) | `--check --no-ai`; fails on drift or schema/taxonomy errors. | No |
 | `workflow_dispatch` | Regenerate; open a PR if outputs changed. | Yes |
-| `workflow_run` after `Sync Skills from Product Repos` | Regenerate; open a PR if outputs changed. | Yes |
+| `push` to `main` touching `skills/**`, `plugins/**`, `plugins.d/**` or `components.d/**` (for example a merged sync PR) | Regenerate; open a PR if outputs changed. | Yes |
 
 On validation failure, a single tracking issue
 (`[skill-metadata] generator validation failed`) is opened or updated with

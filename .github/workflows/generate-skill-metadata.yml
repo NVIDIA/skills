@@ -8,8 +8,9 @@
 #   workflow_dispatch: regenerate (with AI enrichment) and open a PR if files
 #                      changed; open or update a tracking issue on validation
 #                      failure.
-#   workflow_run:     fires after either sync succeeds on main; behaves like
-#                      workflow_dispatch.
+#   push:             fires when skills/, plugins/, plugins.d/ or components.d/
+#                      change on main (a merged sync or registration PR);
+#                      behaves like workflow_dispatch.
 
 name: Generate Skill Metadata
 
@@ -44,20 +45,24 @@ on:
       - "benchmarks.json"
       - "versions.json"
   workflow_dispatch:
-  workflow_run:
-    # Both syncs, because both change what metadata.json should contain: the
-    # skills sync changes the skills, and the plugin sync changes which skills
-    # a plugin bundles, which changes that plugin's rolled-up taxonomy. The
-    # pull_request paths above include `plugins/**`, so a plugin sync that
-    # lands without a regeneration would leave every later PR failing `check`
-    # until someone dispatched this workflow by hand.
-    workflows:
-      - "Sync Skills from Product Repos"
-      - "Sync Plugins from Product Repos"
-    types:
-      - completed
+  push:
+    # Regenerate when the inputs land on main, not when a sync job finishes.
+    # The syncs open PRs instead of pushing to main, so a workflow_run trigger
+    # fired before those PRs merged, saw an unchanged main, and opened nothing.
+    # Main was then left stale and every later PR failed `check` until someone
+    # dispatched this workflow by hand. A push trigger also covers a hand-merged
+    # sync PR and an onboarding PR that adds a `plugins:` entry.
+    #
+    # The paths are the generator's inputs. None of the files the regeneration
+    # PR writes (metadata.json, skills.sh.json, benchmarks.json, versions.json)
+    # is listed, so merging that PR does not trigger another regeneration.
     branches:
       - main
+    paths:
+      - "skills/**"
+      - "plugins/**"
+      - "plugins.d/**"
+      - "components.d/**"
 
 permissions:
   contents: read
@@ -114,9 +119,7 @@ jobs:
   # Regenerate mode: dispatch or post-sync. AI enrichment allowed.
   # ---------------------------------------------------------------------
   regenerate:
-    if: |
-      github.event_name == 'workflow_dispatch' ||
-      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
       contents: write
