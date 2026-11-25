@@ -949,6 +949,18 @@
       }
     },
     {
+      "path": "skills/daqiri-onboarding",
+      "name": "daqiri-onboarding",
+      "description": "Guide DAQIRI setup and configuration generation or repair. Diagnose DAQIRI initialization failures, packet drops, RX-worker/application deficits, buffer errors and saved benchmark/counter evidence, including analysis-only requests with an existing runtime. Explain DAQIRI memory paths, select polling and RX reorder modes, and handle explicitly requested customer demos.",
+      "metadata": {
+        "product.primary": "DAQIRI",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "networking",
+        "audience": "developer,hpc_developer,platform_engineer,devops_engineer,application_developer",
+        "discovery.activity_tags": "configure,troubleshoot,benchmark,debug,get_started"
+      }
+    },
+    {
       "path": "skills/data-designer",
       "name": "data-designer",
       "description": "Use when the user wants to create a dataset, generate synthetic data, or build a data generation pipeline. The argument is the description of the dataset to generate.",
