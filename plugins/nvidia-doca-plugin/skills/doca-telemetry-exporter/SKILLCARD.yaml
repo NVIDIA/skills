@@ -1,0 +1,45 @@
+# SKILLCARD.yaml — skill identity and routing metadata (canonical card: skill-card.md)
+# Schema: https://github.com/NVIDIA/skills/blob/main/docs/skill-cards.mdx
+
+schema_version: "1"
+
+identity:
+  name: "doca-telemetry-exporter"
+  artifact_id: "doca-telemetry-exporter"
+  kind: "library"
+  version: "TBD-at-sign-time"          # NVCARPS fills from the source ref
+  signature: "TBD-at-sign-time"        # NVCARPS-generated SHA + ed25519 sig
+  signed_by: "TBD-at-sign-time"        # NVCARPS identity (NVIDIA-PSIRT signing key)
+
+description: "Use this skill when the user is doing hands-on DOCA Telemetry\nExporter programming on a host where DOCA is installed — defining\na doca_telemetry_exporter_schema and event types, creating\nsources, picking a publish surface (typed events / opaque events\n/ the metrics counter-gauge-histogram API / OTLP logs / NetFlow),\nwalking the schema-then-source lifecycle, or debugging\nDOCA_ERROR_* failures from the exporter API. Trigger even when\nthe user does not explicitly mention \"DOCA Telemetry Exporter\" or\n\"doca_telemetry_exporter_*\" — typical implicit phrasings include\n\"publishing counters from my DOCA app\", \"BAD_STATE when I report\nan event\", \"consumer/DTS sees nothing but my report succeeded\",\n\"how do I export NetFlow/IPFIX records\", or \"should I link the\nexporter or the telemetry service\". Refuse and route elsewhere\nfor the receiving DOCA Telemetry Service (DTS), plain stdout\nlogging via doca_log, or real-time event subscription back into\nthe app via doca-comch — those belong to other skills."
+
+source:
+  repo: "NVIDIA-DOCA/doca-skills"
+  path: "skills/libs/doca-telemetry-exporter/SKILL.md"
+  branch: "main"
+  license: "Apache-2.0 AND CC-BY-4.0"
+
+provenance:
+  scan_run_id: "TBD-at-sign-time"      # NVCARPS scan run UUID
+  signed_at:   "TBD-at-sign-time"      # ISO-8601 timestamp from NVCARPS
+  upstream_catalog: "https://github.com/NVIDIA/skills"
+  upstream_component: "doca"
+
+quality:
+  canonical_card: "skill-card.md"     # signed card with evaluation results
+  benchmark: "BENCHMARK.md"
+
+behavior_boundaries:
+  documentation_only: true             # bundle ships no runnable code
+  hardware_touching_changes_routed_to: "skills/doca-hardware-safety/"
+  version_policy_routed_to: "skills/doca-version/"
+  external_productized_software_routed_to: "skills/doca-public-knowledge-map/"
+  see_also:
+    - "AGENTS.md"                       # universal rules
+    - "BENCHMARK.md"                    # how this skill is graded
+    - "SECURITY.md"                     # safety-bug intake
+
+contact:
+  bug_intake: "https://github.com/NVIDIA-DOCA/doca-skills/issues"
+  safety_bug_intake: "https://github.com/NVIDIA-DOCA/doca-skills/issues/new?labels=safety-bug"
+  security:   "https://www.nvidia.com/en-us/security/"

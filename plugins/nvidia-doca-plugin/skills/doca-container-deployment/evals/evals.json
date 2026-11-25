@@ -1,0 +1,46 @@
+{
+  "skill_name": "doca-container-deployment",
+  "evals": [
+    {
+      "id": "doca-container-deployment.explicit-positive.v1",
+      "prompt": "Use the doca-container-deployment skill for this task: I'm running into this: \"I dropped my service's YAML on the BlueField and the pod just sits there without starting\". Can you walk me through it?",
+      "expected_skill": "doca-container-deployment",
+      "expected_output": "The agent loads doca-container-deployment and answers strictly from that skill's documented workflow, quoting only real symbols, flags, paths, and commands from the bundle (no invented tokens) and routing out to other skills for anything out of doca-container-deployment's scope.",
+      "assertions": [
+        "The doca-container-deployment skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every command, flag, path, or symbol named is traceable to the bundle or a real public NVIDIA doc (no invented tokens).",
+        "Steps are given in a workable order with preconditions established before they are used."
+      ]
+    },
+    {
+      "id": "doca-container-deployment.implicit-positive.v1",
+      "prompt": "I'm running into this: \"I dropped my service's YAML on the BlueField and the pod just sits there without starting\". Can you walk me through it?",
+      "expected_skill": "doca-container-deployment",
+      "expected_output": "The agent recognizes this as a doca-container-deployment task even though the skill is not named, loads doca-container-deployment, and walks the user through the documented workflow with concrete, bundle-grounded steps.",
+      "assertions": [
+        "The answer engages the request directly rather than deflecting it.",
+        "The response is concrete and grounded in the skill content rather than generic advice."
+      ]
+    },
+    {
+      "id": "doca-container-deployment.implicit-positive.v2",
+      "prompt": "I'm running into this: \"how do I run my built service on the BlueField?\". Can you walk me through it?",
+      "expected_skill": "doca-container-deployment",
+      "expected_output": "The agent recognizes this as a doca-container-deployment task even though the skill is not named, loads doca-container-deployment, and walks the user through the documented workflow with concrete, bundle-grounded steps.",
+      "assertions": [
+        "The answer engages the request directly rather than deflecting it.",
+        "The response is concrete and grounded in the skill content rather than generic advice."
+      ]
+    },
+    {
+      "id": "doca-container-deployment.negative.v1",
+      "prompt": "I need to launch a DOCA-linked binary directly under systemd on the host; there is no container image or static Pod.",
+      "expected_skill": null,
+      "expected_output": "The agent does not apply doca-container-deployment's workflow to this request: it points to the guidance that owns the request or helps with the actual need directly, without treating doca-container-deployment as the answer.",
+      "assertions": [
+        "The answer does not apply doca-container-deployment's workflow to this request.",
+        "The answer points to the guidance that owns the request or helps with it directly, rather than refusing without any direction."
+      ]
+    }
+  ]
+}

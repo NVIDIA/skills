@@ -1,0 +1,920 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "bb9acb16b299884a248095b9070b54b4afbdd5d85f56f8c2314c448b3dbce741"
+        }
+      ],
+      "name": "doca-bare-metal-deployment",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/doca-bare-metal-deployment"
+        }
+      ],
+      "type": "data",
+      "version": "bb9acb16b299"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "2cb9636cd66727305f858c717e188c77413c48d3e2f03d53e6af097d7edd5610"
+        }
+      ],
+      "name": "doca-bf3-deployment",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/doca-bf3-deployment"
+        }
+      ],
+      "type": "data",
+      "version": "2cb9636cd667"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "809f253924bd841b2d43cdb631931919669b5add81ad9648ce412a0341bca0b2"
+        }
+      ],
+      "name": "doca-bf4-deployment",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/doca-bf4-deployment"
+        }
+      ],
+      "type": "data",
+      "version": "809f253924bd"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "1119cc786ea9a557b779bfdf8675923ae663cc2645c5f526e80ff263b38ce3fb"
+        }
+      ],
+      "name": "doca-container-deployment",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/doca-container-deployment"
+        }
+      ],
+      "type": "data",
+      "version": "1119cc786ea9"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "b2e9a33e140aeb5812360342c62d43e74f4f829ed4693dc0b43fb166d9da14fc"
+        }
+      ],
+      "name": "doca-debug",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/doca-debug"
+        }
+      ],
+      "type": "data",
+      "version": "b2e9a33e140a"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "2f83c648b8b990d28e3c12ae7f6f2edd3092b172b57c949c33d3c131f5150890"
+        }
+      ],
+      "name": "doca-hardware-safety",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/doca-hardware-safety"
+        }
+      ],
+      "type": "data",
+      "version": "2f83c648b8b9"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "186c936b9ea1bd7235f56ed31f13cf8a1e68dff7f6947e22f943622af1dead10"
+        }
+      ],
+      "name": "doca-programming-guide",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/doca-programming-guide"
+        }
+      ],
+      "type": "data",
+      "version": "186c936b9ea1"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "017e799fd1c2745a1d4a955c67489e8906886fdaa5fed1728bafd83aae3388a7"
+        }
+      ],
+      "name": "doca-public-knowledge-map",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/doca-public-knowledge-map"
+        }
+      ],
+      "type": "data",
+      "version": "017e799fd1c2"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "36b850e5465a5bf4547c9738af775236d16d21502ff3c59f3c40fe05aff9a74d"
+        }
+      ],
+      "name": "doca-setup",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/doca-setup"
+        }
+      ],
+      "type": "data",
+      "version": "36b850e5465a"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "7ce41100eae6fe471f1f116e9558d1153d6614d543a43b2fccf8bb194a171661"
+        }
+      ],
+      "name": "doca-structured-tools-contract",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/doca-structured-tools-contract"
+        }
+      ],
+      "type": "data",
+      "version": "7ce41100eae6"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "b263e701d8eb4e8c9bfde9760e4c2de5308ee36c0cdbacbbd818e707c1b559a4"
+        }
+      ],
+      "name": "doca-upgrade",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/doca-upgrade"
+        }
+      ],
+      "type": "data",
+      "version": "b263e701d8eb"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "d38431c6480f52596aa1a6783090658e2a88ff00d915dab4b66556c526340b0f"
+        }
+      ],
+      "name": "doca-version",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/doca-version"
+        }
+      ],
+      "type": "data",
+      "version": "d38431c6480f"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "e12a9fe608ad510dd060ce7345faf9b2e8011eb71aaef9a88e9e6480ba178fd0"
+        }
+      ],
+      "name": "doca-aes-gcm",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/libs/doca-aes-gcm"
+        }
+      ],
+      "type": "data",
+      "version": "e12a9fe608ad"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "7c36fe78e44fcf8e68c57df589d9bf387990fe5062a9054b65546e0997c40d0b"
+        }
+      ],
+      "name": "doca-argp",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/libs/doca-argp"
+        }
+      ],
+      "type": "data",
+      "version": "7c36fe78e44f"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "61bab3ccecb26f4308fcc80149e73028c72385a7bdbf048946f1db6ce55d0fd3"
+        }
+      ],
+      "name": "doca-comch",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/libs/doca-comch"
+        }
+      ],
+      "type": "data",
+      "version": "61bab3ccecb2"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "dcdc36590b0efa5f3509e973a01c40d1481b148fd4e0006aa4668d4470dfd737"
+        }
+      ],
+      "name": "doca-common",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/libs/doca-common"
+        }
+      ],
+      "type": "data",
+      "version": "dcdc36590b0e"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "8c5dbe7d0393edc1887d230406b7b07e796ec4cbce80e5ae53c9f8888ee8bf39"
+        }
+      ],
+      "name": "doca-compress",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/libs/doca-compress"
+        }
+      ],
+      "type": "data",
+      "version": "8c5dbe7d0393"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "0a3641a0cff53b1f44e07dcd526dcf7bf5a5f39353f110ae78282042f18a26c8"
+        }
+      ],
+      "name": "doca-devemu",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/libs/doca-devemu"
+        }
+      ],
+      "type": "data",
+      "version": "0a3641a0cff5"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "abef386b3dac112f39a761751c15e1cadc2d8240687bf8c539a260a36c10a35c"
+        }
+      ],
+      "name": "doca-dma",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/libs/doca-dma"
+        }
+      ],
+      "type": "data",
+      "version": "abef386b3dac"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "0488c35d9b807c5234e5faf20d57fc50c07300a13688eebe82f709291cae99a5"
+        }
+      ],
+      "name": "doca-dpa",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/libs/doca-dpa"
+        }
+      ],
+      "type": "data",
+      "version": "0488c35d9b80"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "5887f390a77c5acb5807f43e76ee26ebb283729e2ad3c0a5cf08e83ab1c0360a"
+        }
+      ],
+      "name": "doca-dpdk-bridge",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/libs/doca-dpdk-bridge"
+        }
+      ],
+      "type": "data",
+      "version": "5887f390a77c"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "e8e572cae8b57dcfac7e67e2adc8feb8bd1da45dfd1862569106e204c30fc776"
+        }
+      ],
+      "name": "doca-erasure-coding",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/libs/doca-erasure-coding"
+        }
+      ],
+      "type": "data",
+      "version": "e8e572cae8b5"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "c1c0f46f4618ac420aba9166f2575a89340b5ec7043e456257dc00a59be9a7bf"
+        }
+      ],
+      "name": "doca-eth",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/libs/doca-eth"
+        }
+      ],
+      "type": "data",
+      "version": "c1c0f46f4618"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "965812f00c525c7bfcd1a6ad558b10d0ea97f6d26b35d5c508d7f8276b2681b3"
+        }
+      ],
+      "name": "doca-flow",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/libs/doca-flow"
+        }
+      ],
+      "type": "data",
+      "version": "965812f00c52"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "620d9d8667773eb8683b8d085098f9a09da3a8f1105eaa525da8fb0f8a60f475"
+        }
+      ],
+      "name": "doca-gpunetio",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/libs/doca-gpunetio"
+        }
+      ],
+      "type": "data",
+      "version": "620d9d866777"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "74bbbd4b302ad3a3ddddcfcad9d2a3b98da9ae2f3596ea2be5aa0c1436a7d3b1"
+        }
+      ],
+      "name": "doca-mgmt",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/libs/doca-mgmt"
+        }
+      ],
+      "type": "data",
+      "version": "74bbbd4b302a"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "538b76e796c69385a45afd52be9d81b82e238d4c052c8a65c11643f778caeb12"
+        }
+      ],
+      "name": "doca-pcc",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/libs/doca-pcc"
+        }
+      ],
+      "type": "data",
+      "version": "538b76e796c6"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "f0eeab6fccff2c0b64ed63f57b1a56b8c0c0c1175bc332b1fb7a270789228354"
+        }
+      ],
+      "name": "doca-rdma",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/libs/doca-rdma"
+        }
+      ],
+      "type": "data",
+      "version": "f0eeab6fccff"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "dc59356e2dab86dbb6e396628f1636ec540e44be9dcc797578f2a7a38760428f"
+        }
+      ],
+      "name": "doca-rmax",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/libs/doca-rmax"
+        }
+      ],
+      "type": "data",
+      "version": "dc59356e2dab"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "18800206021f25a9e893e8b87fe8c6661edcb2f32457f3977edde9b4a54f51b9"
+        }
+      ],
+      "name": "doca-sha",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/libs/doca-sha"
+        }
+      ],
+      "type": "data",
+      "version": "18800206021f"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "cea8afaa6003056a9a36b32f83d1d115a3296fd016b3167a01e159f2c3c0e928"
+        }
+      ],
+      "name": "doca-sta",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/libs/doca-sta"
+        }
+      ],
+      "type": "data",
+      "version": "cea8afaa6003"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "9b22cf23fc6088631f4728bebc2ff8281e7a12f0fa473e90997134c5ffa2632c"
+        }
+      ],
+      "name": "doca-telemetry",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/libs/doca-telemetry"
+        }
+      ],
+      "type": "data",
+      "version": "9b22cf23fc60"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "391c92e6afa6ba67f719e26ef186b053f6930061052c8445ae1a9af7938e2cf0"
+        }
+      ],
+      "name": "doca-telemetry-exporter",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/libs/doca-telemetry-exporter"
+        }
+      ],
+      "type": "data",
+      "version": "391c92e6afa6"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "12d764b460debe6144e8a137f078a567e025ad5e5807e121312244bd9b2b428a"
+        }
+      ],
+      "name": "doca-urom",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/libs/doca-urom"
+        }
+      ],
+      "type": "data",
+      "version": "12d764b460de"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "3ed06dbb691ff06410966275af8c885f61c591aa5eaeb3fc5b69e96cc2ad91f1"
+        }
+      ],
+      "name": "doca-verbs",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/libs/doca-verbs"
+        }
+      ],
+      "type": "data",
+      "version": "3ed06dbb691f"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "35332681e94b136073c4a021cb3d689d7739b5cf4c4552f8600a257300cfeb59"
+        }
+      ],
+      "name": "doca-argus",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/services/doca-argus"
+        }
+      ],
+      "type": "data",
+      "version": "35332681e94b"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "3e94fe71edea436625116a2f65a08a49a2fbd00ff18aaa4a5daf3f0c2c9cd781"
+        }
+      ],
+      "name": "doca-dms",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/services/doca-dms"
+        }
+      ],
+      "type": "data",
+      "version": "3e94fe71edea"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "e13e91d6679fcb07e98d22b256fa6200c8364be9e5f72cd0911343f99ced7c94"
+        }
+      ],
+      "name": "doca-dts",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/services/doca-dts"
+        }
+      ],
+      "type": "data",
+      "version": "e13e91d6679f"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "276fe9b8ffcce1620e8e5f36b1026f8a092965bfc195efecf5a1148b42ec78e0"
+        }
+      ],
+      "name": "doca-firefly",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/services/doca-firefly"
+        }
+      ],
+      "type": "data",
+      "version": "276fe9b8ffcc"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "66fdcff5100daf513184b8d3afa4438750f1e36f87e0a152e3dbb8e8a8054189"
+        }
+      ],
+      "name": "doca-urom-svc",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/services/doca-urom-svc"
+        }
+      ],
+      "type": "data",
+      "version": "66fdcff5100d"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "63887812a9a9862e2491053ae6c3895fbbe7ba15e25e527546ea9e29191fae1b"
+        }
+      ],
+      "name": "doca-bench",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/tools/doca-bench"
+        }
+      ],
+      "type": "data",
+      "version": "63887812a9a9"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "37ef876eec358df12d9cdd0c965d4edf08c2617f837cf83b0fd508e1e4cfe91e"
+        }
+      ],
+      "name": "doca-caps",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/tools/doca-caps"
+        }
+      ],
+      "type": "data",
+      "version": "37ef876eec35"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "c3365fd88abc2958f9d6ef01198098d5b499ffef953cb8a93bf351612cf69cfa"
+        }
+      ],
+      "name": "doca-comm-channel-admin",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/tools/doca-comm-channel-admin"
+        }
+      ],
+      "type": "data",
+      "version": "c3365fd88abc"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "3a513d1d491adebd635e103f604acdad0e1c0308715a23a7ddfcce4abe2bc7ec"
+        }
+      ],
+      "name": "doca-flow-tune",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/tools/doca-flow-tune"
+        }
+      ],
+      "type": "data",
+      "version": "3a513d1d491a"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "9cab8020308c21444aebcd9df5d32d895579b0cbc621d2e4ea2b0aeead08eb8a"
+        }
+      ],
+      "name": "doca-ngauge",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/tools/doca-ngauge"
+        }
+      ],
+      "type": "data",
+      "version": "9cab8020308c"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "39882f7bfa775731747b2c4bfb9281576d277bdced961378718f43605161b025"
+        }
+      ],
+      "name": "doca-pcc-counters",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/tools/doca-pcc-counters"
+        }
+      ],
+      "type": "data",
+      "version": "39882f7bfa77"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "3b22a966dd262d27e9aab10011359793c3b2eae76acff9e5b528ff8584a54ba0"
+        }
+      ],
+      "name": "doca-perftest",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/tools/doca-perftest"
+        }
+      ],
+      "type": "data",
+      "version": "3b22a966dd26"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "e9668c659ef7d09d808eb20ab168daca687325bb880ce50bed925d19bc7c9c29"
+        }
+      ],
+      "name": "doca-pipeline-language-developer-tools",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/tools/doca-pipeline-language-developer-tools"
+        }
+      ],
+      "type": "data",
+      "version": "e9668c659ef7"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "9a82b98c286d70e965233fbad8145aff20fb2a4170fda3322c9e8d4e2275f263"
+        }
+      ],
+      "name": "doca-sha-offload-engine",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/tools/doca-sha-offload-engine"
+        }
+      ],
+      "type": "data",
+      "version": "9a82b98c286d"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "6a098d1e5647d9911f18faa352ef242560b4354fd71f386a28c4c05e87cfbd00"
+        }
+      ],
+      "name": "doca-socket-relay",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/tools/doca-socket-relay"
+        }
+      ],
+      "type": "data",
+      "version": "6a098d1e5647"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "1c838a4aee2ee6eb62e7896b521dd75e589ad30221ce5e48ad0ca592d1b4df34"
+        }
+      ],
+      "name": "doca-spcx-cc",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/tools/doca-spcx-cc"
+        }
+      ],
+      "type": "data",
+      "version": "1c838a4aee2e"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "556f1bb7f92f11b13470a9aabe5745414ed1ad809d1afac91e74843b6d6de1ef"
+        }
+      ],
+      "name": "doca-telemetry-traceback-application",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/tools/doca-telemetry-traceback-application"
+        }
+      ],
+      "type": "data",
+      "version": "556f1bb7f92f"
+    },
+    {
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "9116ac86193f7cab959b741890a1ececa65dffd061278d722682e5b5bd25c45d"
+        }
+      ],
+      "name": "doca-telemetry-utils",
+      "properties": [
+        {
+          "name": "source_path",
+          "value": "skills/tools/doca-telemetry-utils"
+        }
+      ],
+      "type": "data",
+      "version": "9116ac86193f"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "licenses": [
+        {
+          "expression": "Apache-2.0 AND CC-BY-4.0"
+        }
+      ],
+      "name": "nvidia-doca-plugin",
+      "type": "application",
+      "version": "1.0.0"
+    }
+  },
+  "specVersion": "1.6",
+  "version": 1
+}

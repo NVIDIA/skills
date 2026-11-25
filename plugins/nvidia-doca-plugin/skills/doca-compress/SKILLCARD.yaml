@@ -1,0 +1,45 @@
+# SKILLCARD.yaml — skill identity and routing metadata (canonical card: skill-card.md)
+# Schema: https://github.com/NVIDIA/skills/blob/main/docs/skill-cards.mdx
+
+schema_version: "1"
+
+identity:
+  name: "doca-compress"
+  artifact_id: "doca-compress"
+  kind: "library"
+  version: "TBD-at-sign-time"          # NVCARPS fills from the source ref
+  signature: "TBD-at-sign-time"        # NVCARPS-generated SHA + ed25519 sig
+  signed_by: "TBD-at-sign-time"        # NVCARPS identity (NVIDIA-PSIRT signing key)
+
+description: "Hardware compression offload with DOCA Compress on a BlueField DPU,\nConnectX NIC, or host: DEFLATE compress and decompress, plus LZ4\ndecompress (stream and block; LZ4 encode is NOT supported), instead of\nCPU zlib / zstd. Trigger on \"offload this gzip\", \"decompress incoming\nnetwork data on the NIC\", \"compress task returns INVALID_VALUE on\nalloc_init\", \"submitted a task but no completion arrives\", or\n\"decompress LZ4 on the BlueField\", even without naming DOCA Compress.\nCovers enabling compress-deflate, decompress-deflate,\ndecompress-lz4-stream and decompress-lz4-block tasks on a doca_compress\ncontext, sizing source / destination doca_buf against the per-task cap\nquery, mmap permissions, offload vs CPU decisions, a round-trip smoke,\nand DOCA_ERROR_* from Compress calls. Refuse and route elsewhere for\nzstd / Snappy / brotli, LZ4 encode (a CPU LZ4 library), pure\nmmap-to-mmap copies (doca-dma), or DOCA Core lifecycle internals."
+
+source:
+  repo: "NVIDIA-DOCA/doca-skills"
+  path: "skills/libs/doca-compress/SKILL.md"
+  branch: "main"
+  license: "Apache-2.0 AND CC-BY-4.0"
+
+provenance:
+  scan_run_id: "TBD-at-sign-time"      # NVCARPS scan run UUID
+  signed_at:   "TBD-at-sign-time"      # ISO-8601 timestamp from NVCARPS
+  upstream_catalog: "https://github.com/NVIDIA/skills"
+  upstream_component: "doca"
+
+quality:
+  canonical_card: "skill-card.md"     # signed card with evaluation results
+  benchmark: "BENCHMARK.md"
+
+behavior_boundaries:
+  documentation_only: true             # bundle ships no runnable code
+  hardware_touching_changes_routed_to: "skills/doca-hardware-safety/"
+  version_policy_routed_to: "skills/doca-version/"
+  external_productized_software_routed_to: "skills/doca-public-knowledge-map/"
+  see_also:
+    - "AGENTS.md"                       # universal rules
+    - "BENCHMARK.md"                    # how this skill is graded
+    - "SECURITY.md"                     # safety-bug intake
+
+contact:
+  bug_intake: "https://github.com/NVIDIA-DOCA/doca-skills/issues"
+  safety_bug_intake: "https://github.com/NVIDIA-DOCA/doca-skills/issues/new?labels=safety-bug"
+  security:   "https://www.nvidia.com/en-us/security/"

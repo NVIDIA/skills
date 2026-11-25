@@ -1,0 +1,45 @@
+{
+  "skill_name": "doca-devemu",
+  "evals": [
+    {
+      "id": "doca-devemu.explicit-positive.v1",
+      "prompt": "Use the doca-devemu skill for this task: I'm running into this: \"expose a custom PCIe device from BlueField to the host\". Can you walk me through it?",
+      "expected_skill": "doca-devemu",
+      "expected_output": "The agent selects the doca-devemu skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
+      "assertions": [
+        "The doca-devemu skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every symbol, flag, or command named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-devemu.implicit-positive.v1",
+      "prompt": "I'm running into this: \"expose a custom PCIe device from BlueField to the host\". Can you walk me through it?",
+      "expected_skill": "doca-devemu",
+      "expected_output": "The agent recognizes this as a doca-devemu issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The answer engages the request directly rather than deflecting it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-devemu.implicit-positive.v2",
+      "prompt": "I'm running into this: \"host should see a virtio NIC backed by my DPU code\". Can you walk me through it?",
+      "expected_skill": "doca-devemu",
+      "expected_output": "The agent recognizes this as a doca-devemu issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The answer engages the request directly rather than deflecting it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-devemu.negative.v1",
+      "prompt": "I want to deploy the prepackaged storage and network emulation service containers rather than write my own device backend. How should I approach this?",
+      "expected_skill": null,
+      "expected_output": "The agent does not apply doca-devemu's workflow to this request: it points to the guidance that owns the request or helps with the actual need directly, without treating doca-devemu as the answer.",
+      "assertions": [
+        "The answer does not apply doca-devemu's workflow to this request.",
+        "The answer points to the guidance that owns the request or helps with it directly, rather than refusing without any direction."
+      ]
+    }
+  ]
+}

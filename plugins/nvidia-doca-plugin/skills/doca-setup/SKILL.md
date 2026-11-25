@@ -1,0 +1,252 @@
+---
+license: Apache-2.0 AND CC-BY-4.0
+name: doca-setup
+description: >
+  Use this skill when the user is dealing with the DOCA environment
+  around their workload — verifying an install is healthy, preparing
+  the build env (pkg-config, headers, LD_LIBRARY_PATH, hugepages,
+  devlink, representors), debugging env-class failures, deciding
+  container-vs-bare-metal deployment shape, or reaching a DOCA install
+  from a host that doesn't have one yet via the NGC DOCA container
+  Stage-1 fallback. Trigger even when the user does not explicitly
+  mention "DOCA setup" — typical implicit phrasings include "just
+  got a BlueField, what now", "code is built, how to run it",
+  "pkg-config can't find doca-flow", "no free 2048 kB hugepages",
+  "representor X not found", "on a Mac and want to learn DOCA".
+  Refuse and route elsewhere for library API specifics (Flow pipes,
+  RDMA queues), the modify-a-sample first-app workflow or DOCA_ERROR_*
+  program-side debugging, and "where is X documented" knowledge-map
+  questions — those belong to other skills.
+metadata:
+  author: NVIDIA <doca-feedback@nvidia.com>
+  kind: library
+  doca_version: "3.6"
+  tags:
+    - doca
+    - setup
+    - environment
+compatibility: >
+  No DOCA install required to read this skill (it is an overlay loaded
+  against any DOCA artifact skill); the validation steps within DO
+  require a live DOCA install at /opt/mellanox/doca. The agent must
+  have a target-host command channel or provide commands for the user
+  to run and return their exact output; local shell access must not be
+  assumed to reach the target.
+---
+
+# DOCA setup
+
+> **Host checks.** Commands here that inspect the user's DOCA host (listing or reading `/opt/mellanox/doca`, release files such as `/etc/mlnx-release` or `/etc/nvidia/bf-release`, `/dev/mst`) or reach the BlueField (RShim, SSH, BMC) are for that host. Run them yourself only if the user confirms you are on it; otherwise answer from this skill, give the commands for the user to run, and treat values you can't see as unknown.
+
+**Where to start:** If the user's question is *deployment-shaped*
+(*"how do I deploy"*, *"how do I run my DOCA workload"*, *"I just got a
+BlueField, what now"*, *"my code is built, what next"*), walk
+[`TASKS.md ## recognize`](references/recognize.md) **first**. It is the
+bundle's front-door: it detects the system shape (host x86 / BlueField
+Arm bare-metal / DPU-only / fresh laptop), asks the developer the
+minimal set of questions needed to disambiguate, and routes to the
+correct downstream skill — the container deployment path
+(`doca-container-deployment/SKILL.md`),
+the bare-metal hardware deployment path
+(`doca-bare-metal-deployment/SKILL.md`),
+or the no-hardware fallback
+([`TASKS.md ## no-install`](TASKS.md#no-install)). The wrong failure
+mode is to silently steer every developer onto containers because the
+agent loaded that skill first; `## recognize` exists to prevent that.
+
+If the user does not have DOCA installed yet and the request is not
+deployment-shaped, jump straight to
+[`TASKS.md ## no-install`](TASKS.md#no-install) for the NGC container
+path. Deployment-shaped requests still enter `## recognize` first,
+which routes fresh-laptop cases to `## no-install`. Otherwise read
+[`## When to load this skill`](#when-to-load-this-skill) to confirm the
+question is env-class, then route to the section below that matches the
+user's intent.
+
+**Do not use this skill for:**
+
+- Defining, validating or writing packet-steering rules (DOCA Flow pipes,
+  matches, actions, entries), including when the user says the environment
+  and versions are already verified. That belongs to `doca-flow`: name it
+  and stop. Do not run `## recognize`, environment checks or the
+  verification contract for it.
+- Other library API work (RDMA queues, Comch channels, ...): the matching
+  library skill.
+- First-app derivation from a sample, build structure, or what a
+  `DOCA_ERROR_*` means: `doca-programming-guide`.
+- *"Where is X documented"*: `doca-public-knowledge-map`.
+
+## Examples
+
+The CLASSES this skill is built to handle, each with one worked example.
+The skill must answer the *class*; the worked example is illustrative.
+- **"What is the latest NGC DOCA tag?"** Answer in this order:
+  1. Apply the "How to pick an NGC tag without guessing" rule (`doca-setup
+     TASKS.md`): copy the tag from the NGC catalog Tags page
+     (`https://catalog.ngc.nvidia.com/orgs/nvidia/teams/doca/containers/doca/tags`);
+     never guess a tag or use `:latest`.
+  2. Explain the tag shape for DOCA 3.5: `<flavor>-<version>[-host]`, for
+     example `devel-3.5.0-host`. Flavor `devel` builds, `full-rt` / `base-rt`
+     run; `-host` is the multi-arch host image (x86_64 and aarch64 alike) and
+     the same tag without `-host` is the BlueField Arm image; 3.5 has no OS
+     or architecture fragment, while DOCA 3.3 also published
+     `<version>-devel-amd64-host` / `-arm64-host`. Always say which CPU
+     architecture the recommended tag serves (x86_64 = amd64, Arm / Apple
+     Silicon = arm64) and whether it is the host or the BlueField image.
+     Before giving one tag, ask which CPU architecture (amd64 or arm64)
+     and which target (host or BlueField) they pull for, unless the user
+     already said; then give the tag for that answer.
+  3. Verify what was pulled: run `pkg-config --modversion doca-common` inside
+     the container and check it matches the version in the tag.
+- **"I'm new — where do I start?"** DOCA is NVIDIA's SDK and runtime for
+  building and running accelerated networking, storage and security
+  workloads on BlueField DPUs and ConnectX NICs. First action: run
+  `pkg-config --modversion doca-common` (or `ls /opt/mellanox/doca`). No
+  install yet: pull the NGC DOCA container, copying the tag for your DOCA
+  version from the NGC catalog Tags page; never hardcode a tag.
+
+## Instructions
+
+Follow [`## Loading order`](#loading-order). Open `TASKS.md` or
+`CAPABILITIES.md` as named there. Do not open every companion file.
+
+- **"I want to deploy a DOCA workload — what is the right path?"** —
+  worked example: *"I just got a BlueField; my code is built; what
+  now?"* Resolved by the front-door decision tree in
+  [`TASKS.md ## recognize`](references/recognize.md), which detects the
+  system shape, asks the minimum residual question, and routes to
+  either the container or the bare-metal deployment skill.
+- **"Verify DOCA is installed and healthy."** — worked example:
+  *"Is DOCA Flow actually available on this box?"* Resolved by the
+  install-health snapshot in [`TASKS.md ## test`](TASKS.md#test) plus the
+  version-detection rules in
+  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes).
+- **"I do not have DOCA installed — what now?"** — worked example: *"I'm
+  on macOS and want to learn DOCA before I get a BlueField."* Resolved
+  by [`TASKS.md ## no-install`](TASKS.md#no-install) (NGC DOCA container
+  as universal Stage-1).
+- **"Prepare the build environment for any DOCA library."** — worked
+  example: *"`pkg-config --cflags doca-flow` returns nothing — what's
+  missing?"* Resolved by the build-prep workflow in
+  [`TASKS.md ## configure`](TASKS.md#configure) and the build-class
+  error taxonomy in
+  [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy).
+- **"Prepare the runtime preconditions on a real DPU box."** — worked
+  example: *"hugepages / representors / devlink — what's the minimum set
+  before I run my first DOCA Flow program?"* Resolved by
+  [`TASKS.md ## configure`](TASKS.md#configure) and the runtime
+  observability rules in
+  [`CAPABILITIES.md ## Observability`](CAPABILITIES.md#observability).
+- **"Diagnose an env-class failure (install / build / runtime)."** —
+  worked example: *"My DOCA Flow program built fine but says
+  `pkg-config` cannot find it at runtime."* Resolved by the layered
+  env-class debug workflow in [`TASKS.md ## debug`](TASKS.md#debug).
+- **"Change something about the environment safely."** — worked
+  example: *"I want to switch eswitch mode from legacy to switchdev."*
+  Resolved by the safety constraints in
+  [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy).
+  Hugepage reservation, `mlxconfig` reset, and eswitch mode changes
+  are host-global: they can disrupt live networking and representors,
+  may require a reboot, and can be hard to undo. Obtain explicit user
+  confirmation before recommending or executing them.
+
+If the question is library-API-shaped (Flow pipe construction, RDMA
+queue setup, …) or program-shaped (how to build, modify a sample, debug
+the program itself), route to
+`doca-programming-guide/SKILL.md` or the
+matching library skill instead — env-class only lives here.
+
+> **Route the *code* and stop — but keep the orientation.** For a
+> library-API or program-shaped request, naming the owning skill and
+> then answering it anyway is the failure mode to avoid: no
+> pipe-construction steps, no queue-setup sketch, no example code, not
+> even as a summary. This holds even when the user has already ruled
+> the environment out ("versions are verified, I just need to define
+> the rules") — that phrasing removes the env-class hook that would
+> make it this skill's work.
+>
+> It is scoped to *that* work, and stops there. Saying where a
+> component runs — which side of the BlueField / host split owns it,
+> what the host talks to it over — is deployment orientation, which
+> this skill owns as the front door and must still answer in full.
+> The shared Core lifecycle is the same kind of orientation: name
+> create → configure (properties, permissions, and tasks before
+> start) → start → connect → use → stop → destroy, and that
+> configuration MUST happen before `doca_ctx_start()`. Then hand the
+> per-library calls to the owning skill. Handing off the API surface
+> is not a reason to go quiet about the system shape around the
+> object.
+
+## When to load this skill
+
+Load this skill when the user is dealing with the **environment around DOCA** — installing it, verifying the install is healthy, preparing the build / runtime preconditions, debugging env-class failures, figuring out *how to reach an install* from a host that doesn't have one yet, or asking a **deployment-shaped question** that hasn't yet been routed (containers vs. bare-metal) — the front-door routing decision lives here. Concretely:
+
+- The deployment-shape routing front door: *"I just got a BlueField, what now?"*, *"my code is built, how do I run it?"*, *"how do I deploy this?"* All of these load `## recognize` first so the agent does not silently push the user onto the wrong path.
+- Verifying that the DOCA install is healthy and that the build environment can find it (`pkg-config`, headers, library paths).
+- Preparing the runtime: hugepages, `devlink` device visibility, representor enumeration, kernel-module prerequisites.
+- Diagnosing common setup-class failures: missing `*.pc` file, hugepages not mounted, representor not visible, header-vs-runtime version mismatch.
+- The *I have no install yet* path: the user is on macOS, Windows, or a Linux box without DOCA, and needs to reach an environment where DOCA is actually installed. The canonical Stage-1 answer is the public NGC DOCA container on the catalog Tags page (macOS, Windows, or Linux with Docker Engine or Docker Desktop; no NVIDIA hardware required for the build / read / learn loop). See [`TASKS.md ## no-install`](TASKS.md#no-install).
+
+Do **not** load this skill for:
+
+- *"What is DOCA?", "where is the developer guide?", "where is the install layout documented?"* — those are routing questions; use `doca-public-knowledge-map/SKILL.md`.
+- *"How do I derive a custom first application from a sample?", "how do I structure a DOCA build?", "what does `DOCA_ERROR_BAD_STATE` mean?"* — those are **programming-class** questions and live in `doca-programming-guide/SKILL.md`, which owns the universal `## modify` (first-app derivation), the canonical `## build` pattern, the universal lifecycle, and the cross-library `DOCA_ERROR_*` taxonomy.
+- *Library-internal API questions* (Flow pipe construction, RDMA queue setup, etc.) — those belong in the matching library skill (e.g. `doca-flow/SKILL.md`). This skill stops at *"the install is healthy and the env is ready"*; it does not own program semantics.
+
+## What this skill provides
+
+This is a **thin loader**. The body keeps only the orientation needed to pick the right next file. The substantive env material lives in two companion files:
+
+- `CAPABILITIES.md` — what the install / build / runtime *environment* surface looks like: install profiles (`doca-all`, `doca-ofed`, `doca-networking`), where the build flavors (release vs trace) live on disk and how to point `LD_LIBRARY_PATH` at them, the env-side version-detection rules, the env-class error taxonomy (`pkg-config` not finding `doca-flow`, hugepages not reserved, representors not visible), what a healthy install looks like under observation, and the safety constraints on environment changes (hugepages global, `mlxconfig` reset, eswitch mode change).
+- `TASKS.md` — env workflows: `recognize` (the front-door system-shape detect + dev-Q decision tree that routes deployment-shaped questions to either container or bare-metal), `configure` (env prep), `test` (install health snapshot), `debug` (env-class layered diagnosis), and `no-install` (the *I have no install yet* procedure with the NGC container as Path 0). Three other anchors (`build`, `modify`, `run`) route to `doca-programming-guide/SKILL.md`, which owns those verbs after the env / program split.
+
+This skill assumes nothing about whether DOCA is installed — the `## no-install` workflow exists precisely for the *fresh laptop* case.
+
+## Loading order
+
+1. Classify the question as programming,
+   knowledge-map, beginner orientation, deployment routing, or
+   environment work. Programming and knowledge-map questions route to
+   their owning skill and stop here.
+2. **For beginner orientation**, show the
+   [`TASKS.md ## no-install` Stage 1 vs Stage 2 roadmap](TASKS.md#no-install)
+   before any greeting, recommendation, or command. The opening must
+   explicitly name **Stage 1 — container learning** and **Stage 2 —
+   hardware runtime**; do not open by jumping directly to Docker or
+   installation. Then route Stage 1/container learning to
+   `## no-install` Path 0 and Stage 2/hardware runtime to
+   `## no-install` Paths A/C, followed by `## recognize` before
+   selecting container versus bare-metal. Ask one clarifying question
+   when the stage is unknown; if it remains unknown or no reply is
+   possible, stop and present both paths rather than guessing. Include the authoritative
+   [DOCA SDK documentation](https://docs.nvidia.com/doca/sdk/) as the
+   next-reading link; an NGC catalog link alone is not documentation.
+3. **For deployment routing**, walk
+   [TASKS.md ## recognize](references/recognize.md) first only when the
+   container-versus-bare-metal path is not already established. If it
+   is established, proceed directly to the matching env workflow.
+4. **Before a change recommendation on an installed/hardware target**,
+   load the mandatory
+   [Universal verification contract](CAPABILITIES.md#universal-verification-contract)
+   and walk all applicable steps through an auditable green signal.
+   Hardware-touching answers also load the
+   [hardware binding-layer command stanza](references/hardware-binding.md).
+   The Stage-1 no-hardware path instead uses its own container
+   install/smoke green signal; never fabricate unavailable PCIe,
+   representor, or hardware evidence.
+5. **For env workflows — `configure`, `test`, `debug`, and
+   `no-install` — see [TASKS.md](TASKS.md).** The `build`, `modify`,
+   and `run` anchors route to
+   `doca-programming-guide/SKILL.md`.
+6. Once the env is healthy, hand off to the selected deployment skill,
+   then `doca-programming-guide`, then the matching library skill.
+
+Both companion files cross-link to each other and to `doca-public-knowledge-map` whenever the right answer is *"look it up in the public docs or the installed package layout"* rather than *"setup-specific guidance"*.
+
+## Related skills
+
+- `doca-container-deployment/SKILL.md` — the container deployment runtime (kubelet standalone + YAML pod-spec drop) for any DOCA service container on BlueField. `## recognize` here routes to this skill when the developer's workload + system shape land on the container path.
+- `doca-bare-metal-deployment/SKILL.md` — the bare-metal hardware deployment runtime (host x86 OR BlueField Arm direct launch — systemd / tmux / direct invocation, hardware-resource binding, per-tenant isolation, restart discipline) for a DOCA-linked binary. `## recognize` here routes to this skill when the developer's workload + system shape land on the bare-metal path.
+- `doca-public-knowledge-map/SKILL.md` — public DOCA documentation routing and the on-disk layout of an installed DOCA package. This skill defers all *"where is X documented"*, *"where on disk is Y"*, and *"how do I check the installed version"* questions to the knowledge-map.
+- `doca-programming-guide/SKILL.md` — general DOCA programming patterns once the env is healthy: the canonical `pkg-config doca-<library>` build pattern, the universal *derive a custom first app from a sample* workflow (with C / C++ + non-C tracks), the universal lifecycle, and the cross-library `DOCA_ERROR_*` taxonomy. Anything beyond *"is the install healthy and the env ready"* lives there.
+- `doca-flow/SKILL.md` — DOCA Flow on BlueField. Builds on this skill for env preparation and on `doca-programming-guide` for the universal first-app derivation, then layers Flow-specific overrides on top.

@@ -1,0 +1,36 @@
+{
+  "skill_name": "doca-bf4-deployment",
+  "evals": [
+    {
+      "id": "doca-bf4-deployment.explicit-positive.v1",
+      "prompt": "Use the doca-bf4-deployment skill for this task: I am preparing a BlueField-4 host and need to confirm platform support, version alignment, and the safest first workload smoke test.",
+      "expected_skill": "doca-bf4-deployment",
+      "expected_output": "The agent loads doca-bf4-deployment and answers strictly from that skill's documented workflow, quoting only real symbols, flags, paths, and commands from the bundle (no invented tokens) and routing out to other skills for anything out of doca-bf4-deployment's scope.",
+      "assertions": [
+        "The doca-bf4-deployment skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every command, flag, path, or symbol named is traceable to the bundle or a real public NVIDIA doc (no invented tokens).",
+        "Steps are given in a workable order with preconditions established before they are used."
+      ]
+    },
+    {
+      "id": "doca-bf4-deployment.implicit-positive.v1",
+      "prompt": "I am preparing a BlueField-4 host and need to confirm platform support, version alignment, and the safest first workload smoke test.",
+      "expected_skill": "doca-bf4-deployment",
+      "expected_output": "The agent recognizes this as a doca-bf4-deployment task even though the skill is not named, loads doca-bf4-deployment, and walks the user through the documented workflow with concrete, bundle-grounded steps.",
+      "assertions": [
+        "The answer engages the request directly rather than deflecting it.",
+        "The response is concrete and grounded in the skill content rather than generic advice."
+      ]
+    },
+    {
+      "id": "doca-bf4-deployment.negative.v1",
+      "prompt": "I am bringing up a BlueField-3 and need generation-specific platform requirements before installing any workload.",
+      "expected_skill": null,
+      "expected_output": "The agent does not apply doca-bf4-deployment's workflow to this request: it points to the guidance that owns the request or helps with the actual need directly, without treating doca-bf4-deployment as the answer.",
+      "assertions": [
+        "The answer does not apply doca-bf4-deployment's workflow to this request.",
+        "The answer points to the guidance that owns the request or helps with it directly, rather than refusing without any direction."
+      ]
+    }
+  ]
+}

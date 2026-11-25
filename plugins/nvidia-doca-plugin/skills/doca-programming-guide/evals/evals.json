@@ -1,0 +1,46 @@
+{
+  "skill_name": "doca-programming-guide",
+  "evals": [
+    {
+      "id": "doca-programming-guide.explicit-positive.v1",
+      "prompt": "Use the doca-programming-guide skill for this task: I'm running into this: \"this is my first program against DOCA and I don't know the standard way to set up the build, or what order to create, start and tear down the objects in\". Can you walk me through it?",
+      "expected_skill": "doca-programming-guide",
+      "expected_output": "The agent loads doca-programming-guide and answers strictly from that skill's documented workflow, quoting only real symbols, flags, paths, and commands from the bundle (no invented tokens) and routing out to other skills for anything out of doca-programming-guide's scope.",
+      "assertions": [
+        "The doca-programming-guide skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every command, flag, path, or symbol named is traceable to the bundle or a real public NVIDIA doc (no invented tokens).",
+        "Steps are given in a workable order with preconditions established before they are used."
+      ]
+    },
+    {
+      "id": "doca-programming-guide.implicit-positive.v1",
+      "prompt": "I'm running into this: \"this is my first program against DOCA and I don't know the standard way to set up the build, or what order to create, start and tear down the objects in\". Can you walk me through it?",
+      "expected_skill": "doca-programming-guide",
+      "expected_output": "The agent recognizes this as a doca-programming-guide task even though the skill is not named, loads doca-programming-guide, and walks the user through the documented workflow with concrete, bundle-grounded steps.",
+      "assertions": [
+        "The answer engages the request directly rather than deflecting it.",
+        "The response is concrete and grounded in the skill content rather than generic advice."
+      ]
+    },
+    {
+      "id": "doca-programming-guide.implicit-positive.v2",
+      "prompt": "I'm running into this: \"write my first DOCA program\". Can you walk me through it?",
+      "expected_skill": "doca-programming-guide",
+      "expected_output": "The agent recognizes this as a doca-programming-guide task even though the skill is not named, loads doca-programming-guide, and walks the user through the documented workflow with concrete, bundle-grounded steps.",
+      "assertions": [
+        "The answer engages the request directly rather than deflecting it.",
+        "The response is concrete and grounded in the skill content rather than generic advice."
+      ]
+    },
+    {
+      "id": "doca-programming-guide.negative.v1",
+      "prompt": "The application already builds. I need to deploy its existing container manifest and verify that the service comes up ready. How should I approach this?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-programming-guide; it recognizes an existing container deployment and routes to doca-container-deployment.",
+      "assertions": [
+        "The answer does not attempt the out-of-scope work itself.",
+        "The answer routes to doca-container-deployment."
+      ]
+    }
+  ]
+}

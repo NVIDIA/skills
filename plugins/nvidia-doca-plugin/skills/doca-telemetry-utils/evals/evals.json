@@ -1,0 +1,45 @@
+{
+  "skill_name": "doca-telemetry-utils",
+  "evals": [
+    {
+      "id": "doca-telemetry-utils.explicit-positive.v1",
+      "prompt": "Use the doca-telemetry-utils skill for this task: I'm running into this: \"my exporter ships but the collector sees nothing\". Can you walk me through it?",
+      "expected_skill": "doca-telemetry-utils",
+      "expected_output": "The agent selects the doca-telemetry-utils skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
+      "assertions": [
+        "The doca-telemetry-utils skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every symbol, flag, or command named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-telemetry-utils.implicit-positive.v1",
+      "prompt": "I'm running into this: \"my exporter ships but the collector sees nothing\". Can you walk me through it?",
+      "expected_skill": "doca-telemetry-utils",
+      "expected_output": "The agent recognizes this as a doca-telemetry-utils issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The answer engages the request directly rather than deflecting it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-telemetry-utils.implicit-positive.v2",
+      "prompt": "I'm running into this: \"this DOCA telemetry metric silently drops downstream\". Can you walk me through it?",
+      "expected_skill": "doca-telemetry-utils",
+      "expected_output": "The agent recognizes this as a doca-telemetry-utils issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The answer engages the request directly rather than deflecting it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-telemetry-utils.negative.v1",
+      "prompt": "I'm writing C against the export library so my application can emit its own custom events. How should I approach this?",
+      "expected_skill": null,
+      "expected_output": "The agent does not apply doca-telemetry-utils's workflow to this request: it points to the guidance that owns the request or helps with the actual need directly, without treating doca-telemetry-utils as the answer.",
+      "assertions": [
+        "The answer does not apply doca-telemetry-utils's workflow to this request.",
+        "The answer points to the guidance that owns the request or helps with it directly, rather than refusing without any direction."
+      ]
+    }
+  ]
+}

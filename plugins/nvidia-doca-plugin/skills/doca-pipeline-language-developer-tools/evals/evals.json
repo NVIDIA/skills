@@ -1,0 +1,55 @@
+{
+  "skill_name": "doca-pipeline-language-developer-tools",
+  "evals": [
+    {
+      "id": "doca-pipeline-language-developer-tools.explicit-positive.v1",
+      "prompt": "Use the doca-pipeline-language-developer-tools skill for this task: I'm running into this: \"inspect the DPL tables on the DPU\". Can you walk me through it?",
+      "expected_skill": "doca-pipeline-language-developer-tools",
+      "expected_output": "The agent selects the doca-pipeline-language-developer-tools skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
+      "assertions": [
+        "The doca-pipeline-language-developer-tools skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every symbol, flag, or command named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-pipeline-language-developer-tools.implicit-positive.v1",
+      "prompt": "I'm running into this: \"inspect the DPL tables on the DPU\". Can you walk me through it?",
+      "expected_skill": "doca-pipeline-language-developer-tools",
+      "expected_output": "The agent recognizes this as a DOCA Pipeline Language Developer Tools issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The answer engages the request directly rather than deflecting it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-pipeline-language-developer-tools.implicit-positive.v2",
+      "prompt": "I'm running into this: \"why can't I start a DPL debug session\". Can you walk me through it?",
+      "expected_skill": "doca-pipeline-language-developer-tools",
+      "expected_output": "The agent recognizes this as a DOCA Pipeline Language Developer Tools issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The answer engages the request directly rather than deflecting it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-pipeline-language-developer-tools.negative.v1",
+      "prompt": "I need to install DOCA and bring up the DPL Runtime Service container on my BlueField DPU. How should I approach this?",
+      "expected_skill": null,
+      "expected_output": "The agent does not apply doca-pipeline-language-developer-tools's workflow to this request: it routes the install and DPL Runtime Service container bring-up to doca-setup.",
+      "assertions": [
+        "The answer does not apply doca-pipeline-language-developer-tools's workflow to this request.",
+        "The answer names doca-setup and routes the install/bring-up there rather than refusing without any direction."
+      ]
+    },
+    {
+      "id": "doca-pipeline-language-developer-tools.negative.v2",
+      "prompt": "I need to change the DPU mode or firmware state on the BlueField before using the DPL tools. How should I approach this?",
+      "expected_skill": null,
+      "expected_output": "The agent does not apply doca-pipeline-language-developer-tools's workflow to this request: it routes the hardware or firmware state change to doca-hardware-safety.",
+      "assertions": [
+        "The answer does not apply doca-pipeline-language-developer-tools's workflow to this request.",
+        "The answer names doca-hardware-safety and routes the hardware/firmware state change there rather than refusing without any direction."
+      ]
+    }
+  ]
+}

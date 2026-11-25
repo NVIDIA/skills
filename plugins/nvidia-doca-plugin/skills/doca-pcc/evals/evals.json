@@ -1,0 +1,46 @@
+{
+  "skill_name": "doca-pcc",
+  "evals": [
+    {
+      "id": "doca-pcc.explicit-positive.v1",
+      "prompt": "Use the doca-pcc skill for this task: I'm running into this: \"I'm loading my own congestion control onto a BF port but I get DOCA_ERROR_NOT_PERMITTED on algorithm load\". Can you walk me through it?",
+      "expected_skill": "doca-pcc",
+      "expected_output": "The agent loads doca-pcc and answers from the documented host-side workflow — per-port doca_pcc contexts, loading the dpacc-compiled doca_pcc_app on the RoCE-bearing port's doca_dev, parameterization, and triple-axis capability discovery (DOCA cap-query + DPA-capable BlueField + firmware custom-PCC slot) — quoting only real symbols.",
+      "assertions": [
+        "The doca-pcc skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "The per-port context, doca_pcc_app load, and triple-axis capability discovery are used correctly.",
+        "Every symbol named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-pcc.implicit-positive.v1",
+      "prompt": "I'm running into this: \"I'm loading my own congestion control onto a BF port but I get DOCA_ERROR_NOT_PERMITTED on algorithm load\". Can you walk me through it?",
+      "expected_skill": "doca-pcc",
+      "expected_output": "The agent recognizes this as a doca-pcc task even though the skill is not named, loads it, and walks the NOT_PERMITTED capability/slot-enablement path grounded in the bundle.",
+      "assertions": [
+        "The answer engages the request directly rather than deflecting it.",
+        "The answer ties DOCA_ERROR_NOT_PERMITTED to the triple-axis capability / firmware slot enablement."
+      ]
+    },
+    {
+      "id": "doca-pcc.implicit-positive.v2",
+      "prompt": "I'm running into this: \"my custom rate-update loads fine but isn't affecting RoCE traffic — load succeeds but no on-wire change\". Can you walk me through it?",
+      "expected_skill": "doca-pcc",
+      "expected_output": "The agent loads doca-pcc and diagnoses the load-succeeds-but-no-effect path in the documented order: doca_pcc_start() never called (loaded but inert), then the doca_dev the doca_pcc was created against not being the traffic-carrying port, then no RDMA/RoCE traffic on that port to modulate. Reports firing does not distinguish these. The DPA-side algorithm body is a later, conditional cause owned by doca-dpa, so it must not lead.",
+      "assertions": [
+        "The answer engages the request directly rather than deflecting it.",
+        "The answer leads with the host-side causes -- whether doca_pcc_start() was called and the doca_dev/port carries RoCE traffic -- before any algorithm-body consideration."
+      ]
+    },
+    {
+      "id": "doca-pcc.negative.v1",
+      "prompt": "I need to design the DPA-side algorithm body itself, read pcc_counters from the CLI, and set up the RoCE traffic. How should I approach this?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-pcc; it routes DPA-side algorithm-body design, the pcc_counters CLI, default factory PCC, and RDMA/RoCE traffic setup out to their proper skills.",
+      "assertions": [
+        "The answer does not attempt the out-of-scope work itself.",
+        "The answer routes to the appropriate skill(s) rather than forcing doca-pcc."
+      ]
+    }
+  ]
+}

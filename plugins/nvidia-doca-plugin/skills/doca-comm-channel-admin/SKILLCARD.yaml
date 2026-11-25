@@ -1,0 +1,45 @@
+# SKILLCARD.yaml — skill identity and routing metadata (canonical card: skill-card.md)
+# Schema: https://github.com/NVIDIA/skills/blob/main/docs/skill-cards.mdx
+
+schema_version: "1"
+
+identity:
+  name: "doca-comm-channel-admin"
+  artifact_id: "doca-comm-channel-admin"
+  kind: "tool"
+  version: "TBD-at-sign-time"          # NVCARPS fills from the source ref
+  signature: "TBD-at-sign-time"        # NVCARPS-generated SHA + ed25519 sig
+  signed_by: "TBD-at-sign-time"        # NVCARPS identity (NVIDIA-PSIRT signing key)
+
+description: "Use this skill to enumerate host↔DPU DOCA comch (formerly\nComm Channel) servers and connections via the shipped\ndoca_comm_channel_admin binary — listing comch-capable\ndevices and decoding the per-device server / connection\ntable (server name, PID, in-use / max, PCIe address). The\nshipped binary is a SINGLE-SHOT SCAN-AND-PRINT tool with no\nregistered arguments — NO list / inspect / drain / restart\nsubcommands; one inventory pass over every comch-capable\ndoca_dev on this side. Channel reset / drain / restart go to\ndoca-comch (program side), doca-setup / doca-hardware-safety\n(driver reload), or BFB / RShim — NOT to this binary.\nTrigger on phrasings like \"list comch servers\", \"which\nchannels are active on this BlueField\", or \"verify admin\ntool sees same channel as program.\" Refuse and route\nelsewhere for the comch programming API, library install,\nprotocol design, channel reset, or general orientation."
+
+source:
+  repo: "NVIDIA-DOCA/doca-skills"
+  path: "skills/tools/doca-comm-channel-admin/SKILL.md"
+  branch: "main"
+  license: "Apache-2.0 AND CC-BY-4.0"
+
+provenance:
+  scan_run_id: "TBD-at-sign-time"      # NVCARPS scan run UUID
+  signed_at:   "TBD-at-sign-time"      # ISO-8601 timestamp from NVCARPS
+  upstream_catalog: "https://github.com/NVIDIA/skills"
+  upstream_component: "doca"
+
+quality:
+  canonical_card: "skill-card.md"     # signed card with evaluation results
+  benchmark: "BENCHMARK.md"
+
+behavior_boundaries:
+  documentation_only: true             # bundle ships no runnable code
+  hardware_touching_changes_routed_to: "skills/doca-hardware-safety/"
+  version_policy_routed_to: "skills/doca-version/"
+  external_productized_software_routed_to: "skills/doca-public-knowledge-map/"
+  see_also:
+    - "AGENTS.md"                       # universal rules
+    - "BENCHMARK.md"                    # how this skill is graded
+    - "SECURITY.md"                     # safety-bug intake
+
+contact:
+  bug_intake: "https://github.com/NVIDIA-DOCA/doca-skills/issues"
+  safety_bug_intake: "https://github.com/NVIDIA-DOCA/doca-skills/issues/new?labels=safety-bug"
+  security:   "https://www.nvidia.com/en-us/security/"

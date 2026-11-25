@@ -1,0 +1,45 @@
+# SKILLCARD.yaml — skill identity and routing metadata (canonical card: skill-card.md)
+# Schema: https://github.com/NVIDIA/skills/blob/main/docs/skill-cards.mdx
+
+schema_version: "1"
+
+identity:
+  name: "doca-rmax"
+  artifact_id: "doca-rmax"
+  kind: "library"
+  version: "TBD-at-sign-time"          # NVCARPS fills from the source ref
+  signature: "TBD-at-sign-time"        # NVCARPS-generated SHA + ed25519 sig
+  signed_by: "TBD-at-sign-time"        # NVCARPS identity (NVIDIA-PSIRT signing key)
+
+description: "DOCA Rivermax (doca_rmax) receive streams for timing-precise media over\nIP (SMPTE ST 2110 video / audio, market data, scientific feeds) on a\nBlueField DPU or ConnectX host, once the Rivermax SDK and its license\nare installed; getting the SDK or license is doca-setup /\ndoca-public-knowledge-map territory. Trigger on \"ST 2110 receive isn't\ngetting frames\", \"sub-microsecond jitter on my media receiver\",\n\"NOT_SUPPORTED from doca_rmax_init\", \"no recv events after stream\nstart\", or \"license check failing on a media receiver\", even without\nnaming Rivermax. Covers doca_rmax_in_stream sessions, the SDK + license\nprecondition check, doca_rmax_get_*_supported capability queries,\npairing with doca-eth queues and doca-flow steering, and DOCA_ERROR_*\nfrom Rivermax calls. Refuse and route elsewhere for programming the\nunderlying queue (doca-eth), steering rules (doca-flow), PTP / clock\nsync (doca-firefly), or best-effort packet I/O."
+
+source:
+  repo: "NVIDIA-DOCA/doca-skills"
+  path: "skills/libs/doca-rmax/SKILL.md"
+  branch: "main"
+  license: "Apache-2.0 AND CC-BY-4.0"
+
+provenance:
+  scan_run_id: "TBD-at-sign-time"      # NVCARPS scan run UUID
+  signed_at:   "TBD-at-sign-time"      # ISO-8601 timestamp from NVCARPS
+  upstream_catalog: "https://github.com/NVIDIA/skills"
+  upstream_component: "doca"
+
+quality:
+  canonical_card: "skill-card.md"     # signed card with evaluation results
+  benchmark: "BENCHMARK.md"
+
+behavior_boundaries:
+  documentation_only: true             # bundle ships no runnable code
+  hardware_touching_changes_routed_to: "skills/doca-hardware-safety/"
+  version_policy_routed_to: "skills/doca-version/"
+  external_productized_software_routed_to: "skills/doca-public-knowledge-map/"
+  see_also:
+    - "AGENTS.md"                       # universal rules
+    - "BENCHMARK.md"                    # how this skill is graded
+    - "SECURITY.md"                     # safety-bug intake
+
+contact:
+  bug_intake: "https://github.com/NVIDIA-DOCA/doca-skills/issues"
+  safety_bug_intake: "https://github.com/NVIDIA-DOCA/doca-skills/issues/new?labels=safety-bug"
+  security:   "https://www.nvidia.com/en-us/security/"

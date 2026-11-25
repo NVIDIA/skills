@@ -1,0 +1,45 @@
+# SKILLCARD.yaml — skill identity and routing metadata (canonical card: skill-card.md)
+# Schema: https://github.com/NVIDIA/skills/blob/main/docs/skill-cards.mdx
+
+schema_version: "1"
+
+identity:
+  name: "doca-telemetry-utils"
+  artifact_id: "doca-telemetry-utils"
+  kind: "tool"
+  version: "TBD-at-sign-time"          # NVCARPS fills from the source ref
+  signature: "TBD-at-sign-time"        # NVCARPS-generated SHA + ed25519 sig
+  signed_by: "TBD-at-sign-time"        # NVCARPS identity (NVIDIA-PSIRT signing key)
+
+description: "doca_telemetry_utils command line on a host with DOCA: discover the\ndiagnostic-counter schema, translate counter names to binary Data IDs\nand back, and check per-device counter support before committing a DOCA\nTelemetry exporter config. Start here when telemetry counters vanish\nbetween the exporter and the collector: \"my exporter ships but the\ncollector sees nothing\", \"this metric silently drops downstream\", \"which\ncounters does this BlueField expose\", \"translate this 0x... back to a\ncounter name\", \"what do node / pcie_index / depth mean here\", or \"is\nthis counter supported on this device\", even without naming the tool.\nWriting exporter or collector code belongs to doca-telemetry-exporter /\ndoca-telemetry; DTS deployment to doca-dts; DOCA install or repair to\ndoca-setup."
+
+source:
+  repo: "NVIDIA-DOCA/doca-skills"
+  path: "skills/tools/doca-telemetry-utils/SKILL.md"
+  branch: "main"
+  license: "Apache-2.0 AND CC-BY-4.0"
+
+provenance:
+  scan_run_id: "TBD-at-sign-time"      # NVCARPS scan run UUID
+  signed_at:   "TBD-at-sign-time"      # ISO-8601 timestamp from NVCARPS
+  upstream_catalog: "https://github.com/NVIDIA/skills"
+  upstream_component: "doca"
+
+quality:
+  canonical_card: "skill-card.md"     # signed card with evaluation results
+  benchmark: "BENCHMARK.md"
+
+behavior_boundaries:
+  documentation_only: true             # bundle ships no runnable code
+  hardware_touching_changes_routed_to: "skills/doca-hardware-safety/"
+  version_policy_routed_to: "skills/doca-version/"
+  external_productized_software_routed_to: "skills/doca-public-knowledge-map/"
+  see_also:
+    - "AGENTS.md"                       # universal rules
+    - "BENCHMARK.md"                    # how this skill is graded
+    - "SECURITY.md"                     # safety-bug intake
+
+contact:
+  bug_intake: "https://github.com/NVIDIA-DOCA/doca-skills/issues"
+  safety_bug_intake: "https://github.com/NVIDIA-DOCA/doca-skills/issues/new?labels=safety-bug"
+  security:   "https://www.nvidia.com/en-us/security/"

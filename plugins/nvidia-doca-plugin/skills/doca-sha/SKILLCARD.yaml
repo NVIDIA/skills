@@ -1,0 +1,45 @@
+# SKILLCARD.yaml — skill identity and routing metadata (canonical card: skill-card.md)
+# Schema: https://github.com/NVIDIA/skills/blob/main/docs/skill-cards.mdx
+
+schema_version: "1"
+
+identity:
+  name: "doca-sha"
+  artifact_id: "doca-sha"
+  kind: "library"
+  version: "TBD-at-sign-time"          # NVCARPS fills from the source ref
+  signature: "TBD-at-sign-time"        # NVCARPS-generated SHA + ed25519 sig
+  signed_by: "TBD-at-sign-time"        # NVCARPS identity (NVIDIA-PSIRT signing key)
+
+description: "Use this skill when the user is doing hands-on DOCA SHA programming —\noffloading SHA-1, SHA-256, or SHA-512 hashing onto a BlueField DPU or\nConnectX accelerator, picking between one-shot `doca_sha_task_hash` and\nincremental `doca_sha_task_partial_hash`, querying `doca_sha_cap_*`\nfor algorithm support and min destination / max source buffer sizes, setting\nsource / destination `doca_mmap` permissions, or decoding DOCA_ERROR_*\nreturns from the SHA API. Trigger even when the user does not explicitly\nmention \"DOCA SHA\" or \"doca_sha_task\" — typical implicit phrasings\ninclude \"hash a multi-GiB file on the DPU\", \"offload SHA-256 to the\nBlueField\", \"streaming hash over chunks\", \"partial hash returns\nBAD_STATE\", \"destination buffer too small for digest\", or \"is SHA-512\navailable on this card\". Refuse and route elsewhere for general\ncryptographic-hash theory (collision resistance, SHA-3 selection), other\nDOCA crypto libraries (AES-GCM, Compress, DMA), or DOCA install / BFB\nbring-up — those belong to other skills."
+
+source:
+  repo: "NVIDIA-DOCA/doca-skills"
+  path: "skills/libs/doca-sha/SKILL.md"
+  branch: "main"
+  license: "Apache-2.0 AND CC-BY-4.0"
+
+provenance:
+  scan_run_id: "TBD-at-sign-time"      # NVCARPS scan run UUID
+  signed_at:   "TBD-at-sign-time"      # ISO-8601 timestamp from NVCARPS
+  upstream_catalog: "https://github.com/NVIDIA/skills"
+  upstream_component: "doca"
+
+quality:
+  canonical_card: "skill-card.md"     # signed card with evaluation results
+  benchmark: "BENCHMARK.md"
+
+behavior_boundaries:
+  documentation_only: true             # bundle ships no runnable code
+  hardware_touching_changes_routed_to: "skills/doca-hardware-safety/"
+  version_policy_routed_to: "skills/doca-version/"
+  external_productized_software_routed_to: "skills/doca-public-knowledge-map/"
+  see_also:
+    - "AGENTS.md"                       # universal rules
+    - "BENCHMARK.md"                    # how this skill is graded
+    - "SECURITY.md"                     # safety-bug intake
+
+contact:
+  bug_intake: "https://github.com/NVIDIA-DOCA/doca-skills/issues"
+  safety_bug_intake: "https://github.com/NVIDIA-DOCA/doca-skills/issues/new?labels=safety-bug"
+  security:   "https://www.nvidia.com/en-us/security/"
