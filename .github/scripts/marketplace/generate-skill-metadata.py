@@ -1697,7 +1697,7 @@ def resolve_bundled_skills(
     by_name: dict[str, dict],
     by_path: dict[str, dict],
     source_skills: dict[str, str],
-) -> tuple[list[dict], list[str]]:
+) -> tuple[list[dict], list[str], list[str]]:
     """Identify which catalog skills a mirrored plugin bundles.
 
     A mirrored plugin carries copies of the skills, not references to them, so
@@ -1711,9 +1711,13 @@ def resolve_bundled_skills(
        are unique and are copied verbatim from that same frontmatter, so this
        is an identity match.
     2. The bundled directory's path within the plugin, resolved through the
-       product's own `skills:` declarations to the catalog path.
+       product's own `skills:` declarations to the catalog path. The product
+       declares a full source path, which may nest (TAO declares
+       `skills/applications/<skill>/`), so the bundled directory is matched on
+       the last path segment of each declaration. A segment claimed by more
+       than one declaration is ambiguous and is not used as a key.
 
-    Matching on the directory name instead would be wrong for 43 of the 484
+    Matching on the directory name instead would be wrong for 43 of the 488
     skills in the catalog today, because `catalog_dir` renames a skill on the
     way in. BioIR publishes skills/bench-perf-oss/ as skills/bioir-bench-perf-oss,
     so the bundled directory and the catalog directory do not share a name.
@@ -1725,6 +1729,24 @@ def resolve_bundled_skills(
     skills_dir = plugin_dir / "skills"
     if not skills_dir.is_dir():
         return [], [], []
+
+    # Last path segment of each declared source path -> catalog path. A
+    # product may nest its sources (TAO declares skills/applications/<skill>/),
+    # in which case the bundled directory name matches no declared path
+    # verbatim and the exact lookup below never fires. A segment claimed by
+    # two declarations identifies nothing, so it is dropped rather than
+    # resolved to whichever came first.
+    by_segment: dict[str, str] = {}
+    ambiguous: set[str] = set()
+    for spath, cpath in source_skills.items():
+        seg = spath.rsplit("/", 1)[-1]
+        if not seg:
+            continue
+        if seg in by_segment and by_segment[seg] != cpath:
+            ambiguous.add(seg)
+        by_segment[seg] = cpath
+    for seg in ambiguous:
+        by_segment.pop(seg, None)
 
     resolved: list[dict] = []
     unresolved: list[str] = []
@@ -1748,6 +1770,8 @@ def resolve_bundled_skills(
 
         by_registry = None
         catalog_path = source_skills.get(f"skills/{child.name}")
+        if catalog_path is None:
+            catalog_path = by_segment.get(child.name)
         if catalog_path:
             by_registry = by_path.get(catalog_path)
 

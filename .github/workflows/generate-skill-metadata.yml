@@ -8,7 +8,7 @@
 #   workflow_dispatch: regenerate (with AI enrichment) and open a PR if files
 #                      changed; open or update a tracking issue on validation
 #                      failure.
-#   workflow_run:     fires after Sync Skills succeeds on main; behaves like
+#   workflow_run:     fires after either sync succeeds on main; behaves like
 #                      workflow_dispatch.
 
 name: Generate Skill Metadata
@@ -45,7 +45,15 @@ on:
       - "versions.json"
   workflow_dispatch:
   workflow_run:
-    workflows: ["Sync Skills from Product Repos"]
+    # Both syncs, because both change what metadata.json should contain: the
+    # skills sync changes the skills, and the plugin sync changes which skills
+    # a plugin bundles, which changes that plugin's rolled-up taxonomy. The
+    # pull_request paths above include `plugins/**`, so a plugin sync that
+    # lands without a regeneration would leave every later PR failing `check`
+    # until someone dispatched this workflow by hand.
+    workflows:
+      - "Sync Skills from Product Repos"
+      - "Sync Plugins from Product Repos"
     types:
       - completed
     branches:
