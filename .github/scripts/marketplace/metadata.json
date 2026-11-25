@@ -3829,6 +3829,54 @@
       }
     },
     {
+      "path": "skills/nim-benchmark",
+      "name": "nim-benchmark",
+      "description": "Measures a running NIM endpoint, text or vision-language, for speed with AIPerf and for accuracy with NeMo Gym, against an optional baseline, behind an approved plan id. Use when asked to benchmark a NIM, measure its latency or throughput, or check its accuracy.",
+      "metadata": {
+        "product.primary": "NIM",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "ml_engineer,ai_engineer,developer,platform_engineer,devops_engineer",
+        "discovery.activity_tags": "benchmark,measure,evaluate,compare,validate"
+      }
+    },
+    {
+      "path": "skills/nim-deploy",
+      "name": "nim-deploy",
+      "description": "Deploys and verifies NVIDIA NIM LLMs with Docker, Helm (nim-llm) or the NIM Operator. Use when someone asks to deploy, render, apply, check, troubleshoot, stop or clean up a NIM image on a GPU host or Kubernetes cluster, or asks to free GPUs on such a host by stopping, killing or removing what uses them.",
+      "metadata": {
+        "product.primary": "NIM",
+        "classification.category.primary": "infrastructure",
+        "catalog.subdomain": "inference-ai",
+        "audience": "devops_engineer,platform_engineer,solutions_architect,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "deploy,configure,validate,troubleshoot,operate"
+      }
+    },
+    {
+      "path": "skills/nim-smoke-check",
+      "name": "nim-smoke-check",
+      "description": "Tests which features of a running NVIDIA NIM LLM or VLM work, local, Kubernetes or hosted: health, chat, streaming, tools, reasoning, JSON schema, images, concurrency. Use when asked to smoke test or smoke check a NIM or its URL, or why a feature fails (before a restart or fix), or after a deploy.",
+      "metadata": {
+        "product.primary": "NIM",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "devops_engineer,platform_engineer,ai_engineer,ml_engineer,developer",
+        "discovery.activity_tags": "test,validate,troubleshoot,debug,deploy"
+      }
+    },
+    {
+      "path": "skills/nim-tune",
+      "name": "nim-tune",
+      "description": "Tunes a running vLLM-backed NVIDIA NIM's runtime settings on measured AIPerf evidence, one setting per candidate, against the untuned NIM, on the NIM Operator or Docker. Use when asked to tune or speed up a NIM's engine settings or speculative decoding for a GPU budget, workload and latency target, or to pick or recommend the fastest configuration that still meets a latency target (never one that breaks it).",
+      "metadata": {
+        "product.primary": "NIM",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "ml_engineer,ai_engineer,platform_engineer,devops_engineer,solutions_architect",
+        "discovery.activity_tags": "optimize,benchmark,configure,measure,select"
+      }
+    },
+    {
       "path": "skills/nixl-docs",
       "name": "nixl-docs",
       "description": "Find and read NIXL documentation for APIs, architecture, backends, installation and builds, environment variables, telemetry, troubleshooting, examples, benchmarks, and contribution.",
