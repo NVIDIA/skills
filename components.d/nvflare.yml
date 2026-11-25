@@ -31,3 +31,6 @@ skills:
     catalog_dir: nvflare-orient
   - path: skills/nvflare-shared
     catalog_dir: nvflare-shared
+plugins:
+  - path: plugins/nvidia-nvflare/
+    catalog_dir: nvidia-nvflare
