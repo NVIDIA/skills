@@ -1,0 +1,79 @@
+# versions.yaml — build-time source of truth for TAO container images and Python wheels.
+#
+# Skills are standalone: they carry literal image URIs and wheel pins, each
+# annotated with the key it came from ("# versions-key: images.tao_toolkit.pyt").
+# scripts/stamp_versions.py fans this file out to every annotated line on a
+# release bump, and `stamp_versions.py --check` (run in CI) fails if any
+# annotated line drifts from this file. Do not hand-edit stamped values in
+# skills — edit here and run the stamper.
+#
+# Legacy key references (container_image: tao_toolkit.pyt) are still resolved
+# by the validator and the SDK, but new skills should carry the stamped
+# literal + marker form:
+#   container_image: nvcr.io/nvidia/tao/tao-toolkit:7.0.1-pyt  # versions-key: images.tao_toolkit.pyt
+#
+# Use unannotated absolute paths only for experimental images, third-party
+# registries, or one-offs (annotate those "# unpinned: <reason>"). Add a key
+# here when the image is used by more than one skill OR is bumped on a
+# release cadence.
+#
+# Registry-org policy: on a release, set the entries below to the released
+# nvcr.io/nvidia/tao URIs and run
+# scripts/stamp_versions.py: every stamped site (model skill_info.yaml files
+# and platform-skill examples alike) picks up the public image in one pass.
+# Do not hand-swap orgs inside skill files — CI rejects stamps that do not
+# match this file. Skill prose must stay org-agnostic ("the org of the pinned
+# image") so only stamped pins ever name an org and the release sweep is
+# exactly this file + one stamper run.
+
+images:
+  tao_toolkit:
+    pyt:                nvcr.io/nvidia/tao/tao-toolkit:7.3.0-pyt
+    deploy:             nvcr.io/nvidia/tao/tao-toolkit:7.3.0-deploy
+    data_services:      nvcr.io/nvidia/tao/tao-toolkit:7.3.0-data-services
+    # Sparse4D schemas and conversion require the TAO 7.3 runtime.
+    sparse4d_pyt:       nvcr.io/nvidia/tao/tao-toolkit:7.3.0-pyt
+    sparse4d_data_services: nvcr.io/nvidia/tao/tao-toolkit:7.3.0-data-services
+    deft_pas_pyt:       nvcr.io/nvidia/tao/tao-toolkit:7.3.0-pyt
+    deft_pas_data_services: nvcr.io/nvidia/tao/tao-toolkit:7.3.0-data-services
+    # TAO 7.1.0 has the Cosmos Reason Conv3d/vLLM import regression.
+    cosmos_framework:   nvcr.io/nvidia/tao/tao-toolkit:7.2.0-cosmos-framework
+    cosmos_rl:          nvcr.io/nvidia/tao/tao-toolkit:7.2.0-cosmos-rl
+    deft_cosmos_reason: nvcr.io/nvidia/tao/tao-toolkit:7.2.0-cosmos-rl
+    cosmos_predict:     nvcr.io/nvidia/tao/tao-toolkit:7.0.1-cosmos-predict
+    cosmos_embed:       nvcr.io/nvidia/tao/tao-toolkit:7.3.0-cosmos-embed
+
+  metropolis_sdg:
+    paidf_anomalygen: nvcr.io/nvidia/paidf-anomalygen:1.0.1
+    anomalygen_next: nvcr.io/nvidia/paidf-anomalygen:1.1.0
+    paidf_augmentation: nvcr.io/nvidia/paidf-augmentation:1.0.0
+wheels:
+  # TAO Python wheels, published to public PyPI. Skill Preflight sections
+  # resolve these keys via `scripts/resolve_versions_key.py wheels.<key>` —
+  # exactly like the image keys above — so the pin lives in one place.
+  #
+  # Version bump: change the version on the relevant entries (e.g.
+  # `==7.0.0` -> `==7.1.0`).
+  #
+  # The `nvidia-tao-sdk` package consolidates what used to be multiple wheels
+  # (tao-sdk, tao-sdk-brev). One entry per platform extra.
+  #
+  # RETAINED ONLY AS THE TRANSITIVE DEPENDENCY OF nvidia-tao-automl (AutoML).
+  # The skill bank no longer uses the TAO SDK execution abstraction directly:
+  # platform skills run containers via docker/kubectl/srun and the SDK-free
+  # 4-verb consumer path (tao-data-io + tao_job_record + tao-launch-workflow).
+  # These `tao_sdk_*` keys exist so nvidia-tao-automl can pull a matching SDK.
+  tao_sdk:            nvidia-tao-sdk==7.3.1
+  tao_sdk_brev:       nvidia-tao-sdk[brev]==7.3.1
+  tao_sdk_slurm:      nvidia-tao-sdk[slurm]==7.3.1
+  tao_sdk_kubernetes: nvidia-tao-sdk[kubernetes]==7.3.1
+  tao_sdk_docker:     nvidia-tao-sdk[docker]==7.3.1
+  tao_sdk_all:        nvidia-tao-sdk[all]==7.3.1
+  # nvidia-tao-automl pulls nvidia-tao-sdk as a transitive dep. One entry per
+  # platform extra; append `,llm` or `,wandb` to an extra at install time for
+  # the agentic-search or experiment-tracking deps.
+  tao_automl_slurm:      nvidia-tao-automl[slurm]==7.3.1
+  tao_automl_kubernetes: nvidia-tao-automl[kubernetes]==7.3.1
+  tao_automl_docker:     nvidia-tao-automl[docker]==7.3.1
+  tao_automl_brev:       nvidia-tao-automl[brev]==7.3.1
+  tao_automl_all:        nvidia-tao-automl[all]==7.3.1

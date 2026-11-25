@@ -1,0 +1,368 @@
+{
+  "models": {
+    "tao-finetune-clip": {
+      "actions": [
+        "evaluate",
+        "export",
+        "train"
+      ],
+      "automl_enabled": true,
+      "failures": {},
+      "network_arch": "clip"
+    },
+    "tao-finetune-cosmos-reason": {
+      "actions": [
+        "evaluate",
+        "inference",
+        "quantize",
+        "train"
+      ],
+      "automl_enabled": true,
+      "failures": {},
+      "network_arch": "cosmos-reason"
+    },
+    "tao-train-action-recognition": {
+      "actions": [
+        "evaluate",
+        "export",
+        "inference",
+        "train"
+      ],
+      "automl_enabled": true,
+      "failures": {},
+      "network_arch": "action_recognition"
+    },
+    "tao-train-bevfusion": {
+      "actions": [
+        "dataset_convert",
+        "evaluate",
+        "inference",
+        "train"
+      ],
+      "automl_enabled": true,
+      "failures": {},
+      "network_arch": "bevfusion"
+    },
+    "tao-train-centerpose": {
+      "actions": [
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "train"
+      ],
+      "automl_enabled": true,
+      "failures": {},
+      "network_arch": "centerpose"
+    },
+    "tao-train-deformable-detr": {
+      "actions": [
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "quantize",
+        "train"
+      ],
+      "automl_enabled": true,
+      "failures": {},
+      "network_arch": "deformable_detr"
+    },
+    "tao-train-depth-anything-v2": {
+      "actions": [
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "quantize",
+        "train"
+      ],
+      "automl_enabled": true,
+      "failures": {},
+      "network_arch": "depth_net_mono"
+    },
+    "tao-train-dino": {
+      "actions": [
+        "distill",
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "quantize",
+        "train"
+      ],
+      "automl_enabled": true,
+      "failures": {},
+      "network_arch": "dino"
+    },
+    "tao-train-foundation-stereo": {
+      "actions": [
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "quantize",
+        "train"
+      ],
+      "automl_enabled": true,
+      "failures": {},
+      "network_arch": "depth_net_stereo"
+    },
+    "tao-train-grounding-dino": {
+      "actions": [
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "quantize",
+        "train"
+      ],
+      "automl_enabled": true,
+      "failures": {},
+      "network_arch": "grounding_dino"
+    },
+    "tao-train-image-classification": {
+      "actions": [
+        "distill",
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "quantize",
+        "train"
+      ],
+      "automl_enabled": true,
+      "failures": {},
+      "network_arch": "classification_pyt"
+    },
+    "tao-train-mask-auto-encoder": {
+      "actions": [
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "train"
+      ],
+      "automl_enabled": true,
+      "failures": {},
+      "network_arch": "mae"
+    },
+    "tao-train-mask-auto-label": {
+      "actions": [
+        "evaluate",
+        "inference",
+        "train"
+      ],
+      "automl_enabled": true,
+      "failures": {},
+      "network_arch": "mal"
+    },
+    "tao-train-mask-grounding-dino": {
+      "actions": [
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "quantize",
+        "train"
+      ],
+      "automl_enabled": true,
+      "failures": {},
+      "network_arch": "mask_grounding_dino"
+    },
+    "tao-train-mask2former": {
+      "actions": [
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "quantize",
+        "train"
+      ],
+      "automl_enabled": true,
+      "failures": {},
+      "network_arch": "mask2former"
+    },
+    "tao-train-metric-learning-recognition": {
+      "actions": [
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "train"
+      ],
+      "automl_enabled": true,
+      "failures": {},
+      "network_arch": "ml_recog"
+    },
+    "tao-train-nvdinov2": {
+      "actions": [
+        "distill",
+        "export",
+        "inference",
+        "train"
+      ],
+      "automl_enabled": true,
+      "failures": {},
+      "network_arch": "nvdinov2"
+    },
+    "tao-train-nvpanoptix3d": {
+      "actions": [
+        "evaluate",
+        "export",
+        "inference",
+        "train"
+      ],
+      "automl_enabled": true,
+      "failures": {},
+      "network_arch": "nvpanoptix3d"
+    },
+    "tao-train-ocdnet": {
+      "actions": [
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "prune",
+        "quantize",
+        "retrain",
+        "train"
+      ],
+      "automl_enabled": true,
+      "failures": {},
+      "network_arch": "ocdnet"
+    },
+    "tao-train-ocrnet": {
+      "actions": [
+        "dataset_convert",
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "prune",
+        "quantize",
+        "retrain",
+        "train"
+      ],
+      "automl_enabled": true,
+      "failures": {},
+      "network_arch": "ocrnet"
+    },
+    "tao-train-oneformer": {
+      "actions": [
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "quantize",
+        "train"
+      ],
+      "automl_enabled": true,
+      "failures": {},
+      "network_arch": "oneformer"
+    },
+    "tao-train-optical-inspection": {
+      "actions": [
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "train"
+      ],
+      "automl_enabled": true,
+      "failures": {},
+      "network_arch": "optical_inspection"
+    },
+    "tao-train-pointpillars": {
+      "actions": [
+        "dataset_convert",
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "prune",
+        "retrain",
+        "train"
+      ],
+      "automl_enabled": true,
+      "failures": {},
+      "network_arch": "pointpillars"
+    },
+    "tao-train-pose-classification": {
+      "actions": [
+        "evaluate",
+        "export",
+        "inference",
+        "train"
+      ],
+      "automl_enabled": true,
+      "failures": {},
+      "network_arch": "pose_classification"
+    },
+    "tao-train-reid": {
+      "actions": [
+        "evaluate",
+        "export",
+        "inference",
+        "train"
+      ],
+      "automl_enabled": true,
+      "failures": {},
+      "network_arch": "re_identification"
+    },
+    "tao-train-rtdetr": {
+      "actions": [
+        "distill",
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "quantize",
+        "train"
+      ],
+      "automl_enabled": true,
+      "failures": {},
+      "network_arch": "rtdetr"
+    },
+    "tao-train-segformer": {
+      "actions": [
+        "evaluate",
+        "export",
+        "gen_trt_engine",
+        "inference",
+        "quantize",
+        "train"
+      ],
+      "automl_enabled": true,
+      "failures": {},
+      "network_arch": "segformer"
+    },
+    "tao-train-sparse4d": {
+      "actions": [
+        "dataset_convert",
+        "evaluate",
+        "export",
+        "inference",
+        "quantize",
+        "train"
+      ],
+      "automl_enabled": true,
+      "failures": {},
+      "network_arch": "sparse4d"
+    },
+    "tao-train-visual-changenet": {
+      "actions": [
+        "evaluate",
+        "inference",
+        "segment_evaluate",
+        "segment_inference",
+        "segment_train",
+        "train"
+      ],
+      "automl_enabled": true,
+      "failures": {},
+      "network_arch": "visual-changenet"
+    }
+  },
+  "schema_version": 1
+}

@@ -1,0 +1,5 @@
+input_parquet: ???
+output_parquet: ???
+model: "SigLIP"
+model_path: "google/siglip2-so400m-patch16-256"
+batch_size: 64

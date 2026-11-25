@@ -1,0 +1,89 @@
+class_name: defect
+max_iterations: null
+platform: null
+base_checkpoint: null
+baseline_mode: cold_start
+sources:
+  kpi: {images: null, coco: null}
+  test: {images: null, coco: null}
+  real: {images: null, coco: null}
+  clean: {images: null, coco: null}
+gap:
+  inference_confidence: 0.001
+  loose_confidence: 0.3
+  strict_confidence: 0.8
+  match_iou: 0.5
+  background_iou_upper: 0.05
+  near_miss_iou_upper: 0.5
+retrieval:
+  selection:
+    strategy: round_robin_similarity
+  model: SigLIP
+  model_path: google/siglip-base-patch16-224
+  preprocessing:
+    profile: square_context
+  defect_context_scale: 1.5
+  clean_grids: [1, 2]
+  # Used only by square_context; tight_context preserves native crop dimensions.
+  output_size: 224
+  minimum_similarity: -1.0
+  # Used only by max_similarity; round_robin_similarity uses the refill depths below.
+  candidate_overfetch: 15
+  round_robin_refill_overfetch: [5, 15, 50, 200, 100000]
+  audit_top_k_per_query: 20
+routing:
+  real_mine_factor_min: 1
+  real_mine_factor_max: 6
+  round_robin_real_factor_default: 3
+  near_miss_real_factor: 2
+  near_miss_real_cap_per_pocket: 20
+  clean_factor: 2
+  clean_cumulative_cap_per_real: 1.0
+admission:
+  duplicate_global_cosine: 0.995
+  duplicate_defect_cosine: 0.985
+  duplicate_position_delta: 0.04
+  clean_duplicate_global_cosine: 0.999
+  clean_cluster_cosine: 0.97
+  clean_cluster_minimum_cap: 2
+  clean_cluster_quota_divisor: 4
+  duplicate_gt_iou: 0.9
+  minimum_box_area_px: 64
+  maximum_box_aspect: 25.0
+training:
+  num_gpus: 4
+  batch_size: 8
+  base_lr: 0.0001
+  backbone_lr: 0.00001
+  early_iterations_epochs: 36
+  adaptive_reference_images: 10000
+  adaptive_min_epochs: 24
+  adaptive_max_epochs: 48
+  probes_enabled: true
+  probes_start_iteration: 3
+  probe_epochs: 10
+  workers: 4
+  checkpoint_interval: 1
+  validation_interval: 1
+  growth_high: 1.25
+  growth_low: 0.9
+  high_growth_lr_factor: 1.15
+  low_growth_lr_factor: 0.85
+  jitter_seed_base: 4000
+  jitter_lr_factor: [0.8, 1.2]
+  jitter_backbone_lr_factor: [0.8, 1.2]
+  late_best_window: 3
+  extension_epochs: 12
+synthesis:
+  enabled: false
+  fn_selection:
+    mode: generated_per_type_plan
+  pool_dataset_root: null
+  defect_spec: null
+  routes: {}
+  # Distinct clean candidates attempted per FN before retaining successful neighbors.
+  candidate_topn: 3
+  max_neighbors_per_fn: 1
+  min_similarity: 0.9
+  cumulative_fraction_of_total_defects: 0.25
+  amp_model_id: nvidia/Cosmos3-Nano

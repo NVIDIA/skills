@@ -1,0 +1,162 @@
+---
+name: tao-train-dino
+description: DINO (DETR with Improved DeNoising Anchor Boxes) for 2D object detection. Transformer-based detector with
+  denoising training, multi-scale features, and optional distillation support. Use when training, evaluating, exporting,
+  distilling, quantizing, or running inference for a TAO DINO detector. Trigger phrases include "train DINO", "DETR object
+  detection", "TAO 2D detection", "DINO with distillation".
+license: Apache-2.0
+compatibility: Requires docker + nvidia-container-toolkit.
+metadata:
+  tags:
+  - object
+  - detection
+  version: "0.1.0"
+  author: NVIDIA Corporation
+allowed-tools: Read Bash
+
+---
+
+# DINO
+
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
+DINO (DETR with Improved DeNoising Anchor Boxes) for 2D object detection. Transformer-based detector with denoising training, multi-scale features, and optional distillation support.
+
+Uses pretrained backbone weights (e.g. ResNet-50 ImageNet). Set `model.pretrained_backbone_path` for backbone-only or `train.pretrained_model_path` for full model.
+
+## When To Use
+
+Train, evaluate, export, distill, quantize, or run inference for a TAO DINO 2D object detector.
+
+For TAO Deploy TensorRT actions (`gen_trt_engine`, TensorRT `evaluate`, and
+TensorRT `inference`), read `references/tao-deploy-dino.md` first. Deploy spec templates live
+in this skill's `references/` folder with the `spec_template_deploy_*.yaml`
+prefix.
+
+## Reference Map
+
+- `references/dino-data-specs.md` — dataset contracts, per-action dataset requirements, per-action spec-override examples (train, evaluate, export, deploy/gen_trt_engine, inference, quantize, distill), data-source arrays, checkpoint inference, and dataset layout.
+- `references/dino-actions-errors.md` — important parameters, default values, evaluate/export defaults, hardware, and the full error-pattern catalog.
+- `references/dino-tuning-multigpu.md` — full AutoML/HPO notes (metrics, hyperparameters, extractor) and multi-GPU spec consistency.
+- `references/tao-deploy-dino.md` — TensorRT deploy workflow.
+- `references/detailed-guide.md` — map to the detailed model guide.
+
+## Dataclass Schemas
+
+Generated TAO Core schemas are packaged in `schemas/<action>.schema.json`, with `schemas/manifest.json` listing available actions. Each generated schema also emits `references/spec_template_<action>.yaml` from the schema top-level `default` field. AutoML enablement is declared at the model layer in `references/skill_info.yaml` via `automl_enabled`. Runnable AutoML still requires `schemas/train.schema.json` and `references/spec_template_train.yaml` to exist and parse. Use the packaged train schema for `automl_default_parameters`, `automl_disabled_parameters`, defaults, min/max bounds, enums, option weights, math conditions, dependencies, and popular parameters. Do not expect `~/tao-core` at runtime; maintainers regenerate schemas/templates before packaging the skill bank.
+
+## Train Action Policy
+
+This model is AutoML-enabled at the model layer. Before handling any train-stage request, read `references/skill_info.yaml` and resolve the run override from either an explicit `automl_policy` value or the user's workflow request. Use `automl_policy: on` by default and only expose `on` / `off` in new launch prompts. Treat phrases like "turn off AutoML", "disable AutoML", "no HPO", or "plain training" as `automl_policy: off` for this run only. When `automl_policy: on`, `automl_enabled: true`, and both `schemas/train.schema.json` and `references/spec_template_train.yaml` are packaged, route the train action through `nvidia-tao-toolkit:tao-run-automl` by default with this model's `skill_dir`. Preserve workflow/application overrides for datasets, specs, output directories, GPU/platform settings, parent checkpoints, and `automl_policy`. Use direct model training only when `automl_policy: off` or the packaged train schema/template is missing; in the missing-schema case, report that AutoML is enabled but not runnable for this model until schemas are generated.
+
+Non-train actions such as `evaluate`, `inference`, `export`, and deploy flows stay in this model skill. The per-run `automl_policy` override does not change model metadata.
+
+## Training Requirements
+
+The agent MUST read this section before generating any training or AutoML script for DINO.
+
+- **Dataset type:** object_detection
+- **Formats:** coco, coco_raw
+- **Accepted dataset intents:** training, evaluation, testing, calibration
+- **AutoML metric contract:** for the default evaluation-backed workflow, use `test_mAP50` with maximize direction. Use `test_mAP` only when the user explicitly requests COCO/paper-style mAP.
+- **Training monitoring metrics:** `val_mAP50` (logged as `Validation mAP50`) for quick operational checks; `val_mAP` for COCO/paper-style benchmark comparisons.
+- **Evaluate action metrics:** `test_mAP50` for AP50 and `test_mAP` for COCO mAP. AutoML workflows that score recommendations with the standalone evaluate action must use the corresponding `test_*` KPI.
+
+**Required datasets — MUST resolve both:**
+
+| Dataset | Required | Why |
+|---|---|---|
+| Train dataset URI | Yes | Training data (COCO format) |
+| Validation dataset URI | **Yes — ALWAYS** | DINO unconditionally builds a val dataloader. Omitting `val_data_sources` causes `FileNotFoundError` at startup regardless of the metric or workflow. If the user has no separate eval split, reuse the train URI. |
+
+**Required inputs before generating any training spec:**
+
+1. **Train dataset URI** — path or URI to COCO-format training data
+2. **Validation dataset URI** — path or URI to COCO-format val data (can be same as train)
+3. **`num_classes`** — How many object classes? Default 91 (COCO). Must be >= `max(category_id) + 1`. Too low causes `CUDA error: device-side assert triggered`.
+
+Resolve these from the user request. This skill ships no default dataset and
+never substitutes a remote one. When the user gives no dataset, look in the
+working directory for a COCO-format dataset: per split, a COCO
+`annotations.json` with its images, as `images.tar.gz` (the standard TAO DINO
+artifact described below) or an image folder. Tell the user what was found and
+what a dataset has to look like, then ask for the train and validation paths
+or URIs and the class count that are still missing. Do not search previous
+runners, logs, session state, shell history, or the home directory to recover
+these values.
+
+**Do not prompt for image layout for the standard DINO dataset.** The standard
+TAO DINO dataset artifact is `images.tar.gz` plus `annotations.json`. Use
+`images.tar.gz` in the remote `image_dir` spec override. The SDK downloads the
+archive and rewrites the runtime spec to the extracted folder named after the
+archive stem (`images.tar.gz` -> `images`). Only deviate if the user explicitly
+provides a different image artifact name.
+
+## Core Workflow
+
+DINO supports train, evaluate, export, distill, quantize, and inference. Data-source
+overrides are **mandatory for every action** — DINO's `config.json` has empty
+`data_sources` because the runner cannot auto-resolve array-of-objects spec keys.
+The agent MUST construct data source paths and include them in `spec_overrides`.
+
+See `references/dino-data-specs.md` for the per-action dataset requirements table,
+the standard dataset artifact (`images.tar.gz` + `annotations.json`) and runtime
+folder rewrite rules, and the complete per-action `spec_overrides` examples for
+train, evaluate, export, deploy/gen_trt_engine, inference, quantize, and distill —
+including checkpoint inference via `parent_model`, the `results_dir/train/`
+checkpoint location, and the distillation FAN-teacher / student rules.
+
+## Important Parameters And Defaults
+
+Default values: `num_epochs=10`, `batch_size=4`, `learning_rate=2e-4`,
+`lr_backbone=2e-5`, `num_classes=91`, `backbone=resnet_50`.
+
+- **dataset.num_classes**: Default 91 (COCO). Must be >= `max(category_id) + 1`. Too low causes `CUDA error: device-side assert triggered`. Set as `<num_classes> + 1` in spec overrides.
+- **num_epochs**: default 10 (quick iteration); real datasets typically need 30-50+ epochs for good mAP.
+
+See `references/dino-actions-errors.md` for the full parameter list (backbone
+options, `train.optim.lr`/`lr_steps`, `model.num_queries`, `batch_size`),
+default values, evaluate defaults, export defaults (input 960x544, opset 17,
+TRT data types, workspace 1024 MB), and hardware requirements.
+
+## Multi-GPU And AutoML / HPO
+
+When increasing `train.num_gpus`, also set `train.gpu_ids` to the same visible
+device range, or distributed startup can be inconsistent.
+
+AutoML runs training — all **Training Requirements** above apply, including
+the rule that a dataset is never assumed. For training-log-only scoring, use
+`val_mAP50` (extracted from `Validation mAP50`) or `val_mAP`. When each
+recommendation is scored through the standalone evaluate action, use
+`test_mAP50` or `test_mAP` with `direction="maximize"`.
+
+See `references/dino-tuning-multigpu.md` for the full multi-GPU spec-consistency
+rule (8-GPU example, NCCL timeout note) and the full AutoML/HPO notes (metric
+selection, `metric_extractor`, recommended hyperparameters, dense-dataset
+resume guidance, and parent-model inference mappings).
+
+## Error Patterns
+
+Common failures include CUDA OOM (reduce `batch_size`), missing `val_data_sources`
+(`FileNotFoundError` at startup — always supply val), `num_classes` too low (`CUDA
+device-side assert`), and the parent `dino gen_trt_engine` / `dino convert` PyT-CLI
+restrictions.
+
+See `references/dino-actions-errors.md` for the complete error-pattern catalog
+with diagnostics and fixes.
+
+## Spec Param / Parent Model Inference
+
+Model-specific inference mappings belong in this MD file. For
+`parent_model`/`parent_model_folder`, pass the upstream train/export/AutoML
+child job id as the parent job id; list the parent result folder, filter
+checkpoint artifacts, and select the resolved model.
+
+See `references/dino-tuning-multigpu.md` for the full inference-mapping table
+(per action: `parent_model`, `key`, `output_dir`, `ptm_if_no_resume_model`,
+`resume_model`, `create_onnx_file`) and the TensorRT-mapping note. TensorRT
+mappings live in the deploy workflow, not the PyT model skill.
+
+## Deployment
+
+- [tao-deploy-dino](references/tao-deploy-dino.md)

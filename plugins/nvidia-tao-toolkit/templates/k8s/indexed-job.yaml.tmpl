@@ -1,0 +1,95 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# TAO MULTI-NODE Kubernetes template — the single-pod template's superset: a
+# headless Service (created FIRST so DNS resolves when pods come up) + an Indexed
+# Job + a rank/master rendezvous block. tao-run-on-kubernetes renders it by
+# substituting @@<NAME>@@ (command uses single quotes only).
+#
+# REQUIRES k8s >= 1.28 (PodIndexLabel gives each pod the stable hostname
+# <job>-<index>, so MASTER_ADDR=<job>-0.<svc> resolves). Verify with
+# `kubectl version` before submit — on older clusters the rendezvous DNS silently
+# fails and rank-0 hangs for the whole distributed timeout.
+#
+# LOAD-BEARING: WORLD_SIZE is the NODE COUNT (TAO's misnamed convention). Do NOT
+# change it to a global-rank count. Creds via envFrom.secretRef, never inline.
+apiVersion: v1
+kind: Service
+metadata:
+  name: "@@JOB_NAME@@"
+  labels:
+    tao-job: "@@JOB_NAME@@"
+spec:
+  clusterIP: None            # headless — DNS returns the per-pod IPs for rendezvous
+  # Rank-0's DNS name must resolve BEFORE any pod is Ready: every other rank
+  # blocks on MASTER_ADDR to rendezvous, and pods only become Ready once the
+  # workload is up. Without this the lookup NXDOMAINs and multi-node deadlocks.
+  publishNotReadyAddresses: true
+  selector:
+    job-name: "@@JOB_NAME@@"
+  ports:
+    - name: rendezvous
+      port: 29500
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "@@JOB_NAME@@"
+  labels:
+    tao-job: "@@JOB_NAME@@"
+spec:
+  completionMode: Indexed
+  completions: @@NUM_NODES@@
+  parallelism: @@NUM_NODES@@
+  backoffLimit: 0
+  ttlSecondsAfterFinished: @@TTL_SECONDS@@
+  template:
+    metadata:
+      labels:
+        tao-job: "@@JOB_NAME@@"
+    spec:
+      restartPolicy: Never
+      subdomain: "@@JOB_NAME@@"          # pods get FQDN <job>-<index>.<svc>.<ns>.svc.cluster.local
+      imagePullSecrets:
+        - name: "@@IMAGE_PULL_SECRET@@"
+      containers:
+        - name: tao
+          image: "@@IMAGE@@"
+          command: ["/bin/sh", "-c", "export NODE_RANK=${JOB_COMPLETION_INDEX:-0}; echo \"[tao-k8s] node $NODE_RANK/$WORLD_SIZE master=$MASTER_ADDR:$MASTER_PORT\"; @@COMMAND@@"]
+          resources:
+            limits:
+              "nvidia.com/gpu": "@@GPUS_PER_NODE@@"
+          envFrom:
+            - secretRef:
+                name: "@@CRED_SECRET@@"
+          env:
+            - name: WORLD_SIZE                 # = NODE COUNT (TAO convention), not global ranks
+              value: "@@NUM_NODES@@"
+            - name: NUM_GPU_PER_NODE
+              value: "@@GPUS_PER_NODE@@"
+            # torchrun/PyTorch-standard spelling of the same two values, so a raw
+            # `torchrun --nnodes=$NNODES --nproc-per-node=$NPROC_PER_NODE` command
+            # works alongside the TAO entrypoint's WORLD_SIZE/NUM_GPU_PER_NODE.
+            - name: NNODES
+              value: "@@NUM_NODES@@"
+            - name: NPROC_PER_NODE
+              value: "@@GPUS_PER_NODE@@"
+            - name: MASTER_PORT
+              value: "29500"
+            - name: MASTER_ADDR
+              value: "@@JOB_NAME@@-0.@@JOB_NAME@@"
+            - name: TAO_RESULTS_ROOT
+              value: "@@RESULTS_DIR@@"
+          volumeMounts:
+            - name: dshm
+              mountPath: /dev/shm
+            - name: data
+              mountPath: "@@MOUNT_PATH@@"
+      volumes:
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: "@@SHM_SIZE@@"
+        - name: data
+          persistentVolumeClaim:
+            claimName: "@@PVC_CLAIM@@"

@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "contract_version": "7.2",
+  "artifact_classes": {
+    "container_produced_required": [
+      {
+        "path": "kpi_gaps.parquet",
+        "kind": "file",
+        "state_field": "rca_gaps_parquet",
+        "validation": "non_empty"
+      },
+      {
+        "path": "threshold.txt",
+        "kind": "file",
+        "state_field": "rca_threshold_file",
+        "validation": "float_text"
+      },
+      {
+        "path": "weak_samples_breakdown.txt",
+        "kind": "file",
+        "state_field": "rca_breakdown_file",
+        "validation": "non_empty"
+      }
+    ],
+    "agent_produced_required": [
+      {
+        "path": "RCA_Report.md",
+        "kind": "file",
+        "state_field": "rca_report",
+        "validation": {
+          "type": "markdown_sections",
+          "required_headings": [
+            "Verdict",
+            "Threshold Selection",
+            "Weakness Distribution",
+            "Top-K Weakest Samples",
+            "Visual Spot Check",
+            "Per-Label Breakdown",
+            "Recommended Actions"
+          ],
+          "abridged_heading": "KPI Unreachable"
+        }
+      }
+    ],
+    "agent_produced_conditionally_required": [
+      {
+        "path": "rca_images/",
+        "kind": "directory",
+        "state_field": "rca_images_dir",
+        "required_unless": "unreachable_kpi.txt",
+        "validation": "non_empty_image_directory"
+      }
+    ]
+  },
+  "failure_artifact": {
+    "path": "unreachable_kpi.txt",
+    "kind": "file",
+    "state_field": "rca_unreachable_kpi",
+    "validation": "non_empty"
+  },
+  "not_generated": [
+    {
+      "path": "metrics.json",
+      "semantics": "not_generated",
+      "reason": "Not emitted by the 7.2 data-services vcn_aoi action."
+    }
+  ]
+}

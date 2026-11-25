@@ -1,0 +1,16 @@
+[
+  {
+    "id": "generate-anomalygennext-od-defects",
+    "question": "Generate OD defect images from my prepared AnomalyGenNext inputs. Do not execute anything yet.",
+    "expected_skill": "tao-generate-od-defects",
+    "ground_truth": "Use the pinned AnomalyGenNext 1.1 container, mount and validate the complete checkpoint root at the image's canonical path, validate the plan or native testcase, run upstream generation and pseudo-labeling offline, and publish validated native and binary COCO.",
+    "expected_behavior": [
+      "Select tao-generate-od-defects",
+      "Invoke tao-launch-workflow before submission",
+      "Require matching recipe and task checkpoint",
+      "Require the complete checkpoint root at /workspace/paidf-anomalygen/checkpoints",
+      "Verify generated plus blocked accounting and COCO integrity"
+    ],
+    "expected_script": "scripts/generate_od_defects.py"
+  }
+]

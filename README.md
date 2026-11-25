@@ -218,6 +218,7 @@ The `nvidia-skills` discovery plugin is the one exception: it is built in this r
 | Plugin | Description | Version | Skills | Source |
 |--------|-------------|---------|--------|--------|
 | `nvidia-skills` | Find the right NVIDIA skill for GPU acceleration, CUDA, AI agents, data loading, training, inference, robotics, Physical AI, Omniverse, simulation, and other NVIDIA-powered workflows. | `1.5.0` | 1 | This repo (built from `plugins.d/`) |
+| `nvidia-tao-toolkit` | NVIDIA TAO skill bank with generated capability discovery for model training, data processing, application workflows, AutoML, and platform execution. | `0.1.19` | 82 | [TAO Toolkit](https://github.com/NVIDIA-TAO/tao-skill-bank) |
 <!-- plugins-table-end -->
 
 ---

@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# TAO MULTI-NODE SLURM launch template — the single-node template's strict
+# superset: same skeleton + a rank/master rendezvous block. tao-run-on-slurm
+# renders it by substituting @@<NAME>@@; $SLURM_* stay literal.
+#
+# LOAD-BEARING: WORLD_SIZE is TAO's NODE COUNT (a misnomer — the container
+# entrypoint reads WORLD_SIZE + NUM_GPU_PER_NODE and builds torchrun internally).
+# Do NOT "correct" it to a global-rank count; that silently mis-shards training.
+# EXTRA_ENV carries the cluster's NCCL knobs discovered by the NCCL probe (e.g.
+# NCCL_P2P_DISABLE=1) — a wrong/empty value hangs the first collective for the
+# entire distributed timeout with no error.
+#SBATCH --job-name=@@JOB_NAME@@
+#SBATCH --nodes=@@NUM_NODES@@
+#SBATCH --ntasks-per-node=1
+#SBATCH --gres=gpu:@@GPUS_PER_NODE@@
+#SBATCH --cpus-per-task=@@CPUS_PER_TASK@@
+#SBATCH --time=@@TIME@@
+#SBATCH --wait-all-nodes=1
+#SBATCH --output=@@LOG_DIR@@/%x-%j/main.out
+#SBATCH --error=@@LOG_DIR@@/%x-%j/main.err
+#SBATCH --open-mode=append
+#SBATCH --requeue
+@@SBATCH_EXTRA@@
+set -euo pipefail
+export NCCL_DEBUG=INFO
+export LOGLEVEL=INFO
+
+# Credentials via a mode-600 sidecar sourced + shredded — never inline on Lustre.
+if [ -n "@@ENV_FILE@@" ]; then
+  trap 'shred -u "@@ENV_FILE@@" 2>/dev/null || rm -f "@@ENV_FILE@@"' EXIT
+  set -a
+  source "@@ENV_FILE@@"
+  set +a
+fi
+
+# Per-cluster NCCL env from the probe (e.g. NCCL_P2P_DISABLE=1, NCCL_SOCKET_IFNAME=eth0).
+@@EXTRA_ENV@@
+
+# Rendezvous — WORLD_SIZE = NODE COUNT (TAO convention), not global-rank count.
+export WORLD_SIZE=@@NUM_NODES@@
+export NUM_GPU_PER_NODE=@@GPUS_PER_NODE@@
+export MASTER_PORT=29500
+export MASTER_ADDR=$(scontrol show hostname "$SLURM_JOB_NODELIST" | head -1)
+export NODE_RANK=$SLURM_NODEID
+
+srun --container-image=@@IMAGE@@ \
+     --container-mounts=@@CONTAINER_MOUNTS@@ \
+     @@COMMAND@@

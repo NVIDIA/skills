@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# TAO single-node SLURM launch template — storage tier A (data already on Lustre;
+# nothing is fetched inside the GPU allocation, which would burn it under the
+# scheduler-idle timeout). tao-run-on-slurm renders this by substituting every
+# @@<NAME>@@ placeholder; $SLURM_* and the sidecar env stay literal. Multi-node
+# is a strict superset: the same skeleton plus a rank/master rendezvous
+# block and the NCCL probe's env.
+#SBATCH --job-name=@@JOB_NAME@@
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --gres=gpu:@@NUM_GPUS@@
+#SBATCH --cpus-per-task=@@CPUS_PER_TASK@@
+#SBATCH --time=@@TIME@@
+#SBATCH --output=@@LOG_DIR@@/%x-%j/main.out
+#SBATCH --error=@@LOG_DIR@@/%x-%j/main.err
+#SBATCH --open-mode=append
+#SBATCH --requeue
+@@SBATCH_EXTRA@@
+set -euo pipefail
+export NCCL_DEBUG=INFO
+export LOGLEVEL=INFO
+
+# Credentials come from a sidecar env file created on the login node with
+# `umask 077` (mode 600) and shredded on exit — secrets are NEVER written inline
+# in this script, which lives on shared Lustre. @@ENV_FILE@@ is empty for a
+# pure-Lustre tier-A run that needs no session credentials.
+if [ -n "@@ENV_FILE@@" ]; then
+  trap 'shred -u "@@ENV_FILE@@" 2>/dev/null || rm -f "@@ENV_FILE@@"' EXIT
+  set -a
+  source "@@ENV_FILE@@"
+  set +a
+fi
+
+# Cluster-specific env (e.g. NCCL_P2P_DISABLE=1 on clusters whose multi-GPU nodes need it,
+# or NCCL_IB_HCA). Empty by default on a single-GPU run; the multi-node NCCL
+# probe populates this automatically per cluster context.
+@@EXTRA_ENV@@
+
+# Single node: the TAO container reads its GPU count from the spec; no cross-node
+# rendezvous. Spec + dataset are on Lustre, mounted read-through by Pyxis/Enroot.
+srun --container-image=@@IMAGE@@ \
+     --container-mounts=@@CONTAINER_MOUNTS@@ \
+     @@COMMAND@@

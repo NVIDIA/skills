@@ -1,0 +1,35 @@
+name: tao-run-inference-service
+type: application
+
+required_credentials: []
+  # The inference service has NO cloud-storage dependency. Model weights come
+  # from the HuggingFace Hub or a local container path — no TAO_CLOUD_* keys.
+  # HF_TOKEN is the only credential that ever applies (gated HuggingFace models);
+  # it is read from the env var at runtime per the SKILL.md Secrets rule.
+
+prerequisites:
+  required:
+  - name: network_arch
+    description: >-
+      Model architecture identifier (e.g. "cosmos-rl"). Must match a valid
+      network config basename — see valid_network_arch_config_basenames in
+      references/service.yaml.
+  - name: model_path
+    description: >-
+      Trained model checkpoint. Valid forms: hf_model://<org>/<model>
+      (HuggingFace Hub — set HF_TOKEN for gated models) or a local container
+      filesystem path. Cloud URIs (s3://, gs://, az://) are NOT supported —
+      the inference service has no cloud-storage dependency. See
+      model_path_protocols in references/service.yaml.
+  - name: platform
+    description: >-
+      Compute backend where the container will run. One of: local-docker, brev,
+      slurm, kubernetes.
+
+  optional:
+  - name: num_gpus
+    description: Number of GPUs to allocate for inference.
+    default: 1
+  - name: host_port
+    description: Host-side port to bind for local-docker and brev platforms.
+    default: 8080

@@ -1,0 +1,28 @@
+[
+  {
+    "id": "tao-train-dinov3-basic",
+    "question": "A user request: \"I have a folder of unlabeled factory inspection images and want to domain-adapt a DINOv3 backbone with self-supervised training, then use it for downstream tasks.\" Identify which TAO skill applies and, reading only that skill's documentation, outline the steps it prescribes. Do NOT run any commands, scripts, web searches, or other tools — describe the plan only.",
+    "expected_skill": "tao-train-dinov3",
+    "expected_script": null,
+    "ground_truth": "Identify tao-train-dinov3 as the applicable skill and summarize its basic workflow: obtain compatible DINOv3 weights, run continual SSL training on unlabeled images, evaluate useful teacher checkpoints for the downstream task, and convert the selected teacher checkpoint for downstream use.",
+    "expected_behavior": [
+      "Identifies tao-train-dinov3 as the relevant skill",
+      "Outlines the documented workflow steps from SKILL.md including compatible pretrained weights, training, checkpoint selection, and conversion",
+      "Mentions evaluating teacher checkpoints with metrics relevant to the downstream task",
+      "Does not run commands, scripts, or web searches"
+    ]
+  },
+  {
+    "id": "tao-train-dinov3-checkpoint-selection",
+    "question": "A user request: \"My DINOv3 SSL train loss is still going down, so I plan to train longer and ship the final checkpoint.\" Identify which TAO skill applies and, reading only that skill's documentation, explain what it recommends. Do NOT run any commands, scripts, web searches, or other tools — describe the plan only.",
+    "expected_skill": "tao-train-dinov3",
+    "expected_script": null,
+    "ground_truth": "Identify tao-train-dinov3 and explain that decreasing SSL train loss does not guarantee better downstream representations. Recommend comparing useful teacher checkpoints on held-out data with metrics relevant to the target task.",
+    "expected_behavior": [
+      "Identifies tao-train-dinov3 as the relevant skill",
+      "States that decreasing train loss does not guarantee better downstream transfer",
+      "Recommends downstream evaluation on held-out data to select a teacher checkpoint",
+      "Does not run commands, scripts, or web searches"
+    ]
+  }
+]

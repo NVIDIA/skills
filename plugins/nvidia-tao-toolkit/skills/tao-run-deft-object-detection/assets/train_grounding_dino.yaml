@@ -1,0 +1,55 @@
+# Default Grounding DINO train spec for the DEFT OD loop.
+#
+# Values follow the reference pipeline's init_train_grounding_dino.yaml. The loop
+# uses this when the caller supplies no --train-spec-template, which is the normal
+# case: every value here is one the reference already settled, and hand-authoring a
+# template is how the two silent traps below get reintroduced.
+#
+# `dataset.train_data_sources` is deliberately empty. prepare_spec_for_train.py appends
+# one mined ODVG source per iteration; the list grows while the weights do not,
+# because every iteration fine-tunes the BASE checkpoint rather than the previous
+# iteration's. See references/grounding-dino.md.
+
+train:
+  num_gpus: 1                    # overridden from the resolved GPU count
+  num_nodes: 1
+  num_epochs: 20                 # overridden by --num-epochs
+  validation_interval: 2
+  checkpoint_interval: 2
+  precision: bf16
+  # Frozen because the mined data is small relative to what pretrained these:
+  # unfreezing them lets a few thousand images move representations that took
+  # far more to learn, which is how an iteration ends up worse than baseline.
+  freeze: ["backbone", "bert", "transformer.encoder", "input_proj"]
+  pretrained_model_path: null    # set to the zero-shot checkpoint at init
+  optim:
+    lr: 2e-5                     # overridden by --learning-rate
+    lr_backbone: 2e-06
+    lr_steps: [4]
+    momentum: 0.9
+
+dataset:
+  train_data_sources: []         # appended per iteration by prepare_spec_for_train.py
+  # Deliberately absent. `grounding_dino train` REQUIRES a validation source -- it
+  # subscripts val_data_sources["json_file"] unconditionally -- and the two spellings
+  # that look like "no validation" both fail: a bare `null` crashes the loader, and
+  # `{image_dir: null}` is rejected by Hydra because the members are not Optional even
+  # though the block is. prepare_spec_for_train.py fills both from prepare_val_split_for_train.py
+  # and refuses to emit a spec without them, so this file cannot ship a broken form.
+  max_labels: 4                  # must equal len(captions)
+  batch_size: 8
+
+model:
+  backbone: swin_tiny_224_1k
+  num_feature_levels: 4
+  dec_layers: 6
+  enc_layers: 6
+  num_queries: 900
+  dropout_ratio: 0.0
+  dim_feedforward: 2048
+  # Both of the following are load-bearing and both fail quietly if wrong.
+  # log_scale: null applies NO scaling, so every logit saturates to 1.000 and
+  # conf_threshold filters nothing. class_embed_bias must match the checkpoint or
+  # the load reports unexpected keys. See references/grounding-dino.md.
+  log_scale: auto
+  class_embed_bias: True

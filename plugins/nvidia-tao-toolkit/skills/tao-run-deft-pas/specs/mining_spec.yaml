@@ -1,0 +1,8 @@
+source_parquet: ???
+target_parquet: ???
+output_parquet: ???
+topn: 5
+knn_metric: euclidean
+source_embed_column_name: embedding
+target_embed_column_name: embedding
+filter_by_label: "false"

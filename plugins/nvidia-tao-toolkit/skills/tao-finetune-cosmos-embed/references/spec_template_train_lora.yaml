@@ -1,0 +1,178 @@
+# Cosmos-Embed1-448p LoRA fine-tune on a vad_r1_chunks manifest (PhysicalAI-Event-Videos layout).
+#
+# Dataset: https://huggingface.co/datasets/nvidia/PhysicalAI-Event-Videos
+#   2026/train/labels.json  chunk manifest; each chunk carries caption lists
+#                           (caption_queries, anomaly_queries, action_queries, ...)
+#   2026/train/videos.zip   parent videos; labels.json points at them as videos/<file>.mp4
+#   Unzip videos.zip next to labels.json and point path_prefix_mapping at that videos/ folder.
+#   Parent videos that are not in the package are skipped with a warning.
+#
+# Checkpoint selection: without a benchmark, evaluate the per-epoch checkpoints under
+#   <results_dir>/train/checkpoints/. With a retrieval benchmark release root (gt/, additional_gt/,
+#   clips/), switch val_dataset to dataset_type: retrieval_benchmark AND enable
+#   train.callbacks.retrieval_benchmark (both together; the callback refuses any other val dataset).
+#   The trainer then logs `RETRIEVAL_BENCHMARK iter=... mAP=...` every validation_iter and keeps
+#   <results_dir>/train/selection.json on the best checkpoint.
+#
+# Effective batch = num_gpus x batch_size x grad_accum_iter = 8 x 4 x 2 = 64.
+
+results_dir: /results
+
+train:
+  seed: 1234
+  resume_training_checkpoint_path: null
+  max_iter: 6400               # ~10 epochs of ~40k (chunk, caption) samples at effective batch 64
+  num_nodes: 1
+  num_gpus: 8
+  gpu_ids: [0, 1, 2, 3, 4, 5, 6, 7]
+  validation_iter: 640         # ~1 epoch; keep equal to checkpoint_iter so every scored checkpoint exists
+  checkpoint_iter: 640
+  grad_accum_iter: 2           # micro-steps per optimizer update; *_iter values count optimizer updates
+  optim:
+    optim: fused_adamw
+    lr: 1e-4                   # LoRA adapters train well at 1e-4; 1e-5 under-fits
+    weight_decay: 1e-5
+    betas: [0.9, 0.98]
+    warmup_steps: 320
+    policy: cosine
+    lr_decay_iters: 6400
+  clip_grad_norm: 3.0
+  precision: bf16
+  freeze_visual_encoder: true  # the ViT trains only through its LoRA adapters
+  use_captioning_loss: true
+  use_text_matching_loss: false
+  loss_weights:
+    contrastive_loss: 1.0
+    captioning_loss: 1.0
+    matching_loss: 1.0
+  callbacks:
+    clamp_logit_scale: {}
+    iter_speed: {every_n: 50, save_s3: false}
+    gradient_clip: {clip_norm: 3.0}
+    log_losses: {every_n: 50, verbose: true}
+    # Enable together with val_dataset.dataset_type: retrieval_benchmark (see header).
+    # retrieval_benchmark:
+    #   query_domain: event      # headline group and checkpoint selection
+    #   selection_metric: mAP
+
+model:
+  pretrained_model_path: nvidia/Cosmos-Embed1-448p
+  pretrained_model_strict: false
+  precision: bf16
+  lora:
+    enabled: true
+    lora_rank: 8
+    lora_alpha: 16
+    lora_dropout: 0.1
+    bias: none
+    use_rslora: false
+    use_dora: false
+    # Attention of the last 20 ViT blocks plus the Q-Former and the projection heads.
+    # Copy this list verbatim into the evaluate / inference / export specs used with the checkpoint.
+    target_modules:
+      - visual_encoder.blocks.19.attn.qkv
+      - visual_encoder.blocks.19.attn.proj
+      - visual_encoder.blocks.20.attn.qkv
+      - visual_encoder.blocks.20.attn.proj
+      - visual_encoder.blocks.21.attn.qkv
+      - visual_encoder.blocks.21.attn.proj
+      - visual_encoder.blocks.22.attn.qkv
+      - visual_encoder.blocks.22.attn.proj
+      - visual_encoder.blocks.23.attn.qkv
+      - visual_encoder.blocks.23.attn.proj
+      - visual_encoder.blocks.24.attn.qkv
+      - visual_encoder.blocks.24.attn.proj
+      - visual_encoder.blocks.25.attn.qkv
+      - visual_encoder.blocks.25.attn.proj
+      - visual_encoder.blocks.26.attn.qkv
+      - visual_encoder.blocks.26.attn.proj
+      - visual_encoder.blocks.27.attn.qkv
+      - visual_encoder.blocks.27.attn.proj
+      - visual_encoder.blocks.28.attn.qkv
+      - visual_encoder.blocks.28.attn.proj
+      - visual_encoder.blocks.29.attn.qkv
+      - visual_encoder.blocks.29.attn.proj
+      - visual_encoder.blocks.30.attn.qkv
+      - visual_encoder.blocks.30.attn.proj
+      - visual_encoder.blocks.31.attn.qkv
+      - visual_encoder.blocks.31.attn.proj
+      - visual_encoder.blocks.32.attn.qkv
+      - visual_encoder.blocks.32.attn.proj
+      - visual_encoder.blocks.33.attn.qkv
+      - visual_encoder.blocks.33.attn.proj
+      - visual_encoder.blocks.34.attn.qkv
+      - visual_encoder.blocks.34.attn.proj
+      - visual_encoder.blocks.35.attn.qkv
+      - visual_encoder.blocks.35.attn.proj
+      - visual_encoder.blocks.36.attn.qkv
+      - visual_encoder.blocks.36.attn.proj
+      - visual_encoder.blocks.37.attn.qkv
+      - visual_encoder.blocks.37.attn.proj
+      - visual_encoder.blocks.38.attn.qkv
+      - visual_encoder.blocks.38.attn.proj
+      - query
+      - key
+      - value
+      - dense
+      - vision_proj
+      - text_proj
+      - itm_proj
+  input_hw: [512, 512]
+  network:
+    embed_dim: 768
+    num_query_tokens: 32
+    max_txt_len: 128
+    num_video_frames: 8
+    spatial_resolution: [448, 448]
+    temporal_encoding_type: neighboring_token_propagation
+    contrastive_type: clip
+    qformer_pretrain_ckpt: google-bert/bert-base-uncased
+    query_pooling_type: avg
+    pretrained_text_encoder: false
+    pretrained_visual_encoder: false
+    num_heldout_frames: 0
+    visual_encoder:
+      type: eva_vit_g
+      img_size: 224
+      pretrained: false
+      use_fp8: false
+      transformer_engine: false       # LoRA needs the plain PyTorch attention
+      checkpoint_activations: false   # set true if 448p at batch_size 4-8 runs out of memory
+      checkpoint_attention: false
+
+dataset:
+  train_dataset:
+    dataset_type: vad_r1_chunks
+    metadata: /data/PhysicalAI-Event-Videos/2026/train/labels.json
+    data_root: ""
+    # labels.json stores videos/<file>.mp4; rewrite that prefix to the unzipped videos/ folder.
+    path_prefix_mapping: {"videos/": "/data/PhysicalAI-Event-Videos/2026/train/videos/"}
+    num_video_frames: 8
+    resolution: [512, 512]
+    batch_size: 4
+    workers: 8
+    split: train
+    # One training sample per (chunk, caption) over the three retrieval-query lists.
+    caption_field: [caption_queries, anomaly_queries, action_queries]
+    caption_mode: all
+    label_mode: caption        # identical captions are not treated as negatives of each other
+    drop_last: true
+
+  val_dataset:
+    dataset_type: mock
+    metadata: null
+    num_video_frames: 8
+    resolution: [448, 448]
+    batch_size: 8
+    workers: 8
+    # In-training text->video retrieval benchmark (see header):
+    # dataset_type: retrieval_benchmark
+    # metadata: /data/retrieval_benchmark   # release root holding gt/, additional_gt/, clips/
+
+  test_dataset:
+    dataset_type: mock
+    metadata: null
+
+  inference_dataset:
+    dataset_type: mock
+    metadata: null

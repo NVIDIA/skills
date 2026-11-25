@@ -1,0 +1,53 @@
+[
+  {
+    "id": "tao-run-deft-cr-its-mining-basic",
+    "question": "A user request: \"Use the tao-run-deft-cr-its-mining skill.\" Identify which TAO skill applies and, reading only that skill's documentation, outline the steps it prescribes. Do NOT run any commands, scripts, web searches, or other tools — describe the plan only.",
+    "expected_skill": "tao-run-deft-cr-its-mining",
+    "expected_script": null,
+    "ground_truth": "Identify tao-run-deft-cr-its-mining as the applicable skill and summarize its documented workflow from SKILL.md without executing anything.",
+    "expected_behavior": [
+      "Identifies tao-run-deft-cr-its-mining as the relevant skill",
+      "Outlines the documented workflow steps from SKILL.md",
+      "Does not run commands, scripts, or web searches"
+    ]
+  },
+  {
+    "id": "tao-run-deft-cr-its-mining-resume",
+    "question": "A tao-run-deft-cr-its-mining run was interrupted after several stages. Explain how the agent determines the next stage without rerunning iteration 1. Do not execute commands.",
+    "expected_skill": "tao-run-deft-cr-its-mining",
+    "expected_script": null,
+    "ground_truth": "Use the initialized run directory and resume_position.py. The append-only loop log is the event source, deft_state.json is refreshed from valid events, and malformed log lines do not force a restart.",
+    "expected_behavior": [
+      "Uses the existing initialized run directory",
+      "Names resume_position.py as the next-stage authority",
+      "Explains that loop_log.jsonl drives the refreshed state snapshot",
+      "Does not default to rerunning iteration 1"
+    ]
+  },
+  {
+    "id": "tao-run-deft-cr-its-mining-multi-question",
+    "question": "Explain how tao-run-deft-cr-its-mining handles two KPI questions that share one video. Do not execute commands.",
+    "expected_skill": "tao-run-deft-cr-its-mining",
+    "expected_script": null,
+    "ground_truth": "Preserve each annotation id and question, resolve the external gap video_id to video_path, select both text targets, and use annotation_id/video_path as distinct internal lookup fields.",
+    "expected_behavior": [
+      "Keeps both question rows",
+      "Distinguishes annotation_id from video_path",
+      "Explains that video mining may expand one video to all matching annotations",
+      "Does not treat a shared video as a duplicate question"
+    ]
+  },
+  {
+    "id": "tao-run-deft-cr-its-mining-plugin-paths",
+    "question": "Explain how tao-run-deft-cr-its-mining locates its helper scripts and invokes other TAO stages when installed as a plugin. Do not execute commands.",
+    "expected_skill": "tao-run-deft-cr-its-mining",
+    "expected_script": null,
+    "ground_truth": "Resolve the installed skill directory as DEFT_SKILL_ROOT, use run_script when available or an absolute skill-root script path otherwise, and invoke Cosmos Reason, Cosmos Embed, gap analysis, mining, and platform stages through their registered skills without requiring a tao-skill-bank checkout.",
+    "expected_behavior": [
+      "Resolves helpers from the installed skill directory",
+      "Does not require the tao-skill-bank repository as the working directory",
+      "Invokes underlying stages through registered TAO skills",
+      "Treats the skill-root path as agent/runtime-resolved rather than user input"
+    ]
+  }
+]

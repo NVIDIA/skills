@@ -1,0 +1,128 @@
+name: oneformer-deploy
+type: model
+network_arch: oneformer
+container_image: tao_toolkit.deploy
+data_format: coco_panoptic
+actions:
+  gen_trt_engine:
+    command: oneformer gen_trt_engine -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      gen_trt_engine.onnx_file:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  evaluate:
+    command: oneformer evaluate -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      evaluate.trt_engine:
+        type: file
+      dataset.label_map:
+        type: file
+      dataset.val.annotations:
+        type: file
+      dataset.val.images:
+        type: folder
+      dataset.val.panoptic:
+        type: folder
+      dataset.test.images:
+        type: folder
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  inference:
+    command: oneformer inference -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      inference.trt_engine:
+        type: file
+      dataset.test.images:
+        type: folder
+      dataset.label_map:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+data_sources:
+  evaluate:
+    dataset.label_map:
+      source: train_datasets
+      path: label_map.json
+    dataset.val.annotations:
+      source: eval_dataset
+      path: annotations.json
+    dataset.val.images:
+      source: eval_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.val.panoptic:
+      source: eval_dataset
+      path: images_panoptic.tar.gz
+      runtime: extracted_folder
+    dataset.test.images:
+      source: eval_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+  inference:
+    dataset.test.images:
+      source: inference_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.label_map:
+      source: train_datasets
+      path: label_map.json
+spec_params:
+  gen_trt_engine:
+    encryption_key: key
+    results_dir: output_dir
+    gen_trt_engine.onnx_file: parent_model
+    gen_trt_engine.trt_engine: create_engine_file
+  evaluate:
+    encryption_key: key
+    results_dir: output_dir
+    evaluate.trt_engine: parent_model
+  inference:
+    encryption_key: key
+    results_dir: output_dir
+    inference.trt_engine: parent_model
+spec_shorthand_keys:
+  trt_data_type: gen_trt_engine.tensorrt.data_type
+  trt_engine: gen_trt_engine.trt_engine
+  batch_size: dataset.val.batch_size
+  val_batch_size: dataset.val.batch_size
+  test_batch_size: dataset.test.batch_size
+  num_classes: model.sem_seg_head.num_classes
+  contiguous_id: dataset.contiguous_id
+  export_task: export.task
+  trt_min_batch_size: gen_trt_engine.tensorrt.min_batch_size
+  trt_opt_batch_size: gen_trt_engine.tensorrt.opt_batch_size
+  trt_max_batch_size: gen_trt_engine.tensorrt.max_batch_size
+description: OneFormer deploy workflow for gen_trt_engine, evaluate, inference using
+  TAO Deploy.
+spec_templates:
+  gen_trt_engine: spec_template_deploy_gen_trt_engine.yaml
+  evaluate: spec_template_deploy_evaluate.yaml
+  inference: spec_template_deploy_inference.yaml
+notes:
+- Carry `model.sem_seg_head.num_classes` from train/export; the starter-kit COCO panoptic
+  path uses 133.
+- Evaluate and inference share the deploy infer template but use different top-level
+  engine fields.
+- Set gen_trt_engine.trt_engine explicitly in the spec; do not pre-create it as
+  a declared file output.
+- >-
+  Some older deploy images fail OneFormer gen_trt_engine on the 2D task_tokens
+  ONNX input with IndexError: Out of bounds. Use a deploy image that profiles
+  both images and task_tokens, then validate deploy status by requiring a
+  produced engine before downstream TRT evaluate/inference.

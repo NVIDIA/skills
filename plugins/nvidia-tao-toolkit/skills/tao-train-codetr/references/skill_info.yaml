@@ -1,0 +1,48 @@
+network_arch: codetr
+type: model
+container_image: nvcr.io/nvidia/tao/tao-toolkit:7.0.1-pyt  # unpinned: held at the build this skill is validated against; repin once 7.1.0-pyt is confirmed to carry codetr
+data_format: coco
+gpu_spec_key: train.num_gpus
+automl_enabled: false
+required_credentials: [NGC_KEY]
+actions:
+  train:
+    command: codetr train -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.train_data_sources:
+        type: folder
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  evaluate:
+    command: codetr evaluate -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      evaluate.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  inference:
+    command: codetr inference -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      inference.checkpoint:
+        type: file
+      dataset.infer_data_sources.image_dir:
+        type: folder
+      dataset.infer_data_sources.classmap:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/

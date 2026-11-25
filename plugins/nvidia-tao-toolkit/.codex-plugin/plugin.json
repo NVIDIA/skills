@@ -1,0 +1,42 @@
+{
+  "name": "nvidia-tao-toolkit",
+  "version": "0.1.19",
+  "description": "NVIDIA TAO skill bank with generated capability discovery for model training, data processing, application workflows, AutoML, and platform execution.",
+  "author": {
+    "name": "NVIDIA",
+    "url": "https://github.com/NVIDIA-TAO/tao-skill-bank"
+  },
+  "repository": "https://github.com/NVIDIA-TAO/tao-skill-bank",
+  "license": "Apache-2.0",
+  "keywords": [
+    "nvidia",
+    "tao",
+    "computer-vision",
+    "fine-tuning",
+    "training",
+    "inference",
+    "object-detection",
+    "segmentation",
+    "vlm",
+    "automl"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "NVIDIA TAO Toolkit",
+    "shortDescription": "TAO workflows, models, AutoML",
+    "longDescription": "Agent skills for NVIDIA TAO: fine-tune, evaluate, export, and deploy vision and multimodal models; prepare and generate training data; run AutoML and application workflows; and launch jobs on Docker, Kubernetes, SLURM, or Brev. The plugin exposes every skill under ./skills/. Capability answers are generated from the packaged skills by scripts/list_tao_capabilities.py rather than hard-coded in plugin metadata.",
+    "developerName": "NVIDIA",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Read",
+      "Write",
+      "Interactive"
+    ],
+    "defaultPrompt": [
+      "What can NVIDIA TAO do?",
+      "Choose and run a TAO workflow for my dataset.",
+      "List TAO models, actions, AutoML, and platforms."
+    ],
+    "brandColor": "#76B900"
+  }
+}

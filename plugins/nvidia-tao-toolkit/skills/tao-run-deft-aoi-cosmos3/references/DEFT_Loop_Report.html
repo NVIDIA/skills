@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DEFT Loop Report — Cosmos Reason 3 AOI</title>
+<style>
+  :root {
+    --nvidia-green: #76b900;
+    --nvidia-green-light: #8ed100;
+    --nvidia-yellow: #ffbc01;
+    --nvidia-red: #c2262d;
+    --bg-dark: #1a1a1a;
+    --bg-card: #232323;
+    --bg-panel: #2a2a2a;
+    --bg-panel-2: #2f2f2f;
+    --text-primary: #ffffff;
+    --text-secondary: #b0b0b0;
+    --text-muted: #777777;
+    --border-soft: rgba(255,255,255,0.06);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { color-scheme: dark; }
+  body {
+    font-family: 'NVIDIA Sans', Inter, Arial, sans-serif;
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+    padding: 48px 0;
+    font-size: 16px;
+  }
+
+  /* Keep the Cosmos report on the same single-column visual skeleton as ChangeNet. */
+  .page, .grid { display: contents; }
+
+  .card {
+    width: 1280px;
+    background: var(--bg-card);
+    border-radius: 16px;
+    padding: 36px 48px 40px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--nvidia-green), var(--nvidia-green-light));
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 28px;
+  }
+  .chart-title {
+    font-size: 34px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text-primary);
+    line-height: 1.2;
+  }
+  .chart-subtitle {
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-top: 8px;
+  }
+
+  .hero {
+    width: 1280px;
+    background: linear-gradient(135deg, #1f1f1f 0%, #2a2a2a 100%);
+    border-radius: 16px;
+    padding: 40px 48px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--nvidia-green), var(--nvidia-green-light));
+  }
+  .eyebrow { color: var(--nvidia-green); font-size: 12px; font-weight: 800; letter-spacing: 1.6px; text-transform: uppercase; }
+  .hero h1 { font-size: 44px; font-weight: 800; letter-spacing: -0.8px; color: var(--text-primary); margin: 4px 0 10px; }
+  .subtitle { color: var(--text-secondary); font-size: 18px; font-weight: 500; }
+  .hero .meta { display: flex; gap: 32px; font-size: 15px; color: var(--text-secondary); margin-top: 20px; flex-wrap: wrap; }
+  .hero .meta-item strong { color: var(--text-primary); font-weight: 600; }
+  .hero .meta-item .value { color: var(--nvidia-green); font-weight: 700; }
+
+  .kpi-banner { margin-top: 24px; padding: 18px 22px; background: rgba(118,185,0,0.12); border: 1px solid rgba(118,185,0,0.4); border-radius: 10px; display: flex; align-items: flex-start; gap: 14px; }
+  .kpi-banner.error { background: rgba(194,38,45,0.12); border-color: rgba(194,38,45,0.4); }
+  .kpi-banner .icon { flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; background: var(--nvidia-green); color: #000; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; }
+  .kpi-banner.error .icon { background: var(--nvidia-red); color: #fff; }
+  .kpi-banner .title { font-size: 16px; font-weight: 700; color: var(--nvidia-green); margin-bottom: 3px; }
+  .kpi-banner.error .title { color: var(--nvidia-red); }
+  .kpi-banner .body { color: var(--text-secondary); font-size: 15px; line-height: 1.5; }
+
+  .stat-grid { background: var(--bg-panel); border-radius: 10px; padding: 20px 24px; border: 1px solid var(--border-soft); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; }
+  .stat { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .stat-label { font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); }
+  .stat-value { font-size: 20px; font-weight: 700; color: var(--text-primary); overflow-wrap: anywhere; }
+  .stat-value.green { color: var(--nvidia-green); }
+
+  .table-wrap { overflow-x: auto; border-radius: 8px; }
+  .data-table { width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 15px; }
+  .data-table th { text-align: left; padding: 12px 14px; font-size: 13px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-muted); background: var(--bg-panel); border-bottom: 1px solid var(--border-soft); white-space: nowrap; }
+  .data-table td { padding: 13px 14px; color: var(--text-secondary); border-bottom: 1px solid var(--border-soft); vertical-align: middle; }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr.best { background: rgba(118,185,0,0.06); }
+  .data-table tr.best td { color: var(--text-primary); }
+  .num { font-family: 'SF Mono', 'Fira Code', monospace; font-variant-numeric: tabular-nums; }
+  .path { max-width: 420px; overflow-wrap: anywhere; color: var(--nvidia-green); font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 10px; border: 1px solid var(--border-soft); font-size: 13px; font-weight: 700; letter-spacing: .3px; white-space: nowrap; }
+  .badge.good { color: var(--nvidia-green); background: rgba(118,185,0,.10); border-color: rgba(118,185,0,.28); }
+  .badge.warn { color: var(--nvidia-yellow); background: rgba(255,188,1,.08); border-color: rgba(255,188,1,.26); }
+  .badge.error { color: #ef8085; background: rgba(194,38,45,.10); border-color: rgba(194,38,45,.3); }
+  .badge.muted { color: var(--text-muted); }
+  .chart { min-height: 240px; display: grid; place-items: center; padding: 10px 0 0; }
+  .chart svg { width: 100%; height: auto; overflow: visible; }
+  .chart text { font-family: "NVIDIA Sans", Inter, Arial, sans-serif; }
+  .notice { padding: 15px 17px; border-left: 3px solid var(--nvidia-green); border-radius: 5px; background: rgba(118,185,0,.07); color: var(--text-secondary); }
+  .notice.warn { border-color: var(--nvidia-yellow); background: rgba(255,188,1,.06); }
+  .notice.error { border-color: var(--nvidia-red); background: rgba(194,38,45,.08); }
+  .notice + .notice { margin-top: 10px; }
+  .prompt-list { display: flex; flex-direction: column; gap: 14px; }
+  .prompt-example { padding: 18px 20px; border: 1px solid var(--border-soft); border-radius: 10px; background: var(--bg-panel); }
+  .prompt-meta { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 12px; }
+  .prompt-role { color: var(--nvidia-green); font-size: 13px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; }
+  .prompt-text { color: var(--text-primary); font-size: 15px; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .prompt-truncated { display: block; margin-top: 8px; color: var(--text-muted); font-size: 12px; }
+  .prompt-response { display: flex; align-items: center; gap: 8px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-soft); color: var(--text-muted); font-size: 13px; }
+  .prompt-response code { padding: 2px 8px; border-radius: 4px; background: rgba(118,185,0,.10); color: var(--nvidia-green); font: 700 13px/1.5 'SF Mono', 'Fira Code', monospace; }
+  .footer { width: 1280px; color: var(--text-muted); text-align: center; font-size: 12px; }
+  @media (max-width: 1320px) {
+    .hero, .card, .footer { width: calc(100vw - 40px); }
+  }
+  @media (max-width: 900px) {
+    body { gap: 20px; padding: 20px 0; }
+    .hero, .card { border-radius: 10px; padding: 25px 22px; }
+    h1 { font-size: 32px; }
+    .chart-title { font-size: 28px; }
+    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media print {
+    body { background: white; }
+    .hero, .card { break-inside: avoid; box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+<main class="page">
+  <header class="hero">
+    <div class="eyebrow">NVIDIA TAO · DEFT AOI</div>
+    <h1>Cosmos Reason 3 AOI Report</h1>
+    <p class="subtitle">Disk-backed improvement loop · bare OK/NG classification</p>
+    <div class="meta">
+      <div class="meta-item"><strong>Generated</strong> &nbsp;<span class="value">{{ GENERATED_DATE }}</span></div>
+      <div class="meta-item"><strong>KPI Target</strong> &nbsp;<span class="value">{{ KPI_TARGET }}</span></div>
+      <div class="meta-item"><strong>Iterations</strong> &nbsp;<span class="value">{{ ITERATIONS_RUN }} / {{ MAX_ITERATIONS }}</span></div>
+      <div class="meta-item"><strong>Run Status</strong> &nbsp;<span class="value">{{ RUN_STATUS }}</span></div>
+    </div>
+    {{ KPI_BANNER_HTML }}
+  </header>
+
+  <div class="grid">
+    <section class="card">
+      <div class="header"><div><div class="chart-title">Run Configuration &amp; Outcome</div><div class="chart-subtitle">Approved inputs and the current canonical outcome.</div></div></div>
+      <div class="stat-grid">
+        <div class="stat"><div class="stat-label">Platform</div><div class="stat-value">{{ PLATFORM }}</div></div>
+        <div class="stat"><div class="stat-label">Model</div><div class="stat-value">{{ MODEL }}</div></div>
+        <div class="stat"><div class="stat-label">Annotation mode</div><div class="stat-value">{{ ANNOTATION_MODE }}</div></div>
+        <div class="stat"><div class="stat-label">Compute</div><div class="stat-value">{{ COMPUTE_SHAPE }}</div></div>
+        <div class="stat"><div class="stat-label">Started</div><div class="stat-value">{{ STARTED_AT }}</div></div>
+        <div class="stat"><div class="stat-label">Last event</div><div class="stat-value">{{ FINISHED_AT }}</div></div>
+        <div class="stat"><div class="stat-label">Best iteration</div><div class="stat-value green">{{ BEST_ITERATION }}</div></div>
+        <div class="stat"><div class="stat-label">Best KPI</div><div class="stat-value green">{{ BEST_METRIC }}</div></div>
+      </div>
+      <div class="chart-subtitle" style="margin-top:28px;margin-bottom:10px">DEFT Loop Experiment Summary</div>
+      <div class="table-wrap"><table class="data-table"><thead><tr><th>Item</th><th>Details</th></tr></thead><tbody>{{ RUN_SUMMARY_ROWS_HTML }}</tbody></table></div>
+      <div class="chart-subtitle" style="margin-top:28px;margin-bottom:10px">Training Set Growth</div>
+      <div class="table-wrap"><table class="data-table"><thead><tr><th>Iteration</th><th>KNN Raw Mined</th><th>SDG Generated</th><th>New Unique Images (After Dedup)</th><th>Training Set Total</th><th>Δ</th></tr></thead><tbody>{{ GROWTH_ROWS_HTML }}</tbody></table></div>
+    </section>
+
+    <section class="card">
+      <div class="header"><div><div class="chart-title">Benchmark KPI Trend</div><div class="chart-subtitle">Only frozen Benchmark results carry a pass/fail verdict.</div></div></div>
+      <div class="chart">{{ METRIC_CHART_HTML }}</div>
+    </section>
+
+    <section class="card">
+      <div class="header"><div><div class="chart-title">Dataset Isolation</div><div class="chart-subtitle">Proxy drives RCCA; frozen Benchmark alone owns the stop gate; Mining supplies training candidates.</div></div></div>
+      <div class="table-wrap"><table class="data-table"><thead><tr><th>Role / producer</th><th>Purpose</th><th>Records</th><th>OK / NG</th><th>Path / evidence</th></tr></thead><tbody>{{ DATASET_ROWS_HTML }}</tbody></table></div>
+      <div class="notice" style="margin-top:14px"><strong>Frozen Benchmark SHA-256:</strong> <span class="path">{{ BENCHMARK_HASH }}</span></div>
+    </section>
+
+    <section class="card">
+      <div class="header"><div><div class="chart-title">Prompt Examples</div><div class="chart-subtitle">Representative inspection prompts from the recorded Proxy, Benchmark, and Mining annotations.</div></div></div>
+      <div class="prompt-list">{{ PROMPT_EXAMPLES_HTML }}</div>
+    </section>
+
+    <section class="card">
+      <div class="header"><div><div class="chart-title">Augmentation Volume</div><div class="chart-subtitle">Synthetic and mined contribution by iteration.</div></div></div>
+      <div class="table-wrap"><table class="data-table"><thead><tr><th>Iteration</th><th>SDG requested</th><th>AMP allocated</th><th>Generated</th><th>Defect types</th><th>Mining raw</th><th>Cosine-kept</th><th>Batch unique targets</th><th>Cumulative train</th></tr></thead><tbody>{{ AUGMENTATION_ROWS_HTML }}</tbody></table></div>
+    </section>
+
+    <section class="card">
+      <div class="header"><div><div class="chart-title">Iteration Metrics</div><div class="chart-subtitle">Discrete OK/NG metrics with NG as the positive class.</div></div></div>
+      <div class="table-wrap"><table class="data-table"><thead><tr><th>Phase</th><th>Source</th><th>Accuracy</th><th>NG recall</th><th>NG precision</th><th>NG F1</th><th>False accepts</th><th>False rejects</th><th>Unknown</th><th>KPI</th></tr></thead><tbody>{{ METRIC_ROWS_HTML }}</tbody></table></div>
+    </section>
+
+    <section class="card">
+      <div class="header"><div><div class="chart-title">Pipeline Execution</div><div class="chart-subtitle">Ordered events from deft_state.json; durations are never inferred.</div></div></div>
+      <div class="table-wrap"><table class="data-table"><thead><tr><th>Seq</th><th>Phase</th><th>Stage</th><th>Status</th><th>Duration</th><th>Summary</th></tr></thead><tbody>{{ STAGE_ROWS_HTML }}</tbody></table></div>
+    </section>
+
+    <section class="card">
+      <div class="header"><div><div class="chart-title">Artifacts</div><div class="chart-subtitle">Recorded lineage and evidence paths only; no untracked discovery or fabricated links.</div></div></div>
+      <div class="table-wrap"><table class="data-table"><thead><tr><th>Phase</th><th>Artifact</th><th>State</th><th>Path / value</th></tr></thead><tbody>{{ ARTIFACT_ROWS_HTML }}</tbody></table></div>
+    </section>
+
+    <section class="card">
+      <div class="header"><div><div class="chart-title">Hard Stops / Warnings</div><div class="chart-subtitle">Committed error events from canonical state.</div></div></div>
+      {{ WARNING_ROWS_HTML }}
+    </section>
+  </div>
+  <div class="footer">Generated deterministically from deft_state.json and recorded artifacts · NVIDIA TAO DEFT AOI</div>
+</main>
+</body>
+</html>

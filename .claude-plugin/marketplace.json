@@ -13,6 +13,11 @@
             "name": "nvidia-skills",
             "source": "./plugins/nvidia-skills",
             "description": "Find the right NVIDIA skill for GPU acceleration, CUDA, AI agents, data loading, training, inference, robotics, Physical AI, Omniverse, simulation, and other NVIDIA-powered workflows."
+        },
+        {
+            "name": "nvidia-tao-toolkit",
+            "source": "./plugins/nvidia-tao-toolkit",
+            "description": "NVIDIA TAO skill bank with generated capability discovery for model training, data processing, application workflows, AutoML, and platform execution."
         }
     ]
 }

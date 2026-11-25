@@ -1,0 +1,59 @@
+# Troubleshooting
+
+## Error Patterns
+
+**Checkpoint not found**: The evaluate, inference, export, and quantize actions
+require a concrete checkpoint path. Training emits files such as
+`model_epoch_000_step_00012.pth` and the task-specific latest symlink. Use the
+model-skill `parent_model` resolver for downstream actions and `resume_model`
+for resume, or pass the exact container path when running local Docker. Do not
+build a cross-action path from `${results_dir}`; TAO rebases it to the current
+action's output directory.
+
+**CSV format mismatch**: The classify CSV must have exactly four columns:
+`input_path`, `golden_path`, `label`, and `object_name`. Missing columns or
+extra headers cause a silent failure or KeyError. Verify the CSV has no BOM
+characters and uses comma delimiters (not semicolons or tabs).
+
+**Image extension mismatch**: If `dataset.classify.image_ext` is `.jpg` but the actual images are `.png` (or vice versa), the data loader will find zero samples and training will fail with an empty dataset error. Always verify the extension matches your data.
+
+**OOM during training**: Reduce `dataset.classify.batch_size` (16 -> 8 -> 4). With the default image size of 224x224, batch_size=16 typically fits on a 16GB GPU. If using larger images via `image_width`/`image_height`, reduce batch size proportionally.
+
+**Low evaluation accuracy with correct training loss**: The `eval_margin` threshold may be miscalibrated for your data. After training, run inference on a validation set and inspect the embedding distance distribution to pick an appropriate threshold. The default 0.3 is tuned for the reference dataset and may not generalize.
+
+**Checkpoint load key mismatch at evaluate/inference**: Keep the classify model
+architecture fields aligned with the train spec. C-RADIO classify checkpoints
+require `model.backbone.type: c_radio_v2_vit_base_patch16_224`,
+`model.classify.difference_module: learnable`, `model.classify.embed_dec: 30`,
+`model.classify.eval_margin: 0.3`, `dataset.classify.num_input: 1`, and
+`dataset.classify.input_map: {SolderLight: 0}` unless the training run used a
+different override set.
+
+**`KeyError: radio.*` loading an NGC classify checkpoint on 7.1**: The 7.0.x-era
+NGC model `nvidia/tao/visual_changenet_classification:visual_changenet_nvpcb_trainable_v1.0`
+is INCOMPATIBLE with the 7.1 `backbone_v2` architecture — loading it raises a
+`KeyError` on `radio.radio.radio.*` keys. There is no 7.1-compatible pretrained
+classify checkpoint published on NGC, so do not try to download a `full_model`
+classify checkpoint for evaluate/inference. Stage the public C-RADIOv2-B backbone
+(see SKILL.md) and TRAIN first, then run evaluate/inference against a checkpoint
+from that 7.1 train under `results_dir`. The backbone is a public HuggingFace
+download needing no NGC org — do not hardcode or assume any registry org;
+resolve any genuine NGC pull's org from `ngc config current`.
+
+**Training does not converge**: Check that `train.classify.cls_weight` is appropriate for your class distribution. If defects are very rare (<1% of samples), increase the defective class weight. Also verify that `fpratio_sampling` is not too low, which would under-sample the majority class.
+
+**Backbone dimension mismatch** (segment only): If the log shows size mismatch
+errors while loading the backbone, such as a checkpoint tensor with shape
+`[1024, 1024]` being copied into a model tensor with shape `[384, 384]`, the
+checkpoint does not match `model.backbone.type`. Keep the packaged
+`vit_large_nvdinov2` segment templates when using `NV_DINOV2_518_16_256.ckpt`,
+or clear `model.backbone.pretrained_backbone_path` to use default
+initialization.
+
+**OSError: Could not load MultiScaleDeformableAttention...so** (segment only): CUDA ops not compiled. The ViT adapter backbone requires custom CUDA kernels that must be compiled on first run. Run `python setup.py develop` inside the container (~5 min compilation). This only applies to the segmentation task.
+
+**MisconfigurationException: current_epoch=N, but max_epochs=M**: Old checkpoints in results directory. PyTorch Lightning auto-resumes from checkpoints and crashes if the new `max_epochs` is lower than a previous run's epoch. Fix: use a fresh results directory or unique run name.
+
+**PYTHONPATH / ModuleNotFoundError: nvidia_tao_pytorch**: The TAO entrypoint spawns subprocesses that don't source `.bashrc`. Pass `PYTHONPATH` explicitly via environment variables, not shell init files. The TAO pyt container resolved from `versions.yaml::images.tao_toolkit.pyt` has PYTHONPATH pre-configured.
+
+**Epoch defaults**: Classify training typically uses 100-2000 epochs depending on dataset size. Segmentation uses 200 epochs by default. For small datasets (<1k images), 100 epochs may suffice. For large production datasets, 2000 epochs with early stopping is common. Monitor validation metrics to determine convergence.

@@ -1,0 +1,6 @@
+input_parquet: null
+output_parquet: null
+model: SigLIP                                # CLIP or SigLIP
+model_path: google/siglip-base-patch16-224   # HF id, local HF snapshot dir, or TAO .pth/.ckpt
+model_config_path: ""                        # required only when model_path is a TAO checkpoint
+batch_size: 64

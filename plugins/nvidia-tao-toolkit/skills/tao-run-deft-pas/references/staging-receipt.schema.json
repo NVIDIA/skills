@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://developer.nvidia.com/tao/schemas/pas-staging-receipt-v1.json",
+  "title": "PAS DEFT remote staging receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "workflow",
+    "platform",
+    "request_path",
+    "request_sha256",
+    "backend_scope",
+    "checked_paths_absent",
+    "checked_at",
+    "receipt_sha256"
+  ],
+  "properties": {
+    "schema_version": {"const": "1"},
+    "workflow": {"const": "tao-run-deft-pas"},
+    "platform": {"enum": ["docker", "slurm", "kubernetes", "brev"]},
+    "request_path": {"type": "string", "pattern": "^/"},
+    "request_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "backend_scope": {"type": "string", "minLength": 2},
+    "checked_paths_absent": {
+      "type": "array",
+      "minItems": 2,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^/"}
+    },
+    "checked_at": {"type": "string", "minLength": 1},
+    "receipt_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

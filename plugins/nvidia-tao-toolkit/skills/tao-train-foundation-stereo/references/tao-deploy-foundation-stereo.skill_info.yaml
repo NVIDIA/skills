@@ -1,0 +1,97 @@
+name: depth-net-stereo-deploy
+type: model
+network_arch: depth_net_stereo
+container_image: tao_toolkit.deploy
+data_format: FSD
+actions:
+  gen_trt_engine:
+    command: depth_net gen_trt_engine -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      gen_trt_engine.onnx_file:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+      gen_trt_engine.trt_engine:
+        type: file
+    upload_excludes:
+    - inputs/
+  evaluate:
+    command: depth_net evaluate -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      evaluate.trt_engine:
+        type: file
+      dataset.test_dataset.data_sources[0].data_file:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  inference:
+    command: depth_net inference -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      inference.trt_engine:
+        type: file
+      dataset.infer_dataset.data_sources[0].data_file:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+data_sources:
+  evaluate:
+    dataset.test_dataset.data_sources[0].data_file:
+      source: eval_dataset
+      path: annotations.txt
+  inference:
+    dataset.infer_dataset.data_sources[0].data_file:
+      source: inference_dataset
+      path: annotations.txt
+spec_params:
+  gen_trt_engine:
+    dataset.dataset_name: StereoDataset
+    results_dir: output_dir
+    gen_trt_engine.onnx_file: parent_model
+    gen_trt_engine.trt_engine: create_engine_file
+    model.model_type: FoundationStereo
+  evaluate:
+    dataset.dataset_name: StereoDataset
+    results_dir: output_dir
+    evaluate.trt_engine: parent_model
+    model.model_type: FoundationStereo
+  inference:
+    dataset.dataset_name: StereoDataset
+    results_dir: output_dir
+    inference.trt_engine: parent_model
+    model.model_type: FoundationStereo
+spec_shorthand_keys:
+  trt_data_type: gen_trt_engine.tensorrt.data_type
+  trt_engine: gen_trt_engine.trt_engine
+  test_batch_size: dataset.test_dataset.batch_size
+  infer_batch_size: dataset.infer_dataset.batch_size
+description: DepthNet Stereo deploy workflow for gen_trt_engine, evaluate, inference
+  using TAO Deploy.
+spec_templates:
+  gen_trt_engine: spec_template_deploy.yaml
+  evaluate: spec_template_deploy.yaml
+  inference: spec_template_deploy.yaml
+notes:
+- The TAO Deploy command is `depth_net` for both mono and stereo DepthNet model skills.
+- 'Keep `dataset.dataset_name: StereoDataset` and use a stereo data source such as
+  `GenericDataset` (no GT) or a dataset-specific class like `Middlebury` (with GT) in the deploy spec.'
+- 'Use `gen_trt_engine.tensorrt.data_type: fp32` for fresh-install smoke tests.
+  FP16 is supported on the NGC static-shape and user-trained static / batch-only-dynamic
+  paths. Engine input H/W are pinned to the trace shape on every path. See tao-deploy-foundation-stereo.md.'
+- 'The current TAO Deploy image interprets `gen_trt_engine.tensorrt.workspace_size`
+  as GiB. Use `4` for a 4 GiB workspace; do not use byte or MiB-style values such
+  as 1024.'
+- 'Match `evaluate.input_height/input_width` to the export-time ONNX shape and to
+  `dataset.test_dataset.augmentation.crop_size` for end-to-end shape consistency.'

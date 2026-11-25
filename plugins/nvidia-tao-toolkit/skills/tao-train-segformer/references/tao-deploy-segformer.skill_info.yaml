@@ -1,0 +1,95 @@
+name: segformer-deploy
+type: model
+network_arch: segformer
+container_image: tao_toolkit.deploy
+data_format: unet
+actions:
+  gen_trt_engine:
+    command: segformer gen_trt_engine -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      gen_trt_engine.onnx_file:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  evaluate:
+    command: segformer evaluate -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      evaluate.trt_engine:
+        type: file
+      dataset.segment.root_dir:
+        type: folder
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  inference:
+    command: segformer inference -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      inference.trt_engine:
+        type: file
+      dataset.segment.root_dir:
+        type: folder
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+data_sources:
+  evaluate:
+    dataset.segment.root_dir:
+      source: eval_dataset
+      path: ''
+  inference:
+    dataset.segment.root_dir:
+      source: inference_dataset
+      path: ''
+spec_params:
+  gen_trt_engine:
+    encryption_key: key
+    results_dir: output_dir
+    gen_trt_engine.onnx_file: parent_model
+    gen_trt_engine.trt_engine: create_engine_file
+  evaluate:
+    encryption_key: key
+    results_dir: output_dir
+    evaluate.trt_engine: parent_model
+  inference:
+    encryption_key: key
+    results_dir: output_dir
+    inference.trt_engine: parent_model
+spec_shorthand_keys:
+  trt_data_type: gen_trt_engine.tensorrt.data_type
+  trt_engine: gen_trt_engine.trt_engine
+  batch_size: dataset.segment.batch_size
+  num_classes: dataset.segment.num_classes
+  img_size: dataset.segment.img_size
+  num_workers: dataset.segment.workers
+  root_dir: dataset.segment.root_dir
+  trt_min_batch_size: gen_trt_engine.tensorrt.min_batch_size
+  trt_opt_batch_size: gen_trt_engine.tensorrt.opt_batch_size
+  trt_max_batch_size: gen_trt_engine.tensorrt.max_batch_size
+description: SegFormer deploy workflow for gen_trt_engine, evaluate, inference using
+  TAO Deploy.
+spec_templates:
+  gen_trt_engine: spec_template_deploy_gen_trt_engine.yaml
+  evaluate: spec_template_deploy_evaluate.yaml
+  inference: spec_template_deploy_inference.yaml
+notes:
+- The deploy gen_trt_engine template is stored from the local `export` deploy config
+  because that is where SegFormer keeps the TensorRT profile block.
+- 'Use FP16 for the starter-kit TensorRT path and set `dataset.segment.batch_size:
+  1` for TensorRT inference.'
+- Keep palette, label mapping, input size, and normalization aligned with the trained
+  segmentation model.
+- Do not declare `gen_trt_engine.trt_engine` as a file output. Let TensorRT
+  create the engine file at the path produced by `create_engine_file`.

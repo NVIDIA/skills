@@ -1,0 +1,100 @@
+[
+ {
+  "id": "tao-validate-recipe-transfer-basic",
+  "question": "A user request: \"Use the tao-validate-recipe-transfer skill.\" Identify which skill applies and, reading only that skill's documentation, outline the steps it prescribes. Do NOT run any commands, scripts, web searches, or other tools — describe the plan only.",
+  "expected_skill": "tao-validate-recipe-transfer",
+  "expected_script": null,
+  "ground_truth": "Identify tao-validate-recipe-transfer as the applicable skill and summarize its Phase 0 to A to G to T to R to E workflow from SKILL.md without executing anything.",
+  "expected_behavior": [
+   "Identifies tao-validate-recipe-transfer as the relevant skill",
+   "Outlines the documented phases: feasibility gate, port, domain gap, recipe transfer, run, evaluate",
+   "Does not run commands, scripts, or web searches"
+  ]
+ },
+ {
+  "id": "tao-validate-recipe-transfer-mode-selection-forward",
+  "question": "A user says: \"I want to fine-tune the RT-DETR model from the paper on my own factory inspection images.\" Identify which skill applies and state which of its three modes it would select and why, plus the first gate it must pass. Do NOT run any commands, scripts, web searches, or other tools — describe the plan only.",
+  "expected_skill": "tao-validate-recipe-transfer",
+  "expected_script": null,
+  "ground_truth": "Select Forward mode and name the Phase A checkpoint gate — reproducing the paper's reported number from the released checkpoint — as the prerequisite before touching customer data.",
+  "expected_behavior": [
+   "Identifies tao-validate-recipe-transfer as the relevant skill",
+   "Selects Forward mode and says why",
+   "Names the Phase 0 feasibility gate including the licence check",
+   "States that Phase A must reproduce the published number before Phase B begins",
+   "Does not run commands, scripts, or web searches"
+  ]
+ },
+ {
+  "id": "tao-validate-recipe-transfer-mode-selection-postmortem",
+  "question": "A user says: \"My fine-tuned detector got 0.95 mAP on validation but misses everything in production.\" Identify which skill applies, state which mode it selects, and name the most likely cause the skill tells you to check first. Do NOT run any commands, scripts, web searches, or other tools — describe the plan only.",
+  "expected_skill": "tao-validate-recipe-transfer",
+  "expected_script": null,
+  "ground_truth": "Select Post-mortem mode, consult references/postmortem.md in likelihood order, and identify train/test leakage or a train-versus-inference preprocessing mismatch as the leading hypotheses rather than rerunning training.",
+  "expected_behavior": [
+   "Identifies tao-validate-recipe-transfer as the relevant skill",
+   "Selects Post-mortem mode and points to references/postmortem.md",
+   "States that it does not start by rerunning anything",
+   "Names near-duplicate split leakage and/or preprocessing mismatch as leading causes",
+   "Does not run commands, scripts, or web searches"
+  ]
+ },
+ {
+  "id": "tao-validate-recipe-transfer-split-leakage",
+  "question": "A user reports their dataset was produced by augmenting a few hundred source photos into ten thousand images and split randomly. Identify which skill applies and name the script it prescribes for checking split hygiene and what that script measures. Do NOT run any commands, scripts, web searches, or other tools — describe the plan only.",
+  "expected_skill": "tao-validate-recipe-transfer",
+  "expected_script": "scripts/split_leakage_check.py",
+  "ground_truth": "Name scripts/split_leakage_check.py, which detects near-duplicate images across splits via perceptual hashing plus filename-group clustering, and explain that a random split over augmented images inflates every metric.",
+  "expected_behavior": [
+   "Identifies tao-validate-recipe-transfer as the relevant skill",
+   "Names scripts/split_leakage_check.py as the Phase G split-hygiene check",
+   "Explains dHash near-duplicate detection and filename-stem grouping",
+   "States that the split must be regrouped by source/session/subject rather than by image",
+   "Does not run commands, scripts, or web searches"
+  ]
+ },
+ {
+  "id": "tao-validate-recipe-transfer-recipe-fields",
+  "question": "A user asks whether they should copy the paper's 300-epoch schedule and learning rate when fine-tuning a released checkpoint on 2,000 of their own images. Identify which skill applies and describe how it classifies recipe fields and what it says about schedule length. Do NOT run any commands, scripts, web searches, or other tools — describe the plan only.",
+  "expected_skill": "tao-validate-recipe-transfer",
+  "expected_script": null,
+  "ground_truth": "Describe the INVARIANT / SCALE / DERIVED classification from references/recipe-fields.md and state that schedule length is SCALE, must be reasoned in total gradient steps rather than epochs, and that a released-checkpoint init calls for a much shorter schedule and lower learning rate.",
+  "expected_behavior": [
+   "Identifies tao-validate-recipe-transfer as the relevant skill",
+   "Names the three buckets INVARIANT, SCALE and DERIVED",
+   "States that schedule length and learning rate are SCALE fields and must be adjusted, not copied",
+   "States that reasoning is in total gradient steps, not epochs",
+   "Does not run commands, scripts, or web searches"
+  ]
+ },
+ {
+  "id": "tao-validate-recipe-transfer-verification-ladder",
+  "question": "A user wants to launch a three-day training run immediately. Identify which skill applies and list the cheap checks it requires first, including which rung it calls the highest-value one and what a failure at that rung means. Do NOT run any commands, scripts, web searches, or other tools — describe the plan only.",
+  "expected_skill": "tao-validate-recipe-transfer",
+  "expected_script": null,
+  "ground_truth": "List the seven rungs of references/verification-ladder.md and identify overfitting a single batch to near-zero loss as the highest-value rung, whose failure means the label pipeline, loss or target assignment is broken and training must not proceed.",
+  "expected_behavior": [
+   "Identifies tao-validate-recipe-transfer as the relevant skill",
+   "Lists the verification ladder rungs before the full run",
+   "Names the single-batch overfit as the highest-value check",
+   "States that a rung-4 failure means the pipeline is wrong and training must stop",
+   "Distinguishes a rung-5 failure as an eval-path bug rather than a training-path bug",
+   "Does not run commands, scripts, or web searches"
+  ]
+ },
+ {
+  "id": "tao-validate-recipe-transfer-operating-point",
+  "question": "A user asks which confidence threshold to deploy their detector at, and wants a single mAP number for the customer report. Identify which skill applies and describe what it prescribes for choosing the operating point and structuring the report. Do NOT run any commands, scripts, web searches, or other tools — describe the plan only.",
+  "expected_skill": "tao-validate-recipe-transfer",
+  "expected_script": null,
+  "ground_truth": "Describe Phase E: choose the threshold deliberately from the PR curve against the customer's cost of a miss versus a false alarm, report per-class and per-slice breakdowns rather than a single average, and include the mandatory Known risks section.",
+  "expected_behavior": [
+   "Identifies tao-validate-recipe-transfer as the relevant skill",
+   "States that the score threshold is DERIVED and chosen from the PR curve, never inherited",
+   "States that the miss-versus-false-alarm cost is a business question to ask the customer",
+   "Requires per-class and per-slice breakdowns instead of a single aggregate metric",
+   "Names the Known risks section as non-optional",
+   "Does not run commands, scripts, or web searches"
+  ]
+ }
+]

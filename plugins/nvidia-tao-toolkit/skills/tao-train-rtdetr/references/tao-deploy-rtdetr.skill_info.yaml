@@ -1,0 +1,111 @@
+name: rtdetr-deploy
+type: model
+network_arch: rtdetr
+container_image: tao_toolkit.deploy
+data_format: coco
+actions:
+  gen_trt_engine:
+    command: rtdetr gen_trt_engine -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      gen_trt_engine.onnx_file:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+      gen_trt_engine.trt_engine:
+        type: file
+    upload_excludes:
+    - inputs/
+  evaluate:
+    command: rtdetr evaluate -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      evaluate.trt_engine:
+        type: file
+      dataset.test_data_sources.image_dir:
+        type: folder
+      dataset.test_data_sources.json_file:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  inference:
+    command: rtdetr inference -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      inference.trt_engine:
+        type: file
+      dataset.infer_data_sources.image_dir[0]:
+        type: folder
+      dataset.infer_data_sources.classmap:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+data_sources:
+  gen_trt_engine:
+    gen_trt_engine.tensorrt.calibration.cal_image_dir:
+      source: calibration_dataset
+      path: images.tar.gz
+      list: true
+      runtime: extracted_folder
+  evaluate:
+    dataset.test_data_sources.image_dir:
+      source: eval_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.test_data_sources.json_file:
+      source: eval_dataset
+      path: annotations.json
+  inference:
+    dataset.infer_data_sources.image_dir:
+      source: inference_dataset
+      path: images.tar.gz
+      list: true
+      runtime: extracted_folder
+    dataset.infer_data_sources.classmap:
+      source: inference_dataset
+      path: label_map.txt
+spec_params:
+  gen_trt_engine:
+    encryption_key: key
+    results_dir: output_dir
+    gen_trt_engine.onnx_file: parent_model
+    gen_trt_engine.trt_engine: create_engine_file
+    gen_trt_engine.tensorrt.calibration.cal_cache_file: create_cal_cache
+  evaluate:
+    encryption_key: key
+    results_dir: output_dir
+    evaluate.trt_engine: parent_model
+  inference:
+    encryption_key: key
+    results_dir: output_dir
+    inference.trt_engine: parent_model
+spec_shorthand_keys:
+  num_classes: dataset.num_classes
+  trt_data_type: gen_trt_engine.tensorrt.data_type
+  trt_engine: gen_trt_engine.trt_engine
+  batch_size: dataset.batch_size
+description: RT-DETR deploy workflow for gen_trt_engine, evaluate, inference using
+  TAO Deploy.
+spec_templates:
+  gen_trt_engine: spec_template_deploy_gen_trt_engine.yaml
+  evaluate: spec_template_deploy_evaluate.yaml
+  inference: spec_template_deploy_inference.yaml
+notes:
+- Use FP16 for starter-kit TensorRT builds unless INT8 calibration is explicitly requested.
+- If quantized export is used, build the TensorRT engine from the quantized export
+  ONNX artifact.
+- Carry `dataset.num_classes` and RT-DETR model structure from train/export. Do
+  not set `gen_trt_engine.input_width` or `gen_trt_engine.input_height`; deploy
+  engine generation infers shape from ONNX. Use `evaluate.input_width` /
+  `evaluate.input_height` and `inference.input_width` / `inference.input_height`
+  for TensorRT evaluate/inference.
