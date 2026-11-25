@@ -1899,6 +1899,13 @@
       "last_modified": "2026-11-18"
     },
     {
+      "name": "nemo-gym-analyzing-results",
+      "path": "skills/nemo-gym-analyzing-results",
+      "content_digest": "sha256:99552714185b3f9c7f4b0d36fd6af44258c135d7dde807461e1adc61ab2c242d",
+      "last_commit": "e3ff61d6f182472c9f9835a4fab5b46ac70b236d",
+      "last_modified": "2026-11-25"
+    },
+    {
       "name": "nemo-gym-reward-profiling",
       "path": "skills/nemo-gym-reward-profiling",
       "content_digest": "sha256:e6ed7f0326980cb0f799126b9bb2151074e1bdec5874ca98fdae6eb6c0d45772",
@@ -2328,8 +2335,8 @@
     {
       "name": "nvflare-autofl-report",
       "path": "skills/nvflare-autofl-report",
-      "content_digest": "sha256:02434962ae2bdf4c0f6a1ad70326cd8b462061eef168167ff20e3db7f5867ee7",
-      "last_commit": "f6f05709a2a1e16fe57a708fc680f2a83020e0b4",
+      "content_digest": "sha256:fe0fac0b6d778cbd8e6a473340f09ee5f44c5249f5ccf1c0058b54c9f9fb18de",
+      "last_commit": "e3ff61d6f182472c9f9835a4fab5b46ac70b236d",
       "last_modified": "2026-11-25"
     },
     {
