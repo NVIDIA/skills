@@ -320,7 +320,7 @@ Static validation used NVCARPS CLI 1.3.1435. Findings remain open in that report
 
 **Version (manifest):** `0.1.19` in all four manifests.
 
-**Signing profile:** External — job `SKILLS_EXTERNAL`, scope `SIGNING_SKILLS_EXTERNAL`.
+**Signing profile:** External.
 
 **Content digest:** Per-file SHA-256 inventory carried in [plugin.oms.sig](plugin.oms.sig).
 
@@ -331,10 +331,7 @@ Static validation used NVCARPS CLI 1.3.1435. Findings remain open in that report
 - [TAO skill bank source](https://github.com/NVIDIA-TAO/tao-skill-bank)
 - [Package README](README.md), [agent guidance](AGENTS.md), and [session-start hook](hooks/session_start.sh)
 - [Job records](scripts/tao_job_record.py), [project guidance helper](scripts/tao_agent_identity.py), and [data I/O](skills/tao-data-io/SKILL.md)
-- [Evaluation result](https://gitlab-master.nvidia.com/ai_tools/verified-plugins-playground/-/blob/3d6cc6efebfadd6dddb999762165bae90b987833/plugins/nvidia-tao-toolkit/.eval-results/e068d566e59f4351acaa7e0196ceb8cb/eval-result.json) — NVCARPS 1.3.1430
-- [Evaluation HTML report](https://gitlab-master.nvidia.com/ai_tools/verified-plugins-playground/-/raw/3d6cc6efebfadd6dddb999762165bae90b987833/plugins/nvidia-tao-toolkit/.eval-results/e068d566e59f4351acaa7e0196ceb8cb/evaluation-report.html) — NVCARPS 1.3.1430
-- [Canonical cross-agent aggregate: 94.71/100, PASS, Partial coverage](https://gitlab-master.nvidia.com/ai_tools/verified-plugins-playground/-/blob/3d6cc6efebfadd6dddb999762165bae90b987833/plugins/nvidia-tao-toolkit/.eval-results/e068d566e59f4351acaa7e0196ceb8cb/overall-score.json) — NVCARPS 1.3.1430; the reported policy takes the minimum agent score. Codex's individual score is 98.06/100.
-- [TAO source and evaluation submission](https://gitlab-master.nvidia.com/ai_tools/verified-plugins-playground/-/merge_requests/7)
+- [Evaluation benchmark](BENCHMARK.md)
 
 ## Ethical Considerations
 
