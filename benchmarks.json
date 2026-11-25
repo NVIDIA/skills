@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 488,
-  "result_row_count": 4594,
+  "skill_count": 490,
+  "result_row_count": 4604,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -1995,7 +1995,7 @@
     },
     {
       "skill": "doca-aes-gcm",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:b714f4675f43669d5298e2ed02dbee85b5b8d394ced607da4e7f4da7e23663cb",
@@ -2012,11 +2012,11 @@
       "catalog_dir": "doca-aes-gcm",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 15.07
+      "average_uplift_pct": 16.6
     },
     {
       "skill": "doca-argp",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:00eed782d91c38f8c0b9ff88b81e2b137ce3f0533a3a7e49712ace4e29bfec0d",
@@ -2033,11 +2033,11 @@
       "catalog_dir": "doca-argp",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 13.88
+      "average_uplift_pct": 12.87
     },
     {
       "skill": "doca-argus",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:e2b075fe2be9760c3a342f783c65ee6bbfa9912f5f08a84aadaa925b77cbe4e4",
@@ -2054,11 +2054,11 @@
       "catalog_dir": "doca-argus",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 27.08
+      "average_uplift_pct": 24.8
     },
     {
       "skill": "doca-bare-metal-deployment",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:39e7c229748cb1f865ca636d41514792e647c3c5b0bd6c055f1811615a582b6a",
@@ -2075,11 +2075,11 @@
       "catalog_dir": "doca-bare-metal-deployment",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 19.03
+      "average_uplift_pct": 20.48
     },
     {
       "skill": "doca-bench",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:c8caeb0eb027b18e240f06abd2295f53cb9f30120d1302bb2211d124dfc623fc",
@@ -2096,11 +2096,11 @@
       "catalog_dir": "doca-bench",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 20.83
+      "average_uplift_pct": 21.67
     },
     {
       "skill": "doca-bf3-deployment",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:c3d6c876b2c75b4892b8cad068e3cffbe5d78b34b73f1ee3a8be5c76fc675e88",
@@ -2117,7 +2117,7 @@
       "catalog_dir": "doca-bf3-deployment",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 14.7
+      "average_uplift_pct": 14.07
     },
     {
       "skill": "doca-bf4-deployment",
@@ -2142,7 +2142,7 @@
     },
     {
       "skill": "doca-caps",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:4b2b0da62d51bb794d989f58e8d89cb39e1ebfc2cd1c7e72c9654057f2085cc9",
@@ -2159,11 +2159,11 @@
       "catalog_dir": "doca-caps",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 25.0
+      "average_uplift_pct": 23.53
     },
     {
       "skill": "doca-comch",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:145efaec34e4f9c4a16b8dec48440cbe05f2a3aea48f42d3f9a2546c9675ccf1",
@@ -2180,11 +2180,11 @@
       "catalog_dir": "doca-comch",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 13.2
+      "average_uplift_pct": 9.72
     },
     {
       "skill": "doca-comm-channel-admin",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:9d2e8574f2afb5f9a860008df26c43b3364e7a22f743c6823e50820b6cd7785a",
@@ -2201,11 +2201,11 @@
       "catalog_dir": "doca-comm-channel-admin",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 29.38
+      "average_uplift_pct": 31.45
     },
     {
       "skill": "doca-common",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:9e22539842a371b035b6820995478cb465ac90fc3e65d8d974e6798810076bb7",
@@ -2222,11 +2222,11 @@
       "catalog_dir": "doca-common",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 33.88
+      "average_uplift_pct": 28.12
     },
     {
       "skill": "doca-compress",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:6e91c5d95330da449fbe27bba3be01993b08a9dcf773d993c37186b498a8106a",
@@ -2243,11 +2243,11 @@
       "catalog_dir": "doca-compress",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 16.03
+      "average_uplift_pct": 15.42
     },
     {
       "skill": "doca-container-deployment",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:f620767bb542265dce8251dde87797f9c87f96fcfb08bea2d513dddfb5ebd0e1",
@@ -2264,11 +2264,11 @@
       "catalog_dir": "doca-container-deployment",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 15.27
+      "average_uplift_pct": 14.67
     },
     {
       "skill": "doca-debug",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:3446a776a39d75fe23b46b6dca9423926b519308fbea5b24ff55a018ac1dda98",
@@ -2285,11 +2285,11 @@
       "catalog_dir": "doca-debug",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 24.73
+      "average_uplift_pct": 26.83
     },
     {
       "skill": "doca-devemu",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:bddc3102319aeedfab57309e910e03e8c1185f748c84845eadf3d5b4a3799de2",
@@ -2306,11 +2306,11 @@
       "catalog_dir": "doca-devemu",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 15.0
+      "average_uplift_pct": 19.58
     },
     {
       "skill": "doca-dma",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:58f730de82eaf2a44e485bfea8650a85067792eab4dc2ddae21139b7669af3bb",
@@ -2327,11 +2327,11 @@
       "catalog_dir": "doca-dma",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 15.4
+      "average_uplift_pct": 20.42
     },
     {
       "skill": "doca-dms",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:e498e199e73e2d7f8252c201b21ccf39ea42f12447a4e3231ad0f2c7c04ebfb2",
@@ -2348,13 +2348,13 @@
       "catalog_dir": "doca-dms",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 20.83
+      "average_uplift_pct": 26.47
     },
     {
       "skill": "doca-dpa",
-      "evaluation_date": "2026-11-17",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.6.9",
+      "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:99ac207da052504949cf6f114412975da1858f1bcea2374f3fac8c667696bb9c",
       "validation_status": "passed",
       "tasks": 4,
@@ -2369,11 +2369,11 @@
       "catalog_dir": "doca-dpa",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 12.98
+      "average_uplift_pct": 15.78
     },
     {
       "skill": "doca-dpdk-bridge",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:39186cf8437329daca290b6e5ecdc2eeca67966dd967b9e18b89708531366ae3",
@@ -2390,11 +2390,11 @@
       "catalog_dir": "doca-dpdk-bridge",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 16.38
+      "average_uplift_pct": 18.05
     },
     {
       "skill": "doca-dts",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:1f0a5dec87b17e5f794f9aa7e1c80561854711f5e5b6fdd87c357e0f4a3b0a8c",
@@ -2411,11 +2411,11 @@
       "catalog_dir": "doca-dts",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 23.1
+      "average_uplift_pct": 24.97
     },
     {
       "skill": "doca-erasure-coding",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:ce6ee874a1ed1103e7f48d2a35930d6eafc4d66d818d35f6cca641d5b505d03e",
@@ -2432,11 +2432,11 @@
       "catalog_dir": "doca-erasure-coding",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 41.45
+      "average_uplift_pct": 35.07
     },
     {
       "skill": "doca-eth",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:4d2905f230601c71791bae6c8d3305f1bcd40081e7d3c9d045224dae3d40798c",
@@ -2453,11 +2453,11 @@
       "catalog_dir": "doca-eth",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 29.45
+      "average_uplift_pct": 28.48
     },
     {
       "skill": "doca-firefly",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:507d57859a365707cbf6ff537ee239128427ca02a501116cbf00d3ab681150f7",
@@ -2474,11 +2474,11 @@
       "catalog_dir": "doca-firefly",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 24.78
+      "average_uplift_pct": 22.5
     },
     {
       "skill": "doca-flow",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:032699772d08005c3ea2e3f46cfade4a93485cbd7e2b58c0414b1f0873c18a03",
@@ -2499,7 +2499,7 @@
     },
     {
       "skill": "doca-flow-tune",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:af08855d41640933eb1bea654d69779f4498fdc9c0770aef66b9e233658e2b58",
@@ -2516,11 +2516,11 @@
       "catalog_dir": "doca-flow-tune",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 27.92
+      "average_uplift_pct": 23.32
     },
     {
       "skill": "doca-gpunetio",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:bea4079fa63e42d320dec085b358c6e3f0550d3990e9aac5f7843f923f7e340b",
@@ -2537,11 +2537,11 @@
       "catalog_dir": "doca-gpunetio",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 17.92
+      "average_uplift_pct": 19.17
     },
     {
       "skill": "doca-hardware-safety",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:92ada66ba25e4a14374052c645b38d751d26dab43422e376d5b5bf9034dc939b",
@@ -2558,11 +2558,11 @@
       "catalog_dir": "doca-hardware-safety",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 18.07
+      "average_uplift_pct": 21.95
     },
     {
       "skill": "doca-mgmt",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:d675611fce16769fe5dbc30305f35bc343f0872106413cec0c5cdf6cbd7a0ebb",
@@ -2579,7 +2579,7 @@
       "catalog_dir": "doca-mgmt",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 22.23
+      "average_uplift_pct": 18.33
     },
     {
       "skill": "doca-ngauge",
@@ -2604,7 +2604,7 @@
     },
     {
       "skill": "doca-pcc",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:b4ace845a30f780357610f24b25178c55b01fd92131b765da4b9cab529155e07",
@@ -2621,11 +2621,11 @@
       "catalog_dir": "doca-pcc",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 29.23
+      "average_uplift_pct": 22.43
     },
     {
       "skill": "doca-pcc-counters",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:d4cf11046a7a83cd5f672ca04e9d52a3d7ec7e75196f5e27915e2f5df99a3fc7",
@@ -2642,7 +2642,7 @@
       "catalog_dir": "doca-pcc-counters",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 29.37
+      "average_uplift_pct": 30.2
     },
     {
       "skill": "doca-perftest",
@@ -2688,7 +2688,7 @@
     },
     {
       "skill": "doca-programming-guide",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:2e27fd3409307342645dce6375a022958ae921dbff162c787a794aee65a7587a",
@@ -2705,11 +2705,11 @@
       "catalog_dir": "doca-programming-guide",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 19.87
+      "average_uplift_pct": 13.62
     },
     {
       "skill": "doca-public-knowledge-map",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:a1265eeb43d3a168a96388bb2d6c5639db424404a5f08cc4a61296448d61bcc4",
@@ -2726,11 +2726,11 @@
       "catalog_dir": "doca-public-knowledge-map",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 15.93
+      "average_uplift_pct": 20.95
     },
     {
       "skill": "doca-rdma",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:bbfd9c3fcb8dc14a5ea287c6c1eea970dc9406e529ca07b259c0ca118ecd5ed9",
@@ -2747,11 +2747,11 @@
       "catalog_dir": "doca-rdma",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 23.97
+      "average_uplift_pct": 24.8
     },
     {
       "skill": "doca-rmax",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:6a4d01baa73511220efb9c0ead385bb4eff7924fe876469a2bf3c1cbfebf8a79",
@@ -2768,11 +2768,11 @@
       "catalog_dir": "doca-rmax",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 28.12
+      "average_uplift_pct": 35.63
     },
     {
       "skill": "doca-setup",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:169f7c0489e994502eee43ed5716bf51cebe677b1bd8f3a68ecc6278038d804e",
@@ -2789,11 +2789,11 @@
       "catalog_dir": "doca-setup",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 26.18
+      "average_uplift_pct": 25.77
     },
     {
       "skill": "doca-sha",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:90773914e107032a78213d6408b50f512617b8c988ac48da973ebf7959fa0369",
@@ -2810,11 +2810,11 @@
       "catalog_dir": "doca-sha",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 19.58
+      "average_uplift_pct": 17.5
     },
     {
       "skill": "doca-sha-offload-engine",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:377bcd727017434d29a46091021eadeed1b8a9725c80c997a230768e27b5f062",
@@ -2831,11 +2831,11 @@
       "catalog_dir": "doca-sha-offload-engine",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 16.67
+      "average_uplift_pct": 22.5
     },
     {
       "skill": "doca-socket-relay",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:17dfd2642bf754704fb0dd534cd92cbf58fdf6040a4bec732e227ff10f358941",
@@ -2852,11 +2852,11 @@
       "catalog_dir": "doca-socket-relay",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 25.22
+      "average_uplift_pct": 15.83
     },
     {
       "skill": "doca-spcx-cc",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:257788feb386e0be4f1162015c3ec571bb3e17608b969731541de83dd0c49b9b",
@@ -2873,11 +2873,11 @@
       "catalog_dir": "doca-spcx-cc",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 30.73
+      "average_uplift_pct": 29.38
     },
     {
       "skill": "doca-sta",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:ac6ac74fd23064ac9e631f093ae95a62d9710c941de4349cf35ddc4d1cfb1d8f",
@@ -2894,11 +2894,11 @@
       "catalog_dir": "doca-sta",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 34.48
+      "average_uplift_pct": 32.9
     },
     {
       "skill": "doca-structured-tools-contract",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:9f0e74e9e93f6adaf59703cc2bc5b11aac844586edff0ba18f49ddcf38c2f870",
@@ -2915,11 +2915,11 @@
       "catalog_dir": "doca-structured-tools-contract",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 21.32
+      "average_uplift_pct": 22.37
     },
     {
       "skill": "doca-telemetry",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:70e265d586a768580828bb54df47441590e24c64d1bf6baa15a2f9c5792734b0",
@@ -2936,11 +2936,11 @@
       "catalog_dir": "doca-telemetry",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 25.62
+      "average_uplift_pct": 28.53
     },
     {
       "skill": "doca-telemetry-exporter",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:b1dce467c82515cd711da59c7567693b4f6f017d4de61919fc70f3dbc1d65698",
@@ -2957,11 +2957,11 @@
       "catalog_dir": "doca-telemetry-exporter",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 18.12
+      "average_uplift_pct": 17.72
     },
     {
       "skill": "doca-telemetry-traceback-application",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:0c9167216e7c5952361cf854921a86d3854342935e14e647a42af4d35ac4adb4",
@@ -2978,11 +2978,11 @@
       "catalog_dir": "doca-telemetry-traceback-application",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 16.67
+      "average_uplift_pct": 15.17
     },
     {
       "skill": "doca-telemetry-utils",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:ef327ce957c8da4909cf567b4eda8fafaeaad3a86ec256da673d9215cecba117",
@@ -2999,11 +2999,11 @@
       "catalog_dir": "doca-telemetry-utils",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 27.92
+      "average_uplift_pct": 31.25
     },
     {
       "skill": "doca-upgrade",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:e8be7babdc43b3f9a24fa01668d434ce2211db9e76f46235c2fd58c6e060860f",
@@ -3020,11 +3020,11 @@
       "catalog_dir": "doca-upgrade",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 15.15
+      "average_uplift_pct": 14.73
     },
     {
       "skill": "doca-urom",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:4590d521ae42ad89d08024bcda540556f6f701be61e8a2d6499b969602e2ba41",
@@ -3041,11 +3041,11 @@
       "catalog_dir": "doca-urom",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 29.17
+      "average_uplift_pct": 26.05
     },
     {
       "skill": "doca-urom-svc",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:ea16cc085828d2133e3ded6b24d1d0cc8cb949802c1ddac4c03c2ddb9c1c05f9",
@@ -3062,11 +3062,11 @@
       "catalog_dir": "doca-urom-svc",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 18.53
+      "average_uplift_pct": 18.55
     },
     {
       "skill": "doca-verbs",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:68fee5caecf9a6d68a1653e3eadd6daf86fb1f79f00fb1f99fffcc2003f1a39b",
@@ -3083,11 +3083,11 @@
       "catalog_dir": "doca-verbs",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 26.45
+      "average_uplift_pct": 37.07
     },
     {
       "skill": "doca-version",
-      "evaluation_date": "2026-11-18",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:6c6931b2418673e118574cfd8feb29e098f2f59f103e277f16394a56f6a0dab7",
@@ -3104,7 +3104,7 @@
       "catalog_dir": "doca-version",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 19.45
+      "average_uplift_pct": 23.67
     },
     {
       "skill": "dynamo-interconnect-check",
@@ -5675,6 +5675,27 @@
       "average_uplift_pct": 15.0
     },
     {
+      "skill": "nemo-gym-run-and-babysit-eval",
+      "evaluation_date": "2026-11-25",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.10",
+      "dataset_digest": "sha256:38877db796fe827d3ad2f80d9eb7d118184b7825826f9590140d2f514ef01b8c",
+      "validation_status": "passed",
+      "tasks": 21,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "nemo-gym-run-and-babysit-eval",
+      "component": "NeMo Gym",
+      "has_results": true,
+      "average_uplift_pct": 13.5
+    },
+    {
       "skill": "nemo-mbridge-mlm-bridge-training",
       "evaluation_date": "2026-07-15",
       "environment": "astra-sandbox",
@@ -6765,6 +6786,27 @@
       "component": "Medical AI Skills",
       "has_results": true,
       "average_uplift_pct": 48.9
+    },
+    {
+      "skill": "nv-monai-autoresearch",
+      "evaluation_date": "2026-11-25",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.10",
+      "dataset_digest": "sha256:09f4cf8c4007172a5d80be1b2be449dd58cb53ed812787cb0d7b8d775f638c98",
+      "validation_status": "passed",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "nv-monai-autoresearch",
+      "component": "Medical AI Skills",
+      "has_results": true,
+      "average_uplift_pct": 18.48
     },
     {
       "skill": "nv-reason-ct",
@@ -18433,7 +18475,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 35.0
+      "uplift_pct": 40.0
     },
     {
       "catalog_dir": "doca-aes-gcm",
@@ -18469,7 +18511,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 47.9
+      "uplift_pct": 60.4
     },
     {
       "catalog_dir": "doca-aes-gcm",
@@ -18478,52 +18520,52 @@
       "num": null,
       "agent": "codex",
       "score_pct": 87.5,
+      "uplift_pct": 4.2
+    },
+    {
+      "catalog_dir": "doca-aes-gcm",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 98.1,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "doca-aes-gcm",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 68.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "doca-argp",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-argp",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
       "uplift_pct": 12.5
     },
     {
-      "catalog_dir": "doca-aes-gcm",
-      "component": "DOCA",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 89.8,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "doca-aes-gcm",
-      "component": "DOCA",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 69.8,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "doca-argp",
-      "component": "DOCA",
-      "dimension": "Security",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "doca-argp",
-      "component": "DOCA",
-      "dimension": "Security",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
       "catalog_dir": "doca-argp",
       "component": "DOCA",
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 20.0
+      "uplift_pct": 25.0
     },
     {
       "catalog_dir": "doca-argp",
@@ -18531,8 +18573,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 5.0
+      "score_pct": 95.0,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "doca-argp",
@@ -18558,8 +18600,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 91.7,
-      "uplift_pct": 37.5
+      "score_pct": 93.8,
+      "uplift_pct": 43.8
     },
     {
       "catalog_dir": "doca-argp",
@@ -18567,8 +18609,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 83.3,
-      "uplift_pct": 20.8
+      "score_pct": 79.2,
+      "uplift_pct": -4.1
     },
     {
       "catalog_dir": "doca-argp",
@@ -18576,7 +18618,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 90.1,
+      "score_pct": 90.2,
       "uplift_pct": null
     },
     {
@@ -18585,7 +18627,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 74.9,
+      "score_pct": 74.0,
       "uplift_pct": null
     },
     {
@@ -18622,7 +18664,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 30.0
+      "uplift_pct": 35.0
     },
     {
       "catalog_dir": "doca-argus",
@@ -18648,8 +18690,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 50.0
+      "score_pct": 81.3,
+      "uplift_pct": 31.3
     },
     {
       "catalog_dir": "doca-argus",
@@ -18666,7 +18708,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 85.5,
+      "score_pct": 94.3,
       "uplift_pct": null
     },
     {
@@ -18675,7 +18717,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 78.9,
+      "score_pct": 80.1,
       "uplift_pct": null
     },
     {
@@ -18702,8 +18744,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 35.0
+      "score_pct": 90.0,
+      "uplift_pct": 25.0
     },
     {
       "catalog_dir": "doca-bare-metal-deployment",
@@ -18711,7 +18753,7 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 95.0,
+      "score_pct": 100.0,
       "uplift_pct": 25.0
     },
     {
@@ -18739,7 +18781,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 41.7
+      "uplift_pct": 47.9
     },
     {
       "catalog_dir": "doca-bare-metal-deployment",
@@ -18747,8 +18789,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 87.5,
-      "uplift_pct": 12.5
+      "score_pct": 100.0,
+      "uplift_pct": 25.0
     },
     {
       "catalog_dir": "doca-bare-metal-deployment",
@@ -18756,7 +18798,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 80.9,
+      "score_pct": 93.0,
       "uplift_pct": null
     },
     {
@@ -18765,7 +18807,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 83.7,
+      "score_pct": 83.8,
       "uplift_pct": null
     },
     {
@@ -18793,7 +18835,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 30.0
+      "uplift_pct": 40.0
     },
     {
       "catalog_dir": "doca-bench",
@@ -18802,7 +18844,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 20.0
+      "uplift_pct": 15.0
     },
     {
       "catalog_dir": "doca-bench",
@@ -18819,7 +18861,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 93.3,
+      "score_pct": 95.0,
       "uplift_pct": null
     },
     {
@@ -18829,7 +18871,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 50.0
+      "uplift_pct": 56.2
     },
     {
       "catalog_dir": "doca-bench",
@@ -18837,8 +18879,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 12.5
+      "score_pct": 93.8,
+      "uplift_pct": 6.3
     },
     {
       "catalog_dir": "doca-bench",
@@ -18846,7 +18888,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 89.6,
+      "score_pct": 86.2,
       "uplift_pct": null
     },
     {
@@ -18855,7 +18897,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 68.6,
+      "score_pct": 73.0,
       "uplift_pct": null
     },
     {
@@ -18891,8 +18933,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 93.3,
-      "uplift_pct": 13.3
+      "score_pct": 80.0,
+      "uplift_pct": 6.7
     },
     {
       "catalog_dir": "doca-bf3-deployment",
@@ -18909,7 +18951,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 85.0,
+      "score_pct": 95.0,
       "uplift_pct": null
     },
     {
@@ -18919,7 +18961,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 27.8
+      "uplift_pct": 22.2
     },
     {
       "catalog_dir": "doca-bf3-deployment",
@@ -18927,8 +18969,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 83.3,
-      "uplift_pct": 13.8
+      "score_pct": 100.0,
+      "uplift_pct": 22.2
     },
     {
       "catalog_dir": "doca-bf3-deployment",
@@ -18936,7 +18978,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 81.8,
+      "score_pct": 83.5,
       "uplift_pct": null
     },
     {
@@ -18945,7 +18987,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 78.0,
+      "score_pct": 74.7,
       "uplift_pct": null
     },
     {
@@ -19054,7 +19096,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 12.5
     },
     {
       "catalog_dir": "doca-caps",
@@ -19062,8 +19104,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 25.0
+      "score_pct": 95.0,
+      "uplift_pct": 40.0
     },
     {
       "catalog_dir": "doca-caps",
@@ -19072,7 +19114,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 25.0
+      "uplift_pct": 20.0
     },
     {
       "catalog_dir": "doca-caps",
@@ -19080,7 +19122,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 96.7,
+      "score_pct": 100.0,
       "uplift_pct": null
     },
     {
@@ -19098,8 +19140,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 50.0
+      "score_pct": 75.0,
+      "uplift_pct": 43.7
     },
     {
       "catalog_dir": "doca-caps",
@@ -19108,7 +19150,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 50.0
+      "uplift_pct": 25.0
     },
     {
       "catalog_dir": "doca-caps",
@@ -19116,7 +19158,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 85.1,
+      "score_pct": 79.6,
       "uplift_pct": null
     },
     {
@@ -19125,7 +19167,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 76.5,
+      "score_pct": 79.6,
       "uplift_pct": null
     },
     {
@@ -19144,7 +19186,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 12.5
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "doca-comch",
@@ -19153,7 +19195,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 20.0
+      "uplift_pct": 25.0
     },
     {
       "catalog_dir": "doca-comch",
@@ -19161,8 +19203,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 5.0
+      "score_pct": 95.0,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "doca-comch",
@@ -19189,7 +19231,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 87.5,
-      "uplift_pct": 33.3
+      "uplift_pct": 20.8
     },
     {
       "catalog_dir": "doca-comch",
@@ -19197,8 +19239,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 91.7,
-      "uplift_pct": 8.4
+      "score_pct": 83.3,
+      "uplift_pct": 12.5
     },
     {
       "catalog_dir": "doca-comch",
@@ -19206,7 +19248,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 82.9,
+      "score_pct": 89.7,
       "uplift_pct": null
     },
     {
@@ -19215,7 +19257,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 60.5,
+      "score_pct": 65.2,
       "uplift_pct": null
     },
     {
@@ -19243,7 +19285,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 75.0
+      "uplift_pct": 80.0
     },
     {
       "catalog_dir": "doca-comm-channel-admin",
@@ -19252,7 +19294,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 20.0
+      "uplift_pct": 15.0
     },
     {
       "catalog_dir": "doca-comm-channel-admin",
@@ -19279,7 +19321,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 75.0,
-      "uplift_pct": 50.0
+      "uplift_pct": 56.2
     },
     {
       "catalog_dir": "doca-comm-channel-admin",
@@ -19288,7 +19330,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 93.8,
-      "uplift_pct": 31.3
+      "uplift_pct": 37.5
     },
     {
       "catalog_dir": "doca-comm-channel-admin",
@@ -19296,7 +19338,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 90.9,
+      "score_pct": 89.3,
       "uplift_pct": null
     },
     {
@@ -19305,7 +19347,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 76.2,
+      "score_pct": 77.5,
       "uplift_pct": null
     },
     {
@@ -19324,7 +19366,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 12.5
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "doca-common",
@@ -19332,7 +19374,7 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
+      "score_pct": 90.0,
       "uplift_pct": 40.0
     },
     {
@@ -19341,8 +19383,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 95.0,
-      "uplift_pct": 30.0
+      "score_pct": 100.0,
+      "uplift_pct": 35.0
     },
     {
       "catalog_dir": "doca-common",
@@ -19368,8 +19410,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 83.3,
-      "uplift_pct": 64.5
+      "score_pct": 64.6,
+      "uplift_pct": 39.6
     },
     {
       "catalog_dir": "doca-common",
@@ -19377,8 +19419,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 89.6,
-      "uplift_pct": 56.3
+      "score_pct": 95.8,
+      "uplift_pct": 54.1
     },
     {
       "catalog_dir": "doca-common",
@@ -19386,7 +19428,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 86.4,
+      "score_pct": 79.5,
       "uplift_pct": null
     },
     {
@@ -19395,7 +19437,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 71.8,
+      "score_pct": 69.2,
       "uplift_pct": null
     },
     {
@@ -19431,8 +19473,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 15.0
+      "score_pct": 95.0,
+      "uplift_pct": 5.0
     },
     {
       "catalog_dir": "doca-compress",
@@ -19459,7 +19501,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 37.5
+      "uplift_pct": 50.0
     },
     {
       "catalog_dir": "doca-compress",
@@ -19467,8 +19509,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 6.2
+      "score_pct": 93.8,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "doca-compress",
@@ -19476,7 +19518,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 84.5,
+      "score_pct": 83.1,
       "uplift_pct": null
     },
     {
@@ -19485,7 +19527,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 71.7,
+      "score_pct": 69.1,
       "uplift_pct": null
     },
     {
@@ -19504,7 +19546,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 12.5
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "doca-container-deployment",
@@ -19513,7 +19555,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 25.0
+      "uplift_pct": 35.0
     },
     {
       "catalog_dir": "doca-container-deployment",
@@ -19522,7 +19564,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 85.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 5.0
     },
     {
       "catalog_dir": "doca-container-deployment",
@@ -19539,71 +19581,71 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
+      "score_pct": 93.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "doca-container-deployment",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 54.2
+    },
+    {
+      "catalog_dir": "doca-container-deployment",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 81.3,
+      "uplift_pct": -6.2
+    },
+    {
+      "catalog_dir": "doca-container-deployment",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 89.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "doca-container-deployment",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 82.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "doca-debug",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-debug",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-debug",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
       "score_pct": 90.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "doca-container-deployment",
-      "component": "DOCA",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 47.9
-    },
-    {
-      "catalog_dir": "doca-container-deployment",
-      "component": "DOCA",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 87.5,
-      "uplift_pct": 6.2
-    },
-    {
-      "catalog_dir": "doca-container-deployment",
-      "component": "DOCA",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 86.2,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "doca-container-deployment",
-      "component": "DOCA",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 75.4,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "doca-debug",
-      "component": "DOCA",
-      "dimension": "Security",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "doca-debug",
-      "component": "DOCA",
-      "dimension": "Security",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "doca-debug",
-      "component": "DOCA",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 95.0,
-      "uplift_pct": 45.0
+      "uplift_pct": 50.0
     },
     {
       "catalog_dir": "doca-debug",
@@ -19611,8 +19653,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 80.0,
-      "uplift_pct": 20.0
+      "score_pct": 75.0,
+      "uplift_pct": 15.0
     },
     {
       "catalog_dir": "doca-debug",
@@ -19639,7 +19681,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 93.8,
-      "uplift_pct": 66.7
+      "uplift_pct": 60.5
     },
     {
       "catalog_dir": "doca-debug",
@@ -19648,7 +19690,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 81.3,
-      "uplift_pct": 16.7
+      "uplift_pct": 35.5
     },
     {
       "catalog_dir": "doca-debug",
@@ -19656,7 +19698,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 90.7,
+      "score_pct": 98.5,
       "uplift_pct": null
     },
     {
@@ -19665,7 +19707,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 72.1,
+      "score_pct": 71.6,
       "uplift_pct": null
     },
     {
@@ -19702,7 +19744,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 95.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 15.0
     },
     {
       "catalog_dir": "doca-devemu",
@@ -19728,7 +19770,7 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 93.8,
+      "score_pct": 100.0,
       "uplift_pct": 50.0
     },
     {
@@ -19738,7 +19780,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 12.5
     },
     {
       "catalog_dir": "doca-devemu",
@@ -19755,7 +19797,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 68.6,
+      "score_pct": 71.9,
       "uplift_pct": null
     },
     {
@@ -19792,7 +19834,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 5.0
+      "uplift_pct": 10.0
     },
     {
       "catalog_dir": "doca-dma",
@@ -19818,8 +19860,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 83.3,
-      "uplift_pct": 39.5
+      "score_pct": 89.6,
+      "uplift_pct": 52.1
     },
     {
       "catalog_dir": "doca-dma",
@@ -19827,8 +19869,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 79.2,
-      "uplift_pct": 22.9
+      "score_pct": 91.7,
+      "uplift_pct": 35.4
     },
     {
       "catalog_dir": "doca-dma",
@@ -19836,7 +19878,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 82.0,
+      "score_pct": 86.3,
       "uplift_pct": null
     },
     {
@@ -19845,7 +19887,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 58.8,
+      "score_pct": 63.0,
       "uplift_pct": null
     },
     {
@@ -19859,192 +19901,192 @@
     },
     {
       "catalog_dir": "doca-dms",
-      "component": "DOCA",
-      "dimension": "Security",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "doca-dms",
-      "component": "DOCA",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 90.0,
-      "uplift_pct": 30.0
-    },
-    {
-      "catalog_dir": "doca-dms",
-      "component": "DOCA",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 95.0,
-      "uplift_pct": 20.0
-    },
-    {
-      "catalog_dir": "doca-dms",
-      "component": "DOCA",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "doca-dms",
-      "component": "DOCA",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 95.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "doca-dms",
-      "component": "DOCA",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 75.0,
-      "uplift_pct": 50.0
-    },
-    {
-      "catalog_dir": "doca-dms",
-      "component": "DOCA",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 68.8,
-      "uplift_pct": 25.0
-    },
-    {
-      "catalog_dir": "doca-dms",
-      "component": "DOCA",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 84.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "doca-dms",
-      "component": "DOCA",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 67.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "doca-dpa",
-      "component": "DOCA",
-      "dimension": "Security",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "doca-dpa",
-      "component": "DOCA",
-      "dimension": "Security",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "doca-dpa",
-      "component": "DOCA",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 95.0,
-      "uplift_pct": 25.0
-    },
-    {
-      "catalog_dir": "doca-dpa",
-      "component": "DOCA",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 90.0,
-      "uplift_pct": 5.0
-    },
-    {
-      "catalog_dir": "doca-dpa",
-      "component": "DOCA",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "doca-dpa",
-      "component": "DOCA",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 95.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "doca-dpa",
-      "component": "DOCA",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 83.3,
-      "uplift_pct": 39.5
-    },
-    {
-      "catalog_dir": "doca-dpa",
-      "component": "DOCA",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 56.3,
-      "uplift_pct": 8.4
-    },
-    {
-      "catalog_dir": "doca-dpa",
-      "component": "DOCA",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 85.7,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "doca-dpa",
-      "component": "DOCA",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 59.8,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "doca-dpdk-bridge",
-      "component": "DOCA",
-      "dimension": "Security",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "doca-dpdk-bridge",
       "component": "DOCA",
       "dimension": "Security",
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 12.5
+    },
+    {
+      "catalog_dir": "doca-dms",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "doca-dms",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "doca-dms",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "doca-dms",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "doca-dms",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 87.5,
+      "uplift_pct": 62.5
+    },
+    {
+      "catalog_dir": "doca-dms",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 81.3,
+      "uplift_pct": 18.8
+    },
+    {
+      "catalog_dir": "doca-dms",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 87.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "doca-dms",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 66.2,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "doca-dpa",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-dpa",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 12.5
+    },
+    {
+      "catalog_dir": "doca-dpa",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": 35.0
+    },
+    {
+      "catalog_dir": "doca-dpa",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 85.0,
+      "uplift_pct": -5.0
+    },
+    {
+      "catalog_dir": "doca-dpa",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "doca-dpa",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "doca-dpa",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 81.3,
+      "uplift_pct": 31.3
+    },
+    {
+      "catalog_dir": "doca-dpa",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 91.7,
+      "uplift_pct": 20.9
+    },
+    {
+      "catalog_dir": "doca-dpa",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 85.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "doca-dpa",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 61.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "doca-dpdk-bridge",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-dpdk-bridge",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "doca-dpdk-bridge",
@@ -20062,7 +20104,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 10.0
     },
     {
       "catalog_dir": "doca-dpdk-bridge",
@@ -20097,8 +20139,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 83.3,
-      "uplift_pct": 0.0
+      "score_pct": 79.2,
+      "uplift_pct": 12.5
     },
     {
       "catalog_dir": "doca-dpdk-bridge",
@@ -20106,7 +20148,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 87.7,
+      "score_pct": 87.6,
       "uplift_pct": null
     },
     {
@@ -20115,7 +20157,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 67.0,
+      "score_pct": 68.1,
       "uplift_pct": null
     },
     {
@@ -20133,8 +20175,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "codex",
-      "score_pct": 83.3,
-      "uplift_pct": -8.4
+      "score_pct": 91.7,
+      "uplift_pct": 8.4
     },
     {
       "catalog_dir": "doca-dts",
@@ -20142,8 +20184,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 90.0,
-      "uplift_pct": 46.7
+      "score_pct": 83.3,
+      "uplift_pct": 33.3
     },
     {
       "catalog_dir": "doca-dts",
@@ -20151,8 +20193,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 80.0,
-      "uplift_pct": 10.0
+      "score_pct": 90.0,
+      "uplift_pct": 23.3
     },
     {
       "catalog_dir": "doca-dts",
@@ -20178,8 +20220,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 66.0,
-      "uplift_pct": 42.4
+      "score_pct": 68.8,
+      "uplift_pct": 53.5
     },
     {
       "catalog_dir": "doca-dts",
@@ -20187,8 +20229,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 75.7,
-      "uplift_pct": 47.9
+      "score_pct": 78.5,
+      "uplift_pct": 31.3
     },
     {
       "catalog_dir": "doca-dts",
@@ -20196,7 +20238,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 79.6,
+      "score_pct": 73.2,
       "uplift_pct": null
     },
     {
@@ -20205,7 +20247,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 63.6,
+      "score_pct": 65.7,
       "uplift_pct": null
     },
     {
@@ -20215,7 +20257,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 25.0
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "doca-erasure-coding",
@@ -20224,7 +20266,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 37.5
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "doca-erasure-coding",
@@ -20241,8 +20283,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 50.0
+      "score_pct": 95.0,
+      "uplift_pct": 45.0
     },
     {
       "catalog_dir": "doca-erasure-coding",
@@ -20277,8 +20319,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 79.2,
-      "uplift_pct": 25.0
+      "score_pct": 87.5,
+      "uplift_pct": 54.2
     },
     {
       "catalog_dir": "doca-erasure-coding",
@@ -20286,7 +20328,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 85.1,
+      "score_pct": 90.5,
       "uplift_pct": null
     },
     {
@@ -20295,7 +20337,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 72.0,
+      "score_pct": 76.0,
       "uplift_pct": null
     },
     {
@@ -20314,7 +20356,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 12.5
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "doca-eth",
@@ -20323,7 +20365,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 50.0
+      "uplift_pct": 45.0
     },
     {
       "catalog_dir": "doca-eth",
@@ -20332,7 +20374,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 90.0,
-      "uplift_pct": 35.0
+      "uplift_pct": 30.0
     },
     {
       "catalog_dir": "doca-eth",
@@ -20368,7 +20410,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 87.5,
-      "uplift_pct": 25.0
+      "uplift_pct": 41.7
     },
     {
       "catalog_dir": "doca-eth",
@@ -20376,7 +20418,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 85.9,
+      "score_pct": 93.4,
       "uplift_pct": null
     },
     {
@@ -20385,7 +20427,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 71.3,
+      "score_pct": 76.1,
       "uplift_pct": null
     },
     {
@@ -20404,7 +20446,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 12.5
     },
     {
       "catalog_dir": "doca-firefly",
@@ -20413,7 +20455,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 40.0
+      "uplift_pct": 45.0
     },
     {
       "catalog_dir": "doca-firefly",
@@ -20421,7 +20463,7 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 85.0,
+      "score_pct": 90.0,
       "uplift_pct": 15.0
     },
     {
@@ -20439,7 +20481,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 95.0,
+      "score_pct": 93.3,
       "uplift_pct": null
     },
     {
@@ -20457,134 +20499,134 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 43.7
-    },
-    {
-      "catalog_dir": "doca-firefly",
-      "component": "DOCA",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 82.2,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "doca-firefly",
-      "component": "DOCA",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 73.4,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "doca-flow",
-      "component": "DOCA",
-      "dimension": "Security",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "doca-flow",
-      "component": "DOCA",
-      "dimension": "Security",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "doca-flow",
-      "component": "DOCA",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 50.0
-    },
-    {
-      "catalog_dir": "doca-flow",
-      "component": "DOCA",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 90.0,
-      "uplift_pct": 25.0
-    },
-    {
-      "catalog_dir": "doca-flow",
-      "component": "DOCA",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "doca-flow",
-      "component": "DOCA",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 95.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "doca-flow",
-      "component": "DOCA",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 50.0
-    },
-    {
-      "catalog_dir": "doca-flow",
-      "component": "DOCA",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 81.3,
-      "uplift_pct": 37.5
-    },
-    {
-      "catalog_dir": "doca-flow",
-      "component": "DOCA",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 88.2,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "doca-flow",
-      "component": "DOCA",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 77.3,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "doca-flow-tune",
-      "component": "DOCA",
-      "dimension": "Security",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "doca-flow-tune",
-      "component": "DOCA",
-      "dimension": "Security",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
+      "score_pct": 93.8,
       "uplift_pct": 12.5
+    },
+    {
+      "catalog_dir": "doca-firefly",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 90.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "doca-firefly",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 72.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "doca-flow",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-flow",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-flow",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 55.0
+    },
+    {
+      "catalog_dir": "doca-flow",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 45.0
+    },
+    {
+      "catalog_dir": "doca-flow",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "doca-flow",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 93.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "doca-flow",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 62.5,
+      "uplift_pct": 12.5
+    },
+    {
+      "catalog_dir": "doca-flow",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "doca-flow",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 84.2,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "doca-flow",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 80.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "doca-flow-tune",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-flow-tune",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "doca-flow-tune",
@@ -20601,8 +20643,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 40.0
+      "score_pct": 95.0,
+      "uplift_pct": 25.0
     },
     {
       "catalog_dir": "doca-flow-tune",
@@ -20629,7 +20671,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 75.0,
-      "uplift_pct": 25.0
+      "uplift_pct": 31.2
     },
     {
       "catalog_dir": "doca-flow-tune",
@@ -20638,7 +20680,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 50.0
+      "uplift_pct": 43.7
     },
     {
       "catalog_dir": "doca-flow-tune",
@@ -20646,7 +20688,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 81.3,
+      "score_pct": 76.6,
       "uplift_pct": null
     },
     {
@@ -20655,7 +20697,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 70.7,
+      "score_pct": 66.8,
       "uplift_pct": null
     },
     {
@@ -20691,8 +20733,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 95.0,
-      "uplift_pct": 15.0
+      "score_pct": 90.0,
+      "uplift_pct": 10.0
     },
     {
       "catalog_dir": "doca-gpunetio",
@@ -20728,7 +20770,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 68.8,
-      "uplift_pct": 12.5
+      "uplift_pct": 25.0
     },
     {
       "catalog_dir": "doca-gpunetio",
@@ -20736,7 +20778,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 90.9,
+      "score_pct": 83.3,
       "uplift_pct": null
     },
     {
@@ -20745,7 +20787,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 62.1,
+      "score_pct": 65.7,
       "uplift_pct": null
     },
     {
@@ -20764,7 +20806,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 12.5
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "doca-hardware-safety",
@@ -20772,8 +20814,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 90.0,
-      "uplift_pct": 35.0
+      "score_pct": 95.0,
+      "uplift_pct": 45.0
     },
     {
       "catalog_dir": "doca-hardware-safety",
@@ -20781,8 +20823,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 80.0,
-      "uplift_pct": 15.0
+      "score_pct": 75.0,
+      "uplift_pct": 20.0
     },
     {
       "catalog_dir": "doca-hardware-safety",
@@ -20808,8 +20850,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 81.3,
-      "uplift_pct": 45.9
+      "score_pct": 93.8,
+      "uplift_pct": 54.2
     },
     {
       "catalog_dir": "doca-hardware-safety",
@@ -20818,7 +20860,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 81.3,
-      "uplift_pct": 0.0
+      "uplift_pct": 12.5
     },
     {
       "catalog_dir": "doca-hardware-safety",
@@ -20826,7 +20868,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 93.7,
+      "score_pct": 92.4,
       "uplift_pct": null
     },
     {
@@ -20835,7 +20877,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 70.3,
+      "score_pct": 69.8,
       "uplift_pct": null
     },
     {
@@ -20854,7 +20896,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 12.5
     },
     {
       "catalog_dir": "doca-mgmt",
@@ -20872,7 +20914,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 20.0
+      "uplift_pct": 5.0
     },
     {
       "catalog_dir": "doca-mgmt",
@@ -20898,8 +20940,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 89.6,
-      "uplift_pct": 52.1
+      "score_pct": 68.8,
+      "uplift_pct": 43.8
     },
     {
       "catalog_dir": "doca-mgmt",
@@ -20907,8 +20949,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 66.7,
-      "uplift_pct": 6.3
+      "score_pct": 70.8,
+      "uplift_pct": -6.3
     },
     {
       "catalog_dir": "doca-mgmt",
@@ -20916,7 +20958,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 86.8,
+      "score_pct": 87.2,
       "uplift_pct": null
     },
     {
@@ -20925,7 +20967,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 65.6,
+      "score_pct": 68.4,
       "uplift_pct": null
     },
     {
@@ -21034,7 +21076,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 12.5
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "doca-pcc",
@@ -21042,8 +21084,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 95.0,
-      "uplift_pct": 40.0
+      "score_pct": 100.0,
+      "uplift_pct": 30.0
     },
     {
       "catalog_dir": "doca-pcc",
@@ -21052,7 +21094,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 25.0
+      "uplift_pct": 15.0
     },
     {
       "catalog_dir": "doca-pcc",
@@ -21078,25 +21120,25 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 87.5,
-      "uplift_pct": 50.0
-    },
-    {
-      "catalog_dir": "doca-pcc",
-      "component": "DOCA",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 95.8,
+      "score_pct": 72.9,
       "uplift_pct": 47.9
     },
     {
       "catalog_dir": "doca-pcc",
       "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 41.7
+    },
+    {
+      "catalog_dir": "doca-pcc",
+      "component": "DOCA",
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 86.4,
+      "score_pct": 86.1,
       "uplift_pct": null
     },
     {
@@ -21105,7 +21147,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 71.5,
+      "score_pct": 70.0,
       "uplift_pct": null
     },
     {
@@ -21133,7 +21175,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 85.0
+      "uplift_pct": 90.0
     },
     {
       "catalog_dir": "doca-pcc-counters",
@@ -21142,7 +21184,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 10.0
+      "uplift_pct": 35.0
     },
     {
       "catalog_dir": "doca-pcc-counters",
@@ -21169,7 +21211,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 87.5,
-      "uplift_pct": 68.7
+      "uplift_pct": 62.5
     },
     {
       "catalog_dir": "doca-pcc-counters",
@@ -21177,8 +21219,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 87.5,
-      "uplift_pct": 12.5
+      "score_pct": 62.5,
+      "uplift_pct": -6.3
     },
     {
       "catalog_dir": "doca-pcc-counters",
@@ -21186,7 +21228,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 97.3,
+      "score_pct": 97.0,
       "uplift_pct": null
     },
     {
@@ -21195,7 +21237,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 74.8,
+      "score_pct": 70.2,
       "uplift_pct": null
     },
     {
@@ -21394,7 +21436,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 12.5
     },
     {
       "catalog_dir": "doca-programming-guide",
@@ -21439,7 +21481,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 75.0,
-      "uplift_pct": 47.9
+      "uplift_pct": 35.4
     },
     {
       "catalog_dir": "doca-programming-guide",
@@ -21447,8 +21489,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 81.3,
-      "uplift_pct": 31.3
+      "score_pct": 68.8,
+      "uplift_pct": -6.2
     },
     {
       "catalog_dir": "doca-programming-guide",
@@ -21456,7 +21498,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 81.9,
+      "score_pct": 89.1,
       "uplift_pct": null
     },
     {
@@ -21465,7 +21507,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 70.9,
+      "score_pct": 78.3,
       "uplift_pct": null
     },
     {
@@ -21484,7 +21526,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 16.7
     },
     {
       "catalog_dir": "doca-public-knowledge-map",
@@ -21501,8 +21543,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 80.0,
-      "uplift_pct": -6.7
+      "score_pct": 86.7,
+      "uplift_pct": 6.7
     },
     {
       "catalog_dir": "doca-public-knowledge-map",
@@ -21555,7 +21597,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 75.4,
+      "score_pct": 70.7,
       "uplift_pct": null
     },
     {
@@ -21583,7 +21625,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 45.0
+      "uplift_pct": 50.0
     },
     {
       "catalog_dir": "doca-rdma",
@@ -21591,7 +21633,7 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 95.0,
+      "score_pct": 100.0,
       "uplift_pct": 30.0
     },
     {
@@ -21636,7 +21678,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 88.6,
+      "score_pct": 80.5,
       "uplift_pct": null
     },
     {
@@ -21645,7 +21687,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 72.9,
+      "score_pct": 75.2,
       "uplift_pct": null
     },
     {
@@ -21672,8 +21714,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 75.0,
-      "uplift_pct": 30.0
+      "score_pct": 100.0,
+      "uplift_pct": 50.0
     },
     {
       "catalog_dir": "doca-rmax",
@@ -21708,8 +21750,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 81.3,
-      "uplift_pct": 50.0
+      "score_pct": 87.5,
+      "uplift_pct": 62.5
     },
     {
       "catalog_dir": "doca-rmax",
@@ -21717,8 +21759,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 87.5,
-      "uplift_pct": 43.7
+      "score_pct": 93.8,
+      "uplift_pct": 56.3
     },
     {
       "catalog_dir": "doca-rmax",
@@ -21726,7 +21768,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 84.4,
+      "score_pct": 79.9,
       "uplift_pct": null
     },
     {
@@ -21735,7 +21777,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 70.4,
+      "score_pct": 69.6,
       "uplift_pct": null
     },
     {
@@ -21763,7 +21805,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 40.0
+      "uplift_pct": 45.0
     },
     {
       "catalog_dir": "doca-setup",
@@ -21772,7 +21814,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 40.0
+      "uplift_pct": 45.0
     },
     {
       "catalog_dir": "doca-setup",
@@ -21789,7 +21831,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 91.7,
+      "score_pct": 88.3,
       "uplift_pct": null
     },
     {
@@ -21808,7 +21850,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 29.2
+      "uplift_pct": 16.7
     },
     {
       "catalog_dir": "doca-setup",
@@ -21816,11 +21858,101 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 94.2,
+      "score_pct": 93.7,
       "uplift_pct": null
     },
     {
       "catalog_dir": "doca-setup",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 73.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "doca-sha",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-sha",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-sha",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 45.0
+    },
+    {
+      "catalog_dir": "doca-sha",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 10.0
+    },
+    {
+      "catalog_dir": "doca-sha",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "doca-sha",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "doca-sha",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "doca-sha",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-sha",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 87.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "doca-sha",
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": null,
@@ -21829,7 +21961,7 @@
       "uplift_pct": null
     },
     {
-      "catalog_dir": "doca-sha",
+      "catalog_dir": "doca-sha-offload-engine",
       "component": "DOCA",
       "dimension": "Security",
       "num": null,
@@ -21838,7 +21970,7 @@
       "uplift_pct": 0.0
     },
     {
-      "catalog_dir": "doca-sha",
+      "catalog_dir": "doca-sha-offload-engine",
       "component": "DOCA",
       "dimension": "Security",
       "num": null,
@@ -21847,25 +21979,25 @@
       "uplift_pct": 0.0
     },
     {
-      "catalog_dir": "doca-sha",
+      "catalog_dir": "doca-sha-offload-engine",
       "component": "DOCA",
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 40.0
+      "uplift_pct": 55.0
     },
     {
-      "catalog_dir": "doca-sha",
+      "catalog_dir": "doca-sha-offload-engine",
       "component": "DOCA",
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 15.0
+      "uplift_pct": 5.0
     },
     {
-      "catalog_dir": "doca-sha",
+      "catalog_dir": "doca-sha-offload-engine",
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": null,
@@ -21874,102 +22006,12 @@
       "uplift_pct": null
     },
     {
-      "catalog_dir": "doca-sha",
+      "catalog_dir": "doca-sha-offload-engine",
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
       "score_pct": 95.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "doca-sha",
-      "component": "DOCA",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 50.0
-    },
-    {
-      "catalog_dir": "doca-sha",
-      "component": "DOCA",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 93.8,
-      "uplift_pct": 12.5
-    },
-    {
-      "catalog_dir": "doca-sha",
-      "component": "DOCA",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 86.1,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "doca-sha",
-      "component": "DOCA",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 72.3,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "doca-sha-offload-engine",
-      "component": "DOCA",
-      "dimension": "Security",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "doca-sha-offload-engine",
-      "component": "DOCA",
-      "dimension": "Security",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "doca-sha-offload-engine",
-      "component": "DOCA",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 50.0
-    },
-    {
-      "catalog_dir": "doca-sha-offload-engine",
-      "component": "DOCA",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "doca-sha-offload-engine",
-      "component": "DOCA",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "doca-sha-offload-engine",
-      "component": "DOCA",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 93.3,
       "uplift_pct": null
     },
     {
@@ -21988,70 +22030,43 @@
       "num": null,
       "agent": "codex",
       "score_pct": 93.8,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "doca-sha-offload-engine",
-      "component": "DOCA",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 86.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "doca-sha-offload-engine",
-      "component": "DOCA",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 65.9,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "doca-socket-relay",
-      "component": "DOCA",
-      "dimension": "Security",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "doca-socket-relay",
-      "component": "DOCA",
-      "dimension": "Security",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "doca-socket-relay",
-      "component": "DOCA",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 45.0
-    },
-    {
-      "catalog_dir": "doca-socket-relay",
-      "component": "DOCA",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 95.0,
       "uplift_pct": 25.0
     },
     {
-      "catalog_dir": "doca-socket-relay",
+      "catalog_dir": "doca-sha-offload-engine",
       "component": "DOCA",
-      "dimension": "Discoverability",
+      "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
+      "score_pct": 89.2,
       "uplift_pct": null
+    },
+    {
+      "catalog_dir": "doca-sha-offload-engine",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 68.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "doca-socket-relay",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-socket-relay",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 10.0
     },
     {
       "catalog_dir": "doca-socket-relay",
@@ -22067,27 +22082,9 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": null,
-      "agent": "claude-code",
+      "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 50.0
-    },
-    {
-      "catalog_dir": "doca-socket-relay",
-      "component": "DOCA",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 93.8,
-      "uplift_pct": 31.3
-    },
-    {
-      "catalog_dir": "doca-socket-relay",
-      "component": "DOCA",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 87.0,
-      "uplift_pct": null
+      "uplift_pct": 37.5
     },
     {
       "catalog_dir": "doca-socket-relay",
@@ -22095,7 +22092,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 73.2,
+      "score_pct": 77.0,
       "uplift_pct": null
     },
     {
@@ -22114,7 +22111,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 12.5
     },
     {
       "catalog_dir": "doca-spcx-cc",
@@ -22122,21 +22119,21 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 70.0
-    },
-    {
-      "catalog_dir": "doca-spcx-cc",
-      "component": "DOCA",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 55.0
     },
     {
       "catalog_dir": "doca-spcx-cc",
       "component": "DOCA",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 85.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "doca-spcx-cc",
+      "component": "DOCA",
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
@@ -22158,8 +22155,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 87.5,
-      "uplift_pct": 40.6
+      "score_pct": 100.0,
+      "uplift_pct": 46.9
     },
     {
       "catalog_dir": "doca-spcx-cc",
@@ -22168,7 +22165,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 81.3,
-      "uplift_pct": 18.8
+      "uplift_pct": 21.9
     },
     {
       "catalog_dir": "doca-spcx-cc",
@@ -22176,7 +22173,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 93.8,
+      "score_pct": 89.1,
       "uplift_pct": null
     },
     {
@@ -22185,7 +22182,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 72.3,
+      "score_pct": 75.4,
       "uplift_pct": null
     },
     {
@@ -22248,8 +22245,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 75.0,
-      "uplift_pct": 62.5
+      "score_pct": 65.6,
+      "uplift_pct": 53.1
     },
     {
       "catalog_dir": "doca-sta",
@@ -22257,8 +22254,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 81.3,
-      "uplift_pct": 59.4
+      "score_pct": 90.6,
+      "uplift_pct": 59.3
     },
     {
       "catalog_dir": "doca-sta",
@@ -22266,7 +22263,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 74.4,
+      "score_pct": 72.7,
       "uplift_pct": null
     },
     {
@@ -22275,7 +22272,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 79.2,
+      "score_pct": 73.5,
       "uplift_pct": null
     },
     {
@@ -22294,7 +22291,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 12.5
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "doca-structured-tools-contract",
@@ -22302,7 +22299,7 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
+      "score_pct": 95.0,
       "uplift_pct": 40.0
     },
     {
@@ -22311,7 +22308,7 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
+      "score_pct": 95.0,
       "uplift_pct": 15.0
     },
     {
@@ -22338,8 +22335,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 47.9
+      "score_pct": 87.5,
+      "uplift_pct": 54.2
     },
     {
       "catalog_dir": "doca-structured-tools-contract",
@@ -22348,7 +22345,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 75.0,
-      "uplift_pct": 12.5
+      "uplift_pct": 25.0
     },
     {
       "catalog_dir": "doca-structured-tools-contract",
@@ -22356,7 +22353,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 97.6,
+      "score_pct": 96.8,
       "uplift_pct": null
     },
     {
@@ -22365,7 +22362,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 71.8,
+      "score_pct": 67.5,
       "uplift_pct": null
     },
     {
@@ -22401,8 +22398,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 30.0
+      "score_pct": 95.0,
+      "uplift_pct": 35.0
     },
     {
       "catalog_dir": "doca-telemetry",
@@ -22429,7 +22426,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 56.2
+      "uplift_pct": 50.0
     },
     {
       "catalog_dir": "doca-telemetry",
@@ -22437,8 +22434,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 81.3,
-      "uplift_pct": 12.5
+      "score_pct": 100.0,
+      "uplift_pct": 31.2
     },
     {
       "catalog_dir": "doca-telemetry",
@@ -22446,7 +22443,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 77.1,
+      "score_pct": 76.7,
       "uplift_pct": null
     },
     {
@@ -22455,7 +22452,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 68.2,
+      "score_pct": 65.7,
       "uplift_pct": null
     },
     {
@@ -22483,7 +22480,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 40.0
+      "uplift_pct": 45.0
     },
     {
       "catalog_dir": "doca-telemetry-exporter",
@@ -22492,7 +22489,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 5.0
     },
     {
       "catalog_dir": "doca-telemetry-exporter",
@@ -22527,8 +22524,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 6.2
+      "score_pct": 93.8,
+      "uplift_pct": -6.2
     },
     {
       "catalog_dir": "doca-telemetry-exporter",
@@ -22536,7 +22533,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 87.9,
+      "score_pct": 84.0,
       "uplift_pct": null
     },
     {
@@ -22545,7 +22542,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 66.7,
+      "score_pct": 71.8,
       "uplift_pct": null
     },
     {
@@ -22563,8 +22560,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "score_pct": 90.0,
+      "uplift_pct": -10.0
     },
     {
       "catalog_dir": "doca-telemetry-traceback-application",
@@ -22573,7 +22570,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 40.0
+      "uplift_pct": 44.0
     },
     {
       "catalog_dir": "doca-telemetry-traceback-application",
@@ -22581,8 +22578,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 92.0,
-      "uplift_pct": 0.0
+      "score_pct": 96.0,
+      "uplift_pct": 12.0
     },
     {
       "catalog_dir": "doca-telemetry-traceback-application",
@@ -22617,8 +22614,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 95.0,
-      "uplift_pct": 20.0
+      "score_pct": 85.0,
+      "uplift_pct": 5.0
     },
     {
       "catalog_dir": "doca-telemetry-traceback-application",
@@ -22626,7 +22623,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 86.2,
+      "score_pct": 94.4,
       "uplift_pct": null
     },
     {
@@ -22635,7 +22632,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 82.2,
+      "score_pct": 74.2,
       "uplift_pct": null
     },
     {
@@ -22662,7 +22659,7 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
+      "score_pct": 95.0,
       "uplift_pct": 45.0
     },
     {
@@ -22672,7 +22669,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 35.0
+      "uplift_pct": 55.0
     },
     {
       "catalog_dir": "doca-telemetry-utils",
@@ -22707,7 +22704,7 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 93.8,
+      "score_pct": 100.0,
       "uplift_pct": 37.5
     },
     {
@@ -22716,7 +22713,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 85.0,
+      "score_pct": 83.8,
       "uplift_pct": null
     },
     {
@@ -22725,7 +22722,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 76.9,
+      "score_pct": 76.3,
       "uplift_pct": null
     },
     {
@@ -22753,7 +22750,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 30.0
+      "uplift_pct": 35.0
     },
     {
       "catalog_dir": "doca-upgrade",
@@ -22762,7 +22759,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 15.0
+      "uplift_pct": 20.0
     },
     {
       "catalog_dir": "doca-upgrade",
@@ -22788,7 +22785,7 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 77.1,
+      "score_pct": 64.6,
       "uplift_pct": 16.7
     },
     {
@@ -22797,8 +22794,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 93.8,
-      "uplift_pct": 29.2
+      "score_pct": 81.3,
+      "uplift_pct": 16.7
     },
     {
       "catalog_dir": "doca-upgrade",
@@ -22806,7 +22803,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 81.7,
+      "score_pct": 98.4,
       "uplift_pct": null
     },
     {
@@ -22815,7 +22812,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 72.6,
+      "score_pct": 73.9,
       "uplift_pct": null
     },
     {
@@ -22834,7 +22831,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 12.5
     },
     {
       "catalog_dir": "doca-urom",
@@ -22843,7 +22840,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 40.0
+      "uplift_pct": 45.0
     },
     {
       "catalog_dir": "doca-urom",
@@ -22851,8 +22848,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 90.0,
-      "uplift_pct": 35.0
+      "score_pct": 100.0,
+      "uplift_pct": 30.0
     },
     {
       "catalog_dir": "doca-urom",
@@ -22887,8 +22884,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 50.0
+      "score_pct": 93.8,
+      "uplift_pct": 18.8
     },
     {
       "catalog_dir": "doca-urom",
@@ -22896,7 +22893,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 83.9,
+      "score_pct": 85.7,
       "uplift_pct": null
     },
     {
@@ -22905,7 +22902,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 71.4,
+      "score_pct": 79.5,
       "uplift_pct": null
     },
     {
@@ -22924,7 +22921,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 12.5
     },
     {
       "catalog_dir": "doca-urom-svc",
@@ -22977,98 +22974,62 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
+      "score_pct": 93.8,
+      "uplift_pct": -6.2
+    },
+    {
+      "catalog_dir": "doca-urom-svc",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 91.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "doca-urom-svc",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 70.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "doca-verbs",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-verbs",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": 55.0
+    },
+    {
+      "catalog_dir": "doca-verbs",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "doca-verbs",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
       "score_pct": 87.5,
-      "uplift_pct": 6.2
-    },
-    {
-      "catalog_dir": "doca-urom-svc",
-      "component": "DOCA",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 89.1,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "doca-urom-svc",
-      "component": "DOCA",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 75.1,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "doca-verbs",
-      "component": "DOCA",
-      "dimension": "Security",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "doca-verbs",
-      "component": "DOCA",
-      "dimension": "Security",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "doca-verbs",
-      "component": "DOCA",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 95.0,
-      "uplift_pct": 60.0
-    },
-    {
-      "catalog_dir": "doca-verbs",
-      "component": "DOCA",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 90.0,
-      "uplift_pct": 5.0
-    },
-    {
-      "catalog_dir": "doca-verbs",
-      "component": "DOCA",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "doca-verbs",
-      "component": "DOCA",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 95.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "doca-verbs",
-      "component": "DOCA",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 68.7
-    },
-    {
-      "catalog_dir": "doca-verbs",
-      "component": "DOCA",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 25.0
+      "uplift_pct": 56.2
     },
     {
       "catalog_dir": "doca-verbs",
@@ -23076,16 +23037,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 80.4,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "doca-verbs",
-      "component": "DOCA",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 73.2,
+      "score_pct": 90.3,
       "uplift_pct": null
     },
     {
@@ -23104,7 +23056,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 12.5
     },
     {
       "catalog_dir": "doca-version",
@@ -23113,7 +23065,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 35.0
+      "uplift_pct": 45.0
     },
     {
       "catalog_dir": "doca-version",
@@ -23122,7 +23074,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 90.0,
-      "uplift_pct": 15.0
+      "uplift_pct": 20.0
     },
     {
       "catalog_dir": "doca-version",
@@ -23148,8 +23100,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 87.5,
-      "uplift_pct": 39.6
+      "score_pct": 75.0,
+      "uplift_pct": 33.3
     },
     {
       "catalog_dir": "doca-version",
@@ -23158,7 +23110,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 87.5,
-      "uplift_pct": 27.1
+      "uplift_pct": 31.2
     },
     {
       "catalog_dir": "doca-version",
@@ -23166,7 +23118,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 82.2,
+      "score_pct": 80.3,
       "uplift_pct": null
     },
     {
@@ -23175,7 +23127,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 78.8,
+      "score_pct": 82.7,
       "uplift_pct": null
     },
     {
@@ -32854,6 +32806,96 @@
       "uplift_pct": null
     },
     {
+      "catalog_dir": "nemo-gym-run-and-babysit-eval",
+      "component": "NeMo Gym",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nemo-gym-run-and-babysit-eval",
+      "component": "NeMo Gym",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nemo-gym-run-and-babysit-eval",
+      "component": "NeMo Gym",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 98.1,
+      "uplift_pct": 14.3
+    },
+    {
+      "catalog_dir": "nemo-gym-run-and-babysit-eval",
+      "component": "NeMo Gym",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 99.1,
+      "uplift_pct": 23.9
+    },
+    {
+      "catalog_dir": "nemo-gym-run-and-babysit-eval",
+      "component": "NeMo Gym",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 93.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nemo-gym-run-and-babysit-eval",
+      "component": "NeMo Gym",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 92.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nemo-gym-run-and-babysit-eval",
+      "component": "NeMo Gym",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 85.0,
+      "uplift_pct": 16.1
+    },
+    {
+      "catalog_dir": "nemo-gym-run-and-babysit-eval",
+      "component": "NeMo Gym",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 88.8,
+      "uplift_pct": 26.7
+    },
+    {
+      "catalog_dir": "nemo-gym-run-and-babysit-eval",
+      "component": "NeMo Gym",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 92.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nemo-gym-run-and-babysit-eval",
+      "component": "NeMo Gym",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
       "catalog_dir": "nemo-mbridge-mlm-bridge-training",
       "component": "NeMo MBridge",
       "dimension": "Security",
@@ -37351,6 +37393,96 @@
       "num": null,
       "agent": "codex",
       "score_pct": 75.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nv-monai-autoresearch",
+      "component": "Medical AI Skills",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nv-monai-autoresearch",
+      "component": "Medical AI Skills",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 12.5
+    },
+    {
+      "catalog_dir": "nv-monai-autoresearch",
+      "component": "Medical AI Skills",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 97.5,
+      "uplift_pct": 35.0
+    },
+    {
+      "catalog_dir": "nv-monai-autoresearch",
+      "component": "Medical AI Skills",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 97.5,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "nv-monai-autoresearch",
+      "component": "Medical AI Skills",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 96.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nv-monai-autoresearch",
+      "component": "Medical AI Skills",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 89.2,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nv-monai-autoresearch",
+      "component": "Medical AI Skills",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 70.3,
+      "uplift_pct": 10.4
+    },
+    {
+      "catalog_dir": "nv-monai-autoresearch",
+      "component": "Medical AI Skills",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 72.9,
+      "uplift_pct": 13.0
+    },
+    {
+      "catalog_dir": "nv-monai-autoresearch",
+      "component": "Medical AI Skills",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nv-monai-autoresearch",
+      "component": "Medical AI Skills",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 91.4,
       "uplift_pct": null
     },
     {

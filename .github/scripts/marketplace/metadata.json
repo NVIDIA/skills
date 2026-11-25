@@ -3253,6 +3253,18 @@
       }
     },
     {
+      "path": "skills/nemo-gym-run-and-babysit-eval",
+      "name": "nemo-gym-run-and-babysit-eval",
+      "description": "Take a NeMo Gym evaluation from a request to a trusted result: compose the eval config when none exists (by following add-model-eval-config, in the same task), submit it, let the resumable Slurm chain continue through walltime limits, preemption and node loss, inspect and recover the run with `gym eval resubmit --recover`, check health and the acceptance gates, and decide when to stop a chain or start a fresh run. The entry point for \"run evaluations on model Y on benchmark Z\", with or without a ready config. Not for building a benchmark or harness (use add-benchmark or add-harness). Triggered by: \"run the eval\", \"run evaluations on model Y on benchmark Z with serving params X\", \"submit this benchmark\", \"the job timed out\", \"the chain stopped\", \"resume the run\", \"recover the run\", \"is the run done\", \"inspect the run\", \"gate the score\", \"restart the evaluation\". Also covers local runs, existing API endpoints, supported agents and Gym task folders.\n",
+      "metadata": {
+        "product.primary": "NeMo Gym",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "ml_engineer,ai_engineer,developer,platform_engineer,devops_engineer",
+        "discovery.activity_tags": "evaluate,benchmark,recover,orchestrate,monitor"
+      }
+    },
+    {
       "path": "skills/nemo-mbridge-mlm-bridge-training",
       "name": "nemo-mbridge-mlm-bridge-training",
       "description": "Run Megatron-LM (MLM) and Megatron Bridge training with mock or real data. Covers correlation testing, available recipes, and multi-GPU examples.",
@@ -3874,6 +3886,18 @@
         "catalog.subdomain": "vision-ai",
         "audience": "developer,ai_engineer,ml_engineer",
         "discovery.activity_tags": "fine_tune,train,evaluate,validate"
+      }
+    },
+    {
+      "path": "skills/nv-monai-autoresearch",
+      "name": "nv-monai-autoresearch",
+      "description": "Used for NV-MONAI-Autoresearch medical-imaging research, experiment planning, diagnosis, and resumable optimization. Not for clinical decisions or standalone model inference.",
+      "metadata": {
+        "product.primary": "MONAI",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "research_academic,research_non_academic,ml_engineer,ai_engineer,application_developer",
+        "discovery.activity_tags": "optimize,evaluate,orchestrate,benchmark,select"
       }
     },
     {
@@ -5858,6 +5882,74 @@
     }
   ],
   "plugins": [
+    {
+      "name": "nvidia-doca-plugin",
+      "path": "plugins/nvidia-doca-plugin",
+      "source": "components.d/doca.yml",
+      "description": "NVIDIA DOCA skills for developing, deploying, operating, and debugging applications on BlueField DPUs and ConnectX networking devices.",
+      "skills": [
+        "skills/doca-aes-gcm",
+        "skills/doca-argp",
+        "skills/doca-argus",
+        "skills/doca-bare-metal-deployment",
+        "skills/doca-bench",
+        "skills/doca-bf3-deployment",
+        "skills/doca-bf4-deployment",
+        "skills/doca-caps",
+        "skills/doca-comch",
+        "skills/doca-comm-channel-admin",
+        "skills/doca-common",
+        "skills/doca-compress",
+        "skills/doca-container-deployment",
+        "skills/doca-debug",
+        "skills/doca-devemu",
+        "skills/doca-dma",
+        "skills/doca-dms",
+        "skills/doca-dpa",
+        "skills/doca-dpdk-bridge",
+        "skills/doca-dts",
+        "skills/doca-erasure-coding",
+        "skills/doca-eth",
+        "skills/doca-firefly",
+        "skills/doca-flow",
+        "skills/doca-flow-tune",
+        "skills/doca-gpunetio",
+        "skills/doca-hardware-safety",
+        "skills/doca-mgmt",
+        "skills/doca-ngauge",
+        "skills/doca-pcc",
+        "skills/doca-pcc-counters",
+        "skills/doca-perftest",
+        "skills/doca-pipeline-language-developer-tools",
+        "skills/doca-programming-guide",
+        "skills/doca-public-knowledge-map",
+        "skills/doca-rdma",
+        "skills/doca-rmax",
+        "skills/doca-setup",
+        "skills/doca-sha",
+        "skills/doca-sha-offload-engine",
+        "skills/doca-socket-relay",
+        "skills/doca-spcx-cc",
+        "skills/doca-sta",
+        "skills/doca-structured-tools-contract",
+        "skills/doca-telemetry",
+        "skills/doca-telemetry-exporter",
+        "skills/doca-telemetry-traceback-application",
+        "skills/doca-telemetry-utils",
+        "skills/doca-upgrade",
+        "skills/doca-urom",
+        "skills/doca-urom-svc",
+        "skills/doca-verbs",
+        "skills/doca-version"
+      ],
+      "metadata": {
+        "classification.category.primary": "infrastructure",
+        "product.primary": [
+          "DOCA"
+        ],
+        "audience": "application_developer,developer,devops_engineer,platform_engineer"
+      }
+    },
     {
       "name": "nvidia-skills",
       "path": "plugins/nvidia-skills",
