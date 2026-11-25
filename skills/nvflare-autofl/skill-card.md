@@ -7,7 +7,7 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 <br>
+Apache-2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
 Developers and engineers use this skill to optimize NVFLARE federated learning jobs through isolated, reproducible candidate campaigns that preserve metric semantics, comparison budgets, and evidence across simulation, POC, and production environments. <br>
 
@@ -64,7 +64,6 @@ Underlying evaluation signals used in this run: <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
 - `skill_efficiency`: Tool-call productivity. <br>
 - `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
-
 
 
 ## Evaluation Results: <br>

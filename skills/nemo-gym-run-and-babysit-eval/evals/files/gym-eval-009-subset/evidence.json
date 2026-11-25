@@ -1,0 +1,41 @@
+{
+  "gym_job_id": "eval-subset",
+  "benchmark": "ifbench",
+  "protocol": {
+    "canonical_tasks": 300,
+    "canonical_repeats": 5,
+    "run_limit": 5,
+    "run_repeats": 1,
+    "named_versioned_subset": null
+  },
+  "inspection": {
+    "decision": {
+      "action": "noop",
+      "reason": "selected run complete"
+    },
+    "gate_task": {
+      "status": "SUCCESS",
+      "expected_samples": 5,
+      "scored_samples": 5,
+      "score": 0.8,
+      "evaluation_health": {
+        "status": "PASS"
+      }
+    }
+  },
+  "rollouts_coverage": {
+    "expected": 5,
+    "measured": 5,
+    "complete": true
+  },
+  "aggregate_metrics": [
+    {
+      "agent_metrics": {
+        "mean/reward": 0.8
+      },
+      "agent_ref": {
+        "name": "ifbench_benchmark_simple_agent"
+      }
+    }
+  ]
+}

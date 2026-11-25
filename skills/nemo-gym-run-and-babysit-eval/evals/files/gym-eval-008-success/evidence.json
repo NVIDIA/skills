@@ -1,0 +1,76 @@
+{
+  "gym_job_id": "eval-complete",
+  "benchmark": "ifbench",
+  "protocol": {
+    "all_tasks": 20,
+    "canonical_repeats": 5,
+    "run_repeats": 5,
+    "limit": null
+  },
+  "old_chat_score": 0.99,
+  "inspection": {
+    "decision": {
+      "action": "noop",
+      "reason": "complete"
+    },
+    "gate_task": {
+      "status": "SUCCESS",
+      "expected_samples": 100,
+      "scored_samples": 100,
+      "omitted_samples": 0,
+      "score": 0.73,
+      "evaluation_health": {
+        "status": "PASS",
+        "evaluation_failure_rate": 0.0
+      },
+      "trial_counts": {
+        "observed_healthy": 100,
+        "unhealthy": 0,
+        "unobserved": 0
+      },
+      "mlflow_delivery": {
+        "state": "not_required"
+      }
+    },
+    "operator_verdict": {
+      "state": "accept",
+      "reason": "100 of 100 rollouts scored, run health PASS, nothing to recover",
+      "action": "none"
+    }
+  },
+  "rollouts_coverage": {
+    "expected": 100,
+    "measured": 100,
+    "masked": 0,
+    "failed": 0,
+    "missing": 0,
+    "intentionally_omitted": 0,
+    "complete": true
+  },
+  "aggregate_metrics": [
+    {
+      "agent_metrics": {
+        "mean/reward": 0.73
+      },
+      "agent_ref": {
+        "name": "ifbench_benchmark_simple_agent"
+      }
+    }
+  ],
+  "quality_summary": {
+    "run": {
+      "artifacts": {
+        "healthy": true
+      },
+      "verdicts": {
+        "healthy": 100,
+        "unhealthy": 0,
+        "unobserved": 0
+      }
+    }
+  },
+  "run_config": {
+    "mlflow_tracking_required": false
+  },
+  "chain_incomplete_marker": false
+}

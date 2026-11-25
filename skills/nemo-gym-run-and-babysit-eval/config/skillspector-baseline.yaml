@@ -1,0 +1,28 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Repository-owner review of this exception is required before publication.
+# SkillSpector 2.13.5 matches the --allow-unsafe prefix of --allow-unsafe-resume.
+version: 2
+rules:
+  - id: "TM1"
+    path: "SKILL.md"
+    message: "--allow-unsafe"
+    reason: >-
+      Intentional Gym run identity override. The skill requires the
+      operator to accept the reported differences and normally recommends a
+      fresh run. The CLI flag requires --recover and a nonempty
+      --unsafe-resume-reason; recovery retains spent budgets and journals the
+      actor, time, and reason. The override permits all identity mismatches,
+      including dataset and materialized-input digest differences or a missing
+      manifest, and remains enabled for later run segments. Overridden run
+      identities are marked unverified. These audit requirements describe the
+      CLI path; directly enabling the configuration option does not require its
+      reason or journal. This grants no OS or sandbox permissions; malformed or
+      unsupported saved manifests and unreadable saved materialized inputs still
+      fail. Unreadable current inputs can fall back to saved inputs. This exception
+      covers TM1 findings in root SKILL.md with matched text --allow-unsafe,
+      ignoring case. Currently only the --allow-unsafe-resume recovery
+      instruction matches. Other flags sharing this prefix would also be
+      suppressed; review this exception whenever such instructions change.
+fingerprints: []

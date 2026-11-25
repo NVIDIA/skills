@@ -1,0 +1,28 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+execution:
+  kind: direct gym eval run
+  gym_job_id: null
+original_command: gym eval run --benchmark ifbench --split benchmark --model-type inference_provider --model team-chat-model
+  --model-url https://inference.example.test/v1 --model-api-key '${oc.env:POLICY_API_KEY}' --output results/original/rollouts.jsonl
+  +require_complete=true ++observability_enabled=true ++model_call_capture_dir="$PWD/results/original/model-calls"
+model_protocol_changed: false
+rollouts_coverage:
+  expected: 1500
+  measured: 900
+  missing: 600
+  complete: false
+partial_metric: 0.75
+saved_materialized_inputs: true
+processes_for_original_run_active: false
+remaining_work:
+  not_started: 600
+  retryable_evaluation_failures: 0
+  terminal_model_failures: 0
+original_working_directory: /workspace/gym-evaluation
+current_working_directory: /workspace/review
+saved_absolute_paths:
+  rollouts: /workspace/gym-evaluation/results/original/rollouts.jsonl
+  materialized_inputs: /workspace/gym-evaluation/results/original/rollouts_materialized_inputs.jsonl
+  model_call_capture_dir: /workspace/gym-evaluation/results/original/model-calls

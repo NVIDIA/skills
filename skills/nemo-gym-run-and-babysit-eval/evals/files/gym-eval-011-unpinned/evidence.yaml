@@ -1,0 +1,16 @@
+config_path: submit.yaml
+driver:
+  gym_install:
+    repo: https://github.com/NVIDIA-NeMo/Gym
+    ref: main
+  policy_model: policy
+  policy_model_type: vllm_model
+  benchmarks:
+    ifbench:
+      run:
+        config_paths:
+        - benchmarks/ifbench/config.yaml
+model_checkpoint: /checkpoints/team-model
+candidate_public_gym_commit: 0aa31eb833ee469a88af5b171c52f696d6249e1d # pragma: allowlist secret -- public Gym commit SHA
+candidate_contains_ifbench: true
+candidate_supports_recovery: true

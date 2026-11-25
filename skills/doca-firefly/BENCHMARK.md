@@ -10,7 +10,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 - Skill: `doca-firefly`
 - Validation status: `passed`
-- Evaluation date: 2026-11-18
+- Evaluation date: 2026-11-23
 - Evaluator version: `1.6.10`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
@@ -50,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 96.4% — baseline ran, but no comparable score was available; uplift unavailable | 90.7% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 60.0% → 100.0% (+40.0 points) | 70.0% → 85.0% (+15.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 50.0% → 100.0% (+50.0 points) | 56.3% → 100.0% (+43.7 points) |
-| Efficiency | 82.2% — baseline ran, but no comparable score was available; uplift unavailable | 73.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 98.1% — baseline ran, but no comparable score was available; uplift unavailable | 90.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 87.5% → 100.0% (+12.5 points) |
+| Correctness | 55.0% → 100.0% (+45.0 points) | 75.0% → 90.0% (+15.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 93.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 50.0% → 100.0% (+50.0 points) | 81.3% → 93.8% (+12.5 points) |
+| Efficiency | 90.3% — baseline ran, but no comparable score was available; uplift unavailable | 72.9% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -70,9 +70,9 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 98.1% → 92.2% (-5.9 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 98.1% → 92.8% (-5.3 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 84.8% → 84.8% (±0.0 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 83.3% → 84.1% (+0.8 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -80,17 +80,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 758,878 | 289,883 | +468,995 | +161.79% | skill 4/4; base 4/4 |
-| claude-code | doca-firefly.explicit-positive.v1 | 272,403 | 73,304 | +199,099 | +271.61% | skill 1/1; base 1/1 |
-| claude-code | doca-firefly.implicit-positive.v1 | 281,421 | 73,231 | +208,190 | +284.29% | skill 1/1; base 1/1 |
-| claude-code | doca-firefly.implicit-positive.v2 | 168,502 | 72,010 | +96,492 | +134.00% | skill 1/1; base 1/1 |
-| claude-code | doca-firefly.negative.v1 | 36,552 | 71,338 | -34,786 | -48.76% | skill 1/1; base 1/1 |
-| codex | All cases | 387,276 | 198,773 | +188,503 | +94.83% | skill 4/4; base 4/4 |
-| codex | doca-firefly.explicit-positive.v1 | 133,403 | 48,095 | +85,308 | +177.37% | skill 1/1; base 1/1 |
-| codex | doca-firefly.implicit-positive.v1 | 107,086 | 57,999 | +49,087 | +84.63% | skill 1/1; base 1/1 |
-| codex | doca-firefly.implicit-positive.v2 | 107,977 | 70,762 | +37,215 | +52.59% | skill 1/1; base 1/1 |
-| codex | doca-firefly.negative.v1 | 38,810 | 21,917 | +16,893 | +77.08% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,146,154 | 488,656 | +657,498 | +134.55% | skill 8/8; base 8/8 |
+| claude-code | All cases | 654,830 | 325,349 | +329,481 | +101.27% | skill 4/4; base 4/4 |
+| claude-code | doca-firefly.explicit-positive.v1 | 273,624 | 73,131 | +200,493 | +274.16% | skill 1/1; base 1/1 |
+| claude-code | doca-firefly.implicit-positive.v1 | 132,782 | 73,025 | +59,757 | +81.83% | skill 1/1; base 1/1 |
+| claude-code | doca-firefly.implicit-positive.v2 | 212,283 | 107,907 | +104,376 | +96.73% | skill 1/1; base 1/1 |
+| claude-code | doca-firefly.negative.v1 | 36,141 | 71,286 | -35,145 | -49.30% | skill 1/1; base 1/1 |
+| codex | All cases | 399,036 | 260,568 | +138,468 | +53.14% | skill 4/4; base 4/4 |
+| codex | doca-firefly.explicit-positive.v1 | 140,658 | 121,360 | +19,298 | +15.90% | skill 1/1; base 1/1 |
+| codex | doca-firefly.implicit-positive.v1 | 140,881 | 58,218 | +82,663 | +141.99% | skill 1/1; base 1/1 |
+| codex | doca-firefly.implicit-positive.v2 | 78,825 | 50,418 | +28,407 | +56.34% | skill 1/1; base 1/1 |
+| codex | doca-firefly.negative.v1 | 38,672 | 30,572 | +8,100 | +26.49% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,053,866 | 585,917 | +467,949 | +79.87% | skill 8/8; base 8/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
@@ -116,11 +116,11 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
   vs "## Version compatibility" in CAPABILITIES.md (lines 155-191)
   vs "## Error taxonomy" in CAPABILITIES.md (lines 192-211)
   vs "## Safety policy" in CAPABILITIES.md (lines 265-316)
-  vs "## Instructions" in SKILL.md (lines 65-80)
-  vs "## Example questions this skill answers well" in SKILL.md (lines 85-136)
-  vs "## Audience" in SKILL.md (lines 137-167)
-  vs "## When to load this skill" in SKILL.md (lines 168-209)
-  vs "## Related skills" in SKILL.md (lines 281-325)
+  vs "## Instructions" in SKILL.md (lines 67-82)
+  vs "## Example questions this skill answers well" in SKILL.md (lines 87-138)
+  vs "## Audience" in SKILL.md (lines 139-169)
+  vs "## When to load this skill" in SKILL.md (lines 170-211)
+  vs "## Related skills" in SKILL.md (lines 283-327)
   vs "## configure" in TASKS.md (lines 21-132)
   vs "## build" in TASKS.md (lines 136-165)
   vs "## run" in TASKS.md (lines 211-257)

@@ -10,7 +10,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 - Skill: `doca-version`
 - Validation status: `passed`
-- Evaluation date: 2026-11-18
+- Evaluation date: 2026-11-23
 - Evaluator version: `1.6.10`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
@@ -50,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 93.9% — baseline ran, but no comparable score was available; uplift unavailable | 89.9% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 65.0% → 100.0% (+35.0 points) | 75.0% → 90.0% (+15.0 points) |
+| Overall | 91.1% — baseline ran, but no comparable score was available; uplift unavailable | 90.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 87.5% → 100.0% (+12.5 points) |
+| Correctness | 55.0% → 100.0% (+45.0 points) | 70.0% → 90.0% (+20.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 93.3% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 47.9% → 87.5% (+39.6 points) | 60.4% → 87.5% (+27.1 points) |
-| Efficiency | 82.2% — baseline ran, but no comparable score was available; uplift unavailable | 78.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 41.7% → 75.0% (+33.3 points) | 56.3% → 87.5% (+31.2 points) |
+| Efficiency | 80.3% — baseline ran, but no comparable score was available; uplift unavailable | 82.7% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -70,9 +70,9 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 98.0% → 93.2% (-4.8 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 98.0% → 93.5% (-4.5 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 86.4% → 87.7% (+1.3 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 86.7% → 87.6% (+0.9 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -80,17 +80,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 853,729 | 397,747 | +455,982 | +114.64% | skill 4/4; base 4/4 |
-| claude-code | doca-version.explicit-positive.v1 | 205,376 | 108,849 | +96,527 | +88.68% | skill 1/1; base 1/1 |
-| claude-code | doca-version.implicit-positive.v1 | 209,216 | 72,514 | +136,702 | +188.52% | skill 1/1; base 1/1 |
-| claude-code | doca-version.implicit-positive.v2 | 294,205 | 72,005 | +222,200 | +308.59% | skill 1/1; base 1/1 |
-| claude-code | doca-version.negative.v1 | 144,932 | 144,379 | +553 | +0.38% | skill 1/1; base 1/1 |
-| codex | All cases | 364,294 | 181,341 | +182,953 | +100.89% | skill 4/4; base 4/4 |
-| codex | doca-version.explicit-positive.v1 | 137,429 | 66,234 | +71,195 | +107.49% | skill 1/1; base 1/1 |
-| codex | doca-version.implicit-positive.v1 | 99,127 | 43,506 | +55,621 | +127.85% | skill 1/1; base 1/1 |
-| codex | doca-version.implicit-positive.v2 | 97,900 | 30,564 | +67,336 | +220.31% | skill 1/1; base 1/1 |
-| codex | doca-version.negative.v1 | 29,838 | 41,037 | -11,199 | -27.29% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,218,023 | 579,088 | +638,935 | +110.33% | skill 8/8; base 8/8 |
+| claude-code | All cases | 805,117 | 433,562 | +371,555 | +85.70% | skill 4/4; base 4/4 |
+| claude-code | doca-version.explicit-positive.v1 | 209,910 | 108,760 | +101,150 | +93.00% | skill 1/1; base 1/1 |
+| claude-code | doca-version.implicit-positive.v1 | 247,535 | 108,647 | +138,888 | +127.83% | skill 1/1; base 1/1 |
+| claude-code | doca-version.implicit-positive.v2 | 200,721 | 72,768 | +127,953 | +175.84% | skill 1/1; base 1/1 |
+| claude-code | doca-version.negative.v1 | 146,951 | 143,387 | +3,564 | +2.49% | skill 1/1; base 1/1 |
+| codex | All cases | 435,715 | 423,367 | +12,348 | +2.92% | skill 4/4; base 4/4 |
+| codex | doca-version.explicit-positive.v1 | 117,506 | 317,001 | -199,495 | -62.93% | skill 1/1; base 1/1 |
+| codex | doca-version.implicit-positive.v1 | 140,190 | 34,988 | +105,202 | +300.68% | skill 1/1; base 1/1 |
+| codex | doca-version.implicit-positive.v2 | 148,035 | 30,781 | +117,254 | +380.93% | skill 1/1; base 1/1 |
+| codex | doca-version.negative.v1 | 29,984 | 40,597 | -10,613 | -26.14% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,240,832 | 856,929 | +383,903 | +44.80% | skill 8/8; base 8/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 

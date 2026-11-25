@@ -7,7 +7,7 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 <br>
+Apache-2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
 Developers and ML engineers converting existing plain PyTorch training scripts into NVFLARE federated learning jobs with Client API model exchange, local validation, and job export. <br>
 
@@ -61,7 +61,6 @@ Underlying evaluation signals used in this run: <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
 - `skill_efficiency`: Tool-call productivity. <br>
 - `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
-
 
 
 ## Evaluation Results: <br>

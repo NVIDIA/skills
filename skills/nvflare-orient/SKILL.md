@@ -1,7 +1,7 @@
 ---
 name: nvflare-orient
 description: "Route open-ended NVFLARE advice and only conversion requests whose preliminary source inspection reports unresolved or conflicting ownership; never load this skill merely to inspect a concrete conversion request before selecting its detected framework converter."
-license: Apache-2.0
+license: Apache-2.0 AND CC-BY-4.0
 metadata:
   version: "0.1.0"
   author: "NVIDIA FLARE Team <federatedlearning@nvidia.com>"

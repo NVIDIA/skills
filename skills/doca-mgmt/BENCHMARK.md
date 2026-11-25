@@ -10,7 +10,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 - Skill: `doca-mgmt`
 - Validation status: `passed`
-- Evaluation date: 2026-11-18
+- Evaluation date: 2026-11-23
 - Evaluator version: `1.6.10`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
@@ -50,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 95.3% — baseline ran, but no comparable score was available; uplift unavailable | 85.4% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 45.0% → 100.0% (+55.0 points) | 80.0% → 100.0% (+20.0 points) |
+| Overall | 91.2% — baseline ran, but no comparable score was available; uplift unavailable | 86.9% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 87.5% → 100.0% (+12.5 points) |
+| Correctness | 45.0% → 100.0% (+55.0 points) | 95.0% → 100.0% (+5.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 37.5% → 89.6% (+52.1 points) | 60.4% → 66.7% (+6.3 points) |
-| Efficiency | 86.8% — baseline ran, but no comparable score was available; uplift unavailable | 65.6% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 25.0% → 68.8% (+43.8 points) | 77.1% → 70.8% (-6.3 points) |
+| Efficiency | 87.2% — baseline ran, but no comparable score was available; uplift unavailable | 68.4% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -70,9 +70,9 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 97.8% → 90.5% (-7.3 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 98.1% → 90.6% (-7.5 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 81.4% → 82.4% (+1.0 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 77.1% → 81.8% (+4.7 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -80,17 +80,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 810,142 | 365,057 | +445,085 | +121.92% | skill 4/4; base 4/4 |
-| claude-code | doca-mgmt.explicit-positive.v1 | 218,793 | 109,406 | +109,387 | +99.98% | skill 1/1; base 1/1 |
-| claude-code | doca-mgmt.implicit-positive.v1 | 265,978 | 109,451 | +156,527 | +143.01% | skill 1/1; base 1/1 |
-| claude-code | doca-mgmt.implicit-positive.v2 | 288,652 | 109,686 | +178,966 | +163.16% | skill 1/1; base 1/1 |
-| claude-code | doca-mgmt.negative.v1 | 36,719 | 36,514 | +205 | +0.56% | skill 1/1; base 1/1 |
-| codex | All cases | 526,080 | 210,059 | +316,021 | +150.44% | skill 4/4; base 4/4 |
-| codex | doca-mgmt.explicit-positive.v1 | 151,317 | 75,671 | +75,646 | +99.97% | skill 1/1; base 1/1 |
-| codex | doca-mgmt.implicit-positive.v1 | 148,989 | 47,757 | +101,232 | +211.97% | skill 1/1; base 1/1 |
-| codex | doca-mgmt.implicit-positive.v2 | 141,987 | 47,558 | +94,429 | +198.56% | skill 1/1; base 1/1 |
-| codex | doca-mgmt.negative.v1 | 83,787 | 39,073 | +44,714 | +114.44% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,336,222 | 575,116 | +761,106 | +132.34% | skill 8/8; base 8/8 |
+| claude-code | All cases | 660,234 | 325,732 | +334,502 | +102.69% | skill 4/4; base 4/4 |
+| claude-code | doca-mgmt.explicit-positive.v1 | 219,486 | 71,674 | +147,812 | +206.23% | skill 1/1; base 1/1 |
+| claude-code | doca-mgmt.implicit-positive.v1 | 178,029 | 109,389 | +68,640 | +62.75% | skill 1/1; base 1/1 |
+| claude-code | doca-mgmt.implicit-positive.v2 | 226,141 | 72,652 | +153,489 | +211.27% | skill 1/1; base 1/1 |
+| claude-code | doca-mgmt.negative.v1 | 36,578 | 72,017 | -35,439 | -49.21% | skill 1/1; base 1/1 |
+| codex | All cases | 548,767 | 558,020 | -9,253 | -1.66% | skill 4/4; base 4/4 |
+| codex | doca-mgmt.explicit-positive.v1 | 154,011 | 342,731 | -188,720 | -55.06% | skill 1/1; base 1/1 |
+| codex | doca-mgmt.implicit-positive.v1 | 158,798 | 53,657 | +105,141 | +195.95% | skill 1/1; base 1/1 |
+| codex | doca-mgmt.implicit-positive.v2 | 145,365 | 60,210 | +85,155 | +141.43% | skill 1/1; base 1/1 |
+| codex | doca-mgmt.negative.v1 | 90,593 | 101,422 | -10,829 | -10.68% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,209,001 | 883,752 | +325,249 | +36.80% | skill 8/8; base 8/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
@@ -114,7 +114,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 - **MEDIUM** QUALITY/quality_discoverability: Description contains vague words (`skills/libs/doca-mgmt/SKILL.md`)
 - **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/libs/doca-mgmt/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/libs/doca-mgmt`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: run as root (`BENCHMARK.md:117`)
+- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: run as root (`BENCHMARK.md:115`)
 - 11 additional finding(s) are available in the full evaluation artifacts.
 
 </details>

@@ -10,7 +10,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 - Skill: `doca-comch`
 - Validation status: `passed`
-- Evaluation date: 2026-11-18
+- Evaluation date: 2026-11-23
 - Evaluator version: `1.6.10`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
@@ -50,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.1% — baseline ran, but no comparable score was available; uplift unavailable | 89.4% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 87.5% → 100.0% (+12.5 points) |
-| Correctness | 80.0% → 100.0% (+20.0 points) | 95.0% → 100.0% (+5.0 points) |
+| Overall | 95.4% — baseline ran, but no comparable score was available; uplift unavailable | 87.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 75.0% → 100.0% (+25.0 points) | 95.0% → 95.0% (±0.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 54.2% → 87.5% (+33.3 points) | 83.3% → 91.7% (+8.4 points) |
-| Efficiency | 82.9% — baseline ran, but no comparable score was available; uplift unavailable | 60.5% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 66.7% → 87.5% (+20.8 points) | 70.8% → 83.3% (+12.5 points) |
+| Efficiency | 89.7% — baseline ran, but no comparable score was available; uplift unavailable | 65.2% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -70,9 +70,9 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 98.0% → 93.6% (-4.4 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 98.0% → 93.3% (-4.7 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 80.7% → 84.0% (+3.3 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 80.0% → 78.1% (-1.9 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -80,17 +80,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 624,501 | 256,039 | +368,462 | +143.91% | skill 4/4; base 4/4 |
-| claude-code | doca-comch.explicit-positive.v1 | 219,164 | 37,755 | +181,409 | +480.49% | skill 1/1; base 1/1 |
-| claude-code | doca-comch.implicit-positive.v1 | 166,576 | 109,468 | +57,108 | +52.17% | skill 1/1; base 1/1 |
-| claude-code | doca-comch.implicit-positive.v2 | 201,695 | 72,196 | +129,499 | +179.37% | skill 1/1; base 1/1 |
-| claude-code | doca-comch.negative.v1 | 37,066 | 36,620 | +446 | +1.22% | skill 1/1; base 1/1 |
-| codex | All cases | 347,893 | 282,804 | +65,089 | +23.02% | skill 4/4; base 4/4 |
-| codex | doca-comch.explicit-positive.v1 | 116,308 | 125,618 | -9,310 | -7.41% | skill 1/1; base 1/1 |
-| codex | doca-comch.implicit-positive.v1 | 80,651 | 39,416 | +41,235 | +104.61% | skill 1/1; base 1/1 |
-| codex | doca-comch.implicit-positive.v2 | 107,764 | 78,734 | +29,030 | +36.87% | skill 1/1; base 1/1 |
-| codex | doca-comch.negative.v1 | 43,170 | 39,036 | +4,134 | +10.59% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 972,394 | 538,843 | +433,551 | +80.46% | skill 8/8; base 8/8 |
+| claude-code | All cases | 665,682 | 291,435 | +374,247 | +128.42% | skill 4/4; base 4/4 |
+| claude-code | doca-comch.explicit-positive.v1 | 174,275 | 37,904 | +136,371 | +359.78% | skill 1/1; base 1/1 |
+| claude-code | doca-comch.implicit-positive.v1 | 205,087 | 72,894 | +132,193 | +181.35% | skill 1/1; base 1/1 |
+| claude-code | doca-comch.implicit-positive.v2 | 249,319 | 72,713 | +176,606 | +242.88% | skill 1/1; base 1/1 |
+| claude-code | doca-comch.negative.v1 | 37,001 | 107,924 | -70,923 | -65.72% | skill 1/1; base 1/1 |
+| codex | All cases | 359,806 | 241,656 | +118,150 | +48.89% | skill 4/4; base 4/4 |
+| codex | doca-comch.explicit-positive.v1 | 112,006 | 75,918 | +36,088 | +47.54% | skill 1/1; base 1/1 |
+| codex | doca-comch.implicit-positive.v1 | 115,946 | 43,671 | +72,275 | +165.50% | skill 1/1; base 1/1 |
+| codex | doca-comch.implicit-positive.v2 | 84,213 | 83,159 | +1,054 | +1.27% | skill 1/1; base 1/1 |
+| codex | doca-comch.negative.v1 | 47,641 | 38,908 | +8,733 | +22.45% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,025,488 | 533,091 | +492,397 | +92.37% | skill 8/8; base 8/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
@@ -99,7 +99,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
 | Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 15 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
 ## Findings and Observations
@@ -107,12 +107,14 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
+- **MEDIUM** DUPLICATE/duplicate: Duplicate content found within SKILL.md:
+  "## Instructions" in SKILL.md (lines 19-34)
+  vs "## What this skill provides" in SKILL.md (lines 145-171) (`SKILL.md:19`)
 - **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/libs/doca-comch/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/libs/doca-comch`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo               (`BENCHMARK.md:115`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo               (`BENCHMARK.md:116`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo  (`SKILL.md:203`)
-- 10 additional finding(s) are available in the full evaluation artifacts.
+- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo                 (`BENCHMARK.md:115`)
+- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo                 (`BENCHMARK.md:116`)
+- 11 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

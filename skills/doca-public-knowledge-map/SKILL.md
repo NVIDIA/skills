@@ -30,6 +30,8 @@ compatibility: >
 
 # DOCA Public Knowledge Map
 
+> **Host checks.** Commands here that inspect the user's DOCA host (listing or reading `/opt/mellanox/doca`, release files such as `/etc/mlnx-release` or `/etc/nvidia/bf-release`, `/dev/mst`) or reach the BlueField (RShim, SSH, BMC) are for that host. Run them yourself only if the user confirms you are on it; otherwise answer from this skill, give the commands for the user to run, and treat values you can't see as unknown.
+
 **Where to start:** Reach for this skill whenever the question is "where does
 the authoritative answer live?" — a docs page, the on-disk install layout, a
 sample, or an NGC catalog entry. Read [`## Public documentation entry points`](#public-documentation-entry-points)

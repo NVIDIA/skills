@@ -1,0 +1,6 @@
+{
+  "requested_deliverable": "new benchmark integration",
+  "benchmark_name": "new-reasoning-suite",
+  "existing_gym_benchmark": false,
+  "evaluation_requested": false
+}

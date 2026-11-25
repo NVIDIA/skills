@@ -1,0 +1,4 @@
+interface:
+  display_name: "NeMo Gym Evaluation Run"
+  short_description: "Evaluate models and agents locally, via endpoints, or on Slurm"
+  default_prompt: "Use $nemo-gym-run-and-babysit-eval to take this Gym evaluation to an accepted result, composing its config first if there is none."

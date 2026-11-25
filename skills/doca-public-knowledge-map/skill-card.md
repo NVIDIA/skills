@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-Developers and engineers working with NVIDIA DOCA, BlueField, or ConnectX use this skill to route questions to the authoritative public documentation page, on-disk install path under /opt/mellanox/doca, public sample or GitHub source, version source, or replacement for a stale doc URL, and to hand off hands-on programming, setup, and hardware tasks to the owning DOCA skills. <br>
+Developers and engineers working with NVIDIA DOCA, BlueField, or ConnectX use this skill to route questions to the authoritative public documentation page, installed DOCA layout, sample location, version source, or owning DOCA skill, rather than receiving hands-on tutorials or hardware changes. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,21 +25,21 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [references/map.md](references/map.md) <br>
-- [references/libraries.md](references/libraries.md) <br>
-- [references/services.md](references/services.md) <br>
-- [references/tools.md](references/tools.md) <br>
-- [references/external-dpu.md](references/external-dpu.md) <br>
-- [references/external-fabric.md](references/external-fabric.md) <br>
-- [NVIDIA DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
-- [NVIDIA DOCA Samples (GitHub)](https://github.com/NVIDIA-DOCA/doca-samples) <br>
+- [doca-public-knowledge-map — routing tables](references/map.md) <br>
+- [Library- and module-specific guides](references/libraries.md) <br>
+- [DOCA services](references/services.md) <br>
+- [DOCA tools](references/tools.md) <br>
+- [Externally-productized DOCA software — not in this bundle](references/external-dpu.md) <br>
+- [Externally-productized DOCA software — fabric, orchestration, firmware](references/external-fabric.md) <br>
+- [NVIDIA DOCA SDK documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
+- [DOCA samples (GitHub)](https://github.com/NVIDIA-DOCA/doca-samples) <br>
 - [DOCA Platform Framework (GitHub)](https://github.com/NVIDIA/doca-platform) <br>
 - [DOCA Developer Forum](https://forums.developer.nvidia.com/c/infrastructure/doca/370) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Analysis, Documentation routing, Shell commands] <br>
-**Output Format:** [Markdown with documentation URLs, install paths, and inline bash code blocks] <br>
+**Output Type(s):** [Analysis, Shell commands] <br>
+**Output Format:** [Markdown with documentation links and inline shell command blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -50,7 +50,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-3 evaluation tasks (2 positive, 1 negative), 1 attempt per task, each attempt run in its own isolated sandbox pod (`k8s-sandbox`); each task was also attempted without the skill as a baseline. <br>
+3 evaluation tasks (2 positive, 1 negative), 1 attempt per task, each run in an isolated sandbox pod (`k8s-sandbox`); evaluator version `1.6.10`, evaluated 2026-11-23. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -82,12 +82,12 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 90.1% — baseline ran, but no comparable score was available; uplift unavailable | 83.4% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 40.0% → 86.7% (+46.7 points) | 86.7% → 80.0% (-6.7 points) |
+| Overall | 90.2% — baseline ran, but no comparable score was available; uplift unavailable | 83.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 83.3% → 100.0% (+16.7 points) |
+| Correctness | 40.0% → 86.7% (+46.7 points) | 80.0% → 86.7% (+6.7 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
 | Effectiveness | 27.8% → 66.7% (+38.9 points) | 50.0% → 66.7% (+16.7 points) |
-| Efficiency | 97.4% — baseline ran, but no comparable score was available; uplift unavailable | 75.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Efficiency | 97.4% — baseline ran, but no comparable score was available; uplift unavailable | 70.7% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -100,20 +100,12 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 98.5% → 94.8% (-3.7 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 98.5% → 94.9% (-3.6 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 86.5% → 90.8% (+4.3 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
-
-### Tier Status
-
-| Tier | Purpose | Status | Evidence |
-|---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 10 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
-| Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 3 task(s) |
+| codex | Efficiency | Token-only comparison | 84.5% → 90.0% (+5.5 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Skill Version(s): <br>
-3a9f2bb (source: git SHA, committed 2026-11-18) <br>
+444e267 (source: git SHA, committed 2026-11-23); targets DOCA 3.6 (source: frontmatter doca_version) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

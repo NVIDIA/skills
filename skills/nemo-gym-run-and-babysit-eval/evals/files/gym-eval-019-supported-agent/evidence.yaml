@@ -1,0 +1,29 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+installed_gym_commit: a8eeecedb433b6c483077160a2cf9a06a09fab1b # pragma: allowlist secret -- public Gym commit SHA
+task_target: ./repair-tasks
+format: Harbor task-folder format
+task_count: 4
+selected_tasks: all
+requested_agent: codex_agent
+available_agent_configs:
+- responses_api_agents/codex_agent/configs/codex_agent.yaml
+- responses_api_agents/hermes_agent/configs/hermes_agent.yaml
+dataset_metadata:
+  type: validation
+  allowed_agents:
+  - hermes_agent
+  - codex_agent
+previous_operator_agent: hermes_agent
+sandbox: docker
+docker_available: true
+endpoint:
+  protocol: Responses
+  base_url: https://responses.example.test/v1
+  model: team-responses-model
+  api_key_env: POLICY_API_KEY
+num_repeats: 1
+output_root: results/codex-task-eval
+agent_runtime: Use the existing Gym adapter and its pinned runtime setup; startup has not run yet.
+sandbox_to_model_reachability: not yet demonstrated

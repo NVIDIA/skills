@@ -10,7 +10,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 - Skill: `doca-telemetry-traceback-application`
 - Validation status: `passed`
-- Evaluation date: 2026-11-18
+- Evaluation date: 2026-11-23
 - Evaluator version: `1.6.10`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 5 evaluation tasks (3 positive, 2 negative)
@@ -50,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 95.2% — baseline ran, but no comparable score was available; uplift unavailable | 92.8% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 60.0% → 100.0% (+40.0 points) | 92.0% → 92.0% (±0.0 points) |
+| Overall | 96.9% — baseline ran, but no comparable score was available; uplift unavailable | 88.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 90.0% (-10.0 points) |
+| Correctness | 56.0% → 100.0% (+44.0 points) | 84.0% → 96.0% (+12.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 50.0% → 90.0% (+40.0 points) | 75.0% → 95.0% (+20.0 points) |
-| Efficiency | 86.2% — baseline ran, but no comparable score was available; uplift unavailable | 82.2% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 50.0% → 90.0% (+40.0 points) | 80.0% → 85.0% (+5.0 points) |
+| Efficiency | 94.4% — baseline ran, but no comparable score was available; uplift unavailable | 74.2% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -70,9 +70,9 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 98.1% → 94.7% (-3.4 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 98.1% → 94.3% (-3.8 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 82.6% → 88.8% (+6.2 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 82.9% → 83.9% (+1.0 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -80,19 +80,19 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 695,398 | 468,885 | +226,513 | +48.31% | skill 5/5; base 5/5 |
-| claude-code | doca-telemetry-traceback-application.explicit-positive.v1 | 213,321 | 71,263 | +142,058 | +199.34% | skill 1/1; base 1/1 |
-| claude-code | doca-telemetry-traceback-application.implicit-positive.v1 | 201,591 | 108,270 | +93,321 | +86.19% | skill 1/1; base 1/1 |
-| claude-code | doca-telemetry-traceback-application.implicit-positive.v2 | 204,914 | 71,731 | +133,183 | +185.67% | skill 1/1; base 1/1 |
-| claude-code | doca-telemetry-traceback-application.negative.v1 | 36,503 | 108,104 | -71,601 | -66.23% | skill 1/1; base 1/1 |
-| claude-code | doca-telemetry-traceback-application.negative.v2 | 39,069 | 109,517 | -70,448 | -64.33% | skill 1/1; base 1/1 |
-| codex | All cases | 351,839 | 245,194 | +106,645 | +43.49% | skill 5/5; base 5/5 |
-| codex | doca-telemetry-traceback-application.explicit-positive.v1 | 102,267 | 67,117 | +35,150 | +52.37% | skill 1/1; base 1/1 |
-| codex | doca-telemetry-traceback-application.implicit-positive.v1 | 97,627 | 28,111 | +69,516 | +247.29% | skill 1/1; base 1/1 |
-| codex | doca-telemetry-traceback-application.implicit-positive.v2 | 91,829 | 24,138 | +67,691 | +280.43% | skill 1/1; base 1/1 |
-| codex | doca-telemetry-traceback-application.negative.v1 | 30,057 | 47,510 | -17,453 | -36.74% | skill 1/1; base 1/1 |
-| codex | doca-telemetry-traceback-application.negative.v2 | 30,059 | 78,318 | -48,259 | -61.62% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,047,237 | 714,079 | +333,158 | +46.66% | skill 10/10; base 10/10 |
+| claude-code | All cases | 648,582 | 504,844 | +143,738 | +28.47% | skill 5/5; base 5/5 |
+| claude-code | doca-telemetry-traceback-application.explicit-positive.v1 | 170,537 | 107,722 | +62,815 | +58.31% | skill 1/1; base 1/1 |
+| claude-code | doca-telemetry-traceback-application.implicit-positive.v1 | 164,088 | 107,749 | +56,339 | +52.29% | skill 1/1; base 1/1 |
+| claude-code | doca-telemetry-traceback-application.implicit-positive.v2 | 203,475 | 142,984 | +60,491 | +42.31% | skill 1/1; base 1/1 |
+| claude-code | doca-telemetry-traceback-application.negative.v1 | 36,546 | 36,261 | +285 | +0.79% | skill 1/1; base 1/1 |
+| claude-code | doca-telemetry-traceback-application.negative.v2 | 73,936 | 110,128 | -36,192 | -32.86% | skill 1/1; base 1/1 |
+| codex | All cases | 465,505 | 238,598 | +226,907 | +95.10% | skill 5/5; base 5/5 |
+| codex | doca-telemetry-traceback-application.explicit-positive.v1 | 101,587 | 75,638 | +25,949 | +34.31% | skill 1/1; base 1/1 |
+| codex | doca-telemetry-traceback-application.implicit-positive.v1 | 94,481 | 30,696 | +63,785 | +207.80% | skill 1/1; base 1/1 |
+| codex | doca-telemetry-traceback-application.implicit-positive.v2 | 75,362 | 23,809 | +51,553 | +216.53% | skill 1/1; base 1/1 |
+| codex | doca-telemetry-traceback-application.negative.v1 | 22,329 | 35,001 | -12,672 | -36.20% | skill 1/1; base 1/1 |
+| codex | doca-telemetry-traceback-application.negative.v2 | 171,746 | 73,454 | +98,292 | +133.81% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,114,087 | 743,442 | +370,645 | +49.86% | skill 10/10; base 10/10 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 

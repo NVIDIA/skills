@@ -1,0 +1,27 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+installation:
+  python: 3.13.14
+  git_available: true
+  preview_allowed: true
+  public_gym_commit: a8eeecedb433b6c483077160a2cf9a06a09fab1b # pragma: allowlist secret -- public Gym commit SHA
+  working_directory: an empty directory outside a Gym checkout
+  installed_asset_root: nemo_gym.PARENT_DIR
+endpoint:
+  base_url: https://inference.example.test/v1
+  model: team-chat-model
+  api_key_env: POLICY_API_KEY
+  implements:
+  - POST /chat/completions
+  does_not_implement:
+  - POST /responses
+  vllm: false
+target:
+  benchmark: ifeval
+  split: benchmark
+  canonical_repeats: 1
+  smoke_limit: 5
+  smoke_repeats: 1
+  output: results/chat-smoke/rollouts.jsonl
+  prepare_script: benchmarks/ifeval/prepare.py
