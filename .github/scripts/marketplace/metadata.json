@@ -4621,6 +4621,18 @@
       }
     },
     {
+      "path": "skills/sdm-tabular-prediction",
+      "name": "sdm-tabular-prediction",
+      "description": "Runs single-table classification and regression with NVIDIA Structured Data Models (SDM), a PyTorch-native library. Defaults to KumoTabular, a pretrained tabular foundation model. Use for in-context prediction from labeled tables, including holdout evaluation, batch scoring, and exporting predictions.",
+      "metadata": {
+        "product.primary": "Structured Data Models",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "data-science",
+        "audience": "data_scientist,ml_engineer,ai_engineer,developer",
+        "discovery.activity_tags": "inference,classify,evaluate,generate"
+      }
+    },
+    {
       "path": "skills/skill-card-generator",
       "name": "skill-card-generator",
       "description": "Use only to generate or update a governance skill card for a specified existing agent skill directory. Do not use for explaining, listing, comparing, or discussing skill capabilities.",

@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 487,
-  "result_row_count": 4584,
+  "skill_count": 488,
+  "result_row_count": 4594,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -8055,6 +8055,27 @@
       "component": "Run:ai",
       "has_results": true,
       "average_uplift_pct": 14.7
+    },
+    {
+      "skill": "sdm-tabular-prediction",
+      "evaluation_date": "2026-11-24",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.10",
+      "dataset_digest": "sha256:b62fd0a5ba0dccef58d5a25e4712d4ee02fd8a274b6fe96de427a5359e802c78",
+      "validation_status": "passed",
+      "tasks": 3,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "sdm-tabular-prediction",
+      "component": "Structured Data Models",
+      "has_results": true,
+      "average_uplift_pct": 31.93
     },
     {
       "skill": "skill-card-generator",
@@ -42325,6 +42346,96 @@
       "num": null,
       "agent": "codex",
       "score_pct": 66.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "sdm-tabular-prediction",
+      "component": "Structured Data Models",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "sdm-tabular-prediction",
+      "component": "Structured Data Models",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 83.3,
+      "uplift_pct": -16.7
+    },
+    {
+      "catalog_dir": "sdm-tabular-prediction",
+      "component": "Structured Data Models",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 80.0
+    },
+    {
+      "catalog_dir": "sdm-tabular-prediction",
+      "component": "Structured Data Models",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 20.0
+    },
+    {
+      "catalog_dir": "sdm-tabular-prediction",
+      "component": "Structured Data Models",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 93.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "sdm-tabular-prediction",
+      "component": "Structured Data Models",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "sdm-tabular-prediction",
+      "component": "Structured Data Models",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 90.0
+    },
+    {
+      "catalog_dir": "sdm-tabular-prediction",
+      "component": "Structured Data Models",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 77.5,
+      "uplift_pct": 18.3
+    },
+    {
+      "catalog_dir": "sdm-tabular-prediction",
+      "component": "Structured Data Models",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "sdm-tabular-prediction",
+      "component": "Structured Data Models",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 67.2,
       "uplift_pct": null
     },
     {

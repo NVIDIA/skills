@@ -2697,6 +2697,13 @@
       "last_modified": "2026-10-26"
     },
     {
+      "name": "sdm-tabular-prediction",
+      "path": "skills/sdm-tabular-prediction",
+      "content_digest": "sha256:fcd13eb48cc98e5ec681d2cbd5fb19b6dc16948f67b06fb86d509cb5f4f49533",
+      "last_commit": "99c4b87840af2152a6d0b16f335b7169ea22f730",
+      "last_modified": "2026-11-24"
+    },
+    {
       "name": "skill-card-generator",
       "path": "skills/skill-card-generator",
       "content_digest": "sha256:975d38ea360319d933276ad84e66e898b47472e16e70e9643741866e2a8e5860",
