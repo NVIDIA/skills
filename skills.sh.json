@@ -331,6 +331,7 @@
         "nemo-automodel-launcher-config",
         "nemo-automodel-model-onboarding",
         "nemo-automodel-recipe-development",
+        "nemo-gym-analyzing-results",
         "nemo-gym-reward-profiling",
         "nemo-mbridge-mlm-bridge-training",
         "nemo-mbridge-multi-node-slurm",

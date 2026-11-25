@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 490,
-  "result_row_count": 4594,
+  "skill_count": 491,
+  "result_row_count": 4604,
   "skills_without_results": [
     "daqiri-onboarding",
     "deepstream-generate-pipeline",
@@ -5673,6 +5673,27 @@
       "component": "NeMo Fabric",
       "has_results": true,
       "average_uplift_pct": 28.25
+    },
+    {
+      "skill": "nemo-gym-analyzing-results",
+      "evaluation_date": "2026-11-25",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.10",
+      "dataset_digest": "sha256:25cbc6115a6f8728688b469531f1d6218c33aa5090c954a932cb37562f6cfb48",
+      "validation_status": "passed",
+      "tasks": 23,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "nemo-gym-analyzing-results",
+      "component": "NeMo Gym",
+      "has_results": true,
+      "average_uplift_pct": 5.05
     },
     {
       "skill": "nemo-gym-reward-profiling",
@@ -32758,6 +32779,96 @@
       "num": null,
       "agent": "codex",
       "score_pct": 76.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nemo-gym-analyzing-results",
+      "component": "NeMo Gym",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nemo-gym-analyzing-results",
+      "component": "NeMo Gym",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 97.8,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nemo-gym-analyzing-results",
+      "component": "NeMo Gym",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.7,
+      "uplift_pct": 12.2
+    },
+    {
+      "catalog_dir": "nemo-gym-analyzing-results",
+      "component": "NeMo Gym",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 99.1,
+      "uplift_pct": 2.6
+    },
+    {
+      "catalog_dir": "nemo-gym-analyzing-results",
+      "component": "NeMo Gym",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 96.2,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nemo-gym-analyzing-results",
+      "component": "NeMo Gym",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 89.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nemo-gym-analyzing-results",
+      "component": "NeMo Gym",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 85.6,
+      "uplift_pct": 6.1
+    },
+    {
+      "catalog_dir": "nemo-gym-analyzing-results",
+      "component": "NeMo Gym",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 92.4,
+      "uplift_pct": 9.4
+    },
+    {
+      "catalog_dir": "nemo-gym-analyzing-results",
+      "component": "NeMo Gym",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 93.1,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nemo-gym-analyzing-results",
+      "component": "NeMo Gym",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 83.5,
       "uplift_pct": null
     },
     {
