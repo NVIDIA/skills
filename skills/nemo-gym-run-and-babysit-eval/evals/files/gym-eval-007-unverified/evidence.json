@@ -1,0 +1,45 @@
+{
+  "gym_job_id": "eval-unobserved",
+  "benchmark": "ifbench",
+  "inspection": {
+    "decision": {
+      "action": "noop",
+      "reason": "complete"
+    },
+    "gate_task": {
+      "status": "UNVERIFIED",
+      "expected_samples": 100,
+      "scored_samples": 100,
+      "score": 0.73,
+      "trial_counts": {
+        "observed_healthy": 0,
+        "unhealthy": 0,
+        "unobserved": 100,
+        "unobserved_reason": "the verifier server did not record its grading operations"
+      },
+      "evaluation_health": {
+        "status": "UNVERIFIED"
+      },
+      "mlflow_delivery": {
+        "state": "not_required"
+      }
+    },
+    "operator_verdict": {
+      "state": "unknown",
+      "reason": "grading evidence unobserved",
+      "action": "none: report the unverified grading evidence; recovery does not add missing grading records"
+    }
+  },
+  "quality_summary": {
+    "run": {
+      "artifacts": {
+        "healthy": true
+      },
+      "verdicts": {
+        "healthy": 100,
+        "unhealthy": 0,
+        "unobserved": 0
+      }
+    }
+  }
+}

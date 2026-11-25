@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-External developers building C/C++ and CUDA applications on the DOCA GPUNetIO library use this skill to configure, build, modify, run, test, and debug GPU-initiated packet I/O — such as a persistent CUDA kernel that polls a GPU-visible RX queue on a BlueField DPU or ConnectX NIC host with DOCA and a matched CUDA toolkit already installed. <br>
+External developers and engineers building applications on the DOCA GPUNetIO library use this skill to stand up GPU-visible RX/TX queues on top of DOCA Ethernet, write or modify persistent CUDA kernels that process packets directly on an NVIDIA GPU, check DOCA and CUDA capability and version compatibility, and debug GPUNetIO errors on a host with DOCA, a BlueField DPU or ConnectX NIC, and the CUDA toolkit installed. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,15 +25,16 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [DOCA GPUNetIO documentation](https://docs.nvidia.com/doca/sdk/DOCA-GPUNetIO/index.html) <br>
-- [DOCA Compatibility Policy](https://docs.nvidia.com/doca/sdk/doca-compatibility-policy/index.html) <br>
+- [DOCA GPUNetIO Programming Guide](https://docs.nvidia.com/doca/sdk/DOCA-GPUNetIO/index.html) <br>
+- [NVIDIA DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
+- [DOCA samples and applications](https://github.com/NVIDIA-DOCA/doca-samples) <br>
 - [CAPABILITIES.md](CAPABILITIES.md) <br>
 - [TASKS.md](TASKS.md) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Analysis, Code, Shell commands, Configuration instructions] <br>
-**Output Format:** [Markdown with inline code blocks] <br>
+**Output Format:** [Markdown with inline code blocks (C, CUDA C++, bash)] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -44,7 +45,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-4 evaluation tasks (3 positive, 1 negative), 1 attempt per task, each run in its own isolated sandbox pod (`k8s-sandbox` environment); each task was also attempted without the skill as a baseline. <br>
+4 evaluation tasks (3 positive, 1 negative), 1 attempt per task, each attempt run in its own isolated sandbox pod (`k8s-sandbox` environment); each task was also attempted without the skill as a baseline. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -76,38 +77,32 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 92.2% — baseline ran, but no comparable score was available; uplift unavailable | 84.2% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 90.7% — baseline ran, but no comparable score was available; uplift unavailable | 83.9% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 65.0% → 95.0% (+30.0 points) | 80.0% → 95.0% (+15.0 points) |
+| Correctness | 65.0% → 95.0% (+30.0 points) | 80.0% → 90.0% (+10.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 25.0% → 75.0% (+50.0 points) | 56.3% → 68.8% (+12.5 points) |
-| Efficiency | 90.9% — baseline ran, but no comparable score was available; uplift unavailable | 62.1% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 25.0% → 75.0% (+50.0 points) | 43.8% → 68.8% (+25.0 points) |
+| Efficiency | 83.3% — baseline ran, but no comparable score was available; uplift unavailable | 65.7% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
+Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92.0%, 45.0 percentage points above its 47.0% no-skill baseline.
+
 A partial dimension was calculated from only the available configured signals; review the detailed report before relying on it.
 
-#### Comparison details
+### Comparison details
 
 Shared-source comparisons use the same signals and weights on both conditions. They do not replace the full dimension scores above or change the publication verdict.
 
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 98.3% → 90.1% (-8.2 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 98.1% → 88.7% (-9.4 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 86.0% → 82.3% (-3.7 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
-
-### Tier Status
-
-| Tier | Purpose | Status | Evidence |
-|---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 15 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 2 finding(s) |
-| Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
+| codex | Efficiency | Token-only comparison | 84.1% → 83.9% (-0.2 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Skill Version(s): <br>
-3a9f2bb (source: git SHA, committed 2026-11-18) <br>
+444e267 (source: git SHA, committed 2026-11-23); targets DOCA 3.6 (source: frontmatter metadata) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

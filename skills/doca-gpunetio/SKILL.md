@@ -27,7 +27,7 @@ metadata:
     - cuda
 compatibility: >
   Requires DOCA SDK at /opt/mellanox/doca on Linux (Ubuntu 22.04/24.04
-  or RHEL/SLES) with a BlueField DPU or ConnectX NIC. Reads the local
+  or RHEL/SLES) with a BlueField DPU or ConnectX NIC. On the user's DOCA host, reads the local
   install via `pkg-config doca-gpunetio`. Requires an NVIDIA GPU with
   CUDA toolkit (matched to DOCA per the DOCA Compatibility Policy) and
   GPU memory registered via dmabuf (or the legacy nvidia-peermem fallback) for GPUDirect RDMA; some
@@ -36,6 +36,8 @@ compatibility: >
 ---
 
 # DOCA GPUNetIO
+
+> **Host checks.** Commands here that inspect the user's DOCA host (listing or reading `/opt/mellanox/doca`, release files such as `/etc/mlnx-release` or `/etc/nvidia/bf-release`, `/dev/mst`) or reach the BlueField (RShim, SSH, BMC) are for that host. Run them yourself only if the user confirms you are on it; otherwise answer from this skill, give the commands for the user to run, and treat values you can't see as unknown.
 
 ## Examples
 

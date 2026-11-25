@@ -10,7 +10,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 - Skill: `doca-dpdk-bridge`
 - Validation status: `passed`
-- Evaluation date: 2026-11-18
+- Evaluation date: 2026-11-23
 - Evaluator version: `1.6.10`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
@@ -50,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 96.7% — baseline ran, but no comparable score was available; uplift unavailable | 89.1% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 87.5% → 100.0% (+12.5 points) |
-| Correctness | 60.0% → 100.0% (+40.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Overall | 96.7% — baseline ran, but no comparable score was available; uplift unavailable | 88.5% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 60.0% → 100.0% (+40.0 points) | 90.0% → 100.0% (+10.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 50.0% → 95.8% (+45.8 points) | 83.3% → 83.3% (±0.0 points) |
-| Efficiency | 87.7% — baseline ran, but no comparable score was available; uplift unavailable | 67.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 50.0% → 95.8% (+45.8 points) | 66.7% → 79.2% (+12.5 points) |
+| Efficiency | 87.6% — baseline ran, but no comparable score was available; uplift unavailable | 68.1% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -70,9 +70,9 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 98.2% → 93.1% (-5.1 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 97.9% → 93.0% (-4.9 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 78.2% → 81.7% (+3.5 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 79.0% → 81.7% (+2.7 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -80,17 +80,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 633,314 | 219,596 | +413,718 | +188.40% | skill 4/4; base 4/4 |
-| claude-code | doca-dpdk-bridge.explicit-positive.v1 | 213,882 | 37,350 | +176,532 | +472.64% | skill 1/1; base 1/1 |
-| claude-code | doca-dpdk-bridge.implicit-positive.v1 | 212,453 | 74,100 | +138,353 | +186.71% | skill 1/1; base 1/1 |
-| claude-code | doca-dpdk-bridge.implicit-positive.v2 | 170,443 | 71,882 | +98,561 | +137.11% | skill 1/1; base 1/1 |
-| claude-code | doca-dpdk-bridge.negative.v1 | 36,536 | 36,264 | +272 | +0.75% | skill 1/1; base 1/1 |
-| codex | All cases | 398,720 | 355,318 | +43,402 | +12.21% | skill 4/4; base 4/4 |
-| codex | doca-dpdk-bridge.explicit-positive.v1 | 132,202 | 184,624 | -52,422 | -28.39% | skill 1/1; base 1/1 |
-| codex | doca-dpdk-bridge.implicit-positive.v1 | 125,469 | 56,734 | +68,735 | +121.15% | skill 1/1; base 1/1 |
-| codex | doca-dpdk-bridge.implicit-positive.v2 | 101,834 | 70,706 | +31,128 | +44.02% | skill 1/1; base 1/1 |
-| codex | doca-dpdk-bridge.negative.v1 | 39,215 | 43,254 | -4,039 | -9.34% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,032,034 | 574,914 | +457,120 | +79.51% | skill 8/8; base 8/8 |
+| claude-code | All cases | 636,163 | 257,515 | +378,648 | +147.04% | skill 4/4; base 4/4 |
+| claude-code | doca-dpdk-bridge.explicit-positive.v1 | 176,543 | 38,229 | +138,314 | +361.80% | skill 1/1; base 1/1 |
+| claude-code | doca-dpdk-bridge.implicit-positive.v1 | 213,285 | 74,623 | +138,662 | +185.82% | skill 1/1; base 1/1 |
+| claude-code | doca-dpdk-bridge.implicit-positive.v2 | 209,509 | 108,570 | +100,939 | +92.97% | skill 1/1; base 1/1 |
+| claude-code | doca-dpdk-bridge.negative.v1 | 36,826 | 36,093 | +733 | +2.03% | skill 1/1; base 1/1 |
+| codex | All cases | 383,260 | 240,664 | +142,596 | +59.25% | skill 4/4; base 4/4 |
+| codex | doca-dpdk-bridge.explicit-positive.v1 | 107,712 | 56,806 | +50,906 | +89.61% | skill 1/1; base 1/1 |
+| codex | doca-dpdk-bridge.implicit-positive.v1 | 117,732 | 69,701 | +48,031 | +68.91% | skill 1/1; base 1/1 |
+| codex | doca-dpdk-bridge.implicit-positive.v2 | 108,525 | 70,698 | +37,827 | +53.51% | skill 1/1; base 1/1 |
+| codex | doca-dpdk-bridge.negative.v1 | 49,291 | 43,459 | +5,832 | +13.42% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,019,423 | 498,179 | +521,244 | +104.63% | skill 8/8; base 8/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
@@ -98,7 +98,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 19 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 18 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
@@ -111,8 +111,8 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 - **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/libs/doca-dpdk-bridge/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/libs/doca-dpdk-bridge`)
 - **MEDIUM** SECURITY/skillspector_execution_failure: skillspector scan did not execute reliably (agent-control analysis limitation): TASKS.md [static; static_parse_limit; analyzers=static_patterns_tool_misuse]: A security-relevant expression could not be fully resolved by the bounded static parser. SkillSpector could not determine this command or code fragment's boundaries. Check: expansion boundary; location: reported source range; unchecked scope: expression. Relevant parser input not fully checked. (`.`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo          (`BENCHMARK.md:113`)
-- 14 additional finding(s) are available in the full evaluation artifacts.
+- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo            (`BENCHMARK.md:114`)
+- 13 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

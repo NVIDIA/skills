@@ -1,0 +1,94 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+execution:
+  kind: direct gym eval run
+  gym_job_id: null
+  output: results/indic-subset/rollouts.jsonl
+  exit_code: 0
+protocol:
+  benchmark: indic/ifeval
+  selected_tasks: 10
+  num_repeats: 1
+  selection: named subset decision-suite-v1, not the full benchmark
+  grading_mode: binary
+  requested_metric: inst_level_strict_acc
+old_chat_score: 0.99
+rollouts_coverage:
+  expected: 10
+  measured: 10
+  masked: 0
+  failed: 0
+  missing: 0
+  intentionally_omitted: 0
+  complete: true
+  identity_verified: true
+  reconciled: true
+aggregate_metrics:
+- agent_ref:
+    name: indic_ifeval_instruction_following_simple_agent
+  agent_metrics:
+    mean/reward: 0.8
+    prompt_level_strict_acc: 0.8
+    inst_level_strict_acc: 0.9
+selected_rows:
+- task: prompt-1
+  reward: 1
+  inst_level_strict_acc:
+  - true
+  - true
+- task: prompt-2
+  reward: 1
+  inst_level_strict_acc:
+  - true
+  - true
+- task: prompt-3
+  reward: 1
+  inst_level_strict_acc:
+  - true
+- task: prompt-4
+  reward: 1
+  inst_level_strict_acc:
+  - true
+  - true
+  - true
+- task: prompt-5
+  reward: 1
+  inst_level_strict_acc:
+  - true
+- task: prompt-6
+  reward: 1
+  inst_level_strict_acc:
+  - true
+  - true
+- task: prompt-7
+  reward: 1
+  inst_level_strict_acc:
+  - true
+  - true
+  - true
+  - true
+- task: prompt-8
+  reward: 1
+  inst_level_strict_acc:
+  - true
+  - true
+- task: prompt-9
+  reward: 0
+  inst_level_strict_acc:
+  - true
+  - false
+- task: prompt-10
+  reward: 0
+  inst_level_strict_acc:
+  - false
+quality_summary:
+  run:
+    artifacts:
+      healthy: true
+    verdicts:
+      healthy: 10
+      unhealthy: 0
+      unobserved: 0
+benchmark_metric_definition: inst_level_strict_acc is all passed instruction checks divided by all instruction checks;
+  mean/reward with binary grading is the prompt-level all-instructions pass fraction.

@@ -10,7 +10,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 - Skill: `doca-socket-relay`
 - Validation status: `passed`
-- Evaluation date: 2026-11-18
+- Evaluation date: 2026-11-23
 - Evaluator version: `1.6.10`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
@@ -50,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 97.4% — baseline ran, but no comparable score was available; uplift unavailable | 91.4% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 55.0% → 100.0% (+45.0 points) | 70.0% → 95.0% (+25.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 50.0% → 100.0% (+50.0 points) | 62.5% → 93.8% (+31.3 points) |
-| Efficiency | 87.0% — baseline ran, but no comparable score was available; uplift unavailable | 73.2% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | Not available | 93.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | Not available | 100.0% → 100.0% (±0.0 points) |
+| Correctness | Not available | 85.0% → 95.0% (+10.0 points) |
+| Discoverability | Not available | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | Not available | 62.5% → 100.0% (+37.5 points) |
+| Efficiency | Not available | 77.0% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -69,10 +69,8 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
-| claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 98.8% → 95.6% (-3.2 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 86.2% → 86.7% (+0.5 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 87.3% → 87.2% (-0.1 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -80,17 +78,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 798,905 | 395,316 | +403,589 | +102.09% | skill 4/4; base 4/4 |
-| claude-code | doca-socket-relay.explicit-positive.v1 | 262,869 | 108,554 | +154,315 | +142.16% | skill 1/1; base 1/1 |
-| claude-code | doca-socket-relay.implicit-positive.v1 | 262,153 | 108,449 | +153,704 | +141.73% | skill 1/1; base 1/1 |
-| claude-code | doca-socket-relay.implicit-positive.v2 | 201,578 | 107,297 | +94,281 | +87.87% | skill 1/1; base 1/1 |
-| claude-code | doca-socket-relay.negative.v1 | 72,305 | 71,016 | +1,289 | +1.82% | skill 1/1; base 1/1 |
-| codex | All cases | 346,163 | 197,549 | +148,614 | +75.23% | skill 4/4; base 4/4 |
-| codex | doca-socket-relay.explicit-positive.v1 | 124,144 | 59,448 | +64,696 | +108.83% | skill 1/1; base 1/1 |
-| codex | doca-socket-relay.implicit-positive.v1 | 99,366 | 47,266 | +52,100 | +110.23% | skill 1/1; base 1/1 |
-| codex | doca-socket-relay.implicit-positive.v2 | 108,969 | 45,208 | +63,761 | +141.04% | skill 1/1; base 1/1 |
-| codex | doca-socket-relay.negative.v1 | 13,684 | 45,627 | -31,943 | -70.01% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,145,068 | 592,865 | +552,203 | +93.14% | skill 8/8; base 8/8 |
+| claude-code | All cases | 638,563 | 358,733 | +279,830 | +78.01% | skill 4/4; base 4/4 |
+| claude-code | doca-socket-relay.explicit-positive.v1 | 228,298 | 71,569 | +156,729 | +218.99% | skill 1/1; base 1/1 |
+| claude-code | doca-socket-relay.implicit-positive.v1 | 172,333 | 108,647 | +63,686 | +58.62% | skill 1/1; base 1/1 |
+| claude-code | doca-socket-relay.implicit-positive.v2 | 165,376 | 107,633 | +57,743 | +53.65% | skill 1/1; base 1/1 |
+| claude-code | doca-socket-relay.negative.v1 | 72,556 | 70,884 | +1,672 | +2.36% | skill 1/1; base 1/1 |
+| codex | All cases | 365,440 | 185,058 | +180,382 | +97.47% | skill 4/4; base 4/4 |
+| codex | doca-socket-relay.explicit-positive.v1 | 126,010 | 52,146 | +73,864 | +141.65% | skill 1/1; base 1/1 |
+| codex | doca-socket-relay.implicit-positive.v1 | 99,842 | 42,443 | +57,399 | +135.24% | skill 1/1; base 1/1 |
+| codex | doca-socket-relay.implicit-positive.v2 | 125,916 | 45,202 | +80,714 | +178.56% | skill 1/1; base 1/1 |
+| codex | doca-socket-relay.negative.v1 | 13,672 | 45,267 | -31,595 | -69.80% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,004,003 | 543,791 | +460,212 | +84.63% | skill 8/8; base 8/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
@@ -107,26 +105,26 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
+- **HIGH** DUPLICATE/duplicate: Duplicate content found within CAPABILITIES.md:
+  "## Pattern overview" in CAPABILITIES.md (lines 32-48)
+  vs "## Capabilities and modes" in CAPABILITIES.md (lines 94-109)
+  vs "## Safety policy" in CAPABILITIES.md (lines 315-373) (`CAPABILITIES.md:32`)
 - **HIGH** DUPLICATE/duplicate: Duplicate content found across CAPABILITIES.md and SKILL.md and TASKS.md:
   "# DOCA Socket Relay — Capabilities" in CAPABILITIES.md (lines 1-18)
   vs "## Pattern overview" in CAPABILITIES.md (lines 23-30)
   vs "## Capabilities and modes" in CAPABILITIES.md (lines 63-72)
   vs "## Capabilities and modes" in CAPABILITIES.md (lines 77-81)
   vs "## Error taxonomy" in CAPABILITIES.md (lines 156-237)
-  vs "## Instructions" in SKILL.md (lines 30-59)
-  vs "## Example questions this skill answers well" in SKILL.md (lines 60-117)
-  vs "## When to load this skill" in SKILL.md (lines 118-149)
-  vs "## What this skill provides" in SKILL.md (lines 150-183)
-  vs "## Related skills" in SKILL.md (lines 223-275)
+  vs "## Instructions" in SKILL.md (lines 32-61)
+  vs "## Example questions this skill answers well" in SKILL.md (lines 62-119)
+  vs "## When to load this skill" in SKILL.md (lines 120-151)
+  vs "## What this skill provides" in SKILL.md (lines 152-185)
+  vs "## Related skills" in SKILL.md (lines 225-277)
   vs "# DOCA Socket Relay — Tasks" in TASKS.md (lines 1-28)
   vs "## configure" in TASKS.md (lines 41-104)
   vs "## run" in TASKS.md (lines 249-308)
   vs "## debug" in TASKS.md (lines 405-489)
   vs "## Command appendix" in TASKS.md (lines 574-582) (`CAPABILITIES.md:1`)
-- **MEDIUM** DUPLICATE/duplicate: Duplicate content found within CAPABILITIES.md:
-  "## Pattern overview" in CAPABILITIES.md (lines 32-48)
-  vs "## Capabilities and modes" in CAPABILITIES.md (lines 94-109)
-  vs "## Safety policy" in CAPABILITIES.md (lines 315-373) (`CAPABILITIES.md:32`)
 - **MEDIUM** QUALITY/quality_discoverability: Description uses first/second person (`skills/tools/doca-socket-relay/SKILL.md`)
 - **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/tools/doca-socket-relay/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/tools/doca-socket-relay`)

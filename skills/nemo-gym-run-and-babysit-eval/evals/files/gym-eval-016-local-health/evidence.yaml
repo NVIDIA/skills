@@ -1,0 +1,48 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+execution:
+  kind: direct gym eval run
+  output: results/local/rollouts.jsonl
+  gym_job_id: null
+  exit_code: 0
+protocol:
+  selected_tasks: 10
+  repeats: 1
+  name: my-taskset
+  subset: null
+rollouts_coverage:
+  expected: 10
+  measured: 10
+  masked: 0
+  failed: 0
+  missing: 0
+  intentionally_omitted: 0
+  complete: true
+  identity_verified: true
+  reconciled: true
+aggregate_metrics:
+- agent_ref:
+    name: harbor_my-taskset_agent
+  agent_metrics:
+    mean/reward: 0.8
+selected_rewards:
+- 1
+- 1
+- 1
+- 1
+- 1
+- 1
+- 1
+- 1
+- 0
+- 0
+quality_summary:
+  run:
+    artifacts:
+      healthy: true
+    verdicts:
+      healthy: 0
+      unhealthy: 0
+      unobserved: 10
+grading_traceability: not recorded; no submitted-run gate was evaluated

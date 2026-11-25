@@ -1,0 +1,33 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+installed_gym_commit: a8eeecedb433b6c483077160a2cf9a06a09fab1b # pragma: allowlist secret -- public Gym commit SHA
+task_target: ./my-tasks
+format: Harbor task-folder format already supported by Gym
+task_count: 6
+selected_tasks:
+- hello-a
+- hello-c
+reference_solutions: true
+agent: hermes_agent
+sandbox: docker
+docker_available: true
+endpoint:
+  type: Chat Completions
+  model: team-chat-model
+  base_url: https://inference.example.test/v1
+  api_key_env: POLICY_API_KEY
+output_root: results/selected-smoke
+num_repeats: 1
+available_tasks:
+- hello-a
+- hello-b
+- hello-c
+- hello-d
+- hello-e
+- hello-f
+dataset_metadata:
+  type: validation
+  allowed_agents:
+  - hermes_agent
+all_selected_tasks_load: true

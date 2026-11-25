@@ -1,0 +1,21 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+installed_gym_commit: a8eeecedb433b6c483077160a2cf9a06a09fab1b # pragma: allowlist secret -- public Gym commit SHA
+endpoint:
+  base_url: https://responses.example.test/v1
+  model: team-responses-model
+  api_key_env: POLICY_API_KEY
+  implements:
+  - POST /responses
+  does_not_implement:
+  - POST /chat/completions
+benchmark:
+  name: ifbench
+  split: benchmark
+  bound_agent_instance: ifbench_benchmark_simple_agent
+  agent_implementation: simple_agent
+  canonical_repeats: 5
+  preparation_complete: true
+  working_directory_contains_prepared_benchmark_assets: true
+output: results/responses-full/rollouts.jsonl

@@ -1,5 +1,5 @@
 ## Description: <br>
-Host-side DOCA UROM library (doca_urom_*) guidance for offloading an HPC / UCX / MPI application's remote memory operations (puts, gets, atomics, collectives) from the host CPU onto a BlueField DPU, covering UROM Service and Worker contexts, plugin discovery via doca_urom_service_get_plugins_list, completion progress, and DOCA_ERROR_* from doca_urom_* calls. <br>
+Guides agents through the host-side DOCA UROM library (doca_urom_*) to offload an HPC / UCX / MPI application's remote memory operations (puts, gets, atomics, collectives) from the host CPU onto a BlueField DPU, covering UROM Service and Worker contexts, plugin discovery via doca_urom_service_get_plugins_list, completion progressing, and DOCA_ERROR_* diagnosis from doca_urom_* calls. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-External developers building HPC / UCX / MPI applications use this skill to consume the DOCA UROM library from the host side — configuring, building, modifying, running, testing, and debugging code that pushes remote memory operations onto a BlueField DPU running the DOCA UROM Service. <br>
+External developers building HPC / UCX / MPI applications use this skill to consume the DOCA UROM library from the host side, creating UROM Service and Worker contexts, discovering plugins, enqueueing offloaded remote memory operations onto a BlueField DPU, and debugging DOCA_ERROR_* results from doca_urom_* calls. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,7 +25,7 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [DOCA UROM library guide](https://docs.nvidia.com/doca/sdk/DOCA-UROM/index.html) <br>
+- [DOCA UROM library documentation](https://docs.nvidia.com/doca/sdk/DOCA-UROM/index.html) <br>
 - [DOCA SDK documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
 - [DOCA samples and applications](https://github.com/NVIDIA-DOCA/doca-samples) <br>
 - [CAPABILITIES.md](CAPABILITIES.md) <br>
@@ -46,7 +46,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-4 evaluation tasks (3 positive, 1 negative), 1 attempt per task, each run in its own isolated sandbox pod (`k8s-sandbox` environment); evaluator version `1.6.10`, evaluation date 2026-11-18. <br>
+4 evaluation tasks (3 positive, 1 negative), 1 attempt per task, each attempt run in its own isolated sandbox pod (`k8s-sandbox` environment); each task was also attempted without the skill as a baseline. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -76,12 +76,12 @@ Underlying evaluation signals used in this run: <br>
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 96.8% — baseline ran, but no comparable score was available; uplift unavailable | 91.3% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 60.0% → 100.0% (+40.0 points) | 55.0% → 90.0% (+35.0 points) |
+| Overall | 97.1% — baseline ran, but no comparable score was available; uplift unavailable | 93.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 87.5% → 100.0% (+12.5 points) |
+| Correctness | 55.0% → 100.0% (+45.0 points) | 70.0% → 100.0% (+30.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 50.0% → 100.0% (+50.0 points) | 50.0% → 100.0% (+50.0 points) |
-| Efficiency | 83.9% — baseline ran, but no comparable score was available; uplift unavailable | 71.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 50.0% → 100.0% (+50.0 points) | 75.0% → 93.8% (+18.8 points) |
+| Efficiency | 85.7% — baseline ran, but no comparable score was available; uplift unavailable | 79.5% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -89,27 +89,27 @@ Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92
 
 A partial dimension was calculated from only the available configured signals; review the detailed report before relying on it.
 
-### Comparison details
+#### Comparison details
 
 Shared-source comparisons use the same signals and weights on both conditions. They do not replace the full dimension scores above or change the publication verdict.
 
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 98.1% → 92.3% (-5.8 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 98.0% → 91.3% (-6.7 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 85.4% → 86.7% (+1.3 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 83.4% → 86.7% (+3.3 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ### Tier Status
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 13 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 14 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
 ## Skill Version(s): <br>
-155651c (source: git SHA, committed 2026-11-17) <br>
+444e267 (source: git SHA, committed 2026-11-23) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

@@ -1,0 +1,4 @@
+{
+  "name": "Synthetic imaging study",
+  "task": "Plan a research-only segmentation study using caller-provided synthetic images and a fixed development split. Do not train or access held-out labels during initialization."
+}

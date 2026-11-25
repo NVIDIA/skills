@@ -1,0 +1,38 @@
+{
+  "gym_job_id": "eval-judge",
+  "benchmark": "ifbench",
+  "inspection": {
+    "decision": {
+      "action": "reverify",
+      "reason": "only judge_failed identities with saved answers remain"
+    },
+    "gate_task": {
+      "status": "PLANNED",
+      "expected_samples": 100,
+      "scored_samples": 98
+    },
+    "reverify": {
+      "saved_answers": 2
+    },
+    "dispatched": false
+  },
+  "scheduler": {
+    "live_jobs": []
+  },
+  "profile": {
+    "policy": "vllm on GPU nodes",
+    "served_judge": false,
+    "cpu_node_pool_in_saved_config": false,
+    "reader_partition": null,
+    "available_cpu_partition": "cpu",
+    "required_cpu_qos": "normal"
+  },
+  "inspect_options": {
+    "score_agent": "ifbench_benchmark_simple_agent",
+    "score_key": [
+      "agent_metrics",
+      "mean/reward"
+    ],
+    "no_auto_repin": true
+  }
+}

@@ -1,5 +1,5 @@
 ## Description: <br>
-Guides host-side DOCA PCC work to load a custom Programmable Congestion Control algorithm onto a BlueField DPU — creating per-port `doca_pcc` contexts, loading a `dpacc`-compiled `doca_pcc_app`, parameterizing it, walking triple-axis capability discovery (DOCA cap-query, DPA-capable BlueField, firmware custom-PCC slot enabled), and debugging `DOCA_ERROR_*` from `doca_pcc_*` calls. <br>
+Guides hands-on host-side DOCA PCC work to load a custom Programmable Congestion Control algorithm onto a BlueField DPU — creating per-port `doca_pcc` contexts, loading a `dpacc`-compiled `doca_pcc_app` onto the `doca_dev` for the RoCE-bearing port, parameterizing it, walking triple-axis capability discovery (DOCA cap-query, DPA-capable BlueField, firmware custom-PCC slot enabled), and debugging `DOCA_ERROR_*` from `doca_pcc_*`. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-External developers and engineers consuming the DOCA PCC library from the host side use this skill to load, attach, parameterize, start, and debug a custom DPA-side congestion control algorithm on a BlueField port carrying RDMA / RoCE traffic. <br>
+External developers using the DOCA PCC host-side C library to load, attach, parameterize, start, and debug a custom DPA-side congestion control algorithm on a BlueField port that carries RDMA / RoCE traffic. The skill routes DPA-side algorithm design, the `pcc_counters` CLI, factory firmware PCC, and RoCE traffic setup to other skills. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,11 +25,12 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [DOCA PCC Programming Guide](https://docs.nvidia.com/doca/sdk/DOCA-PCC/index.html) <br>
-- [DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
-- [DOCA Samples and Applications](https://github.com/NVIDIA-DOCA/doca-samples) <br>
+- [DOCA PCC programming guide](https://docs.nvidia.com/doca/sdk/DOCA-PCC/index.html) <br>
+- [DOCA SDK documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
+- [DOCA samples and applications](https://github.com/NVIDIA-DOCA/doca-samples) <br>
 - [CAPABILITIES.md](CAPABILITIES.md) <br>
 - [TASKS.md](TASKS.md) <br>
+- [BENCHMARK.md](BENCHMARK.md) <br>
 
 
 ## Skill Output: <br>
@@ -45,7 +46,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-4 evaluation tasks (3 positive, 1 negative), 1 attempt per task, each run in an isolated sandbox pod in a `k8s-sandbox` environment; each task was also attempted without the skill as a baseline. Evaluator version `1.6.10`, evaluated 2026-11-18. <br>
+4 evaluation tasks (3 positive, 1 negative), 1 attempt per task, each task attempt run in its own isolated sandbox pod (`k8s-sandbox` environment); evaluator version `1.6.10`, evaluation date 2026-11-23. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -77,12 +78,12 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 93.8% — baseline ran, but no comparable score was available; uplift unavailable | 92.5% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 87.5% → 100.0% (+12.5 points) |
-| Correctness | 55.0% → 95.0% (+40.0 points) | 75.0% → 100.0% (+25.0 points) |
+| Overall | 91.8% — baseline ran, but no comparable score was available; uplift unavailable | 93.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 70.0% → 100.0% (+30.0 points) | 85.0% → 100.0% (+15.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 37.5% → 87.5% (+50.0 points) | 47.9% → 95.8% (+47.9 points) |
-| Efficiency | 86.4% — baseline ran, but no comparable score was available; uplift unavailable | 71.5% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 25.0% → 72.9% (+47.9 points) | 58.3% → 100.0% (+41.7 points) |
+| Efficiency | 86.1% — baseline ran, but no comparable score was available; uplift unavailable | 70.0% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -97,9 +98,9 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 98.1% → 91.8% (-6.3 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 98.1% → 91.7% (-6.4 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 83.1% → 81.5% (-1.6 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 80.3% → 82.5% (+2.2 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ### Tier Status
 
@@ -110,7 +111,7 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
 ## Skill Version(s): <br>
-155651c (source: git SHA, committed 2026-11-17) <br>
+444e267 (source: git SHA, committed 2026-11-23); targets DOCA 3.6 (source: frontmatter metadata) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

@@ -1,5 +1,5 @@
 ## Description: <br>
-Guides agents operating the DOCA Firefly Service container on BlueField: choosing the four PTP configuration axes (role / profile / domain / interface), wiring the BlueField PHC, host follower, and consumer workload pairing, deciding whether PTP-grade time is needed versus chrony / NTP, and debugging Firefly deployments where PTP is not syncing or the host clock is not following. <br>
+Use this skill when the user is operating the DOCA Firefly Service container on BlueField — picking the four PTP configuration axes (role / profile / domain / interface), wiring the BlueField PHC + host follower + consumer workload pairing, deciding whether PTP-grade time is even needed (vs. chrony / NTP), or debugging a Firefly deployment where PTP isn't syncing or the host clock isn't following. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-External operators and platform teams use this skill to deploy, configure, validate, and debug the DOCA Firefly Service container that provides PTP-grade time synchronization on BlueField and the host behind it for time-sensitive workloads such as Rivermax SMPTE ST 2110, 5G UPF, financial trading, and distributed databases. <br>
+External operators and platform teams who deploy the DOCA Firefly Service container on BlueField Arm use this skill to choose PTP role, profile, domain, and interface, wire the host-side time follower to the BlueField PHC, pair Firefly with time-sensitive workloads such as Rivermax SMPTE, and debug PTP sync, host-follower, or jitter problems. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -27,10 +27,7 @@ Mitigation: Review and scan skill before deployment. <br>
 ## Reference(s): <br>
 - [CAPABILITIES.md](CAPABILITIES.md) <br>
 - [TASKS.md](TASKS.md) <br>
-- [BENCHMARK.md](BENCHMARK.md) <br>
 - [NVIDIA DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
-- [DOCA Samples and Applications](https://github.com/NVIDIA-DOCA/doca-samples) <br>
-- [DOCA Developer Forum](https://forums.developer.nvidia.com/c/infrastructure/doca/370) <br>
 
 
 ## Skill Output: <br>
@@ -46,7 +43,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-4 evaluation tasks (3 positive, 1 negative); 1 attempt per task, each in an isolated sandbox pod (`k8s-sandbox` environment), compared against a no-skill baseline. Dataset digest `sha256:507d57859a365707cbf6ff537ee239128427ca02a501116cbf00d3ab681150f7` (skill-evaluator-dataset-snapshot/1); evaluator version `1.6.10`; evaluation date 2026-11-18. <br>
+4 evaluation tasks (3 positive, 1 negative), 1 attempt per task, each in its own isolated sandbox pod (`k8s-sandbox` environment); evaluator version `1.6.10`, evaluation date 2026-11-23. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -68,26 +65,22 @@ Underlying evaluation signals used in this run: <br>
 
 
 ## Evaluation Results: <br>
-> ✅ **Overall verdict: PASS — Recommended for publication**
+**Overall verdict: PASS — Recommended for publication**
 
-### Publication Recommendation
-
-Recommended for publication based on the completed evaluation evidence in this report.
+**Publication Recommendation:** Recommended for publication based on the completed evaluation evidence in this report.
 
 ### Results at a Glance
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 96.4% — baseline ran, but no comparable score was available; uplift unavailable | 90.7% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 60.0% → 100.0% (+40.0 points) | 70.0% → 85.0% (+15.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 50.0% → 100.0% (+50.0 points) | 56.3% → 100.0% (+43.7 points) |
-| Efficiency | 82.2% — baseline ran, but no comparable score was available; uplift unavailable | 73.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 98.1% — baseline ran, but no comparable score was available; uplift unavailable | 90.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 87.5% → 100.0% (+12.5 points) |
+| Correctness | 55.0% → 100.0% (+45.0 points) | 75.0% → 90.0% (+15.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 93.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 50.0% → 100.0% (+50.0 points) | 81.3% → 93.8% (+12.5 points) |
+| Efficiency | 90.3% — baseline ran, but no comparable score was available; uplift unavailable | 72.9% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
-
-Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92.0%, 45.0 percentage points above its 47.0% no-skill baseline.
 
 A partial dimension was calculated from only the available configured signals; review the detailed report before relying on it.
 
@@ -98,20 +91,12 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 98.1% → 92.2% (-5.9 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 98.1% → 92.8% (-5.3 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 84.8% → 84.8% (±0.0 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
-
-### Tier Status
-
-| Tier | Purpose | Status | Evidence |
-|---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 14 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
-| Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
+| codex | Efficiency | Token-only comparison | 83.3% → 84.1% (+0.8 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Skill Version(s): <br>
-155651c (source: git SHA, committed 2026-11-17) <br>
+444e267 (source: git SHA, committed 2026-11-23) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

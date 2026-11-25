@@ -10,7 +10,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 - Skill: `doca-verbs`
 - Validation status: `passed`
-- Evaluation date: 2026-11-18
+- Evaluation date: 2026-11-23
 - Evaluator version: `1.6.10`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
@@ -50,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 95.1% — baseline ran, but no comparable score was available; uplift unavailable | 91.6% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 35.0% → 95.0% (+60.0 points) | 85.0% → 90.0% (+5.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 31.3% → 100.0% (+68.7 points) | 75.0% → 100.0% (+25.0 points) |
-| Efficiency | 80.4% — baseline ran, but no comparable score was available; uplift unavailable | 73.2% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 94.6% — baseline ran, but no comparable score was available; uplift unavailable | Not available |
+| Security | 100.0% → 100.0% (±0.0 points) | Not available |
+| Correctness | 40.0% → 95.0% (+55.0 points) | Not available |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | Not available |
+| Effectiveness | 31.3% → 87.5% (+56.2 points) | Not available |
+| Efficiency | 90.3% — baseline ran, but no comparable score was available; uplift unavailable | Not available |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -70,9 +70,7 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 98.4% → 89.0% (-9.4 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
-| codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 83.5% → 87.4% (+3.9 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 98.3% → 89.0% (-9.3 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -80,17 +78,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 673,132 | 322,043 | +351,089 | +109.02% | skill 4/4; base 4/4 |
-| claude-code | doca-verbs.explicit-positive.v1 | 192,012 | 71,512 | +120,500 | +168.50% | skill 1/1; base 1/1 |
-| claude-code | doca-verbs.implicit-positive.v1 | 221,204 | 106,918 | +114,286 | +106.89% | skill 1/1; base 1/1 |
-| claude-code | doca-verbs.implicit-positive.v2 | 224,117 | 72,342 | +151,775 | +209.80% | skill 1/1; base 1/1 |
-| claude-code | doca-verbs.negative.v1 | 35,799 | 71,271 | -35,472 | -49.77% | skill 1/1; base 1/1 |
-| codex | All cases | 238,158 | 199,439 | +38,719 | +19.41% | skill 4/4; base 4/4 |
-| codex | doca-verbs.explicit-positive.v1 | 54,888 | 58,208 | -3,320 | -5.70% | skill 1/1; base 1/1 |
-| codex | doca-verbs.implicit-positive.v1 | 59,247 | 43,490 | +15,757 | +36.23% | skill 1/1; base 1/1 |
-| codex | doca-verbs.implicit-positive.v2 | 81,073 | 42,735 | +38,338 | +89.71% | skill 1/1; base 1/1 |
-| codex | doca-verbs.negative.v1 | 42,950 | 55,006 | -12,056 | -21.92% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 911,290 | 521,482 | +389,808 | +74.75% | skill 8/8; base 8/8 |
+| claude-code | All cases | 561,008 | 358,619 | +202,389 | +56.44% | skill 4/4; base 4/4 |
+| claude-code | doca-verbs.explicit-positive.v1 | 150,230 | 71,911 | +78,319 | +108.91% | skill 1/1; base 1/1 |
+| claude-code | doca-verbs.implicit-positive.v1 | 150,130 | 143,016 | +7,114 | +4.97% | skill 1/1; base 1/1 |
+| claude-code | doca-verbs.implicit-positive.v2 | 224,692 | 72,589 | +152,103 | +209.54% | skill 1/1; base 1/1 |
+| claude-code | doca-verbs.negative.v1 | 35,956 | 71,103 | -35,147 | -49.43% | skill 1/1; base 1/1 |
+| codex | All cases | 269,363 | 220,856 | +48,507 | +21.96% | skill 4/4; base 4/4 |
+| codex | doca-verbs.explicit-positive.v1 | 50,188 | 73,181 | -22,993 | -31.42% | skill 1/1; base 1/1 |
+| codex | doca-verbs.implicit-positive.v1 | 82,484 | 62,027 | +20,457 | +32.98% | skill 1/1; base 1/1 |
+| codex | doca-verbs.implicit-positive.v2 | 92,316 | 38,859 | +53,457 | +137.57% | skill 1/1; base 1/1 |
+| codex | doca-verbs.negative.v1 | 44,375 | 46,789 | -2,414 | -5.16% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 830,371 | 579,475 | +250,896 | +43.30% | skill 8/8; base 8/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
@@ -99,7 +97,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
 | Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 18 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
 ## Findings and Observations
@@ -107,12 +105,22 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
+- **MEDIUM** DUPLICATE/duplicate: Duplicate content found across CAPABILITIES.md and SKILL.md and TASKS.md and references/deferred-topics.md:
+  "## Capabilities and modes" in CAPABILITIES.md (lines 37-44)
+  vs "## Version compatibility" in CAPABILITIES.md (lines 182-219)
+  vs "## Examples" in SKILL.md (lines 5-28)
+  vs "## STOP — most RDMA tasks do NOT belong here" in SKILL.md (lines 34-61)
+  vs "## The decision this skill exists to gate" in SKILL.md (lines 87-118)
+  vs "## When to load this skill" in SKILL.md (lines 141-171)
+  vs "## What this skill provides" in SKILL.md (lines 172-196)
+  vs "## Related skills" in SKILL.md (lines 242-290)
+  vs "## configure" in TASKS.md (lines 65-163)
+  vs "## Deferred topic boundaries" in references/deferred-topics.md (lines 1-41) (`CAPABILITIES.md:37`)
 - **MEDIUM** QUALITY/quality_discoverability: Description contains vague words (`skills/libs/doca-verbs/SKILL.md`)
 - **MEDIUM** QUALITY/quality_efficiency: Instructions lack clear action verbs (`skills/libs/doca-verbs/SKILL.md`)
 - **MEDIUM** QUALITY/quality_efficiency: Deeply nested references in command-appendix.md (`skills/libs/doca-verbs/SKILL.md`)
 - **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/libs/doca-verbs/SKILL.md`)
-- **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/libs/doca-verbs`)
-- 13 additional finding(s) are available in the full evaluation artifacts.
+- 14 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

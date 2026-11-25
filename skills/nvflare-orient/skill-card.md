@@ -7,7 +7,7 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 <br>
+Apache-2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
 Developers and engineers use this skill to route ambiguous NVFLARE federated learning requests to the appropriate workflow skill based on automated project inspection evidence. <br>
 
@@ -61,7 +61,6 @@ Underlying evaluation signals used in this run: <br>
 - `behavior_check`: Verifies whether the expected workflow behavior was followed. <br>
 - `skill_efficiency`: Verifies tool-call productivity; routing is scored under Discoverability. <br>
 - `token_efficiency`: Verifies actual uncached prompt plus completion token usage. <br>
-
 
 
 ## Evaluation Results: <br>

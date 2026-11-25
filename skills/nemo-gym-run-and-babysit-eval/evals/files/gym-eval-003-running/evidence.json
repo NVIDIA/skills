@@ -1,0 +1,23 @@
+{
+  "gym_job_id": "eval-running",
+  "benchmark": "ifbench",
+  "inspection": {
+    "decision": {
+      "action": "noop",
+      "reason": "continuation 782 live"
+    },
+    "gate_task": {
+      "status": "RUNNING",
+      "score": null
+    },
+    "operator_verdict": {
+      "state": "unknown",
+      "reason": "continuation 782 is RUNNING",
+      "action": "wait for the live job to finish, then inspect again"
+    },
+    "dispatched": false
+  },
+  "scheduler": {
+    "782": "RUNNING"
+  }
+}
