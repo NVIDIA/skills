@@ -5,7 +5,7 @@ description: "A practical checklist for preparing an agent skill or plugin for e
 
 Use this checklist when preparing a skill for review, publication, or internal deployment.
 
-For an NVIDIA Verified Plugin, complete this checklist for every bundled skill, then the [plugin checklist](#plugins).
+For an NVIDIA Verified Plugin, apply the [Before Scanning](#before-scanning) items to each bundled skill, then complete the [plugin checklist](#plugins).
 
 ## Before Scanning
 
@@ -68,7 +68,7 @@ model_signing verify certificate SKILL_DIR \
 
 ## Plugins
 
-- Every bundled skill has passed the skill checklist above.
+- Bundled skills are evaluated as part of the plugin and covered by `plugin.oms.sig`.
 - Any MCP server, hooks, commands, or subagents in the plugin are needed for its stated use case.
 - The plugin's `BENCHMARK.md` shows that it improves agent output.
 - The Plugin Card (`plugin-card.md`) lists everything in the bundle.
