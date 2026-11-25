@@ -1,0 +1,167 @@
+{
+  "skill_name": "daqiri-onboarding",
+  "evals": [
+    {
+      "id": "C1",
+      "prompt": "A raw-ibverbs receiver sees no application packets while the fixed instrument sender is active. Inspect input/context.md, the supplied receiver YAML, sender description and native observations. Create a corrected receiver config at solution/receiver.yaml and explain the cause, the minimal change, and an appropriate verification at solution/report.md. The sender and input files are fixed. Preserve the existing queue, memory and polling design. After repairing and native-validating the config, actually invoke the prepared bounded lab tool with --config solution/receiver.yaml --output solution/lab-result.json. It tests your submitted config on the IGX dGPU receiver against the fixed sender. Include its measurement ID and actual delivery/integrity outcome in your report. This tool is the only permitted hardware interface; do not start other traffic or change host settings.",
+      "expected_output": "Identify the precise UDP destination mismatch between the fixed sender and RX flow, using supplied native observations. Create native-valid receiver YAML whose RX flow matches the fixed sender and targets the configured queue; preserve unrelated operational values. Distinguish validator success from runtime steering success; verify queue delivery and corresponding sender/receiver/counter evidence. Explain the minimal receive-side repair without unsupported hardware, buffer-capacity or packet-integrity claims. Actually invoke the bounded lab tool, retain its authentic fresh receipt, and cite the measurement ID and observed result without overstating evidence.",
+      "expected_skill": "daqiri-onboarding",
+      "assertions": [
+        "Identify the precise UDP destination mismatch between the fixed sender and RX flow, using supplied native observations.",
+        "Create native-valid receiver YAML whose RX flow matches the fixed sender and targets the configured queue; preserve unrelated operational values.",
+        "Distinguish validator success from runtime steering success; verify queue delivery and corresponding sender/receiver/counter evidence.",
+        "Explain the minimal receive-side repair without unsupported hardware, buffer-capacity or packet-integrity claims.",
+        "Actually invoke the bounded lab tool, retain its authentic fresh receipt, and cite the measurement ID and observed result without overstating evidence."
+      ]
+    },
+    {
+      "id": "C2",
+      "prompt": "Review the raw-ibverbs RX loop in input/receive.cpp and the accompanying configuration/source excerpts. A colleague proposes doubling num_bufs to prevent eventual receive starvation. Provide the smallest correct application repair at solution/receive.cpp, and explain which resource was not returned, why capacity alone does not fix it, and how you would verify sustained recycling at solution/report.md. consume_sync is synchronous and non-throwing. This is a controlled code-review fixture, not a captured production incident. Preserve the public function signature and the input configuration.",
+      "expected_output": "Correctly distinguish raw non-reordered RX packet/stride ownership from burst metadata ownership; free_rx_burst alone returns only metadata. Release all successfully received packet buffers and metadata exactly once after synchronous consumption on every normal path, using public APIs; preserve function behavior/signature. Explain that increasing finite num_bufs delays unreleased-buffer exhaustion; do not treat a larger pool as the root repair. Propose a sustained bounded test or instrumentation of acquired/released resources and queue counters; do not misrepresent the controlled fixture as observed native starvation.",
+      "expected_skill": "daqiri-onboarding",
+      "assertions": [
+        "Correctly distinguish raw non-reordered RX packet/stride ownership from burst metadata ownership; free_rx_burst alone returns only metadata.",
+        "Release all successfully received packet buffers and metadata exactly once after synchronous consumption on every normal path, using public APIs; preserve function behavior/signature.",
+        "Explain that increasing finite num_bufs delays unreleased-buffer exhaustion; do not treat a larger pool as the root repair.",
+        "Propose a sustained bounded test or instrumentation of acquired/released resources and queue counters; do not misrepresent the controlled fixture as observed native starvation."
+      ]
+    },
+    {
+      "id": "C3",
+      "prompt": "Actually invoke the prepared bounded lab tool with --output solution/lab-result.json to run a fresh two-Spark, two-link receive-throughput measurement. Use its recorded active interval and one-second counter samples to report stable PHY throughput per physical link and in aggregate. State topology and memory placement, reconcile application counts and longer RX lifetime, and explain what remains untested about delivery and payload integrity. Save solution/report.md citing the fresh measurement ID and observed values. Read input/context.md for measurement conventions; its historical example is not your new measurement. The prepared lab tool is the only permitted hardware interface; do not launch other traffic, change host settings or claim payload identity from matching counts.",
+      "expected_output": "Calculate per-link and aggregate stable PHY throughput from the fresh tool receipt, excluding startup/shutdown with its monotonic intervals. Use the new observed values, not the historical example. Allow ordinary rounding error. Describe two independent 100GbE physical links and aggregate capacity 200 Gb/s; count each delivered direction once and identify host-pinned buffers, not a GPU-device payload measurement. Explain the longer RX process lifetime includes waiting/drain time, so packet bytes divided by total RX runtime understates active steady throughput. Reconcile the fresh observed TX, application and PHY data-bin packet counts, reporting equality or the actual deficit as observed. Distinguish unfiltered PHY/control traffic and pre-stop engine snapshots. Do not claim unique delivery, full payload integrity or absolute-zero counters without supporting evidence. Actually invoke the bounded lab tool and cite its authentic fresh measurement ID; use complete sample intervals inside [TX launch+4 seconds, TX end-2 seconds] and monotonic delta for byte rates.",
+      "expected_skill": "daqiri-onboarding",
+      "assertions": [
+        "Calculate per-link and aggregate stable PHY throughput from the fresh tool receipt, excluding startup/shutdown with its monotonic intervals. Use the new observed values, not the historical example. Allow ordinary rounding error.",
+        "Describe two independent 100GbE physical links and aggregate capacity 200 Gb/s; count each delivered direction once and identify host-pinned buffers, not a GPU-device payload measurement.",
+        "Explain the longer RX process lifetime includes waiting/drain time, so packet bytes divided by total RX runtime understates active steady throughput.",
+        "Reconcile the fresh observed TX, application and PHY data-bin packet counts, reporting equality or the actual deficit as observed. Distinguish unfiltered PHY/control traffic and pre-stop engine snapshots. Do not claim unique delivery, full payload integrity or absolute-zero counters without supporting evidence.",
+        "Actually invoke the bounded lab tool and cite its authentic fresh measurement ID; use complete sample intervals inside [TX launch+4 seconds, TX end-2 seconds] and monotonic delta for byte rates."
+      ]
+    },
+    {
+      "id": "C4",
+      "prompt": "Investigate the finite-stream application count deficit in the controlled native reproduction under input/. Use the exact configurations, receiver/sender observations, sequence or byte checks, and drain policy. Explain the most specific conclusion supported, give a minimal corrective experiment or configuration change, and state what you cannot conclude. Save solution/report.md. Distinguish application delivery, NIC receipt, tail batching and payload integrity; no new traffic or hardware changes are available in this task.",
+      "expected_output": "Account for 10007 accepted TX and NIC/worker packets versus 9984 unique application packets; relate 23 missing tail IDs to 10007 = 156 * 64 + 23. Use the timeout 0 versus 1000 us comparison and source semantics to diagnose partial-burst tail retention before shutdown; finite timeout delivers all 10007 unique packets and verifies 10247168 payload bytes. Separate supported application deficit/tail evidence from unproved physical packet loss, corruption or universal lossless claims; preserve any positive issue counters and attribution uncertainty. Propose a bounded confirmation using the same finite sequence set, explicit drain/completion criteria and end-to-end checks; do not blanket-increase pools or change hardware settings.",
+      "expected_skill": "daqiri-onboarding",
+      "assertions": [
+        "Account for 10007 accepted TX and NIC/worker packets versus 9984 unique application packets; relate 23 missing tail IDs to 10007 = 156 * 64 + 23.",
+        "Use the timeout 0 versus 1000 us comparison and source semantics to diagnose partial-burst tail retention before shutdown; finite timeout delivers all 10007 unique packets and verifies 10247168 payload bytes.",
+        "Separate supported application deficit/tail evidence from unproved physical packet loss, corruption or universal lossless claims; preserve any positive issue counters and attribution uncertainty.",
+        "Propose a bounded confirmation using the same finite sequence set, explicit drain/completion criteria and end-to-end checks; do not blanket-increase pools or change hardware settings."
+      ]
+    },
+    {
+      "id": "C5",
+      "prompt": "The DAQIRI runtime and native validator are already installed and working. For the next acquisition, the instrument keeps UDP source port 4556 and changes its destination to 4778. Copy the known-good two-link RX config in input/receiver.yaml to solution/receiver.yaml and adapt it for that stream on both links, preserving the existing queue, memory and polling settings. In solution/report.md give the prepared-runtime validation command and a 10-second RX smoke command using the supplied binary paths. This is a routine handoff; no new installation or traffic is needed.",
+      "expected_output": "New native-valid config matches source 4556 / destination 4778 on both RX flows; preserves all unrelated semantics and input files. Give a hardware-free native validation command using the prepared validator and new YAML. Give the prepared raw benchmark command for the new config with --seconds 10; note RX-only delivery needs the external sender if discussing expected packets. Finish the routine task directly without requiring rebuild, reinstallation, privileges, hardware mutation or an unnecessary confirmation.",
+      "expected_skill": "daqiri-onboarding",
+      "assertions": [
+        "New native-valid config matches source 4556 / destination 4778 on both RX flows; preserves all unrelated semantics and input files.",
+        "Give a hardware-free native validation command using the prepared validator and new YAML.",
+        "Give the prepared raw benchmark command for the new config with --seconds 10; note RX-only delivery needs the external sender if discussing expected packets.",
+        "Finish the routine task directly without requiring rebuild, reinstallation, privileges, hardware mutation or an unnecessary confirmation."
+      ]
+    },
+    {
+      "id": "G1",
+      "prompt": "Prepare a configuration handoff for two separate Spark UMA hosts using only the synthetic deployment facts in input/deployment.json and the repository source/docs. There is no full configuration to copy. Write independently runnable raw TX-only solution/tx.yaml and RX-only solution/rx.yaml, including the corresponding benchmark sections. Preserve the specified endpoint, CPU, memory and packet settings; do not configure the peer NIC as a local interface. Actually native-validate both outputs using the prepared validator and save the command/results and deployment limits in solution/report.md. Choose your own supported configuration workflow. Inputs are read-only; do not install anything or send traffic.",
+      "expected_output": "Both role outputs pass the prepared engine-aware native validator and semantically match the explicit deployment endpoints, packet geometry, buffer sizing/kind/affinity, worker/application CPU roles and RX timeout. TX and RX files are independently runnable on their respective hosts, with only local intended interfaces, memory and matching benchmark role; no extra peer interface or hidden startup dependency. Actually validate both delivered outputs, preserve inputs and accurately state configuration-only/deployment scope. Trace attestation establishes execution separately from output acceptance.",
+      "expected_skill": "daqiri-onboarding",
+      "assertions": [
+        "Both role outputs pass the prepared engine-aware native validator and semantically match the explicit deployment endpoints, packet geometry, buffer sizing/kind/affinity, worker/application CPU roles and RX timeout.",
+        "TX and RX files are independently runnable on their respective hosts, with only local intended interfaces, memory and matching benchmark role; no extra peer interface or hidden startup dependency.",
+        "Actually validate both delivered outputs, preserve inputs and accurately state configuration-only/deployment scope. Trace attestation establishes execution separately from output acceptance."
+      ]
+    },
+    {
+      "id": "G2",
+      "prompt": "Complete the supplied deployment template using input/parameters.json. Actually invoke the repository configuration renderer to write solution/rendered.yaml. Resolve the three marked configuration values and use the renderer's existing-path override facility to set application.io.run_label to the requested label in the parameter file. Preserve every other application-owned value, including array order and scalar types. Use supported renderer interfaces, actually native-validate the concrete output, and record commands/results in solution/report.md. The input files are read-only; do not run traffic or install dependencies.",
+      "expected_output": "Actually invoke the repository renderer through a supported CLI/API/wrapped interface and use its existing-path override operation for the run label; do not substitute a handwritten renderer or merely print a future command. Resolve all three marked deployment values with correct types, produce the requested label and preserve all other application/configuration values and array ordering. Actually validate the final concrete artifact with the prepared engine-aware native validator and preserve read-only inputs; report actual acceptance separately from runtime behavior.",
+      "expected_skill": "daqiri-onboarding",
+      "assertions": [
+        "Actually invoke the repository renderer through a supported CLI/API/wrapped interface and use its existing-path override operation for the run label; do not substitute a handwritten renderer or merely print a future command.",
+        "Resolve all three marked deployment values with correct types, produce the requested label and preserve all other application/configuration values and array ordering.",
+        "Actually validate the final concrete artifact with the prepared engine-aware native validator and preserve read-only inputs; report actual acceptance separately from runtime behavior."
+      ]
+    },
+    {
+      "id": "P1",
+      "prompt": "Convert input/stream.yaml into caller-driven raw-ibverbs TX and RX for a latency-sensitive application on Spark UMA. One dedicated application thread continuously owns and services each queue; no reorder pipeline is required. Save and actually native-validate solution/stream.yaml. Preserve endpoint routing, host_pinned allocations and application CPU assignments. Make the configuration and benchmark settings consistent with the supported direct-polling API contract. In solution/report.md describe polling/progress, successful and unsuccessful submission ownership, RX release after consumption, and a fair bounded latency comparison with the original indirect mode. Do not send traffic or claim a measured latency improvement.",
+      "expected_output": "Native-valid raw ibverbs direct TX and RX omit their forbidden worker-only queue fields; benchmark direct TX uses one packet per submission. Preserve routing, allocations and application affinity, allowing necessary benchmark batch adjustment. Explain one caller owner per queue, caller-driven progress and normal acquisition NOT_READY/backpressure. For raw ibverbs send_tx_burst, SUCCESS and NO_SPACE_AVAILABLE consume the burst: never access, retry or free that handle afterwards; NO_SPACE_AVAILABLE has already released reservation/metadata. Other send failures retain caller ownership for a supported retry or explicit release. Distinguish failed acquisition from sending an acquired burst and direct posting from the original indirect comparison. Release RX storage/metadata only after all consumption completes. Propose a bounded matched indirect/direct comparison with defined latency endpoints, actual completed/delivered traffic, CPU/polling cost and no unsupported measured improvement.",
+      "expected_skill": "daqiri-onboarding",
+      "assertions": [
+        "Native-valid raw ibverbs direct TX and RX omit their forbidden worker-only queue fields; benchmark direct TX uses one packet per submission. Preserve routing, allocations and application affinity, allowing necessary benchmark batch adjustment.",
+        "Explain one caller owner per queue, caller-driven progress and normal acquisition NOT_READY/backpressure. For raw ibverbs send_tx_burst, SUCCESS and NO_SPACE_AVAILABLE consume the burst: never access, retry or free that handle afterwards; NO_SPACE_AVAILABLE has already released reservation/metadata. Other send failures retain caller ownership for a supported retry or explicit release. Distinguish failed acquisition from sending an acquired burst and direct posting from the original indirect comparison. Release RX storage/metadata only after all consumption completes.",
+        "Propose a bounded matched indirect/direct comparison with defined latency endpoints, actual completed/delivered traffic, CPU/polling cost and no unsupported measured improvement."
+      ]
+    },
+    {
+      "id": "P2",
+      "prompt": "A Spark UMA application uses the existing GPU software reorder pipeline in input/stream.yaml, backed by host_pinned source and output regions. The receiving application spends about 2.5 ms consuming each aggregate before requesting another; ordering and buffer contents must be preserved. A colleague proposes changing only the RX queue to direct polling to reduce latency. Assess the proposal and give a supported alternative and bounded verification plan in solution/report.md. Explain progress during application stalls and how GPU completion and aggregate release are coordinated. Do not change the sender, disable ordering, alter input files or run traffic.",
+      "expected_output": "Recognize the existing reorder target cannot become a direct RX queue and changing only polling cannot preserve that pipeline. Keep the supported indirect GPU software reorder pipeline and recommend a workable consumption/processing arrangement. Explain finite queues and that blocking the consumer can still cause backlog/backpressure/drops; do not promise unlimited progress. Coordinate GPU readiness and all consumer completion before aggregate release, retain borrowed metadata while needed, and propose a bounded test of progress, backlog, delivery and latency across the specified processing stalls.",
+      "expected_skill": "daqiri-onboarding",
+      "assertions": [
+        "Recognize the existing reorder target cannot become a direct RX queue and changing only polling cannot preserve that pipeline.",
+        "Keep the supported indirect GPU software reorder pipeline and recommend a workable consumption/processing arrangement. Explain finite queues and that blocking the consumer can still cause backlog/backpressure/drops; do not promise unlimited progress.",
+        "Coordinate GPU readiness and all consumer completion before aggregate release, retain borrowed metadata while needed, and propose a bounded test of progress, backlog, delivery and latency across the specified processing stalls."
+      ]
+    },
+    {
+      "id": "H1",
+      "prompt": "For the IGX dGPU deployment in input/, can the receiver avoid copying each payload into its aggregate while retaining the sender protocol? The sender repeatedly cycles sequence values 0..127, with 32 fixed 1024-byte payloads per aggregate. Use the same-adapter capability capture, device-memory configuration and source/docs to prepare solution/stream.yaml, actually native-validate it, and explain the decision in solution/report.md. Keep the finite layout, UDP gate, existing indirect target queue and GPU-visible output design. Explain remaining host work, safe GPU consumption and output-credit release, and distinguish capability/config acceptance from a new payload or performance test. After preparing and native-validating the config, actually invoke the prepared bounded lab tool with --config solution/stream.yaml --output solution/lab-result.json. It runs finite cyclic hardware-reorder traffic on the IGX dGPU and checks device-memory placement, payloads and output reuse. Report the fresh measurement ID and actual outcome; this is not a throughput test. Inputs are fixed. The tool is the only permitted hardware interface; do not launch other traffic or change host settings.",
+      "expected_output": "Use the selected same-adapter current effective parser/RX steering capability and finite cyclic source/layout to justify eligibility; an asterisk or adapter family/firmware version alone is not the decision. Produce an actually native-validated hardware-reorder configuration preserving the fixed 4-by-32 device aggregate geometry, extraction and UDP-only gate, with GPU semantics and an indirect target queue. Accept supported semantically equivalent representations. Describe host completion/timeout/publication work, safe GPU consumption, output/bitmap lifetime and whole-aggregate credit release. Separate capability/config checks from actual new placement, payload or performance evidence. Actually invoke the bounded lab tool, retain its authentic fresh receipt, and cite the measurement ID and observed result without overstating evidence.",
+      "expected_skill": "daqiri-onboarding",
+      "assertions": [
+        "Use the selected same-adapter current effective parser/RX steering capability and finite cyclic source/layout to justify eligibility; an asterisk or adapter family/firmware version alone is not the decision.",
+        "Produce an actually native-validated hardware-reorder configuration preserving the fixed 4-by-32 device aggregate geometry, extraction and UDP-only gate, with GPU semantics and an indirect target queue. Accept supported semantically equivalent representations.",
+        "Describe host completion/timeout/publication work, safe GPU consumption, output/bitmap lifetime and whole-aggregate credit release. Separate capability/config checks from actual new placement, payload or performance evidence.",
+        "Actually invoke the bounded lab tool, retain its authentic fresh receipt, and cite the measurement ID and observed result without overstating evidence."
+      ]
+    },
+    {
+      "id": "H2",
+      "prompt": "The IGX dGPU receiver in input/ is qualified for the hardware parser/steering path on the selected adapter. Its working configuration uses GPU software reorder with device source/output regions. The fixed instrument instead sends a 32-bit monotonic sequence whose values are not restricted to the finite output ring; firmware, sender protocol and memory layout must remain unchanged. Assess whether hardware reorder can replace this pipeline. Deliver a supported native-valid solution/stream.yaml and actually validate it; explain the addressing constraint and evidence limits in solution/report.md. Do not truncate, mask, wrap or reinterpret the sender sequence, and do not run traffic.",
+      "expected_output": "Explain why the unchanged wide monotonic sequence is not the bounded cyclic destination domain required by this hardware direct-placement path, even though the selected receiver is capable. Field width alone is not proof of a finite cycle. Deliver and actually native-validate the preserved supported ibverbs GPU software reorder configuration on IGX device source/output, keeping the original sequence extraction/domain and operational settings. Keeping an already correct input unchanged is accepted. Distinguish source/protocol limits, validator acceptance and actual long-running stream correctness; propose a bounded relevant check without truncation, wrapping, guessed firmware fixes or sender changes.",
+      "expected_skill": "daqiri-onboarding",
+      "assertions": [
+        "Explain why the unchanged wide monotonic sequence is not the bounded cyclic destination domain required by this hardware direct-placement path, even though the selected receiver is capable. Field width alone is not proof of a finite cycle.",
+        "Deliver and actually native-validate the preserved supported ibverbs GPU software reorder configuration on IGX device source/output, keeping the original sequence extraction/domain and operational settings. Keeping an already correct input unchanged is accepted.",
+        "Distinguish source/protocol limits, validator acceptance and actual long-running stream correctness; propose a bounded relevant check without truncation, wrapping, guessed firmware fixes or sender changes."
+      ]
+    },
+    {
+      "id": "H3",
+      "prompt": "Review the two finite hardware-reorder captures under input/ from an IGX dGPU receiver with device-memory aggregates. The diagnostic sender intentionally omitted two sequence values; one receive configuration publishes incomplete aggregates and the other uses drop. Reconcile sender submissions, NIC placements, returned aggregate slots, valid source packets, timeout flags, missing bitmaps and bytes actually checked for each run. In solution/report.md explain a safe GPU consumer and release sequence, what can happen when the finite destination ring is revisited while outputs remain owned, and a bounded confirmation plan. Does this evidence support the claim that hardware reorder can return only complete batches? Use the supplied records; do not run traffic or treat this finite check as a throughput result.",
+      "expected_output": "Reconcile each corrected capture exactly: source submissions versus NIC placements, published aggregates/capacity, valid source packets, missing bitmap locations, timeout/drop counts and payload bytes compared. Distinguish source omissions from packets lost in transport and do not count missing capacity as valid data. Use returned flags/info/bitmap to skip missing slots; safely consume device output through supported GPU visibility/completion/copy ordering and retain aggregate/borrowed bitmap until all consumers finish. Release once via the supported whole-output contract; explain finite credits/revisits without claiming unlimited retention or reuse safety. Recognize bounded timeout passthrough and drop behavior, reject the complete-only claim using the actual logs, and propose a bounded missing-value/reuse confirmation while separating finite full-byte checking from throughput/general losslessness.",
+      "expected_skill": "daqiri-onboarding",
+      "assertions": [
+        "Reconcile each corrected capture exactly: source submissions versus NIC placements, published aggregates/capacity, valid source packets, missing bitmap locations, timeout/drop counts and payload bytes compared. Distinguish source omissions from packets lost in transport and do not count missing capacity as valid data.",
+        "Use returned flags/info/bitmap to skip missing slots; safely consume device output through supported GPU visibility/completion/copy ordering and retain aggregate/borrowed bitmap until all consumers finish. Release once via the supported whole-output contract; explain finite credits/revisits without claiming unlimited retention or reuse safety.",
+        "Recognize bounded timeout passthrough and drop behavior, reject the complete-only claim using the actual logs, and propose a bounded missing-value/reuse confirmation while separating finite full-byte checking from throughput/general losslessness."
+      ]
+    },
+    {
+      "id": "F1",
+      "prompt": "An operator saved hardware-parser settings but initialization still reports the required effective capability as absent. Inspect input/receiver-state.json and input/mlxconfig-query.txt for the selected receiver and explain the discrepancy in solution/report.md. Give the smallest supported activation and same-adapter recheck plan, separating configured persistence from effective runtime capability. This is a synthetic decision fixture, not a real repaired host. Do not change settings, execute an activation/reset/reboot or run traffic.",
+      "expected_output": "Read Current versus Next Boot and absent effective capability on the same selected receiver: desired supported settings are saved but not currently active. Preserve synthetic provenance; do not infer state from '*' alone. Prescribe the documented supported activation boundary and requery the same BDF/ibdev for current settings and effective parser/RX steering capability before retrying HW initialization. Do not repeat already saved settings blindly or execute privileged changes. Separate persisted intention, current effectiveness and future verified success; do not claim an observed real-host repair or require unsupported firmware/platform conclusions.",
+      "expected_skill": "daqiri-onboarding",
+      "assertions": [
+        "Read Current versus Next Boot and absent effective capability on the same selected receiver: desired supported settings are saved but not currently active. Preserve synthetic provenance; do not infer state from '*' alone.",
+        "Prescribe the documented supported activation boundary and requery the same BDF/ibdev for current settings and effective parser/RX steering capability before retrying HW initialization. Do not repeat already saved settings blindly or execute privileged changes.",
+        "Separate persisted intention, current effectiveness and future verified success; do not claim an observed real-host repair or require unsupported firmware/platform conclusions."
+      ]
+    },
+    {
+      "id": "F2",
+      "prompt": "A hardware-reorder initialization attempt failed on the Spark UMA receiver in input/. Prepare solution/report.md using the actual initialization log, selected-adapter mapping, settings and effective capability query. Explain the current blocking condition, whether another YAML change or a reboot alone is established to resolve it, and a supported immediate fallback and qualification plan. Keep Spark source/output buffers host_pinned. Separate observed facts from hypotheses; do not assume all adapters with this platform name share the same capability. No settings changes, traffic or activation actions are allowed.",
+      "expected_output": "Link actual failed init to the selected adapter's disabled Current/Next Boot settings and absent max/current FLEX_PARSE_GRAPH while distinguishing the successful RX steering capability query. Do not substitute another adapter's state. Recommend a supported ibverbs GPU software-reorder fallback on Spark UMA host_pinned buffers and a documented capability/setting/support qualification plan. Do not claim another YAML edit or reboot alone is proven sufficient when desired settings are not saved and capability is absent. Keep the conclusion local to the measured adapter/state; do not infer permanent Spark incompatibility, a firmware-age sole cause or a guessed release that fixes it. No disallowed settings/activation/traffic action.",
+      "expected_skill": "daqiri-onboarding",
+      "assertions": [
+        "Link actual failed init to the selected adapter's disabled Current/Next Boot settings and absent max/current FLEX_PARSE_GRAPH while distinguishing the successful RX steering capability query. Do not substitute another adapter's state.",
+        "Recommend a supported ibverbs GPU software-reorder fallback on Spark UMA host_pinned buffers and a documented capability/setting/support qualification plan. Do not claim another YAML edit or reboot alone is proven sufficient when desired settings are not saved and capability is absent.",
+        "Keep the conclusion local to the measured adapter/state; do not infer permanent Spark incompatibility, a firmware-age sole cause or a guessed release that fixes it. No disallowed settings/activation/traffic action."
+      ]
+    }
+  ]
+}

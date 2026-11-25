@@ -1,0 +1,4 @@
+interface:
+  display_name: "DAQIRI Onboarding"
+  short_description: "Guide first DAQIRI setup and benchmarks"
+  default_prompt: "Use $daqiri-onboarding to help me run my first DAQIRI benchmark."

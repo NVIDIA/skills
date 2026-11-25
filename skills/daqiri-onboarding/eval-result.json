@@ -1,0 +1,158 @@
+{
+  "results": [
+    {
+      "validator": "AGENT_EVAL"
+    }
+  ],
+  "tier3": {
+    "schema_version": "2.0",
+    "skill_name": "daqiri-onboarding",
+    "bindings": {
+      "validated_sha": "4d38aa791f81a4178b2f1fb8c51f332bf6cf1fcd"
+    },
+    "execution_status": "succeeded",
+    "execution_errors": [],
+    "evaluator_version": "daqiri-paired-cli-byoe",
+    "evaluated_at": "2026-11-25T00:43:21.205029+00:00",
+    "dataset_summary": {
+      "total_tasks": 14,
+      "positive_tasks": 14,
+      "negative_tasks": 0,
+      "unclassified_tasks": 0
+    },
+    "agents_run": [
+      "codex",
+      "claude"
+    ],
+    "overall_score": 1.0,
+    "baseline_overall": 1.0,
+    "overall_lift": 0.0,
+    "verdict": "PASS",
+    "attempt_policy": {
+      "max_attempts": 3,
+      "pass_threshold": 1.0,
+      "stop_on_pass": false
+    },
+    "agents": {
+      "codex": {
+        "name": "codex",
+        "model": null,
+        "execution_status": "succeeded",
+        "execution_errors": [],
+        "with_skill": 1.0,
+        "baseline": 1.0,
+        "lift": 0.0,
+        "num_trials": 42,
+        "num_trials_baseline": 42,
+        "baseline_ran": true,
+        "dimensions": [],
+        "resources": {
+          "tokens": {
+            "with_skill": {
+              "status": "complete",
+              "measured_trials": 42,
+              "trials": 42,
+              "total": 19399682
+            },
+            "baseline": {
+              "status": "complete",
+              "measured_trials": 42,
+              "trials": 42,
+              "total": 20462158
+            },
+            "delta": -1062476
+          },
+          "agent_seconds": {
+            "with_skill": {
+              "status": "complete",
+              "measured_trials": 42,
+              "trials": 42,
+              "total": 5070.920373184956
+            },
+            "baseline": {
+              "status": "complete",
+              "measured_trials": 42,
+              "trials": 42,
+              "total": 5145.027480721154
+            },
+            "delta": -74.10710753619787
+          }
+        }
+      },
+      "claude": {
+        "name": "claude",
+        "model": "claude-opus-5-5",
+        "execution_status": "succeeded",
+        "execution_errors": [],
+        "with_skill": 1.0,
+        "baseline": 1.0,
+        "lift": 0.0,
+        "num_trials": 42,
+        "num_trials_baseline": 42,
+        "baseline_ran": true,
+        "dimensions": [],
+        "resources": {
+          "tokens": {
+            "with_skill": {
+              "status": "complete",
+              "measured_trials": 42,
+              "trials": 42,
+              "total": 62214352
+            },
+            "baseline": {
+              "status": "complete",
+              "measured_trials": 42,
+              "trials": 42,
+              "total": 83879903
+            },
+            "delta": -21665551
+          },
+          "agent_seconds": {
+            "with_skill": {
+              "status": "complete",
+              "measured_trials": 42,
+              "trials": 42,
+              "total": 8527.206887534965
+            },
+            "baseline": {
+              "status": "complete",
+              "measured_trials": 42,
+              "trials": 42,
+              "total": 10021.163960701087
+            },
+            "delta": -1493.9570731661224
+          }
+        }
+      }
+    },
+    "scoring_methodology": {
+      "overall": "Binary core task completion. Incorrect calculations/configuration, missing required operations and unsafe ownership advice fail. Reporting-only certainty overstatements are notes when core work is correct.",
+      "review": "Saved answers were blindly reviewed and adjudicated; the reporting-note policy was adopted retrospectively and applied to both arms. No participant reruns or replaced attempts.",
+      "resources": "All scheduled attempts; tokens are cache-inclusive prompt plus output, counting cache reads once. Agent seconds are participant CLI wall time including tool and hardware-queue waits; setup/grading excluded. No LLM/tool timing split or native dimension scores are claimed.",
+      "hardware": "All 36 required bounded hardware executions were verified against authentic receipts and submitted configurations."
+    },
+    "producer_metadata": {
+      "agents": {
+        "codex": {
+          "model_requested": "gpt-6.1-sol",
+          "model_observed": null,
+          "effort_requested": "xhigh",
+          "effort_observed": null,
+          "cli_version": "0.167.0"
+        },
+        "claude": {
+          "model_requested": "claude-opus-5-5",
+          "model_observed": "claude-opus-5-5",
+          "effort_requested": "xhigh",
+          "effort_observed": null,
+          "cli_version": "2.1.319"
+        }
+      },
+      "authored_dataset_sha256": "4760a9401252d694edd7801b84b47a458a3ea681643ad9a0a9133600cb94ef5c",
+      "campaign_bundle_sha256": "1f07d775dc54f013a891f17f320d352044536951445dc04e084c6a5871582fe3",
+      "grading_protocol_sha256": "a577a3be260c19a574319e4ba4f58b78de4452201cb7f736d19c5d85cac907ef",
+      "finalized_table_sha256": "2fe7a6808fe70a3f1d4912eb37db001b74d2902318f031a767e94a35eb90f376"
+    },
+    "quality_verdict_note": "Producer self-assessment only; CI independently decides publication and signing."
+  }
+}
