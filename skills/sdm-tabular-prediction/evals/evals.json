@@ -1,0 +1,48 @@
+{
+  "skill_name": "sdm-tabular-prediction",
+  "evals": [
+    {
+      "id": "sdm-classification",
+      "prompt": "Show me Python code to use a pretrained tabular foundation model from NVIDIA Structured Data Models (SDM) on my pandas DataFrames `context_df` and `holdout_df`. I've already split them by date. Both have `account_id`, `plan_code` (an integer plan ID), `monthly_spend`, `churn_flag`, and `closed_at` (recorded after the outcome). `churn_flag` is 0 for accounts that churned and 1 for accounts that stayed. I want churn probabilities alongside the holdout account IDs and ROC AUC. Both classes are present in each split. Just show the code.",
+      "expected_output": "Uses `sdm.models.KumoTabular` and `TableTensor` with the existing split. Uses `plan_code` as categorical, uses the same feature schema on both sides, and represents `churn_flag` as a categorical context target. Keeps `account_id` for output and `churn_flag` for scoring, and excludes `closed_at` from features. Uses the probability for class 0 and the corresponding binary labels for ROC AUC, and preserves holdout row alignment.",
+      "assertions": [
+        "Uses pretrained KumoTabular configured for classification",
+        "Uses the supplied context and holdout split and passes only plan_code and monthly_spend as features to both tables",
+        "Marks plan_code and the integer churn_flag target as categorical and uses the same feature semantic types for context and holdout",
+        "Uses class 0 as the positive label and computes ROC AUC from probabilities with binary labels that mark class 0 as positive",
+        "Returns one probability per holdout account in the original row order"
+      ],
+      "files": [],
+      "expected_skill": "sdm-tabular-prediction",
+      "expected_script": null
+    },
+    {
+      "id": "sdm-regression",
+      "prompt": "Write a Python function to predict median sale prices using pretrained KumoTabular from SDM. I have a labeled pandas DataFrame `sales_context` with `floor_area`, `building_age`, and `sale_price` in dollars. The iterator `sales_batches` yields pandas DataFrames with the same two features and a `row_id`. Reuse the same labeled context for all batches and return one median price alongside each row ID. Just show the code.",
+      "expected_output": "Uses `sdm.models.KumoTabular` for regression with a numerical `sale_price` target and matching context and query feature schemas. Calls `fit` once, calls `predict` for each batch, and clears the fitted context when done. Reads the median from the `q500` column and pairs it with the original row IDs.",
+      "assertions": [
+        "Uses pretrained KumoTabular configured for regression with a single numerical sale_price target",
+        "Uses only floor_area and building_age as features with matching order and semantic types in the context and each query batch",
+        "Fits once before scoring the batches, calls predict for each batch, and clears the fitted context when done",
+        "Extracts one median from q500 per query row and pairs it with row_id in the original batch row order"
+      ],
+      "files": [],
+      "expected_skill": "sdm-tabular-prediction",
+      "expected_script": null
+    },
+    {
+      "id": "sdm-predictions-csv",
+      "prompt": "Use a pretrained SDM model to predict median sale prices from floor_area and building_age in /workspace/input/home-sales.csv. Hold out sales from March 1, 2025 onward. Save the held-out sale_id, actual_sale_price, and predicted_sale_price in input order to /workspace/output/predictions.csv. Report the file path and MAE in dollars.",
+      "expected_output": "Reads the supplied CSV and runs pretrained KumoTabular regression with the chronological split. Uses the q500 median prediction and saves a CSV pairing each held-out sale ID with its actual and predicted price. Reports the held-out mean absolute error in dollars and the path to the written file.",
+      "assertions": [
+        "Loads the supplied CSV, uses only pre-March 1 sales as context, and reserves the later sale prices for scoring",
+        "Runs pretrained KumoTabular for regression with floor_area and building_age as features and extracts the q500 median",
+        "Writes /workspace/output/predictions.csv with the requested columns and one row per held-out sale in input order",
+        "Reports the mean absolute error computed from the actual and predicted prices in the saved CSV"
+      ],
+      "files": ["evals/files/home-sales.csv"],
+      "expected_skill": "sdm-tabular-prediction",
+      "expected_script": null
+    }
+  ]
+}
