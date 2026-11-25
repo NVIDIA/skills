@@ -1800,15 +1800,17 @@ def build_mirrored_plugin_entries(
         plugin_dir = PLUGINS_DIR / name
 
         if not plugin_dir.is_dir():
-            # Registered but not mirrored yet, or held by the sync for drift
-            # or missing compliance. Both are normal and transient. The plugin
+            # Registered but not mirrored yet, or reverted by the plugin sync
+            # over signature integrity. A signature hold can persist, so the
+            # warning does not promise it resolves on its own. The plugin
             # stays declared, so a previously published entry is recovered
             # rather than delisted.
             warnings.append(
                 f"{src}: plugin `{name}` is registered but plugins/{name}/ is "
-                f"not in the repository yet, so it has no entry this run. This "
-                f"is expected between registration and the first successful "
-                f"plugin sync."
+                f"not in the repository yet, so it has no entry this run. "
+                f"Either the plugin sync has not mirrored it yet, or the sync "
+                f"is holding it back over signature integrity. Check the "
+                f"plugin sync's tracker issue if this persists."
             )
             continue
 
