@@ -31,7 +31,7 @@ A skill can pass every security check and still make an agent worse. Tier 3 is w
 
 A plugin is only as trustworthy as everything inside it, so verification runs at two levels.
 
-**Skill level.** Every skill in a Verified Plugin has passed the full skill pipeline on this page, whether it was already in the catalog or is published together with the plugin. Each bundled skill is signed with its own `skill.oms.sig`, so it can be verified on its own.
+**Skill level.** Every skill in a Verified Plugin has passed the full skill pipeline on this page, whether it was already in the catalog or is published together with the plugin.
 
 **Bundle level.** Combining skills with an MCP server, hooks, commands, subagents, or other agent resources creates a new artifact that needs its own evidence:
 
@@ -92,7 +92,7 @@ Every released skill should ship or link to:
 Every released plugin should ship or link to:
 
 - Per-agent manifests (`.claude-plugin/`, `.codex-plugin/`, `.cursor-plugin/`) and a portable `plugin.json`
-- `skills/` with the bundled skills, each with its own `skill.oms.sig`
+- `skills/` with the bundled skills
 - Any bundled MCP server, hooks, commands, subagents, or other agent resources, declared in the manifests
 - `plugin-card.md`
 - Evaluation data, either at the plugin level (such as `evals.json` or an `evals/` directory) or in the bundled skills, plus the evaluation results
@@ -109,7 +109,7 @@ Before approval, reviewers should be able to answer:
 - For a plugin, does the Plugin Card's contents list match what is in the bundle, and are platform-specific resources such as hooks, commands, and subagents justified by the plugin's stated use case?
 - Are known risks and mitigations written in plain language?
 - Does the `BENCHMARK.md` verdict show the skill or plugin improving agent output?
-- Does the signature verify against the released directory? For a plugin, that means `plugin.oms.sig` and the `skill.oms.sig` of every bundled skill.
+- Does the signature verify against the released directory? For a plugin, that means `plugin.oms.sig`.
 
 If one of those answers is unclear, the skill or plugin is not ready for broad deployment.
 
