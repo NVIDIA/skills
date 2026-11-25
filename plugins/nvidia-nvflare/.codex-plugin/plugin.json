@@ -1,0 +1,22 @@
+{
+  "name": "nvidia-nvflare",
+  "version": "1.0.0",
+  "description": "NVIDIA FLARE skills for federated learning conversion, job diagnosis, federated statistics, and Auto-FL optimization and reporting.",
+  "author": {
+    "name": "NVIDIA FLARE Team",
+    "email": "federatedlearning@nvidia.com"
+  },
+  "homepage": "https://nvidia.github.io/NVFlare/",
+  "repository": "https://github.com/NVIDIA/NVFlare",
+  "license": "Apache-2.0 AND CC-BY-4.0",
+  "keywords": ["nvidia", "nvflare", "federated-learning", "pytorch", "lightning", "huggingface", "autofl"],
+  "skills": "./skills/",
+  "requires_local_executor": true,
+  "interface": {
+    "displayName": "NVIDIA FLARE",
+    "shortDescription": "Build and improve federated learning workflows.",
+    "longDescription": "Convert PyTorch, Lightning, and Hugging Face training code to NVIDIA FLARE, diagnose jobs, compute federated statistics, and optimize and report Auto-FL campaigns.",
+    "developerName": "NVIDIA FLARE Team",
+    "category": "Developer Tools"
+  }
+}

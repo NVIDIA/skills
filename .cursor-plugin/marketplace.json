@@ -14,6 +14,11 @@
             "description": "NVIDIA DOCA skills for developing, deploying, operating, and debugging applications on BlueField DPUs and ConnectX networking devices."
         },
         {
+            "name": "nvidia-nvflare",
+            "source": "./plugins/nvidia-nvflare",
+            "description": "NVIDIA FLARE skills for federated learning conversion, job diagnosis, federated statistics, and Auto-FL optimization and reporting."
+        },
+        {
             "name": "nvidia-skills",
             "source": "./plugins/nvidia-skills",
             "description": "Find the right NVIDIA skill for GPU acceleration, CUDA, AI agents, data loading, training, inference, robotics, Physical AI, Omniverse, simulation, and other NVIDIA-powered workflows."
