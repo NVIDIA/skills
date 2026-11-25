@@ -1,0 +1,45 @@
+# SKILLCARD.yaml — skill identity and routing metadata (canonical card: skill-card.md)
+# Schema: https://github.com/NVIDIA/skills/blob/main/docs/skill-cards.mdx
+
+schema_version: "1"
+
+identity:
+  name: "doca-sha-offload-engine"
+  artifact_id: "doca-sha-offload-engine"
+  kind: "tool"
+  version: "TBD-at-sign-time"          # NVCARPS fills from the source ref
+  signature: "TBD-at-sign-time"        # NVCARPS-generated SHA + ed25519 sig
+  signed_by: "TBD-at-sign-time"        # NVCARPS identity (NVIDIA-PSIRT signing key)
+
+description: "Use this skill when wiring the DOCA SHA Offload Engine\n(an OpenSSL ENGINE) into an existing OpenSSL pipeline\nto offload one-shot SHA-1, SHA-256, or SHA-512\n(EVP_Digest) onto DOCA SHA hardware without rewriting\nagainst doca-sha. Covers engine load mechanics\n(`openssl engine dynamic`, `set_pci_addr` ctrl,\n`-engine_impl`), the SHA-224 negative test that proves\noffload engaged, the message-size window where offload\nbeats CPU SHA, and engine-vs-library selection.\nTrigger even when the user does not say \"DOCA SHA\nOffload Engine\" or \"OpenSSL ENGINE\" — typical implicit\nphrasings: \"speed up openssl SHA on BlueField\",\n\"offload SHA without code changes\", \"is openssl using\nthe accelerator or falling back to software\", \"prove\nDOCA SHA actually ran\", \"openssl dgst hashed but I'm\nnot sure it was offloaded\". Refuse and route elsewhere\nfor new SHA pipelines (use doca-sha), MD5 / SHA-3 /\nSHA-224 / HMAC-SHA offload, incremental hashing via\nchained `EVP_DigestUpdate`, or OpenSSL PROVIDER authoring."
+
+source:
+  repo: "NVIDIA-DOCA/doca-skills"
+  path: "skills/tools/doca-sha-offload-engine/SKILL.md"
+  branch: "main"
+  license: "Apache-2.0 AND CC-BY-4.0"
+
+provenance:
+  scan_run_id: "TBD-at-sign-time"      # NVCARPS scan run UUID
+  signed_at:   "TBD-at-sign-time"      # ISO-8601 timestamp from NVCARPS
+  upstream_catalog: "https://github.com/NVIDIA/skills"
+  upstream_component: "doca"
+
+quality:
+  canonical_card: "skill-card.md"     # signed card with evaluation results
+  benchmark: "BENCHMARK.md"
+
+behavior_boundaries:
+  documentation_only: true             # bundle ships no runnable code
+  hardware_touching_changes_routed_to: "skills/doca-hardware-safety/"
+  version_policy_routed_to: "skills/doca-version/"
+  external_productized_software_routed_to: "skills/doca-public-knowledge-map/"
+  see_also:
+    - "AGENTS.md"                       # universal rules
+    - "BENCHMARK.md"                    # how this skill is graded
+    - "SECURITY.md"                     # safety-bug intake
+
+contact:
+  bug_intake: "https://github.com/NVIDIA-DOCA/doca-skills/issues"
+  safety_bug_intake: "https://github.com/NVIDIA-DOCA/doca-skills/issues/new?labels=safety-bug"
+  security:   "https://www.nvidia.com/en-us/security/"

@@ -1,0 +1,45 @@
+# SKILLCARD.yaml — skill identity and routing metadata (canonical card: skill-card.md)
+# Schema: https://github.com/NVIDIA/skills/blob/main/docs/skill-cards.mdx
+
+schema_version: "1"
+
+identity:
+  name: "doca-comch"
+  artifact_id: "doca-comch"
+  kind: "library"
+  version: "TBD-at-sign-time"          # NVCARPS fills from the source ref
+  signature: "TBD-at-sign-time"        # NVCARPS-generated SHA + ed25519 sig
+  signed_by: "TBD-at-sign-time"        # NVCARPS identity (NVIDIA-PSIRT signing key)
+
+description: "Use this skill when the user is doing hands-on DOCA Comch work\non a host + BlueField pair — bringing up host ↔ DPU PCIe\ncontrol-plane messaging, picking server (DPU) vs client (host)\nroles, choosing slow-path send-task / recv-callback vs\nfast-path producer / consumer, querying max-msg-size or\nmax-clients capabilities, registering connection callbacks, or\ndebugging DOCA_ERROR_* returns from the Comch API. Trigger\neven when the user does not explicitly mention \"DOCA Comch\" or\n\"Comm Channel\" (renamed in DOCA 2.5) — typical implicit\nphrasings include \"send a control message from host to\nBlueField over PCIe\", \"DPU can't see the host representor\",\n\"DOCA_ERROR_NOT_PERMITTED on server_create\", \"DOCA_ERROR_AGAIN\non task_send submit\", \"connect callback never fires\", or\n\"stream bulk data from a host driver to a DPU agent\". Refuse\nand route elsewhere for installing DOCA itself, BFB / firmware\nbring-up, non-Comch DOCA libraries, or deploying Comch apps at\nscale — those belong to other skills."
+
+source:
+  repo: "NVIDIA-DOCA/doca-skills"
+  path: "skills/libs/doca-comch/SKILL.md"
+  branch: "main"
+  license: "Apache-2.0 AND CC-BY-4.0"
+
+provenance:
+  scan_run_id: "TBD-at-sign-time"      # NVCARPS scan run UUID
+  signed_at:   "TBD-at-sign-time"      # ISO-8601 timestamp from NVCARPS
+  upstream_catalog: "https://github.com/NVIDIA/skills"
+  upstream_component: "doca"
+
+quality:
+  canonical_card: "skill-card.md"     # signed card with evaluation results
+  benchmark: "BENCHMARK.md"
+
+behavior_boundaries:
+  documentation_only: true             # bundle ships no runnable code
+  hardware_touching_changes_routed_to: "skills/doca-hardware-safety/"
+  version_policy_routed_to: "skills/doca-version/"
+  external_productized_software_routed_to: "skills/doca-public-knowledge-map/"
+  see_also:
+    - "AGENTS.md"                       # universal rules
+    - "BENCHMARK.md"                    # how this skill is graded
+    - "SECURITY.md"                     # safety-bug intake
+
+contact:
+  bug_intake: "https://github.com/NVIDIA-DOCA/doca-skills/issues"
+  safety_bug_intake: "https://github.com/NVIDIA-DOCA/doca-skills/issues/new?labels=safety-bug"
+  security:   "https://www.nvidia.com/en-us/security/"

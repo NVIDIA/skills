@@ -1,0 +1,46 @@
+{
+  "skill_name": "doca-setup",
+  "evals": [
+    {
+      "id": "doca-setup.explicit-positive.v1",
+      "prompt": "Use the doca-setup skill for this task: I'm running into this: \"I just got a BlueField, what now\". Can you walk me through it?",
+      "expected_skill": "doca-setup",
+      "expected_output": "The agent loads doca-setup and answers strictly from that skill's documented workflow, quoting only real symbols, flags, paths, and commands from the bundle (no invented tokens) and routing out to other skills for anything out of doca-setup's scope.",
+      "assertions": [
+        "The doca-setup skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every command, flag, path, or symbol named is traceable to the bundle or a real public NVIDIA doc (no invented tokens).",
+        "Steps are given in a workable order with preconditions established before they are used."
+      ]
+    },
+    {
+      "id": "doca-setup.implicit-positive.v1",
+      "prompt": "I'm running into this: \"I just got a BlueField, what now\". Can you walk me through it?",
+      "expected_skill": "doca-setup",
+      "expected_output": "The agent recognizes this as a doca-setup task even though the skill is not named, loads doca-setup, and walks the user through the documented workflow with concrete, bundle-grounded steps.",
+      "assertions": [
+        "The answer engages the request directly rather than deflecting it.",
+        "The response is concrete and grounded in the skill content rather than generic advice."
+      ]
+    },
+    {
+      "id": "doca-setup.implicit-positive.v2",
+      "prompt": "I'm running into this: \"my DOCA application is built, how do I run it on the BlueField DPU\". Can you walk me through it?",
+      "expected_skill": "doca-setup",
+      "expected_output": "The agent recognizes this as a doca-setup task even though the skill is not named, loads doca-setup, and walks the user through the documented workflow with concrete, bundle-grounded steps.",
+      "assertions": [
+        "The answer engages the request directly rather than deflecting it.",
+        "The response is concrete and grounded in the skill content rather than generic advice."
+      ]
+    },
+    {
+      "id": "doca-setup.negative.v1",
+      "prompt": "The environment and versions are already verified. I need to define and validate packet-steering rules in an application.",
+      "expected_skill": null,
+      "expected_output": "The agent does not apply doca-setup's workflow to this request: it points to the guidance that owns the request or helps with the actual need directly, without treating doca-setup as the answer.",
+      "assertions": [
+        "The answer does not apply doca-setup's workflow to this request.",
+        "The answer points to the guidance that owns the request or helps with it directly, rather than refusing without any direction."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "skill_name": "doca-socket-relay",
+  "evals": [
+    {
+      "id": "doca-socket-relay.explicit-positive.v1",
+      "prompt": "Use the doca-socket-relay skill for this task: I'm running into this: \"move my socket app onto the BlueField without rewriting it\". Can you walk me through it?",
+      "expected_skill": "doca-socket-relay",
+      "expected_output": "The agent selects the doca-socket-relay skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
+      "assertions": [
+        "The doca-socket-relay skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every symbol, flag, or command named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-socket-relay.implicit-positive.v1",
+      "prompt": "I'm running into this: \"move my socket app onto the BlueField without rewriting it\". Can you walk me through it?",
+      "expected_skill": "doca-socket-relay",
+      "expected_output": "The agent recognizes this as a doca-socket-relay issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The answer engages the request directly rather than deflecting it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-socket-relay.implicit-positive.v2",
+      "prompt": "I'm running into this: \"host app gets ECONNREFUSED on the relay\". Can you walk me through it?",
+      "expected_skill": "doca-socket-relay",
+      "expected_output": "The agent recognizes this as a doca-socket-relay issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The answer engages the request directly rather than deflecting it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-socket-relay.negative.v1",
+      "prompt": "I'm writing the C code that opens a control-plane channel and sends messages across it. How should I approach this?",
+      "expected_skill": null,
+      "expected_output": "The agent does not apply doca-socket-relay's workflow to this request: it points to the guidance that owns the request or helps with the actual need directly, without treating doca-socket-relay as the answer.",
+      "assertions": [
+        "The answer does not apply doca-socket-relay's workflow to this request.",
+        "The answer points to the guidance that owns the request or helps with it directly, rather than refusing without any direction."
+      ]
+    }
+  ]
+}

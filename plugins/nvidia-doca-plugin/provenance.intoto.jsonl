@@ -1,0 +1,37 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "predicate": {
+    "buildDefinition": {
+      "buildType": "https://github.com/NVIDIA-DOCA/doca-skills/plugin-build/v1",
+      "externalParameters": {
+        "version": "1.0.0"
+      },
+      "resolvedDependencies": [
+        {
+          "digest": {
+            "gitCommit": "09fdfcf26441e8cb337126f1bc11331aa9bcaa94"
+          },
+          "uri": "https://github.com/NVIDIA-DOCA/doca-skills"
+        }
+      ]
+    },
+    "runDetails": {
+      "builder": {
+        "id": "doca-skills/plugin/build.py"
+      },
+      "metadata": {
+        "reproducible": true,
+        "sourceDateEpoch": 1795454573
+      }
+    }
+  },
+  "predicateType": "https://slsa.dev/provenance/v1",
+  "subject": [
+    {
+      "digest": {
+        "sha256": "269de92b6ca2162da61488dbed4de251f52026e94f00f44bc3e47dce147dd737"
+      },
+      "name": "nvidia-doca-plugin"
+    }
+  ]
+}

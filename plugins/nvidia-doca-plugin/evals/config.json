@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "execution": {
+    "runtime": {
+      "system_packages": [
+        "curl",
+        "git"
+      ]
+    },
+    "openshell": {
+      "allowed_origins": [
+        "https://linux.mellanox.com",
+        "https://mellanox.github.io"
+      ],
+      "filesystem_policy": {
+        "read_only": [
+          "/sys/class/infiniband",
+          "/sys/class/net",
+          "/sys/bus/pci/devices"
+        ]
+      }
+    }
+  }
+}

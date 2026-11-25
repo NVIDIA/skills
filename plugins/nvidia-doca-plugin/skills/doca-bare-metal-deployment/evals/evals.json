@@ -1,0 +1,46 @@
+{
+  "skill_name": "doca-bare-metal-deployment",
+  "evals": [
+    {
+      "id": "doca-bare-metal-deployment.explicit-positive.v1",
+      "prompt": "Use the doca-bare-metal-deployment skill for this task: I'm running into this: \"my DOCA binary on the BlueField exits 1 right after launch\". Can you walk me through it?",
+      "expected_skill": "doca-bare-metal-deployment",
+      "expected_output": "The agent loads doca-bare-metal-deployment and answers strictly from that skill's documented workflow, quoting only real symbols, flags, paths, and commands from the bundle (no invented tokens) and routing out to other skills for anything out of doca-bare-metal-deployment's scope.",
+      "assertions": [
+        "The doca-bare-metal-deployment skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every command, flag, path, or symbol named is traceable to the bundle or a real public NVIDIA doc (no invented tokens).",
+        "Steps are given in a workable order with preconditions established before they are used."
+      ]
+    },
+    {
+      "id": "doca-bare-metal-deployment.implicit-positive.v1",
+      "prompt": "I'm running into this: \"my DOCA binary on the BlueField exits 1 right after launch\". Can you walk me through it?",
+      "expected_skill": "doca-bare-metal-deployment",
+      "expected_output": "The agent recognizes this as a doca-bare-metal-deployment task even though the skill is not named, loads doca-bare-metal-deployment, and walks the user through the documented workflow with concrete, bundle-grounded steps.",
+      "assertions": [
+        "The answer engages the request directly rather than deflecting it.",
+        "The response is concrete and grounded in the skill content rather than generic advice."
+      ]
+    },
+    {
+      "id": "doca-bare-metal-deployment.implicit-positive.v2",
+      "prompt": "I'm running into this: \"systemd keeps restarting my DOCA service on the BlueField DPU\". Can you walk me through it?",
+      "expected_skill": "doca-bare-metal-deployment",
+      "expected_output": "The agent recognizes this as a doca-bare-metal-deployment task even though the skill is not named, loads doca-bare-metal-deployment, and walks the user through the documented workflow with concrete, bundle-grounded steps.",
+      "assertions": [
+        "The answer engages the request directly rather than deflecting it.",
+        "The response is concrete and grounded in the skill content rather than generic advice."
+      ]
+    },
+    {
+      "id": "doca-bare-metal-deployment.negative.v1",
+      "prompt": "I already have a Kubernetes static-Pod manifest and need to deploy the workload through kubelet; no bare-metal process will be launched.",
+      "expected_skill": null,
+      "expected_output": "The agent does not apply doca-bare-metal-deployment's workflow to this request: it points to the guidance that owns the request or helps with the actual need directly, without treating doca-bare-metal-deployment as the answer.",
+      "assertions": [
+        "The answer does not apply doca-bare-metal-deployment's workflow to this request.",
+        "The answer points to the guidance that owns the request or helps with it directly, rather than refusing without any direction."
+      ]
+    }
+  ]
+}

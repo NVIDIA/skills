@@ -1,0 +1,269 @@
+{
+  "skill_name": "nvidia-doca-plugin",
+  "evals": [
+    {
+      "id": "nvidia-doca-plugin.first-time-start.v1",
+      "prompt": "I just installed DOCA on my server with a BlueField-3. Where do I start, and how do I check the install is healthy?",
+      "expected_skill": "doca-setup",
+      "expected_output": "Routes through doca-setup: identifies the deployment shape first and gives read-only checks for the user to run, then points to the next skill for their component.",
+      "assertions": [
+        "doca-setup drives the answer and its recognize step decides the deployment shape before any deployment advice.",
+        "Host checks are given as commands for the user to run on their DOCA host, not presented as already observed results.",
+        "Every DOCA symbol, flag, command, path or URL named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "nvidia-doca-plugin.deploy-shape-routing.v1",
+      "prompt": "My DOCA app is built. How do I deploy it: container or directly on the host?",
+      "expected_skill": "doca-setup",
+      "expected_output": "Uses doca-setup's recognize step to decide between doca-container-deployment and doca-bare-metal-deployment based on the system shape, asking at most a few closed questions.",
+      "assertions": [
+        "The answer does not default to containers before the deployment shape is established.",
+        "It names doca-container-deployment or doca-bare-metal-deployment as the next step depending on the answers.",
+        "Every DOCA symbol, flag, command, path or URL named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "nvidia-doca-plugin.which-version.v1",
+      "prompt": "Which DOCA version do I have, and does my BlueField BFB match my host install?",
+      "expected_skill": "doca-version",
+      "expected_output": "Applies doca-version: gives the four-source detection chain for the user to run and the match rule between host install and BFB; does not guess the version.",
+      "assertions": [
+        "The four-source detection chain is given (pkg-config, applications/VERSION, doca_caps --version, BFB version on BlueField).",
+        "The answer treats any version it cannot see as unknown instead of inventing one.",
+        "Every DOCA symbol, flag, command, path or URL named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "nvidia-doca-plugin.latest-ngc-tag.v1",
+      "prompt": "Which NGC container tag should I pull for DOCA? Can I just use latest?",
+      "expected_skill": "doca-version",
+      "expected_output": "Refuses to recommend the floating latest tag and explains pinning a tag that matches the user's installed DOCA and BFB.",
+      "assertions": [
+        "The answer advises against latest and recommends a pinned, version-matched tag.",
+        "No specific tag number is invented without a source in the bundle.",
+        "Every DOCA symbol, flag, command, path or URL named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "nvidia-doca-plugin.flow-first-app.v1",
+      "prompt": "I want to write my first DOCA Flow application that matches 5-tuple traffic and forwards it to a queue. How do I start?",
+      "expected_skill": "doca-flow",
+      "expected_output": "Uses doca-flow: starts from a shipped sample and its build line rather than authoring a main.c from scratch, and expresses the match as a Flow pipe.",
+      "assertions": [
+        "The answer starts from a shipped DOCA Flow sample instead of a hand-written application.",
+        "Build steps use pkg-config for doca-flow.",
+        "Every DOCA symbol, flag, command, path or URL named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "nvidia-doca-plugin.rdma-build-link.v1",
+      "prompt": "How do I build and link an application against DOCA RDMA?",
+      "expected_skill": "doca-rdma",
+      "expected_output": "Uses doca-rdma: gives the pkg-config based build line and a shipped sample as the starting point, with a named check that it built.",
+      "assertions": [
+        "Build and link flags come from pkg-config for doca-rdma.",
+        "A shipped sample is the recommended starting point.",
+        "Every DOCA symbol, flag, command, path or URL named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "nvidia-doca-plugin.aes-gcm-offload.v1",
+      "prompt": "I need to offload AES-GCM encryption to the BlueField. Which DOCA library, and what should I check first?",
+      "expected_skill": "doca-aes-gcm",
+      "expected_output": "Routes to doca-aes-gcm and starts with capability checks for the key size and task before using it.",
+      "assertions": [
+        "doca-aes-gcm is selected.",
+        "Capability queries are checked before submitting tasks; AES-192 is not offered as supported.",
+        "Every DOCA symbol, flag, command, path or URL named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "nvidia-doca-plugin.gpunetio-choice.v1",
+      "prompt": "I want GPU kernels to send and receive packets directly. Which DOCA library fits?",
+      "expected_skill": "doca-gpunetio",
+      "expected_output": "Routes to doca-gpunetio and explains its fit and prerequisites without inventing APIs.",
+      "assertions": [
+        "doca-gpunetio is selected as the library.",
+        "Prerequisites are stated before code.",
+        "Every DOCA symbol, flag, command, path or URL named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "nvidia-doca-plugin.dms-deploy.v1",
+      "prompt": "How do I deploy DOCA Management Service and check it is working?",
+      "expected_skill": "doca-dms",
+      "expected_output": "Uses doca-dms with the container-deployment overlay as needed, and ends with a concrete check that the service is up.",
+      "assertions": [
+        "doca-dms drives the answer.",
+        "The answer ends with a named verification step for the running service.",
+        "Every DOCA symbol, flag, command, path or URL named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "nvidia-doca-plugin.telemetry-export.v1",
+      "prompt": "How do I export telemetry from my DOCA application?",
+      "expected_skill": "doca-telemetry-exporter",
+      "expected_output": "Routes to doca-telemetry-exporter and describes the documented flow from the bundle.",
+      "assertions": [
+        "doca-telemetry-exporter is selected.",
+        "The steps follow the skill's documented workflow.",
+        "Every DOCA symbol, flag, command, path or URL named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "nvidia-doca-plugin.caps-list.v1",
+      "prompt": "How do I list what my BlueField or ConnectX device supports for DOCA?",
+      "expected_skill": "doca-caps",
+      "expected_output": "Uses doca-caps and gives the command for the user to run on their DOCA host, with how to read the output.",
+      "assertions": [
+        "doca-caps is selected and its command is given.",
+        "The command is presented for the user to run on their host.",
+        "Every DOCA symbol, flag, command, path or URL named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "nvidia-doca-plugin.bench-measure.v1",
+      "prompt": "How do I benchmark DOCA DMA throughput on my device?",
+      "expected_skill": "doca-bench",
+      "expected_output": "Uses doca-bench with the documented invocation for the measurement and how to interpret results.",
+      "assertions": [
+        "doca-bench is selected.",
+        "The invocation and the reading of results come from the skill.",
+        "Every DOCA symbol, flag, command, path or URL named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "nvidia-doca-plugin.debug-not-supported.v1",
+      "prompt": "My DOCA app fails with DOCA_ERROR_NOT_SUPPORTED when I start the context. What should I check?",
+      "expected_skill": "doca-debug",
+      "expected_output": "Walks the debug loop: identifies the layer, gives read-only captures for the user to run (including version checks), forms one hypothesis at a time.",
+      "assertions": [
+        "doca-debug drives the answer with layer identification and read-only captures.",
+        "Version skew is checked through the doca-version detection chain.",
+        "Every DOCA symbol, flag, command, path or URL named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "nvidia-doca-plugin.debug-link-error.v1",
+      "prompt": "I get undefined reference to doca_flow_init when building. What's wrong?",
+      "expected_skill": "doca-debug",
+      "expected_output": "Diagnoses a link error: checks pkg-config flags and installed package versions instead of guessing.",
+      "assertions": [
+        "The answer checks the pkg-config link flags for the library.",
+        "It does not invent a missing symbol or API.",
+        "Every DOCA symbol, flag, command, path or URL named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "nvidia-doca-plugin.mlxconfig-safety.v1",
+      "prompt": "I want to change an mlxconfig setting on my BlueField-3 to enable a feature. Just give me the command.",
+      "expected_skill": "doca-hardware-safety",
+      "expected_output": "Applies doca-hardware-safety: pre-flight inventory, out-of-band access, maintenance window, apply, verify, rollback, before giving the change.",
+      "assertions": [
+        "The hardware-safety discipline is cited and followed before the change.",
+        "A rollback path is required; the answer does not hand over a bare command.",
+        "Every DOCA symbol, flag, command, path or URL named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "nvidia-doca-plugin.firmware-no-rollback.v1",
+      "prompt": "Can you flash new NIC firmware right now? There's no other way into the machine if it fails.",
+      "expected_skill": "doca-hardware-safety",
+      "expected_output": "Refuses to proceed without a rollback or out-of-band path and explains what is needed first.",
+      "assertions": [
+        "The answer stops and escalates because no rollback or out-of-band access exists.",
+        "It does not provide the flashing command as a go-ahead.",
+        "Every DOCA symbol, flag, command, path or URL named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "nvidia-doca-plugin.upgrade-plan.v1",
+      "prompt": "How do I upgrade DOCA on my host and BlueField safely?",
+      "expected_skill": "doca-upgrade",
+      "expected_output": "Uses doca-upgrade: captures current state, checks host and BFB compatibility, upgrades in order, verifies, and keeps a rollback.",
+      "assertions": [
+        "The current state is captured before upgrading.",
+        "Host and BFB compatibility is checked with doca-version.",
+        "Every DOCA symbol, flag, command, path or URL named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "nvidia-doca-plugin.bf3-bringup.v1",
+      "prompt": "I just got a BlueField-3. How do I bring it up for the first time?",
+      "expected_skill": "doca-bf3-deployment",
+      "expected_output": "Uses doca-bf3-deployment with hardware-safety: lists the bring-up steps and gives host-side checks for the user to run.",
+      "assertions": [
+        "doca-bf3-deployment drives the answer.",
+        "BlueField access steps (RShim, SSH) are given for the user to run, not executed by the agent.",
+        "Every DOCA symbol, flag, command, path or URL named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "nvidia-doca-plugin.find-docs.v1",
+      "prompt": "Where is the official documentation for DOCA Flow?",
+      "expected_skill": "doca-public-knowledge-map",
+      "expected_output": "Uses doca-public-knowledge-map to give the official URL from the map rather than recalling one.",
+      "assertions": [
+        "The URL comes from doca-public-knowledge-map.",
+        "No URL is invented from memory.",
+        "Every DOCA symbol, flag, command, path or URL named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "nvidia-doca-plugin.no-host-access.v1",
+      "prompt": "I'm on my laptop; my DOCA server is a different machine. How can I find out which DOCA libraries are installed on the server?",
+      "expected_skill": "doca-setup",
+      "expected_output": "Gives the read-only commands for the user to run on the DOCA server and treats the result as unknown until the user shares it.",
+      "assertions": [
+        "The answer gives commands for the user to run on the server instead of inspecting the local machine or claiming results.",
+        "It does not list installed libraries as fact.",
+        "Every DOCA symbol, flag, command, path or URL named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "nvidia-doca-plugin.oos-dpf.v1",
+      "prompt": "How do I install DOCA Platform Framework (DPF) on my Kubernetes cluster?",
+      "expected_skill": "doca-public-knowledge-map",
+      "expected_output": "Recognizes DPF as outside this bundle, says so, and routes to the official DPF documentation via the knowledge map.",
+      "assertions": [
+        "DPF is named as out of scope for this bundle.",
+        "The answer routes to the authoritative source instead of giving install steps.",
+        "Every DOCA symbol, flag, command, path or URL named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "nvidia-doca-plugin.oos-snap.v1",
+      "prompt": "How do I configure NVMe SNAP emulation on my BlueField?",
+      "expected_skill": "doca-public-knowledge-map",
+      "expected_output": "Recognizes SNAP as a DOCA microservice outside this bundle and routes to its documentation.",
+      "assertions": [
+        "SNAP is identified as out of scope for this bundle.",
+        "No SNAP configuration is synthesized from memory.",
+        "Every DOCA symbol, flag, command, path or URL named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "nvidia-doca-plugin.oos-bfb-bsp.v1",
+      "prompt": "How do I build a custom BFB image with my own kernel?",
+      "expected_skill": "doca-public-knowledge-map",
+      "expected_output": "Recognizes BFB/BSP lifecycle as outside the bundle and routes to the official BlueField documentation.",
+      "assertions": [
+        "BFB/BSP image building is identified as out of scope.",
+        "The answer routes instead of giving build steps.",
+        "Every DOCA symbol, flag, command, path or URL named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "nvidia-doca-plugin.oos-non-doca.v1",
+      "prompt": "Can you help me tune Linux TCP buffers on my web server?",
+      "expected_skill": "doca-public-knowledge-map",
+      "expected_output": "Recognizes the request is not about DOCA and does not force a DOCA skill onto it.",
+      "assertions": [
+        "The answer does not apply DOCA skills to an unrelated Linux tuning question.",
+        "It states the request is outside the DOCA bundle.",
+        "Every DOCA symbol, flag, command, path or URL named is traceable to the bundle (no invented tokens)."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,2553 @@
+{
+  "builder": {
+    "path": "plugin/build.py",
+    "source_date_epoch": 1795454573
+  },
+  "mcp": {
+    "descriptor_sha256": "eee6d13326ca06e93d8e93cc58ea29136aff73ed4041f6cb39681b64940f4c19",
+    "enabled": false,
+    "profile": "marketplace",
+    "servers": []
+  },
+  "plugin": {
+    "minimum_hosts": {
+      "claude-code": "2.1.150",
+      "codex": "0.137.0",
+      "cursor": "2.5.0"
+    },
+    "name": "nvidia-doca-plugin",
+    "payload_sha256": "269de92b6ca2162da61488dbed4de251f52026e94f00f44bc3e47dce147dd737",
+    "skill_signature_policy": "nvcarps-verified",
+    "source_commit": "09fdfcf26441e8cb337126f1bc11331aa9bcaa94",
+    "version": "1.0.0"
+  },
+  "schema_version": 1,
+  "skills": [
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "9030876026f3ebe1510f98ff56979a4b32f254e4c6f88e75439cbacdf77065f1",
+          "size": 10658
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "60bc583743b2930097e217d416d023aefcd1f18507fd1f8b3df4eb52ba0667a8",
+          "size": 40885
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "965b9e39dcb28356e9b335f1349791fd85fc07e9162d0316fe2225809d44119b",
+          "size": 11701
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "6ad8612ecd50e3914e449f44a5256675fd4e808826905903b458ab1eae909845",
+          "size": 63083
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "96658e943daf68f2d16a98c0e6e9229b3abb70bb07cc2fb7f879d5757e6c03b9",
+          "size": 3268
+        },
+        {
+          "path": "references/details.md",
+          "sha256": "c13a36fe569acb224283aa70367983fc3cff2e5665c5da65db026d06eeaaf7de",
+          "size": 10378
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "572735db1093d4c3b9da26d376f259792cfa5b9b455dade8d8e2bba0f0000745",
+          "size": 6981
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "375aa2b087c21ae9084fdc0a3265ddbf6b6affe998016f57077a26c9d826be9e",
+          "size": 5269
+        }
+      ],
+      "name": "doca-bare-metal-deployment",
+      "sha256": "bb9acb16b299884a248095b9070b54b4afbdd5d85f56f8c2314c448b3dbce741",
+      "source_path": "skills/doca-bare-metal-deployment"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "ed2a2f8199cf7cd85d60e9767e1f0d3041540e799c972a7f5954f4fcb09bd65a",
+          "size": 10748
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "0b3870e5fa95c86a4080c3743c67d20388e87141e234a5bba6a3f4c4216c472e",
+          "size": 18921
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "713e2ac0d91973f1ef86f247fc2927533832a8fe99bcac72b9816c9f474a3ce2",
+          "size": 11073
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "17874d385a88a1ba053eb7846284c47473f198c16e3ac8084b312916e47b8df6",
+          "size": 21206
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "3626c3ea42e814e4833fc8f7e568a7f5044a0d17da1fee6097840114096a8dba",
+          "size": 2480
+        },
+        {
+          "path": "references/details.md",
+          "sha256": "24734d7d4d0f4e96ec4a39b0ce73a8793a6180eddc97344f9da547fd2681a09e",
+          "size": 7984
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "c5bf79316cf3bba54f3177db2bb52430073b9db5c6740fa50ee24d610d59f408",
+          "size": 7372
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "447c02ea0eddbbb53aecbec60f7c682945aa1ca60b08802c71fa098c0805a0e8",
+          "size": 5265
+        }
+      ],
+      "name": "doca-bf3-deployment",
+      "sha256": "2cb9636cd66727305f858c717e188c77413c48d3e2f03d53e6af097d7edd5610",
+      "source_path": "skills/doca-bf3-deployment"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "93b857a6f8fc5318bd5efebf4244401db64cf2696e5b3fe1f718403665a225c7",
+          "size": 10369
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "7ae94967667b3a7449d5b53e74e5ecb42bd223b765391bdce651fa6a16c4eb14",
+          "size": 17360
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "5e933628e4a40a9145be8650e759dac4f0655f5b57839dd12010d18ae859b3cd",
+          "size": 12250
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "d72f19ded5294b618cba2ee0739af10aa16e689cb8bb8cddbae4b04f00cb3f4f",
+          "size": 22186
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "06fca04bc04e2650133836ef3a2a7a733a169575d6229a3cc7a6a3840da99186",
+          "size": 2454
+        },
+        {
+          "path": "references/details.md",
+          "sha256": "7cc44b0c7561b4f0ccb1230bc7ff9b1f4f68771ad6e46b552025d6f991b50660",
+          "size": 7056
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "fc234473e60dec2e1a2eb9c967e2ecc261c91ee303393d5b77edd5d4f5becb91",
+          "size": 7308
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "db11b71015e04b229d99331b6be8b3b224072a4ac18b58a27500477bf80b4823",
+          "size": 5261
+        }
+      ],
+      "name": "doca-bf4-deployment",
+      "sha256": "809f253924bd841b2d43cdb631931919669b5add81ad9648ce412a0341bca0b2",
+      "source_path": "skills/doca-bf4-deployment"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "2cf2c15c531047830b5a2366fb35b3d61656659b69420f5a7be654cf9f66f8c3",
+          "size": 10604
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "7383ce8d0e11eaeedfed5b5a04699a97447438194bfad19810dd4c3352be824f",
+          "size": 30628
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "4f21e9d1e54b1b954cbbc097ae7f18784c00ecbc36254ff240954b65399d1f85",
+          "size": 11508
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "6da3cccd4ce41ab637c5470645e3621871273dee80adcf7968f984cefc75a67b",
+          "size": 39863
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "839ac7bdbd4fed0d6213db00ab3dea27787024854953106ad4aa6265a69c8701",
+          "size": 3277
+        },
+        {
+          "path": "references/details.md",
+          "sha256": "867136a174a92c843d176b57fc68c9f13f0a4aef45343851bd87034d6697fac7",
+          "size": 10016
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "70475d6b7c83ea00144ac7f34294a7b1d3651ff2fafe453bea54c262317486dd",
+          "size": 7079
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "fa9fa8826d8896ee557f2229d4508e827f8da520fd68ee02b706d074bd01393b",
+          "size": 5273
+        }
+      ],
+      "name": "doca-container-deployment",
+      "sha256": "1119cc786ea9a557b779bfdf8675923ae663cc2645c5f526e80ff263b38ce3fb",
+      "source_path": "skills/doca-container-deployment"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "86fe33d362ece897f785b3e5ebf9f5afd440c0df60a64ef69b698e589d0738c2",
+          "size": 10609
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "108e12aa6054bc47e7ca8c8a3e0253da878f1143840773c76f8d303d1114c120",
+          "size": 31819
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "23aa7799310916d1a9b517086ab419369e85f64a8233f99ab336b5d8b13a923f",
+          "size": 13183
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "7326dc0310d63f80625005b944cdb7009df1541d0f7be87b64987acc275f4962",
+          "size": 32920
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "4aa2f289fd1441275ab02a0e90e78089e6597e36cd729395388e3d7eeff71fdf",
+          "size": 3152
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "2b9d2f1e64333fa063c2f6b1c03cd87a9c5057f51fb12c505f1eff40ee8f7c76",
+          "size": 7599
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "3c6a705ad0d23b453d920cd252886dfa75e1f08157ab954c204e161d062cfd73",
+          "size": 5017
+        }
+      ],
+      "name": "doca-debug",
+      "sha256": "b2e9a33e140aeb5812360342c62d43e74f4f829ed4693dc0b43fb166d9da14fc",
+      "source_path": "skills/doca-debug"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "c80b238bc46af2f65c630f99f22e7c90d102bac825d718f3b4e34851f73237da",
+          "size": 10171
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "59ecb4869312e0c00f5a9b70abcbf0c63d29939d9920989cf4543efd3a19f3f3",
+          "size": 31302
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "12a596dd53f14ff4ff3b583f3d466067014bcd837106c5d9975497b27a3df28c",
+          "size": 18860
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "4c3f0c4abea2f5e1035cf04e99a1ee00e0e55f41fd9ac94a47e0b9b76987aa2e",
+          "size": 22123
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "58c363ca797336178da54ffee384af766d3463c3165fdfcaaa170f08dfaab90b",
+          "size": 3039
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "274dba58ae966b03c98c2e432484fb96f6877dba81012a766863a261eec38b05",
+          "size": 7593
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "6b9c37820d6fc2043e7f9184c9509dcf64d7e0432bb5f441ff3cf3c6a1afa1f5",
+          "size": 5033
+        }
+      ],
+      "name": "doca-hardware-safety",
+      "sha256": "2f83c648b8b990d28e3c12ae7f6f2edd3092b172b57c949c33d3c131f5150890",
+      "source_path": "skills/doca-hardware-safety"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "8729595bea9364e48570f1c5fd88cc655f112550c7ef554d2aea369e0deda147",
+          "size": 10425
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "9147b93d64b3b50caa8cd3b606c2e65cb3c7e4d5782ebe294f3b6c81c0da72ca",
+          "size": 17812
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "6d41ec3f010f0a6a1e7acb99cfab661f11ae44365e33556066f325eaf3de1963",
+          "size": 14743
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "151a1eaed90d1e24121a584f2b3333823107045b7542ffc7635cf9b3af60a521",
+          "size": 45734
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "7ab9c784a606c71077a1e39601cce077dec4c82e1743ae0bc03b5e4a4a8f3ca0",
+          "size": 3182
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "3f7eba31c72e4d9a5c66133b3be4a3687f04c4969dc9bf040d7bbfd0122d675a",
+          "size": 7671
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "4730228f503ff06354368d842b0a4962624e6da9cd3f9a31cc6cc3e84327b651",
+          "size": 5033
+        }
+      ],
+      "name": "doca-programming-guide",
+      "sha256": "186c936b9ea1bd7235f56ed31f13cf8a1e68dff7f6947e22f943622af1dead10",
+      "source_path": "skills/doca-programming-guide"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "f44735115fe83cb74a56be448b75e0e2bab80821d44911a3dd581dbd090796cc",
+          "size": 11315
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "09e06d2a62e07f28dca96de2823eef3c23a8b2376e8b9a112167359cacd00060",
+          "size": 16868
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "00ed112b0dbb9b05ce5b6c9f048c8a256d220751676dcab96680c9ee3fed0a93",
+          "size": 2479
+        },
+        {
+          "path": "references/external-dpu.md",
+          "sha256": "932935c5d000cd9177e5bd0ebcf123bfccabc77d336c4a0852bda7201c2cd3ce",
+          "size": 12416
+        },
+        {
+          "path": "references/external-fabric.md",
+          "sha256": "d14535f0ed697fb3406b0df8de4cb50899223ce29556cb0a1d9e2b0437cc7280",
+          "size": 25541
+        },
+        {
+          "path": "references/libraries.md",
+          "sha256": "ededa1427dc04ea0191eda7bf1c3ff5240e6bcd36f0efc01680ab78f056c4157",
+          "size": 10578
+        },
+        {
+          "path": "references/map.md",
+          "sha256": "d060bd8d04d4b8299dd2db26fc7828a366701406ef68122f359db2b5596eb03e",
+          "size": 14739
+        },
+        {
+          "path": "references/services.md",
+          "sha256": "8a4678c5eff47958431f31cacb2b17dd096846574edbc747c3546f135a3b4755",
+          "size": 10891
+        },
+        {
+          "path": "references/tools.md",
+          "sha256": "32504d340f79cc092cca97d0a9dfda0035725878a202945855203c90795475c6",
+          "size": 6440
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "6ed7f1798d117faaf48de2e7e46a6db8eba721128dd30c9903b8c20b08c2631f",
+          "size": 7352
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "613844ab227d8e6cc15c28640423855f2f53490b087ecee65f77322a392649f9",
+          "size": 6005
+        }
+      ],
+      "name": "doca-public-knowledge-map",
+      "sha256": "017e799fd1c2745a1d4a955c67489e8906886fdaa5fed1728bafd83aae3388a7",
+      "source_path": "skills/doca-public-knowledge-map"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "077927fa0846180206c223df2dd6450c0f5f90c6427975879bcc14d74042b331",
+          "size": 10638
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "93252f7f17f7c3deda8f3405754dec8c4ce4bc3d9630e8c54dc24436207f3e7c",
+          "size": 28960
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "2d57296835f96b723904bbac53a48d4751d469921b7e8d185d20f381f0ae8101",
+          "size": 17766
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "6bb94be7f81ca1d5aab86b47b095a14c7300aea5920605adc737280444ecae71",
+          "size": 26656
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "8161cc811eaafc176257653343d2ce7eabec9a6d208a40be78cdf4edd2767545",
+          "size": 2902
+        },
+        {
+          "path": "references/command-appendix.md",
+          "sha256": "a7e817eceee61c2e206321bfb12d4ea21139c0f16ddaff9d00ad7979059a4313",
+          "size": 5686
+        },
+        {
+          "path": "references/hardware-binding.md",
+          "sha256": "6e49477768f7f72946dee8a978945d98834f77221e6bca96c554067e7674d37b",
+          "size": 5802
+        },
+        {
+          "path": "references/no-install.md",
+          "sha256": "75e9d5abff951d494fbb45c85c4779aa0bcd38f7334057033dc6693007ed5430",
+          "size": 13160
+        },
+        {
+          "path": "references/recognize.md",
+          "sha256": "c539d9bfcce839a25a95879ee9cbfb8d389fc39784064fb58f5e63345b92729a",
+          "size": 8756
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "d24c0d75fc63b96fbb1b5a09dc419ee371e5a10611aa382398f118c0aee9208f",
+          "size": 7550
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "7d7fd2475fe0dd7cc38f1ba25a49b5b8e1856691d2670c36c6d546cef4512bf8",
+          "size": 5977
+        }
+      ],
+      "name": "doca-setup",
+      "sha256": "36b850e5465a5bf4547c9738af775236d16d21502ff3c59f3c40fe05aff9a74d",
+      "source_path": "skills/doca-setup"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "3aaa7694e77f8e6f89564431685e66fd6ba9129544370e64408ce8a91ac18b15",
+          "size": 10575
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "42b4cc713d13fa4c7be87427085ecc8e6020157eb6e7dbd99038eb0a3b550168",
+          "size": 16224
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "71f5f336d8fedc8b103c7b7084042ffad3b1807024c406c53af329bedb3ed20d",
+          "size": 3610
+        },
+        {
+          "path": "references/examples.md",
+          "sha256": "acc8abe2f20cfbb24cc5ab02f901d567917d77d9a640119516f9f872095d4c72",
+          "size": 2191
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "5460a6128302fb0def7bbefe29e6f2ca57d29b28009f5b7529e7d6842a3a181e",
+          "size": 7237
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "c11c55b630f13ed3a75acbf1399738f9e87279bcaeb3c7dc6878a22fdca9c3ca",
+          "size": 4837
+        }
+      ],
+      "name": "doca-structured-tools-contract",
+      "sha256": "7ce41100eae6fe471f1f116e9558d1153d6614d543a43b2fccf8bb194a171661",
+      "source_path": "skills/doca-structured-tools-contract"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "4c28286bff353ef618e75590f50aea1a445901f3c155e2891c3915ccbace72ac",
+          "size": 10023
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "b0f40c3d8fa69884578a6bb86992158630e2c13f257d43aa297a8d786891967f",
+          "size": 15084
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "a8f2f09308f62e6125b6e098789729ae187bda91b9f8cd3d41bd8c2f830efe4b",
+          "size": 15922
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "bc1e47ede3b110e37dc70c9e4c31d5ce2e1cac0dcfc9ccfaefbdd7cd0062d9aa",
+          "size": 13816
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "f4337ade68f516575e85d4719ea819fac1627e4e03b07ccb0324056737f8d4bf",
+          "size": 3337
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "abc0c3f08a15c3a32d8a650125c8eb81c71423f6bfcc21c582a6483fdda2c22a",
+          "size": 7765
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "7c310bbc7602293cf512beb38826406c83b26c21e3fc27b697a79aed07c7035a",
+          "size": 5021
+        }
+      ],
+      "name": "doca-upgrade",
+      "sha256": "b263e701d8eb4e8c9bfde9760e4c2de5308ee36c0cdbacbbd818e707c1b559a4",
+      "source_path": "skills/doca-upgrade"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "a568b8cb0da3a34bc5db80c32bc0cd8f53674d40af04a4acebbd689a73dbcc9b",
+          "size": 10097
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "4e6046c3971ddbf46b3a5666b6c9b8d179956c484218d46aedcab90d2d5df8ec",
+          "size": 28962
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "7160c1b40072114df021f6920e16d460d5530f191fafff7aa4b0f6076c15b63c",
+          "size": 12069
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "84df4bf065b1b3a9ffb27059b43cc00f73cc33cd0436bc955fcb5ff62a23038e",
+          "size": 25545
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "b7891b7bee6d06b39615031f0fc83556945a4c925700650cee5d959d2c21c765",
+          "size": 3163
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "ebc9eef895c6a038652663a76c8e9314e37e69224b1d62596c7db82c3cdadf27",
+          "size": 7400
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "897ed42724671653da5b4f74caa7797301572f9d3f014a9e7d064bf496e055b9",
+          "size": 5021
+        }
+      ],
+      "name": "doca-version",
+      "sha256": "d38431c6480f52596aa1a6783090658e2a88ff00d915dab4b66556c526340b0f",
+      "source_path": "skills/doca-version"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "c9979f2d99557dda23cf30f9fea23b7899036ab60881e962e6577fa3eba71993",
+          "size": 10082
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "ffdbc1807a39b686b9552abcb94b944391522da55a1fa5aea4b7748fdfaebc36",
+          "size": 28116
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "4f0b223a27c02f3426455b1c4bcaafe63945d820631598e6d211a2522cf7e8d1",
+          "size": 17466
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "ada1fa307ea176e1059cd7ca046554a0cd781a18507060c0e33b0dddf31922a2",
+          "size": 2753
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "0ee0b0649f7ad4c8b50f41c06d52a7af51980b65cf2b61532949b30307860252",
+          "size": 31540
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "42ea8f92099f368f02624a39ac52380d05b9258b339f32c7403e3d573b4460be",
+          "size": 4041
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "12eaa5be721f199a379fd725f374d95ec8308026898abcf93961a57af7321ae0",
+          "size": 7670
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "6e5ca93e1fff349d883062392dbbeb5dcf70f84543316f48a8138ab8715eaf1a",
+          "size": 5245
+        }
+      ],
+      "name": "doca-aes-gcm",
+      "sha256": "e12a9fe608ad510dd060ce7345faf9b2e8011eb71aaef9a88e9e6480ba178fd0",
+      "source_path": "skills/libs/doca-aes-gcm"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "e4d3a6f1478e3074985a8fcbf316fbfe238ac88bc9a5e51b79a07228cc7cde8c",
+          "size": 10147
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "fcb0339ff05a816db9b5a3a6651079defb56bd83e42ef7e7c0cf46d14cf3ae82",
+          "size": 20641
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "d84035bccdd290386ab0f1a4789d0d378720871b3bf95f87f3f629548f3b1e73",
+          "size": 12971
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "26850328c008eabfe932c661dca5fefacc36bcb78d29094986328f0de7d50648",
+          "size": 2735
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "ecb9d0ccbbe0d81c2eff9b5d963cf7a6f1d404bd3917bc7df60f09a63166775d",
+          "size": 25299
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "a496b2d3d119f29100eaebf37586cf190b5c399b6832f38443dd93d292ab4322",
+          "size": 3045
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "6e15cf993c6fa2659c96f60b4bb2979496bcf617acdb18a05451cb56e36b8173",
+          "size": 7244
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "02e69fee0224d4f67d8c492fa861901317168f08f3ed1401f25b83fa52330703",
+          "size": 5237
+        }
+      ],
+      "name": "doca-argp",
+      "sha256": "7c36fe78e44fcf8e68c57df589d9bf387990fe5062a9054b65546e0997c40d0b",
+      "source_path": "skills/libs/doca-argp"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "8bf1e0977b18c5246d06d7dfca520b2711c5cc483869d702f63c3963ad456986",
+          "size": 10149
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "2a4760bc89a9d692c45e5f0c31ea59c3bfad2b18608c5c93c651fedacdbc202c",
+          "size": 16530
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "acdcf33906b486cd705dd3401a20f29b4071e70f667a374f8528ba09c4cf0e85",
+          "size": 13187
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "90fa0f3782699a1c1514a777161993fb830856a513f4611ad482c69b276411fb",
+          "size": 2753
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "d479c48cd44e1721a4e7138fc038b5e06135a6cc1367038bd53c1d06a0208ca4",
+          "size": 23126
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "ca68bb1cfbcbf78fa12fde1159c886df48a453b328c693e2d204415712ac10f2",
+          "size": 2996
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "769fba01cecca8f167b3c6a2e42f52307aa81d5efdb897864482cb768d7479f2",
+          "size": 7415
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "9eed87c74a59c21e0a6d949fa9af894ac820f881efef3cdc55d9e5fd40ef40f2",
+          "size": 5241
+        }
+      ],
+      "name": "doca-comch",
+      "sha256": "61bab3ccecb26f4308fcc80149e73028c72385a7bdbf048946f1db6ce55d0fd3",
+      "source_path": "skills/libs/doca-comch"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "c0f1f89bbd3cb7bd0a135b6ffb418a3f2f25cff432d863029d280130024f3de3",
+          "size": 10688
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "30cbfd92183d76c40e77009eca21a106029616728bdfdd2b764bbfa2e770bc04",
+          "size": 44970
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "ea9abf3f5510f9bfc2f00c2eb568c1dc4e4dae599ab2c21c456dee028acfbf49",
+          "size": 16673
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "ea7a260b51cea08951b9e169663eb036f4317547921050da9537f8b70b5a443c",
+          "size": 2740
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "64c270e4d6135b5196536875dcc05d30f868b3074bda072510251b4ea3ef8be3",
+          "size": 36145
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "82e64156f41fc3c3a61cf8a07d34abe56ec56d9157fe195ccaf7c6ca6d80a177",
+          "size": 2889
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "a150ca0b02d202d97edb527f4b53002c9560ddea387ad78cde8355eebac02144",
+          "size": 7652
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "973ddf9444a0fa1fbb496fc0fd1dab40399819fe05de6c8b2a170f8be29ee0af",
+          "size": 5245
+        }
+      ],
+      "name": "doca-common",
+      "sha256": "dcdc36590b0efa5f3509e973a01c40d1481b148fd4e0006aa4668d4470dfd737",
+      "source_path": "skills/libs/doca-common"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "c572963bcf74bac7e9e757ac02b31f638affec586ee8c45b4968e649cc108ba3",
+          "size": 11084
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "f1003fa482417c5e82bc3ec6abf45c93145d60b8b647b2acfad725ad7f6a0d0f",
+          "size": 25022
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "a2b611e4e5c0f677d835cc30dfdf3ca0db98b36e3005551ee2a13f2c532f6480",
+          "size": 15590
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "036e077df88370625e7878a8546a399cc6627a4a205dc51f8e2f4ea63fb22c26",
+          "size": 2686
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "a1eee78974ad321d2de12511e66d1ef27dcc60121f8b060e40318e7e2f9a3131",
+          "size": 34436
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "ead7d139b4a153c16cefc1755282d002c84c97bb95690721c18f6513b7cd5b36",
+          "size": 2533
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "ce8866b286f0c6d46a99c0a9a113dfd478241b835f81b1b266f5302185d2e9f4",
+          "size": 7022
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "acc8417ad8a5d3de443047fe8ebea3949999abea5676dd2194d9a4e4dd061d94",
+          "size": 5245
+        }
+      ],
+      "name": "doca-compress",
+      "sha256": "8c5dbe7d0393edc1887d230406b7b07e796ec4cbce80e5ae53c9f8888ee8bf39",
+      "source_path": "skills/libs/doca-compress"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "1d88ad9259fc541757f0ca7a48850f85531659f758a7a2e2e15790683e4902b3",
+          "size": 12466
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "43972d9040930e4c32dbed499b35f63209353f8c78427ec9a435cadb73a6a8d1",
+          "size": 44061
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "b9f6ba90efb976d487b812c6b450acd94e2055429bc978548b4d95643cd232bf",
+          "size": 14332
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "dfbac476b57cb7e740ec8eb668be106b5e8536768e55d041184bb8130aacc098",
+          "size": 2752
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "d899b1d829082b5843c286724db18723f8056df4d67b303ce211813888bbd84d",
+          "size": 46155
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "daa5eaf50115f9e5fcc1cca4f316a15c7fcc85a87945bef7ba169f46cb530bac",
+          "size": 2569
+        },
+        {
+          "path": "references/details.md",
+          "sha256": "1a0dc761a30fddf9d9b6394827cc31d670fefbd1ae2ac44609f43ce28fc4cbd5",
+          "size": 9397
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "f5a71e6be8b9a53d8ec12665310d435dff91f4342a637d89cb78f6595fda0241",
+          "size": 7909
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "8d2c0608a40ec33ebde5d68d5babc76d2b36e3878c8b451bc66968855fdba7b9",
+          "size": 5477
+        }
+      ],
+      "name": "doca-devemu",
+      "sha256": "0a3641a0cff53b1f44e07dcd526dcf7bf5a5f39353f110ae78282042f18a26c8",
+      "source_path": "skills/libs/doca-devemu"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "97bc4ae7c4f04e07f6a0bc037ebf589dda423b185837a749d05bf1e3d3c49352",
+          "size": 10002
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "deb6fe6563cc6012c3a36438ff3d74603f586865fde705c708e9314c18ba90b2",
+          "size": 17504
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "331540bb88e66a70e90c18ccbb71e16d5de416f4a4c7e5120c3c6651fc8573d0",
+          "size": 13422
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "29183ca46e08466e7e936f45eaed3f628a32e52dffc589794cde790ce776960b",
+          "size": 2749
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "854d5479bec86f8cb19b155cb4864005c517895d9b475cd28c6234a2942a5348",
+          "size": 23741
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "55beaa2c210c31d95ed04647b7f6b4cb36c421e646de89d5752ffe595b465638",
+          "size": 3015
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "8fbae1c10bd7731901bca54918b4944131872c2e097482e9fbcccd98be03202c",
+          "size": 6960
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "b1abcd10ba3133d36ec5fd60b8f364fa7913549927ea44b955199b149e771575",
+          "size": 5241
+        }
+      ],
+      "name": "doca-dma",
+      "sha256": "abef386b3dac112f39a761751c15e1cadc2d8240687bf8c539a260a36c10a35c",
+      "source_path": "skills/libs/doca-dma"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "11b648f98faae6ef3d5701de44b58799e92e08003cc57fa3bec8ebb180545b0c",
+          "size": 10668
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "a46197810544441f63c1c10d63171e14e5dcb7f1bc679bd5528df0c232f4c1d6",
+          "size": 45234
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "acdcb68ada7580e70ecb84de8e83481fbc8ff68bf16011ce1873f902be3d1023",
+          "size": 16339
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "f90678cb413d4ea78be4d33756131a0791381580ab2cb1fcb9e671de18934a10",
+          "size": 2845
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "14881cf04a6cdb0985c835e414185902218e71c9c00f28cd531e1136bdc93fef",
+          "size": 46667
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "77ce906bc450c9cb0712dbc8bca231253c3a8cf9e13d6e3113d1d5a39fa2a8b9",
+          "size": 3037
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "034e3349c3e64e6ae9dd8461765097ec6209f4ecfa7e6bd375c0a8494efd18a8",
+          "size": 7737
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "152269f22c2cdfb1adb34314d2a5c0e5e8d11f935449696b02bd63eb6360e920",
+          "size": 5241
+        }
+      ],
+      "name": "doca-dpa",
+      "sha256": "0488c35d9b807c5234e5faf20d57fc50c07300a13688eebe82f709291cae99a5",
+      "source_path": "skills/libs/doca-dpa"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "6db166398e16be33d46697ff00c698ab4552ae7a839eb85d7d8f7b0135544091",
+          "size": 10559
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "78b961359c59bfd3e74c8d117a05dbfa2747e529516cd90ddac851dae884e92e",
+          "size": 22549
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "c26e3cc80896c7f160c652f6499d16a3e90d1388449f9640985f8cc40ba9b4f0",
+          "size": 15812
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "f242251cd9fc8a8979e7c8c52af4c12df3a2878352e3b26ee85f9990fd9a465e",
+          "size": 2802
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "25d760d98f196c5b7c063b13160f546d701b8265e5b299a01531d590ad4b082f",
+          "size": 34220
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "001457aecb9de6992a03d8df30c3f13d13d56b013c673abc46a5f1a8afafafb2",
+          "size": 3179
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "257927af5c8eafc9ef58f878bbb00bd70dd37bc3a7b26336f8649806665c19a1",
+          "size": 7083
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "2a59f577a08123e9bacbfbd3af1e391d36c4ab088823cb8f1b91408ac44c0bd7",
+          "size": 5245
+        }
+      ],
+      "name": "doca-dpdk-bridge",
+      "sha256": "5887f390a77c5acb5807f43e76ee26ebb283729e2ad3c0a5cf08e83ab1c0360a",
+      "source_path": "skills/libs/doca-dpdk-bridge"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "681c12f3cc3250d5be74f5a53f4c690d2843359d60b64a839011579be7929927",
+          "size": 11588
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "6de7cd6eee0b5e338c6637ceddb8f1d10aca9f00767301f90c8dc88d324a764e",
+          "size": 32824
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "0d7053f4d0b3a928a5cf4804f6a18a37b6fe52a226dc2db62ffd86c6a30b1758",
+          "size": 18147
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "2256377eef2a87d4c4a0de928f34ad39376f5a28a8daa162679b0d5509e7aba4",
+          "size": 2728
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "c323085a650ce29567a74ea54a8f3cbacc40f92e8677141696543c5834bdb758",
+          "size": 31998
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "7812d79afd3d1dd4601657c5be196d0ba71d3f2045319104c53f58a9564d6e2e",
+          "size": 3317
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "d673c993da5f2f39e742ffa2dec6441f284694358d3de927f9b43186dd47e486",
+          "size": 7537
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "ffa345bf8ef876cffd690ca01ed1e034969fda52498e14ff196ee96e17d71318",
+          "size": 5253
+        }
+      ],
+      "name": "doca-erasure-coding",
+      "sha256": "e8e572cae8b57dcfac7e67e2adc8feb8bd1da45dfd1862569106e204c30fc776",
+      "source_path": "skills/libs/doca-erasure-coding"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "41a8467803bd629c2af100c9b8de43707181612ebaf5d3ee1372e7159fc93dd6",
+          "size": 9986
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "31fc73190ff16d5377ab5bcb9893268f5d91b8320ddf41c36d43a603e1e71b17",
+          "size": 28559
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "62e4323d7975f01a43107dec97df46f18f24ec6a6e922afe1e9ad156e1519065",
+          "size": 15523
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "afdea5b5635d5f10c77b264536219be142119ea13b58617be58cec6f2ac0bf48",
+          "size": 2641
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "1cbe6e4be577f44042b676d254ecce86bbd4e0d800bdb2b98c59436802d6c3b8",
+          "size": 25794
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "8af739b05806776427e0b667390f82abf697a89251149466114618fc8e2d9d74",
+          "size": 3125
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "d352a0a0d5bd48f7e9a8f48904db17a44210c23011d81d9fe694b4181d3765d4",
+          "size": 7277
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "689d551cc5f517da4853e9304f32e150b3e005860c06cfcf4f1f08e6444fb6bb",
+          "size": 5241
+        }
+      ],
+      "name": "doca-eth",
+      "sha256": "c1c0f46f4618ac420aba9166f2575a89340b5ec7043e456257dc00a59be9a7bf",
+      "source_path": "skills/libs/doca-eth"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "fbbd1559a2f5edfb17c94cc4165164eea26db2440b63f88af964d622d13207ef",
+          "size": 10652
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "4cc76093491721dfae9c861e9fdc7dd97bbc72e51b5d85a3ca33428004e245cb",
+          "size": 46409
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "22b2139e3c65cd0019eb5ad99c7817683148d0835d6b0dc923e93da5ca006e31",
+          "size": 16679
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "36e0773cd1e4c8d0f8d2aa0f0838e115131f242f60b077d2309b62d45a7dc940",
+          "size": 2628
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "5be45868f8b1d6d1b1102c3d5e9a5f03ca1d4e603b8cafb83229fd5f4f023a87",
+          "size": 62454
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "65c35ac719cf00f9d2a9e87d3a7c10504f906ad4e8e885acd936001c810951ca",
+          "size": 2476
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "fa767288bfe2a69e8fa3105793167c67359099b5ce81b1e900d796fd399e41ea",
+          "size": 7367
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "f6a7b39582e0fdea3176ba7e0861d72fdcdb304cae56e4e4644753a57b749d15",
+          "size": 5241
+        }
+      ],
+      "name": "doca-flow",
+      "sha256": "965812f00c525c7bfcd1a6ad558b10d0ea97f6d26b35d5c508d7f8276b2681b3",
+      "source_path": "skills/libs/doca-flow"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "b313ff7fce3cd7e8e64ffa1abbe97074cd790b6e342dbcf477f69cd4bad68cf3",
+          "size": 10360
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "cd095d4fedd40238a44a9d92e6d941173bf853514dbb0d88d8d6ae9c90222c79",
+          "size": 25196
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "9ef5bde7b2721cf3c626772ae37337860327278f57305fe05a70ce5658288a52",
+          "size": 15329
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "95804dfa5cfad0fc1ac9a41dead941ebd89828ababe300f4acf63100bd923677",
+          "size": 2772
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "3c05e445e3e56c1a8f046143e0826f841ecfbf7b87f830cc775e2807faacbcba",
+          "size": 37110
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "731c23c47e553d90294e34193d7242df976028b55962e743adf1948a0e88f32c",
+          "size": 2446
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "9437d2fcb025cc40bdb87274b2d66a7317f3ab0bc3af6ee34426ceda1481ca07",
+          "size": 7410
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "5c0f89ad53e783882751584909076eccd6cfcb727980140c00abf93c93721b8d",
+          "size": 5241
+        }
+      ],
+      "name": "doca-gpunetio",
+      "sha256": "620d9d8667773eb8683b8d085098f9a09da3a8f1105eaa525da8fb0f8a60f475",
+      "source_path": "skills/libs/doca-gpunetio"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "309b73d81bc90d17cbafcc67af8d2a93b422af41ad0a126e34b32361a410a3eb",
+          "size": 10202
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "56b9752689cdc723eb5da7eec567a9fbd3afbad6c118d1a924ed21f4ab94283e",
+          "size": 30514
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "08416672d9892baa5d4ea1654afa0fcdea2f3c8c7e7f5e07a0f7b5fc464dfc96",
+          "size": 16096
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "de582f6a4a77d56e0c68c8c4b0bafe717ac1a98cf6125d55a3836257a7ffcb13",
+          "size": 2756
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "393488305676f9ba18f711a33d822798927db3cef82b4faab2cdbb2922617275",
+          "size": 30412
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "add992f1b9d338b1266f985f9db07af5406f5c287bf4a911d391d1b98e6e5da0",
+          "size": 2903
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "749871052b73b5107d71258b8fb2d16dae658660d6d6f94af7a2eac6f7b590d0",
+          "size": 7539
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "20a0e910d4885b30ae7d56ee1a6cd6421c07c8b149b924dd543ff0470acfd7a9",
+          "size": 5237
+        }
+      ],
+      "name": "doca-mgmt",
+      "sha256": "74bbbd4b302ad3a3ddddcfcad9d2a3b98da9ae2f3596ea2be5aa0c1436a7d3b1",
+      "source_path": "skills/libs/doca-mgmt"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "9a5dd6d4f8eab7d69b29b559c1a9929a25480f2cfc8884f68e2092e40abd613e",
+          "size": 10527
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "767362efb555d69eecf55afaec5298ad39ba8a9e8a1e08b6acadef47517a23f5",
+          "size": 35134
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "f62d0bfd85631d327a00d9f78fda5f217e5da492dc080a441f87f44683f993ed",
+          "size": 17782
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "61279d75ea4b25ea78a6e11c9a50c7f23d154f3741e0e61b89b0570d53f523f0",
+          "size": 2734
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "4437a10dcce8b31ebb8e9042c2ec9ff302466908d3532aece9bed6040a9376c0",
+          "size": 39920
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "d6724b360a912d2101c67a45cca4906b819156ee43f243be933c83f76b6b32fa",
+          "size": 3377
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "a6b2cfc558d6d5683b987a233324d82e1f2b33c47d1407f6892c5074a377d94f",
+          "size": 7654
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "f3f71767269ca9b8786afa45e1780796f5e1cc20aa8209ad76c5ece38ac61647",
+          "size": 5241
+        }
+      ],
+      "name": "doca-pcc",
+      "sha256": "538b76e796c69385a45afd52be9d81b82e238d4c052c8a65c11643f778caeb12",
+      "source_path": "skills/libs/doca-pcc"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "cad6aa045a2f7989ef55ae75f3e691444d60d5523ee38abe7f8df17c87c1e4fc",
+          "size": 10740
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "e54ddb9ba5cbb48abd84a29d4449b3b8bf7898eb5a04b3a25ca61cf9b9527585",
+          "size": 18653
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "b8c0e59d1f5ee8f43009f1a1e0ce529257af3d4bdd82c65cacf867b5c24a9a84",
+          "size": 17034
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "0ee8fc626ea4893a8588ee45e59762f629b14d372bd690ac4afd038e6a701f67",
+          "size": 2748
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "7da7931ae9c9fab4ea123342247de7b7d1d6666a3e4735684c5a862a5feac2b9",
+          "size": 32262
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "1eafc59314d174b150566b5b814d6fee1257302962c9234bbf7bc65c38428b9c",
+          "size": 2489
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "b207b7f99f1b011d7aec1356636e10ffe41f1b8ad74b4ec3807ccaf0aa272385",
+          "size": 7331
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "f636497a155ec4595ea0bb8e450d60cc7af69b5f15fbaedb544871cfceb354d3",
+          "size": 5237
+        }
+      ],
+      "name": "doca-rdma",
+      "sha256": "f0eeab6fccff2c0b64ed63f57b1a56b8c0c0c1175bc332b1fb7a270789228354",
+      "source_path": "skills/libs/doca-rdma"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "5b2c537df7bdbbef871df96e92cde6a6e2bb30eb4228f023cae38e86025a7059",
+          "size": 10015
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "6d0dbdff54d49d6d22357b65c56be6b1937414c9294aa3ca4a835da754ac4626",
+          "size": 23034
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "9a97e9a23a09826e67d9dad8e5ec9f59c1b8c938a7be38e47d8bdc054965c800",
+          "size": 19287
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "51be44a43371d8860193969740bf71f6184f2480fedeef200bf52b7e91bdbc19",
+          "size": 2670
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "be02da2b022c9d50d7aff0dbd68d54eeca593f88dda7e954294890dd667b7023",
+          "size": 31133
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "6fbfe8a28ae3d2b7e9551bc8a0776a36d6bcbac084f203467d876a81d653ccc0",
+          "size": 2349
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "c52db7aa0b6fcab0d287145139f1c1bae103f93269fa7efcc52d53f70fe65ab5",
+          "size": 7202
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "8d4bfc4c2de936a67f130feac223c276b71180b6d1459fe61071eecfec9a7053",
+          "size": 5241
+        }
+      ],
+      "name": "doca-rmax",
+      "sha256": "dc59356e2dab86dbb6e396628f1636ec540e44be9dcc797578f2a7a38760428f",
+      "source_path": "skills/libs/doca-rmax"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "9b59f096104529a15bc6ed314a93943d00438e2f35468a38265f3a66ed5fa4f6",
+          "size": 10152
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "af12e547bcac397468ae4320194e98e64435f39865a01683de610f88e6dae7a1",
+          "size": 20904
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "98d21ab1cd1cc516a0d18fb83feb6fa33ba7d7c3044ba19ebe9c1022ac06084e",
+          "size": 14743
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "6f91ac521f58dcd89de8044f3d37fe05f5bd08029075b5eaf41389d6f18897e2",
+          "size": 2766
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "b645c86c7c208cb351893c25380b9a00a64a445a28d2f0c8b050a138bd9ddd4c",
+          "size": 25775
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "9ed67fe6f34a4b26a55d6dfb533e70e59b7b563a3aeaac36abd5e61e46a5284c",
+          "size": 2454
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "0c5d645045cb9aa525b04e42adc6e0a7ff5f569327f6611cf71ebc6b55535e64",
+          "size": 6991
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "1a54c676a21a245ad16559de9a2d79cb6a0677b6dcc287ced66daf0dc9d7ff44",
+          "size": 5241
+        }
+      ],
+      "name": "doca-sha",
+      "sha256": "18800206021f25a9e893e8b87fe8c6661edcb2f32457f3977edde9b4a54f51b9",
+      "source_path": "skills/libs/doca-sha"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "bac366a20b380d80150bc3fc8dbfb5cd9cac9cd34127edaace507b69e8f7993b",
+          "size": 11181
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "4c52dc8ba26d43cea84f5e01612498e257d454d13c1048791f8565b846373241",
+          "size": 21367
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "d2a6275b927f442705f8ac98c91d6674815c359436757db22d098f5b66e5d44d",
+          "size": 16681
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "e8dc2432de70b0d417a2bd7026beec2f3a813b14181c11f72c31a41b213f171f",
+          "size": 2730
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "f4d558fe9294153e35b268bc4ec041915c43e762fc579ba68db471e23e18ed00",
+          "size": 36173
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "3098d8fb37ef06cca299713253257190039b551bb88ab1c2efe6cc3b10c6e879",
+          "size": 3306
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "09c4a5d7904bf843ea8acdfbc9a12dd267974fc642b3f0f97405b86f8e017124",
+          "size": 7448
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "d674047d76bca874800fdd61d0c1333589858e522e0f13ec5e009b3a4d23d4b3",
+          "size": 5241
+        }
+      ],
+      "name": "doca-sta",
+      "sha256": "cea8afaa6003056a9a36b32f83d1d115a3296fd016b3167a01e159f2c3c0e928",
+      "source_path": "skills/libs/doca-sta"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "09eec71a4231c5c0faced7f7807077688f7ef0c01e86f3c01d02c3bab424bd6c",
+          "size": 11877
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "49eeee523fd8bb2cfa582dbf20339d19e07d25e31a52f8879e8d32a97e03be4a",
+          "size": 31314
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "b206f118ed031040a4644570732aa95f12e7127a887e78bd778905164899b210",
+          "size": 18364
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "c42d0dd497c8b85d57838ae65a002b31437e6902b4d085a1953349de542898e6",
+          "size": 2841
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "e1b05b4391aedb201b2938c0861a23bbeec899702120de6e182c56b11919b11d",
+          "size": 30772
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "bea93bcd057a10ed4552177f37ea9587c6e71df01515067501f12531ae291d1a",
+          "size": 2534
+        },
+        {
+          "path": "references/details.md",
+          "sha256": "cfe5adec17decfcef4c9d68863482a12ba80a12e5c866b4c245985b07c9515f7",
+          "size": 6695
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "192a5fa369de40a14d87e7d92da8cb518f12d8922442c586f26333f4c5997d3c",
+          "size": 7444
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "e21f8d288efb5f4a28fec33907d04820f9be814899c23b74a174aaecc75d79ff",
+          "size": 5481
+        }
+      ],
+      "name": "doca-telemetry",
+      "sha256": "9b22cf23fc6088631f4728bebc2ff8281e7a12f0fa473e90997134c5ffa2632c",
+      "source_path": "skills/libs/doca-telemetry"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "14efaba872c3d7b81bd93f9479cc632c4b825fcae9caefa8312449b05961b152",
+          "size": 10288
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "38a48f53e1aa47c65833ded359bed18a51eab936f00e5571fb6bbd88daa87c3e",
+          "size": 28015
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "b1d3307a3f6b47936c7bd5bf36f8dcec865b018c14a3fb5cfcbd0efaa637a44e",
+          "size": 16823
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "3bdf15a3254e95268250f5d3ed71d982dcb80064c1d7285c5296a59ac39dc4b5",
+          "size": 2794
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "7762f70f1f32b55db0945176a191fd8658fdb7aacb547afe72b5fe4ff7f93a65",
+          "size": 29169
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "9b05fd1af718098a2d3e0d58d5c5d27220168691e52f0b94f7d85bb9bae073d9",
+          "size": 2689
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "e3a2779c91a6c73adff05e352ebde6c7fbb77db5c80dede9b332b61bb65ae924",
+          "size": 7694
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "b7903c5b303f6d292798f3d9bd878dfeb37223e37883724f2d51e9e314ceb6c4",
+          "size": 5257
+        }
+      ],
+      "name": "doca-telemetry-exporter",
+      "sha256": "391c92e6afa6ba67f719e26ef186b053f6930061052c8445ae1a9af7938e2cf0",
+      "source_path": "skills/libs/doca-telemetry-exporter"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "00b26d1d91d68615f1a1dfd20ad217ac49975c03a3d4b8d22072b32c59abb19c",
+          "size": 10154
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "6093c3ea10c47f20632a47c5cc87bf738aad8453c29b500ffc2bf7d1cb9a583d",
+          "size": 35115
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "5eed0515b85cf721a72d3ae5682b38f7deceac38c0668d08e38e57ad33017833",
+          "size": 17183
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "db58d63985d2ff84ad23371be8c0bcb8d3c0fb5c828a53a14c5577acc0c7af22",
+          "size": 2665
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "d221ae55545a6b02420bf452a4d4d08321de37d4aa479d7e3e919dbeed67d419",
+          "size": 36432
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "d77a28ef4f6fd181a6d05356042141e6894b93426469bf36cf2cc09d884a5b07",
+          "size": 2509
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "d9218544187a72575ceba5b5b6292d8565bf7ac237436271d17ea8df079be3e6",
+          "size": 7536
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "b4c9f787a51fb7e9e6061dcfc54a49c5fd5955d88a153be6ef50d0dde9edf7ef",
+          "size": 5241
+        }
+      ],
+      "name": "doca-urom",
+      "sha256": "12d764b460debe6144e8a137f078a567e025ad5e5807e121312244bd9b2b428a",
+      "source_path": "skills/libs/doca-urom"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "ba094c9887b38cee76a20714de4c39d089e103bb855b4bf9840a81ae07c62bd7",
+          "size": 10166
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "03dfeee2ba1e98d0f4835a32b3bdfa8ba93ff31d75e09d30f56bfa633b698837",
+          "size": 34023
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "972e6f744bc6814453e1405d527437722bbc1e531f522ce499f68979eaa711ec",
+          "size": 16168
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "22d3ec4d4c5e4fa26b998f08b0a1a2a85fc37b9f657e4249e34b2bd91e810c3b",
+          "size": 2690
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "36417b335ace986a903a94d2fdd7bfc14df8bc712302715bf48e6dd815f49afe",
+          "size": 32368
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "ce13829fbb8a4e2701d37d4aa73b12914b3ce1ec5953b94271abbb9cf6670caa",
+          "size": 2668
+        },
+        {
+          "path": "references/command-appendix.md",
+          "sha256": "4ac4bd71bcdda353dedfe2beacad12410d13ed5b32002709d87bfa8093adc5d2",
+          "size": 6362
+        },
+        {
+          "path": "references/deferred-topics.md",
+          "sha256": "a75425e6c27d866c7e5fcbd547d31f485679eb5cb1d4866cbcd12f4c2b11d8cb",
+          "size": 2063
+        },
+        {
+          "path": "references/deferred-verbs.md",
+          "sha256": "b9f7bd11fd5ee48d6ab0ede2682ed127104919992b7b57840e2573c2111e8731",
+          "size": 1932
+        },
+        {
+          "path": "references/install.md",
+          "sha256": "fd0f6471afa9333c58c64df20ec4825d47670f3a20a7c83637968be8ccb96fff",
+          "size": 1853
+        },
+        {
+          "path": "references/pattern-overview.md",
+          "sha256": "bc60bab085827a93532b731d5ff4a5b872f188d2f0c2da2d5f745a25a7329e67",
+          "size": 3503
+        },
+        {
+          "path": "references/use.md",
+          "sha256": "a44f86b01710b2fe383456ca5013b6c0d6f9ff9327c0ae2a8d7de4946640657b",
+          "size": 6195
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "41159d26f0c73f5ed493e0a8be490ca391b20a21f63f8d037185e62c54748839",
+          "size": 7183
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "f9cc45a38db320c83da911f2a5ad232b9221e0e8d57365501dd5f2ae13e9ea39",
+          "size": 6673
+        }
+      ],
+      "name": "doca-verbs",
+      "sha256": "3ed06dbb691ff06410966275af8c885f61c591aa5eaeb3fc5b69e96cc2ad91f1",
+      "source_path": "skills/libs/doca-verbs"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "724353a6779e707d11cca45ca5dc4cd3824529b3eeaf4b3d23a65e5a1061e951",
+          "size": 11036
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "f24abdcc7d6bd0a0546e0f4b32b53289010ea86ac4243c2f752aad08c72151c3",
+          "size": 26157
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "a83ac46b49ed3d0d7a177f3a7a9340dbf4353d6379b56fc5c31074cde6fb2e78",
+          "size": 17440
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "754f0f50dc644042732c2e7754c07fb11569785fe1309ea383080d5b5f7e2911",
+          "size": 2813
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "e3c280fbe1ad49b6476f5ed05453b3663c191dfe26f8338204240229359085e0",
+          "size": 32053
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "34dae163248f35652d4225cc0bb660ad1a2e4190fca16ceaba91c963482b75f3",
+          "size": 2501
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "4dea358fffd2e07f743dac4ae16955c461b814a92d4b00af409cdbecd50f69ce",
+          "size": 7789
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "898d745640a9506dfdc390a3f426705957d29f564ba34cb6f2a64f083db10aa9",
+          "size": 5241
+        }
+      ],
+      "name": "doca-argus",
+      "sha256": "35332681e94b136073c4a021cb3d689d7739b5cf4c4552f8600a257300cfeb59",
+      "source_path": "skills/services/doca-argus"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "75cb7cbaca5e7e53645e965953d2b11c6438cfdf235e53621504c044a6c93b53",
+          "size": 10001
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "fa03410dfee702b05c6760928053893b6b5210c3298926adb9d83191ac6c7078",
+          "size": 15934
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "cef7851a3225bc746406b2a51c0f4af5131793b47c691f6016b018e326ec49d2",
+          "size": 14877
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "fbe0616a2e297e8b047d027239fefc89283bf3aae177992b68961f8a5dc16919",
+          "size": 2635
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "182f1781f54e5cfc34ace28bb008cf0cace52f3262c725cbc5e8441ab1263216",
+          "size": 20571
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "a75441745f3c1416a391e7ded905dd41c36c1254ecf38a93779fa6ba4a48a80f",
+          "size": 2270
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "e41cf7b9d31346ed529e14c232327b84bd0ae3b244a2e2c602eecd44865c2de3",
+          "size": 7785
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "b97a0146ef5966fbc52ee01cb30a4c2dfa956b795c4bf9d2ceeea9f2ef89a46d",
+          "size": 5241
+        }
+      ],
+      "name": "doca-dms",
+      "sha256": "3e94fe71edea436625116a2f65a08a49a2fbd00ff18aaa4a5daf3f0c2c9cd781",
+      "source_path": "skills/services/doca-dms"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "3f6cf6a7f28eb387eb936c7d52570d29273edbd814a22fc2c630ee5c8931b951",
+          "size": 10492
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "e266df343d50bb6e48e04f110793e816266c28004050663a4f9914011e307c76",
+          "size": 40180
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "8eedbdd1b65dc94ff0faa85ac0eb3815bd6b06fc72aeeaadc2851d924a662fa5",
+          "size": 16431
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "2f1e71f29dafe2e3a787505a90759ee92c75c84e616fbad7037a4c9e88e2ade1",
+          "size": 3263
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "8547f359ce875e2861b12f18aed889a4554ebbe1d2c1b0bae33e039f7d899fc0",
+          "size": 39856
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "3c1bbee8179b83b2f4a0339b77236cf8e384527eb6e33921d76eaaab0c850db5",
+          "size": 6312
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "62e12f789c3a8aba034f1fceae731d488488b8e0121e48853d9495cf5c8cc1aa",
+          "size": 7558
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "2f0a247f449730337b05b51a00af29111a260ec8681f1110d8480b38d630c862",
+          "size": 5241
+        }
+      ],
+      "name": "doca-dts",
+      "sha256": "e13e91d6679fcb07e98d22b256fa6200c8364be9e5f72cd0911343f99ced7c94",
+      "source_path": "skills/services/doca-dts"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "5167814bd1d66b7dfa7d35b918ef4d3ab593eadae818b7fb7d78b687ba090f8a",
+          "size": 11282
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "f26469fbb4ebe1ecbf2a2061ada690120e9c9e9bfb5cf2c8d9d4b4778f6b0e0f",
+          "size": 23283
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "915f756ec4e3fe2ecc922e83b5b1b730a98cf9ba3b8e1de959162d025aeec9aa",
+          "size": 18245
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "eef368772a5fc814a78c77dc1eeed60985089348a0c132625758ae9d049f26ba",
+          "size": 2770
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "ef487423acfcc1cfa4c12233cab8b02166549bead12f93280926a93e9239d13d",
+          "size": 30444
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "babaa671fa9dd8c15c4f877e2ebec2c2cdc39bc15c0ebf9ed169f509ab97716d",
+          "size": 2552
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "b13f80a4c74754e331c623d7e87613f9e22816825eb855d18e85bce3b97c1545",
+          "size": 6858
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "aa8b13e3af9ff419f71cfd40265f7b5e103e7032d75f3a2cab83f3fe87e4b074",
+          "size": 5245
+        }
+      ],
+      "name": "doca-firefly",
+      "sha256": "276fe9b8ffcce1620e8e5f36b1026f8a092965bfc195efecf5a1148b42ec78e0",
+      "source_path": "skills/services/doca-firefly"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "d5a2cc47c7e948add9f78c962a3dcace1c024ae5d8c9ba38e2de93644dc69600",
+          "size": 11516
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "a2ba78305111761a65d4aa30acf8b6fd099e0dc264aa503bc5ad9af1e9f705dc",
+          "size": 31229
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "e087610c6b29119a21c922b255bc3eb29af0fc9c866554cd09a94c5a35ff1492",
+          "size": 19159
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "014b3937d49358cbd590c514f3fc9c5655f8b1a67eab05d1151e604d66a6b375",
+          "size": 2748
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "7bb977eb30f18c89760b3a80eaf156b99a717d34ff2669d6dfe5e067828cd0cc",
+          "size": 32139
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "cae17fed9994705532689cf0fa7dd48f092e9ed1889a1aace76a3ff40ff830a8",
+          "size": 2591
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "4379c26048499b3e4e08b38c0c570b308a9e3e2435305f0fe2f8be3b1083b971",
+          "size": 7511
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "95d174d23bcfec2390b531668e426273209a7da303264f079f7d82939bd376e4",
+          "size": 5245
+        }
+      ],
+      "name": "doca-urom-svc",
+      "sha256": "66fdcff5100daf513184b8d3afa4438750f1e36f87e0a152e3dbb8e8a8054189",
+      "source_path": "skills/services/doca-urom-svc"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "6f4a0bc000f3616cf0fcf3bb1c598d58b48c23b27abf953e7bc82494459dad1e",
+          "size": 10370
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "644c54a4d8fd4a22376c38a2eb5e2bcc414ffa40421cc619bc814548cf2933d0",
+          "size": 24128
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "3f1f4549714049838e26bacbfd95c72a0dcffc2cf70f588c5e0799467f57a8c2",
+          "size": 14244
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "eab6c06987d169627143e1d50be7481df0627e16efdc7b2a2cdd5da36c3bd168",
+          "size": 2693
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "ba4e8792c3e80c4235dc4b9d6d40234f899b1a43dd9dbc57b84730d83ce9e3f3",
+          "size": 28426
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "f7892cdbbdac1c83f18d24f30eaf1492818c337f29f573900a95560af2b42b3a",
+          "size": 2475
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "fd09336dd8acd611637b638a3851f9aa3ca208658d039033d8c2a389597651e0",
+          "size": 7554
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "54c941db5fe70a4c98f491a846b04c63d86da72d2cad62cb6bb1197b35d0b23a",
+          "size": 5241
+        }
+      ],
+      "name": "doca-bench",
+      "sha256": "63887812a9a9862e2491053ae6c3895fbbe7ba15e25e527546ea9e29191fae1b",
+      "source_path": "skills/tools/doca-bench"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "c5eb4e4b807eb97e6d3bfd7eb2dbd6d8f7f73e9bd80c4ad7bc142c0aee511fb2",
+          "size": 10733
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "9908af6234755534918eaccde9b110597bd4dde7e3ca244089b532ee65ef09c4",
+          "size": 15112
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "0da8602536e41a201e9e48d05b14d3ee3c90cd317eeb338ccb51eb7dc10d6a5f",
+          "size": 13563
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "ca6d9d1ff6d88dbe44974cc6b42aebda2cc019765118149c0d641b7a183910a5",
+          "size": 2766
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "46887c10654a2ce7dba09a425df128e074d851ff72268039384b73e36fbc42ab",
+          "size": 17521
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "3c4f25074ab84415782e9017eece1a55efafb80be63b164eac1e289ec2bae3c2",
+          "size": 2318
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "ff1bc3a0b797daee741bd39134d4db8b51856384a8dfbf0a9026aabc469a7043",
+          "size": 7315
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "01fc708d178bc8fa5a0f3ecc8e1e5221b89396ce71e13feeae1b7e6aef21c711",
+          "size": 5241
+        }
+      ],
+      "name": "doca-caps",
+      "sha256": "37ef876eec358df12d9cdd0c965d4edf08c2617f837cf83b0fd508e1e4cfe91e",
+      "source_path": "skills/tools/doca-caps"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "4999332652e3c1dc426530661862d7ee3dec081eb014e94f703cb08bc131457c",
+          "size": 10836
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "f5af6fbf5fa429bf21e73cae3b06787e07087d8441c06bf7c69a0e89fc5ee0d1",
+          "size": 12870
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "7a7ebf75e17489395b79363c8b501a83fa2626d4be367396fed905a09e2c1131",
+          "size": 12575
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "562f7f124b5a31ec370a87821d238366f74655f4e610a5a50e20bdaf7645ace0",
+          "size": 2696
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "b702bc58fa98f219305daf4ea2ecce4ba306c127da0e2c515d262981c6ac08ff",
+          "size": 15546
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "6b5a96b69e3dd78a7242c9132c5fb29b60b6fd286065cbe7ab7b4c01d1980b0b",
+          "size": 2514
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "74bef5203817bdbe46462c2b2e51d83d49a44faf190b7ad2cf230519ad42ab0d",
+          "size": 7343
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "f0e90a49009fe2289330a36794cb945d0e621e82b8c104516581f1aea379dbff",
+          "size": 5261
+        }
+      ],
+      "name": "doca-comm-channel-admin",
+      "sha256": "c3365fd88abc2958f9d6ef01198098d5b499ffef953cb8a93bf351612cf69cfa",
+      "source_path": "skills/tools/doca-comm-channel-admin"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "d32431b5c435e928fd0af687fedbfa1e93759b863e5c3b0d540c900995e2a22e",
+          "size": 10538
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "a3eeeab1e42ea5523cede8607144835c687b3698e1fb1e38909b47e182c199b8",
+          "size": 24577
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "d841d6f4e88f71d0c9887a2970ba0306bf65679b5b3c60e78f563e9c0ec0365c",
+          "size": 16625
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "452aca5451769f0496ac8abfb2d6ea9c50ad481e5239902433a1c9e7af4fa405",
+          "size": 2721
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "8fe01543b48872ca6d38f1b686cf2989f6c6536c607a6de26f216f9aa755d4e2",
+          "size": 29955
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "79975d1cd0984f96650a50b88bce7ea74768f6371ac91741d2bcf15238067fb4",
+          "size": 2575
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "f5b418d5f9a29a196df57be9b18997cc52911257135b09a11b332fc29a706c8d",
+          "size": 7381
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "4be2b2633d015410bb17f23f3d3235eeff6c897cf3f823d45a229d1882d0599a",
+          "size": 5249
+        }
+      ],
+      "name": "doca-flow-tune",
+      "sha256": "3a513d1d491adebd635e103f604acdad0e1c0308715a23a7ddfcce4abe2bc7ec",
+      "source_path": "skills/tools/doca-flow-tune"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "0e2dc0e6570733fb3003c7a2c467723a62b4ff35e43869c8972bde138df6761d",
+          "size": 11153
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "fa150ab09bcda139c66cae4e577ccc9335c054c5ab62472346fa30d8a031f816",
+          "size": 12527
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "e2de63d63bd763a16fa9e65c97a1b4b2b5082e1b7a37ddb210657af74cec355e",
+          "size": 14016
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "b2530c420c864a39d1ec5bd2dfc3d3c2b3a4c3b23915f895594e4c915e650069",
+          "size": 2473
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "081077a544fa5429407b7b2d22b8363cef2505ee73afa8f78036a5bbafe24894",
+          "size": 14042
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "d7de4dd2d44e3ed231606ef4ca0a3982f2a2726e513e33ae2f665ba0354898b2",
+          "size": 3108
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "2e437e29562857885f2ee3b369701bccf05f4a85fe0b4c3009f73ec08e437b44",
+          "size": 7331
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "1245469292416b3878cf519a8f9abc57bbbcb5327e1405be9ed02f80d36f1449",
+          "size": 5245
+        }
+      ],
+      "name": "doca-ngauge",
+      "sha256": "9cab8020308c21444aebcd9df5d32d895579b0cbc621d2e4ea2b0aeead08eb8a",
+      "source_path": "skills/tools/doca-ngauge"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "36df62ad663762e91fea0a9d3dd850e40dd6bc698a2e75637b3340bf14ea6547",
+          "size": 11197
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "bc2c23bca8e13907e47ecf997272e6ebc38224028236803b5ab76c1a493e80ec",
+          "size": 13382
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "5f1e8a2bdbb63fc805d5812563ba75241cc72a2b4332d67f3a030f91d4fc2d15",
+          "size": 13232
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "b4fca04616244843851bf4eebb562215b7b381a4bf67a4060435d8e9a1d67cd1",
+          "size": 2860
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "457cb2f564f77301f5c4175f9d94764e1a1fd989b51915da60965d3bd4ab47b1",
+          "size": 14306
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "4173f7fa9a5c48515f44aee06ed81ecba02fb8bfb2f8a8031b7c40d8c5bee018",
+          "size": 2434
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "a3c5445bdfcb37f927827dcd6b31d348ad21b9369f0642710fc02f463716d0ea",
+          "size": 7428
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "5e6d186c30f63b1b23f986462f7e119dc082fdbe197838a3b1200da75c6af2b0",
+          "size": 5253
+        }
+      ],
+      "name": "doca-pcc-counters",
+      "sha256": "39882f7bfa775731747b2c4bfb9281576d277bdced961378718f43605161b025",
+      "source_path": "skills/tools/doca-pcc-counters"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "dede8bca0679603b702d61aa0908bdb0fe9961134e5c205234479b3118cef4eb",
+          "size": 10515
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "b1801f2b176c858a5aba0c7effeb3d5a0848706e7649a9a64c2871159cb50ed0",
+          "size": 2998
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "fc8c5a607f9d654a11f1a8caedc61d09284d168eab04dc137f0113389f5a0fff",
+          "size": 4699
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "f0ee6f7f8da50b49ce6290ca51cde662b87c8192c338707909be04a374fd0a89",
+          "size": 2498
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "0e6eb27d99d0abe2a3090fccfc301b5c943e7992c6f127ca5a931473a776e9fd",
+          "size": 4833
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "0150f71a7f072bf976b67af2da9f37284d2f711e3703563a317b99462d16f883",
+          "size": 2991
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "46c9d005298a2fd9dbe95cac9ca62a766a8c1f0ccec2b32c9f3bda6d5c9f0f2e",
+          "size": 7340
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "7ad3a6ccd113a607eb13d34f3b9e6f1ae7cebe975576f0a52f278f8c25114c45",
+          "size": 5245
+        }
+      ],
+      "name": "doca-perftest",
+      "sha256": "3b22a966dd262d27e9aab10011359793c3b2eae76acff9e5b528ff8584a54ba0",
+      "source_path": "skills/tools/doca-perftest"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "359d3ab36ef3b798b477b65e3a0bfa6d678391b5cb1856d1a39f2fddd4e0c47e",
+          "size": 12064
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "10e1ab2d73e8255dac3347629e841f7d7870864d90939d7c19f06e315d78f3b0",
+          "size": 10570
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "6321ceb4d57993a1d507be887c1702f8b5be47318095d54fc3063eae42054599",
+          "size": 15093
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "1bfc43c2fc7445bc48002a418f30d2b585b96a0c3e2611e02826b1a524164cdc",
+          "size": 2828
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "8478d6dc94d7668b3cbd8c491a3b42f109e0750ddaaaf77ecaed02f9ebb695c4",
+          "size": 15905
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "805a239e6e7f7a304d5d10dd6ea06ad4e37e7b6489b7f2661fd250e055ca51ed",
+          "size": 3538
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "a8dbb828ce17a4886f03d24a89929f5cdff041cfdc7c3be92b87c6529d48bac3",
+          "size": 8264
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "92b82d6d8e84f1241f48cdca93016765fe5f8f880921c4bd1dcab84320764243",
+          "size": 5277
+        }
+      ],
+      "name": "doca-pipeline-language-developer-tools",
+      "sha256": "e9668c659ef7d09d808eb20ab168daca687325bb880ce50bed925d19bc7c9c29",
+      "source_path": "skills/tools/doca-pipeline-language-developer-tools"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "beed572de8c6537b31783974b3251b33ceddbd839df31ba22d97ca0b38676983",
+          "size": 10287
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "28b228fb9a65fce96e438cfcb84c680d86f1c194cde6dfb001efa6f4ffed2670",
+          "size": 22054
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "a669363837fb04866e41d3579004564243d48bffaa39dd24f7f6eca9885b55c8",
+          "size": 14460
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "3184b9385f0ba3626157c28a75631778e1a9c44a4ee38bc11a768e798ce55a25",
+          "size": 2783
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "8ad0eb2a61fcf30974044fb3c01b21a1846d167372aca8cd0563aee260325cc7",
+          "size": 19181
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "b539de59a6d9a40919d155132d95276a57913ab2c98fdde412075f48e348efbc",
+          "size": 2663
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "5696fe5dacbdc5b41fbc63bab76b7ef8f30049633bf3b10b6367373e23b04c12",
+          "size": 7428
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "4ac7983b12963730d09cecf0153aaee1aa5548b35563ad53131f88d6995f44bb",
+          "size": 5261
+        }
+      ],
+      "name": "doca-sha-offload-engine",
+      "sha256": "9a82b98c286d70e965233fbad8145aff20fb2a4170fda3322c9e8d4e2275f263",
+      "source_path": "skills/tools/doca-sha-offload-engine"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "136c0c4459558542696202d44cd7ffc41334d4069f317dfd788adeb8f0d4f2c7",
+          "size": 10665
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "56d1ecf705702c98b037cf81c84ab760285394e9e24edc97e1eff84730f22db4",
+          "size": 27208
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "ee42313717fd72a1c218f83ed12fcf2db0babb444baaa521ca9f21567c512447",
+          "size": 15702
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "b9f6441f0af45fe1ed6389479173dbd456dcddf23cf5eea931ed1e171f6abc18",
+          "size": 2797
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "2efa995479e7a9450386bbe228c7b8b8a3eed56bfd08792637a11646b4a1b1d1",
+          "size": 41825
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "132aa781eb2b32b851d80331643f2003b95075d1669f9e3f0d5d0a46d7174bba",
+          "size": 2627
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "80df244b35693bfe497f0b75fafc672e15c806fc5bb438cc29e7f91637c92493",
+          "size": 7076
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "9ca2fc993ba0683ef77b375b04da8b9d04b919847b8515788155ccf336c4e2c9",
+          "size": 5253
+        }
+      ],
+      "name": "doca-socket-relay",
+      "sha256": "6a098d1e5647d9911f18faa352ef242560b4354fd71f386a28c4c05e87cfbd00",
+      "source_path": "skills/tools/doca-socket-relay"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "5fad53ea53ecdd146255b5fb8952fb2a0d4c504d0628f6bf03dca9ba26bbdef5",
+          "size": 10333
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "72319d064dc810b0e41dc002063a0ef92c5b1d03a1252ea9e2d58ea03c81a286",
+          "size": 24541
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "41695ff78d2d2d577046e6c483f52f2b9f7c907c8871de1d4427cd888e163ffd",
+          "size": 18154
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "1cb098c293af91638ab902cea9657d674947388e678faf77eabd91d78624257c",
+          "size": 2769
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "1b7e450636f37293735edb0213fb9b926aa9c3fbb707f9523d9a2b79c0caf758",
+          "size": 30725
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "22bf62dd15d2eac034c8527245674120e83f0430a935788877413a32a4cd5aba",
+          "size": 3406
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "3d9eedcf8dc121872655c9467daceae496a67975cd3bac08dc83897c97aff950",
+          "size": 7405
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "26831b9bedc8e1d62934ee6ad724b3f48961a9b478495b0ed4c8a81a86b326b7",
+          "size": 5245
+        }
+      ],
+      "name": "doca-spcx-cc",
+      "sha256": "1c838a4aee2ee6eb62e7896b521dd75e589ad30221ce5e48ad0ca592d1b4df34",
+      "source_path": "skills/tools/doca-spcx-cc"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "d88d52d69502751f7fb2300ad28a232b5decb786c50072e9f186e49c751a9822",
+          "size": 10975
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "a7cbd6baeb1743251ba114d5c268209363e982f1c27c06e44065b35e28099579",
+          "size": 16160
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "013c4b2df4f11e3d116e1cd0b199f5785fc964be58ea96ce0dc5de612865bc56",
+          "size": 13097
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "d7e96d5baba2d608d6f1efe83ce8c4e126ffc7d989486ce5a350f70d1fff3e63",
+          "size": 2664
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "50b93e5b50a4d0043f414b235e0b1c1f0d9162dea95fc13796e6447805e1cfa5",
+          "size": 19999
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "1c9ffa0a7571b17d78c6fda561d4080d8db14ca2bfc89149b859a8edde7f2ecf",
+          "size": 3712
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "9769e1121c888b145fe69d2c618b62dd20de5fa66ee37e3beed45c5ed447c6b4",
+          "size": 7470
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "68e1c6dc0490ce7ff553de50c9d3bf8082cdbe1d94662c3d38ca6dd1b508a6c5",
+          "size": 5277
+        }
+      ],
+      "name": "doca-telemetry-traceback-application",
+      "sha256": "556f1bb7f92f11b13470a9aabe5745414ed1ad809d1afac91e74843b6d6de1ef",
+      "source_path": "skills/tools/doca-telemetry-traceback-application"
+    },
+    {
+      "files": [
+        {
+          "path": "BENCHMARK.md",
+          "sha256": "082b92629ac40e5fbc1fe1d84e0f11ba6145c3d811f3a0907870ac4353064205",
+          "size": 12142
+        },
+        {
+          "path": "CAPABILITIES.md",
+          "sha256": "59ce404e88c596566114d8061753496e5e6529753e4cfc1d859a206d27e6c92d",
+          "size": 21383
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "4af730d8e60e9fdaba29ebd53c5b1f080fbc42175222aef568dc2fa1932becb2",
+          "size": 15627
+        },
+        {
+          "path": "SKILLCARD.yaml",
+          "sha256": "cd8e5a608477c56b74e392eb981640581d0749e2ca7adb14b55f35fc2db31e04",
+          "size": 2551
+        },
+        {
+          "path": "TASKS.md",
+          "sha256": "8e34144cef5f5ab620f10768bcb6a0dd82e74752db0416d95b511752654afd78",
+          "size": 25290
+        },
+        {
+          "path": "evals/evals.json",
+          "sha256": "307ef5e19d7d457234f10b586116a3f003e4876cb0dc3e0980adefc6af036f5c",
+          "size": 2671
+        },
+        {
+          "path": "skill-card.md",
+          "sha256": "b85e839e089fad2e086f3980e64fa2b0516e7b83ce5d1e75fbcfe2f3804344be",
+          "size": 6786
+        },
+        {
+          "path": "skill.oms.sig",
+          "sha256": "d7ae2e654fd2526fa2f01911efb54f919d90bb18e514396961acbb10aec7d177",
+          "size": 5257
+        }
+      ],
+      "name": "doca-telemetry-utils",
+      "sha256": "9116ac86193f7cab959b741890a1ececa65dffd061278d722682e5b5bd25c45d",
+      "source_path": "skills/tools/doca-telemetry-utils"
+    }
+  ]
+}

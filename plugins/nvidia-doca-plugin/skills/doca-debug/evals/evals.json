@@ -1,0 +1,46 @@
+{
+  "skill_name": "doca-debug",
+  "evals": [
+    {
+      "id": "doca-debug.explicit-positive.v1",
+      "prompt": "Use the doca-debug skill for this task: I'm running into this: \"ld says undefined reference to doca_flow_init — where do I even start?\". Can you walk me through it?",
+      "expected_skill": "doca-debug",
+      "expected_output": "The agent loads doca-debug and works the cross-cutting layered ladder (install → version → build → link → runtime → program), quoting only real commands, log-level controls, and paths from the bundle (no invented tokens), and routing out to the owning skill for anything outside cross-cutting debug.",
+      "assertions": [
+        "The doca-debug skill is selected and its SKILL.md/TASKS.md layered ladder drives the answer.",
+        "The response identifies the responsible layer (here, Link) rather than guessing at a fix.",
+        "Every command, flag, path, or log-level control named is traceable to the bundle or a real public NVIDIA doc (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-debug.implicit-positive.v1",
+      "prompt": "I'm running into this: \"ld says undefined reference to doca_flow_init — where do I even start?\". Can you walk me through it?",
+      "expected_skill": "doca-debug",
+      "expected_output": "The agent recognizes this as a cross-cutting debug task even though the skill is not named, loads doca-debug, and uses the layered ladder to place the symptom at the Link layer with concrete, bundle-grounded next steps.",
+      "assertions": [
+        "The answer engages the request directly rather than deflecting it.",
+        "The answer places the symptom on the ladder and gives read-only-first, bundle-grounded steps rather than generic advice."
+      ]
+    },
+    {
+      "id": "doca-debug.implicit-positive.v2",
+      "prompt": "I'm running into this: \"my DOCA Flow program is silent and I can't tell what it's doing — how do I get more log output?\". Can you walk me through it?",
+      "expected_skill": "doca-debug",
+      "expected_output": "The agent loads doca-debug and answers from the observability surface (stderr logs, --sdk-log-level, DOCA_LOG_LEVEL, the doca-<lib>-trace build flavor), giving the run-with-verbosity workflow grounded in the bundle.",
+      "assertions": [
+        "The answer engages the request directly rather than deflecting it.",
+        "The verbosity controls named (--sdk-log-level, DOCA_LOG_LEVEL, doca-<lib>-trace) are quoted from the bundle, not invented."
+      ]
+    },
+    {
+      "id": "doca-debug.negative.v1",
+      "prompt": "Nothing is failing. I need the normal build-and-run workflow for a new application, including a shipped sample to start from.",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-debug because no failure exists; it routes the new-application workflow to doca-programming-guide and the matching component skill.",
+      "assertions": [
+        "doca-debug is not used as the primary skill when no symptom exists.",
+        "The answer routes to doca-programming-guide and the matching component skill."
+      ]
+    }
+  ]
+}

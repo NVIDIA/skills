@@ -1,0 +1,23 @@
+{
+  "author": {
+    "name": "NVIDIA",
+    "url": "https://github.com/NVIDIA-DOCA/doca-skills"
+  },
+  "description": "NVIDIA DOCA skills for developing, deploying, operating, and debugging applications on BlueField DPUs and ConnectX networking devices.",
+  "homepage": "https://github.com/NVIDIA-DOCA/doca-skills",
+  "keywords": [
+    "nvidia",
+    "doca",
+    "bluefield",
+    "connectx",
+    "dpu",
+    "networking",
+    "acceleration"
+  ],
+  "license": "Apache-2.0 AND CC-BY-4.0",
+  "logo": "assets/doca.svg",
+  "name": "nvidia-doca-plugin",
+  "repository": "https://github.com/NVIDIA-DOCA/doca-skills",
+  "skills": "./skills/",
+  "version": "1.0.0"
+}

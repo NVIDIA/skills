@@ -1,0 +1,47 @@
+{
+  "skill_name": "doca-aes-gcm",
+  "evals": [
+    {
+      "id": "doca-aes-gcm.explicit-positive.v1",
+      "prompt": "Use the doca-aes-gcm skill for this task: I'm running into this: \"my decrypt completion comes back IO_FAILED and the auth tag isn't verifying\". Can you walk me through it?",
+      "expected_skill": "doca-aes-gcm",
+      "expected_output": "The agent loads doca-aes-gcm and gives the documented answer for this symptom: an IO_FAILED decrypt completion means auth tag verification failed, which CAPABILITIES.md ## Error taxonomy and ## Safety policy classify as the security-relevant outcome rather than a code bug. The plaintext output of that task is poisoned and must not be consumed, the decrypt must not be silently retried, the input ciphertext is treated as tampered or corrupted, and the outcome is routed to the caller's application-layer policy for tampered input. Only real symbols from the bundle are quoted (no invented tokens).",
+      "assertions": [
+        "The answer treats a failed tag verification on decrypt as a security event rather than a code bug: the plaintext output is not to be consumed and the decrypt is not to be retried.",
+        "The answer treats the input ciphertext as untrusted (tampered or corrupted) and routes the outcome to the caller's application-layer policy for tampered input.",
+        "Every symbol, cap query, and permission named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-aes-gcm.implicit-positive.v1",
+      "prompt": "I'm running into this: \"my decrypt completion comes back IO_FAILED and the auth tag isn't verifying\". Can you walk me through it?",
+      "expected_skill": "doca-aes-gcm",
+      "expected_output": "The agent recognizes this as a doca-aes-gcm task even though the skill is not named, loads it, and treats the tag-verification-failed / IO_FAILED-on-decrypt path as the security-critical outcome, walking the documented debug steps grounded in the bundle.",
+      "assertions": [
+        "The answer engages the request directly rather than deflecting it.",
+        "The answer handles the tag-verification-failed outcome as security-critical rather than generic error advice."
+      ]
+    },
+    {
+      "id": "doca-aes-gcm.implicit-positive.v2",
+      "prompt": "I'm running into this: \"is AES-192-GCM available on this BlueField?\". Can you walk me through it?",
+      "expected_skill": "doca-aes-gcm",
+      "expected_output": "The agent loads doca-aes-gcm and answers that AES-192 is not supported, grounding that in the real enum: enum doca_aes_gcm_key_type contains only DOCA_AES_GCM_KEY_128 and DOCA_AES_GCM_KEY_256, so AES-192 is absent from the API rather than merely unavailable on this device. Per-device support for the two real key types is confirmed with doca_aes_gcm_cap_task_{encrypt,decrypt}_is_key_type_supported. No AES-192 capability or query is invented.",
+      "assertions": [
+        "The answer engages the request directly rather than deflecting it.",
+        "The answer states AES-192-GCM is unsupported because the only key types in enum doca_aes_gcm_key_type are DOCA_AES_GCM_KEY_128 and DOCA_AES_GCM_KEY_256.",
+        "The answer does not invent an AES-192 capability or a cap query that would return it."
+      ]
+    },
+    {
+      "id": "doca-aes-gcm.negative.v1",
+      "prompt": "I need AES-CBC and AES-XTS encryption done on the CPU with OpenSSL, plus key rotation through our KMS. Nothing should touch the accelerator. How should I approach this?",
+      "expected_skill": null,
+      "expected_output": "The agent does not apply doca-aes-gcm's workflow to this request: it points to the guidance that owns the request or helps with the actual need directly, without treating doca-aes-gcm as the answer.",
+      "assertions": [
+        "The answer does not apply doca-aes-gcm's workflow to this request.",
+        "The answer points to the guidance that owns the request or helps with it directly, rather than refusing without any direction."
+      ]
+    }
+  ]
+}

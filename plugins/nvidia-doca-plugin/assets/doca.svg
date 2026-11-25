@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-labelledby="title">
+  <title id="title">NVIDIA DOCA</title>
+  <rect width="256" height="256" rx="32" fill="#76b900"/>
+  <path d="M48 72h64c58 0 96 25 96 56s-38 56-96 56H48V72zm36 30v52h29c35 0 57-10 57-26s-22-26-57-26H84z" fill="#fff"/>
+</svg>

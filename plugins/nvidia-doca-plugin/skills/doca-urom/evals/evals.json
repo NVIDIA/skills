@@ -1,0 +1,45 @@
+{
+  "skill_name": "doca-urom",
+  "evals": [
+    {
+      "id": "doca-urom.explicit-positive.v1",
+      "prompt": "Use the doca-urom skill for this task: I'm running into this: \"my one-sided puts and gets should run on the DPU instead of the host CPU\". Can you walk me through it?",
+      "expected_skill": "doca-urom",
+      "expected_output": "The agent selects the doca-urom skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
+      "assertions": [
+        "The doca-urom skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every symbol, flag, or command named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-urom.implicit-positive.v1",
+      "prompt": "I'm running into this: \"my one-sided puts and gets should run on the DPU instead of the host CPU\". Can you walk me through it?",
+      "expected_skill": "doca-urom",
+      "expected_output": "The agent recognizes this as a doca-urom issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The answer engages the request directly rather than deflecting it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-urom.implicit-positive.v2",
+      "prompt": "I'm running into this: \"MPI all-reduce burning host CPU\". Can you walk me through it?",
+      "expected_skill": "doca-urom",
+      "expected_output": "The agent recognizes this as a doca-urom issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The answer engages the request directly rather than deflecting it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-urom.negative.v1",
+      "prompt": "I need to deploy and operate the offload service container on the DPU itself. How should I approach this?",
+      "expected_skill": null,
+      "expected_output": "The agent does not apply doca-urom's workflow to this request: it points to the guidance that owns the request or helps with the actual need directly, without treating doca-urom as the answer.",
+      "assertions": [
+        "The answer does not apply doca-urom's workflow to this request.",
+        "The answer points to the guidance that owns the request or helps with it directly, rather than refusing without any direction."
+      ]
+    }
+  ]
+}

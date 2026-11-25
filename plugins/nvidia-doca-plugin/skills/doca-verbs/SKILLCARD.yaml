@@ -1,0 +1,45 @@
+# SKILLCARD.yaml — skill identity and routing metadata (canonical card: skill-card.md)
+# Schema: https://github.com/NVIDIA/skills/blob/main/docs/skill-cards.mdx
+
+schema_version: "1"
+
+identity:
+  name: "doca-verbs"
+  artifact_id: "doca-verbs"
+  kind: "library"
+  version: "TBD-at-sign-time"          # NVCARPS fills from the source ref
+  signature: "TBD-at-sign-time"        # NVCARPS-generated SHA + ed25519 sig
+  signed_by: "TBD-at-sign-time"        # NVCARPS identity (NVIDIA-PSIRT signing key)
+
+description: "Raw verbs inside DOCA Core (doca-verbs): direct control of QP, CQ, PD,\nSRQ and address-handle objects through doca_verbs_context,\ndoca_verbs_qp_create / doca_verbs_qp_modify and doca_verbs_cq_create,\nporting libibverbs code into DOCA Core, or a QP attribute, opcode or WR\nflag the doca-rdma task API does not expose. Trigger on \"raw QP\nattribute the task API does not expose\", \"keep ibv_* code next to doca_*\non the same QP\", \"porting libibverbs code\", \"IO_FAILED on WR submit\",\n\"QP state transition rejected\", or \"attach a congestion-control group\",\neven without naming doca-verbs. Its first job is to route MOST users\nback up to doca-rdma, doca-eth or doca-rmax. Covers CC-group and\nEthernet SQ/RQ primitives, capability queries via\ndoca_verbs_query_device, and DOCA_ERROR_* from doca_verbs_* calls.\nRefuse and route elsewhere for ordinary doca-rdma / doca-eth / doca-rmax\nworkloads, DOCA install, Core internals, and general libibverbs theory."
+
+source:
+  repo: "NVIDIA-DOCA/doca-skills"
+  path: "skills/libs/doca-verbs/SKILL.md"
+  branch: "main"
+  license: "Apache-2.0 AND CC-BY-4.0"
+
+provenance:
+  scan_run_id: "TBD-at-sign-time"      # NVCARPS scan run UUID
+  signed_at:   "TBD-at-sign-time"      # ISO-8601 timestamp from NVCARPS
+  upstream_catalog: "https://github.com/NVIDIA/skills"
+  upstream_component: "doca"
+
+quality:
+  canonical_card: "skill-card.md"     # signed card with evaluation results
+  benchmark: "BENCHMARK.md"
+
+behavior_boundaries:
+  documentation_only: true             # bundle ships no runnable code
+  hardware_touching_changes_routed_to: "skills/doca-hardware-safety/"
+  version_policy_routed_to: "skills/doca-version/"
+  external_productized_software_routed_to: "skills/doca-public-knowledge-map/"
+  see_also:
+    - "AGENTS.md"                       # universal rules
+    - "BENCHMARK.md"                    # how this skill is graded
+    - "SECURITY.md"                     # safety-bug intake
+
+contact:
+  bug_intake: "https://github.com/NVIDIA-DOCA/doca-skills/issues"
+  safety_bug_intake: "https://github.com/NVIDIA-DOCA/doca-skills/issues/new?labels=safety-bug"
+  security:   "https://www.nvidia.com/en-us/security/"

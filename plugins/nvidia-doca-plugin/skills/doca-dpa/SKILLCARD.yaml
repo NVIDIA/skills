@@ -1,0 +1,45 @@
+# SKILLCARD.yaml — skill identity and routing metadata (canonical card: skill-card.md)
+# Schema: https://github.com/NVIDIA/skills/blob/main/docs/skill-cards.mdx
+
+schema_version: "1"
+
+identity:
+  name: "doca-dpa"
+  artifact_id: "doca-dpa"
+  kind: "library"
+  version: "TBD-at-sign-time"          # NVCARPS fills from the source ref
+  signature: "TBD-at-sign-time"        # NVCARPS-generated SHA + ed25519 sig
+  signed_by: "TBD-at-sign-time"        # NVCARPS identity (NVIDIA-PSIRT signing key)
+
+description: "Use this skill when the user is doing hands-on DOCA DPA\nhost-side work on a BlueField — creating the `doca_dpa` Core\ncontext, loading a DPACC-compiled DPA application image\n(`doca_dpa_app`), creating DPA threads, launching kernels via\n`doca_dpa_kernel_launch_update_*`, draining\n`doca_dpa_completion`, running `doca_dpa_cap_*` discovery,\nchoosing between the DPA device-side comm component\n(`libdoca_dpa_dev_comm.a`, inter-DPA messaging) and the DPA\ndevice-side verbs component (`libdoca_dpa_dev_verbs.a`, in-kernel RDMA),\nor debugging `DOCA_ERROR_*` from `doca_dpa_*`. Trigger even\nwhen the user does not say \"DOCA DPA\" or \"Data-Path\nAccelerator\" — typical implicit phrasings include \"run\ncompute on the DPA from my host\", \"DPA kernel hangs, no\ncompletion\", \"DOCA_ERROR_DRIVER on launch\", \"DOCA/DPACC\nversion skew\", or \"does this BlueField expose a DPA\". Refuse\nand route elsewhere for DPA-side kernel programming itself,\nDPACC compiler internals, host↔DPU messaging (`doca-comch`),\nhost-side RDMA (`doca-rdma`), and GPU-initiated networking\n(`doca-gpunetio`) — those belong to other skills."
+
+source:
+  repo: "NVIDIA-DOCA/doca-skills"
+  path: "skills/libs/doca-dpa/SKILL.md"
+  branch: "main"
+  license: "Apache-2.0 AND CC-BY-4.0"
+
+provenance:
+  scan_run_id: "TBD-at-sign-time"      # NVCARPS scan run UUID
+  signed_at:   "TBD-at-sign-time"      # ISO-8601 timestamp from NVCARPS
+  upstream_catalog: "https://github.com/NVIDIA/skills"
+  upstream_component: "doca"
+
+quality:
+  canonical_card: "skill-card.md"     # signed card with evaluation results
+  benchmark: "BENCHMARK.md"
+
+behavior_boundaries:
+  documentation_only: true             # bundle ships no runnable code
+  hardware_touching_changes_routed_to: "skills/doca-hardware-safety/"
+  version_policy_routed_to: "skills/doca-version/"
+  external_productized_software_routed_to: "skills/doca-public-knowledge-map/"
+  see_also:
+    - "AGENTS.md"                       # universal rules
+    - "BENCHMARK.md"                    # how this skill is graded
+    - "SECURITY.md"                     # safety-bug intake
+
+contact:
+  bug_intake: "https://github.com/NVIDIA-DOCA/doca-skills/issues"
+  safety_bug_intake: "https://github.com/NVIDIA-DOCA/doca-skills/issues/new?labels=safety-bug"
+  security:   "https://www.nvidia.com/en-us/security/"

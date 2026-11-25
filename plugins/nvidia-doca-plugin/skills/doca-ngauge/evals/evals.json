@@ -1,0 +1,55 @@
+{
+  "skill_name": "doca-ngauge",
+  "evals": [
+    {
+      "id": "doca-ngauge.explicit-positive.v1",
+      "prompt": "Use the doca-ngauge skill for this task: I need to collect HDF5 performance data from NIC hardware counters on a single node. Can you walk me through it?",
+      "expected_skill": "doca-ngauge",
+      "expected_output": "The agent selects the doca-ngauge skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
+      "assertions": [
+        "The doca-ngauge skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every symbol, flag, or command named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-ngauge.implicit-positive.v1",
+      "prompt": "I need to collect HDF5 performance data from NIC hardware counters on a single node. Can you walk me through it?",
+      "expected_skill": "doca-ngauge",
+      "expected_output": "The agent recognizes this as a doca-ngauge issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The answer engages the request directly rather than deflecting it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-ngauge.implicit-positive.v2",
+      "prompt": "I sampled NIC hardware counters on a single BlueField node with the DOCA counter-sampling tool and it wrote an HDF5 (.h5) file. How do I plot the collected counter data?",
+      "expected_skill": "doca-ngauge",
+      "expected_output": "The agent recognizes this as a doca-ngauge issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The answer engages the request directly rather than deflecting it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-ngauge.negative.v1",
+      "prompt": "I need to send and receive raw Ethernet packets at line rate on the BlueField. How should I approach this?",
+      "expected_skill": null,
+      "expected_output": "The agent does not apply doca-ngauge's workflow to this request: it points to doca-eth as the skill that owns raw packet I/O, without treating doca-ngauge as the answer.",
+      "assertions": [
+        "The answer does not apply doca-ngauge's workflow to this request.",
+        "The answer names doca-eth as the owning skill."
+      ]
+    },
+    {
+      "id": "doca-ngauge.negative.v2",
+      "prompt": "I'm writing C code that opens a control-plane channel between host and DPU and sends messages across it. How should I approach this?",
+      "expected_skill": null,
+      "expected_output": "The agent does not apply doca-ngauge's workflow to this request: it points to doca-comch as the skill that owns the host-to-DPU control-plane channel, without treating doca-ngauge as the answer.",
+      "assertions": [
+        "The answer does not apply doca-ngauge's workflow to this request.",
+        "The answer names doca-comch as the owning skill."
+      ]
+    }
+  ]
+}

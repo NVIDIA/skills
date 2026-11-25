@@ -1,0 +1,45 @@
+# SKILLCARD.yaml — skill identity and routing metadata (canonical card: skill-card.md)
+# Schema: https://github.com/NVIDIA/skills/blob/main/docs/skill-cards.mdx
+
+schema_version: "1"
+
+identity:
+  name: "doca-urom-svc"
+  artifact_id: "doca-urom-svc"
+  kind: "service"
+  version: "TBD-at-sign-time"          # NVCARPS fills from the source ref
+  signature: "TBD-at-sign-time"        # NVCARPS-generated SHA + ed25519 sig
+  signed_by: "TBD-at-sign-time"        # NVCARPS identity (NVIDIA-PSIRT signing key)
+
+description: "Use when operating the DOCA UROM Service container on a\nBlueField Arm to execute remote memory ops (puts, gets,\natomics, collectives) that paired hosts enqueue through the\nhost-side `doca-urom` library — pulling the NGC container,\nchoosing UCX-component / collective surface, sizing enqueue\nqueue, wiring DOCA Comch endpoint pairing with `doca-urom`\n(the binary has NO standalone authz list / `allowed_host` /\n`allowed_users` / `auth_token` / `NOT_PERMITTED` knob — access\nis governed by Comch pairing + RDMA permissions), or pinning\nhost-library + service paired versions per the DOCA\nCompatibility Policy. Trigger even without \"DOCA UROM\" —\nimplicit forms: \"MPI/UCX collectives slow on host CPU, want\nBlueField offload\", \"enqueue returns NOT_PERMITTED though\ndoca_dev access is fine\", \"ops enqueue but completions never\nfire\", \"cap query says supported but runtime says\nNOT_SUPPORTED\". Refuse for host-side app code, MPI/UCX\nintegration, RDMA substrate bring-up, or installing DOCA."
+
+source:
+  repo: "NVIDIA-DOCA/doca-skills"
+  path: "skills/services/doca-urom-svc/SKILL.md"
+  branch: "main"
+  license: "Apache-2.0 AND CC-BY-4.0"
+
+provenance:
+  scan_run_id: "TBD-at-sign-time"      # NVCARPS scan run UUID
+  signed_at:   "TBD-at-sign-time"      # ISO-8601 timestamp from NVCARPS
+  upstream_catalog: "https://github.com/NVIDIA/skills"
+  upstream_component: "doca"
+
+quality:
+  canonical_card: "skill-card.md"     # signed card with evaluation results
+  benchmark: "BENCHMARK.md"
+
+behavior_boundaries:
+  documentation_only: true             # bundle ships no runnable code
+  hardware_touching_changes_routed_to: "skills/doca-hardware-safety/"
+  version_policy_routed_to: "skills/doca-version/"
+  external_productized_software_routed_to: "skills/doca-public-knowledge-map/"
+  see_also:
+    - "AGENTS.md"                       # universal rules
+    - "BENCHMARK.md"                    # how this skill is graded
+    - "SECURITY.md"                     # safety-bug intake
+
+contact:
+  bug_intake: "https://github.com/NVIDIA-DOCA/doca-skills/issues"
+  safety_bug_intake: "https://github.com/NVIDIA-DOCA/doca-skills/issues/new?labels=safety-bug"
+  security:   "https://www.nvidia.com/en-us/security/"

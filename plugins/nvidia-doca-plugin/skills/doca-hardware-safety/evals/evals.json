@@ -1,0 +1,46 @@
+{
+  "skill_name": "doca-hardware-safety",
+  "evals": [
+    {
+      "id": "doca-hardware-safety.explicit-positive.v1",
+      "prompt": "Use the doca-hardware-safety skill for this task: I'm running into this: \"BlueField DPU hardware safety limits and thermal shutdown\". Can you walk me through it?",
+      "expected_skill": "doca-hardware-safety",
+      "expected_output": "The agent loads doca-hardware-safety and answers strictly from that skill's documented workflow, quoting only real symbols, flags, paths, and commands from the bundle (no invented tokens) and routing out to other skills for anything out of doca-hardware-safety's scope.",
+      "assertions": [
+        "The doca-hardware-safety skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every command, flag, path, or symbol named is traceable to the bundle or a real public NVIDIA doc (no invented tokens).",
+        "Steps are given in a workable order with preconditions established before they are used."
+      ]
+    },
+    {
+      "id": "doca-hardware-safety.implicit-positive.v1",
+      "prompt": "I'm running into this: \"BlueField DPU hardware safety limits and thermal shutdown\". Can you walk me through it?",
+      "expected_skill": "doca-hardware-safety",
+      "expected_output": "The agent recognizes this as a doca-hardware-safety task even though the skill is not named, loads doca-hardware-safety, and walks the user through the documented workflow with concrete, bundle-grounded steps.",
+      "assertions": [
+        "The answer engages the request directly rather than deflecting it.",
+        "The response is concrete and grounded in the skill content rather than generic advice."
+      ]
+    },
+    {
+      "id": "doca-hardware-safety.implicit-positive.v2",
+      "prompt": "I'm running into this: \"flip BlueField mode over SSH\". Can you walk me through it?",
+      "expected_skill": "doca-hardware-safety",
+      "expected_output": "The agent recognizes this as a doca-hardware-safety task even though the skill is not named, loads doca-hardware-safety, and walks the user through the documented workflow with concrete, bundle-grounded steps.",
+      "assertions": [
+        "The answer engages the request directly rather than deflecting it.",
+        "The response is concrete and grounded in the skill content rather than generic advice."
+      ]
+    },
+    {
+      "id": "doca-hardware-safety.negative.v1",
+      "prompt": "I only need read-only device inventory and version information; no firmware, PCI, link, boot, or hardware state will change.",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-hardware-safety because no state change is requested; it routes version detection to doca-version and read-only inventory to the appropriate inspection skill.",
+      "assertions": [
+        "doca-hardware-safety is not used as the primary skill for a read-only request.",
+        "The answer routes to doca-version and an appropriate read-only inspection skill."
+      ]
+    }
+  ]
+}

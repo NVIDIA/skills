@@ -1,0 +1,45 @@
+{
+  "skill_name": "doca-comm-channel-admin",
+  "evals": [
+    {
+      "id": "doca-comm-channel-admin.explicit-positive.v1",
+      "prompt": "Use the doca-comm-channel-admin skill for this task: I'm running into this: \"list comch servers\". Can you walk me through it?",
+      "expected_skill": "doca-comm-channel-admin",
+      "expected_output": "The agent selects the doca-comm-channel-admin skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
+      "assertions": [
+        "The doca-comm-channel-admin skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every symbol, flag, or command named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-comm-channel-admin.implicit-positive.v1",
+      "prompt": "I'm running into this: \"list comch servers\". Can you walk me through it?",
+      "expected_skill": "doca-comm-channel-admin",
+      "expected_output": "The agent recognizes this as a doca-comm-channel-admin issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The answer engages the request directly rather than deflecting it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-comm-channel-admin.implicit-positive.v2",
+      "prompt": "I'm running into this: \"which channels are active on this BlueField\". Can you walk me through it?",
+      "expected_skill": "doca-comm-channel-admin",
+      "expected_output": "The agent recognizes this as a doca-comm-channel-admin issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The answer engages the request directly rather than deflecting it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-comm-channel-admin.negative.v1",
+      "prompt": "I'm writing the C code that opens a control-plane channel and sends messages across it. How should I approach this?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-comm-channel-admin; it explains that the comch programming API is out of doca-comm-channel-admin's scope and routes to the appropriate skill instead.",
+      "assertions": [
+        "The answer does not attempt the out-of-scope work itself.",
+        "The answer routes to the appropriate skill(s) instead."
+      ]
+    }
+  ]
+}
