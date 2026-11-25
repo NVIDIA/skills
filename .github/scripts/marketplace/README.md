@@ -8,17 +8,20 @@ This repo generates two catalog-wide metadata files:
   `discovery.activity_tags`), plus a `plugins` block carrying one entry per
   plugin. A plugin's taxonomy is rolled up from the skills it bundles rather
   than authored per plugin. Two kinds of plugin feed that block:
-  - plugins the catalog builds itself, declared in `plugins.d/<name>.yml` and
-    rolled up from their `include_skills` paths — see
+  - plugins the catalog builds itself, declared by a `name:` in a
+    `plugins.d/*.yml` and rolled up from their `include_skills` paths — see
     [`plugins.d/README.md`](../../../plugins.d/README.md);
   - plugins a product team owns, registered under `plugins:` in
     `components.d/<product>.yml` and mirrored into `plugins/<catalog_dir>/`,
     rolled up from the skills bundled in that tree — see
     [`components.d/README.md`](../../../components.d/README.md).
 
-  A `plugins/<name>/` that has a `plugins.d/<name>.yml` is the catalog's own
-  built plugin and is read from there, never claimed as mirrored. This matches
-  the plugin sync, which never mirrors, prunes or lists such a directory.
+  A plugin whose name is declared in `plugins.d/` is the catalog's own built
+  plugin and is read from there, never claimed as mirrored. The match is on
+  the `name:` field inside the file, not on the filename, because that is the
+  name `build-plugins.py` builds `plugins/<name>/` from. This matches the
+  plugin sync, which resolves the same set through `list-built-plugins.sh` and
+  never mirrors, prunes or lists such a directory.
 - `skills.sh.json` (repo root) — marketplace/index file derived from
   `metadata.json`, grouping skills by `catalog.subdomain`. Skills only;
   plugins have no `catalog.subdomain`.

@@ -393,6 +393,46 @@ def check_mirrored_plugins_through_main(gen, r):
                 and entry["skills"] == sorted(s["path"] for s in sample),
                 f"rc={rc}; {entry and entry.get('skills')}")
 
+    # --- The second key, nested sources: TAO declares skills/applications/. -
+    # The declared path has a directory in front of the skill, so the bundled
+    # directory name matches no declaration verbatim. Only the last-segment
+    # index can resolve it.
+    with tempfile.TemporaryDirectory() as tmp:
+        comp, plugins = build(
+            tmp, dir_names=product_dirs,
+            registry_skills=[(f"skills/applications/{d}",
+                              s["path"].split("/")[-1])
+                             for d, s in zip(product_dirs, sample)])
+        for d in product_dirs:
+            p = plugins / "nvidia-tao" / "skills" / d / "SKILL.md"
+            p.write_text("---\ndescription: d\n---\n\nBody.\n", encoding="utf-8")
+        rc, out, log = run(tmp, comp, plugins)
+        entry = plugins_of(out).get("nvidia-tao")
+        r.check("mirrored: a nested registry source path still resolves",
+                entry is not None
+                and entry["skills"] == sorted(s["path"] for s in sample),
+                f"rc={rc}; {entry and entry.get('skills')}")
+
+    # --- An ambiguous last segment identifies nothing and is not guessed. ---
+    # Two declarations whose paths end in the same segment cannot tell the
+    # bundled directory apart, so the fallback must decline rather than take
+    # whichever was read first.
+    with tempfile.TemporaryDirectory() as tmp:
+        dup = product_dirs[0]
+        comp, plugins = build(
+            tmp, dir_names=[dup],
+            registry_skills=[(f"skills/applications/{dup}",
+                              sample[0]["path"].split("/")[-1]),
+                             (f"skills/experimental/{dup}",
+                              sample[1]["path"].split("/")[-1])])
+        p = plugins / "nvidia-tao" / "skills" / dup / "SKILL.md"
+        p.write_text("---\ndescription: d\n---\n\nBody.\n", encoding="utf-8")
+        rc, out, log = run(tmp, comp, plugins)
+        entry = plugins_of(out).get("nvidia-tao")
+        r.check("mirrored: an ambiguous last segment resolves to nothing",
+                rc == 0 and (entry is None or not entry.get("skills")),
+                f"rc={rc}; {entry and entry.get('skills')}")
+
     # --- Precedence: plugins.d wins, the registry entry is ignored. ---------
     with tempfile.TemporaryDirectory() as tmp:
         comp, plugins = build(tmp, dir_names=product_dirs, registry_skills=[],
@@ -893,7 +933,15 @@ def check_recovery_through_main(gen, r):
             return rc, captured.get("out"), buf.getvalue()
 
     def names(doc):
-        return [p["name"] for p in (doc or {}).get("plugins", [])]
+        # plugins.d-built plugins only. This block patches PLUGINS_D_DIR but
+        # not the mirrored path, so a plugin the real tree registers under
+        # `plugins:` in components.d is generated here too, and would
+        # otherwise read as a plugin these plugins.d scenarios produced.
+        return [
+            p["name"]
+            for p in (doc or {}).get("plugins", [])
+            if str(p.get("source", "")).startswith("plugins.d/")
+        ]
 
     # A healthy run proves the happy path and supplies the baseline that the
     # recovery scenarios below fall back on.

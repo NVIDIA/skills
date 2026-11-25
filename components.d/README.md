@@ -118,10 +118,10 @@ A bundled skill is identified by the `name` in its `SKILL.md` frontmatter, or fa
 
 Two consequences worth knowing:
 
-- Changing what a plugin bundles changes `metadata.json`. The sync regenerates it, but a hand-edited PR that touches `plugins/` must re-run the generator and commit the result, or CI's byte-stability check fails.
+- Changing what a plugin bundles changes `metadata.json`. The plugin sync does not regenerate it; the Generate Skill Metadata workflow does, on its own run after the sync succeeds on `main`. A hand-edited PR that touches `plugins/` has no such run, so it must re-run the generator and commit the result, or CI's byte-stability check fails.
 - A plugin registered here but not yet present at `plugins/<catalog_dir>/` is reported and left out, not treated as an error. That is the normal state before the first successful sync, and also while the plugin sync holds a plugin back over signature integrity. Either way, a plugin already published keeps its previous entry rather than disappearing.
 
-A plugin whose `catalog_dir` has a `plugins.d/<name>.yml` is built by the catalog rather than mirrored, and is read from there instead. This matches the plugin sync, which never mirrors, prunes or lists such a directory.
+A plugin whose name is declared in `plugins.d/` is built by the catalog rather than mirrored, and is read from there instead. The match is on the `name:` field inside the file, not on the filename, because that is the name `build-plugins.py` builds `plugins/<name>/` from. This matches the plugin sync, which resolves the same set through `list-built-plugins.sh` and never mirrors, prunes or lists such a directory.
 
 ## How aggregation works
 
