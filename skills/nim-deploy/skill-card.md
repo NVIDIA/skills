@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-CC-BY-4.0 AND Apache-2.0 <br>
+CC-BY-4.0 AND Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to have an agent deploy an NVIDIA NIM LLM on a GPU host with Docker or on a Kubernetes cluster with the nim-llm Helm chart or the NIM Operator, including rendering, approval-gated apply, readiness and smoke verification, troubleshooting, and rollback. <br>
+Developers and engineers use this skill to deploy NVIDIA NIM LLM containers on a GPU host with Docker or on Kubernetes with the nim-llm Helm chart or the NIM Operator, with approval-gated apply, readiness and smoke verification, failure triage, rollback, and safe cleanup. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -36,9 +36,9 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Skill Output: <br>
 **Output Type(s):** [Shell commands, Files, Configuration instructions, Analysis] <br>
-**Output Format:** [JSON objects from helper scripts; rendered Docker run scripts, Helm values and NIM Operator YAML manifests; Markdown summaries] <br>
+**Output Format:** [JSON script output plus rendered Docker run scripts, Helm values, and NIM Operator manifests, summarized in Markdown] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [Apply and rollback commands run only after explicit user approval with a token; secret values are never written to commands, files or run state.] <br>
+**Other Properties Related to Output:** [Apply and rollback commands require an explicit user approval token; secret values are never written to commands, files, or run state] <br>
 
 ## Evaluation Agents Used: <br>
 - Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`) <br>
@@ -47,7 +47,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-29 evaluation tasks (29 positive), 1 attempt per task, run in the `k8s-sandbox` environment with each task attempt in its own isolated sandbox pod (dataset digest `sha256:6f98da5bb5845c77dd8b27b37977ea8900c7b43a095c6715bd42a228595a6966`, skill-evaluator-dataset-snapshot/1; evaluator version `1.6.10`; evaluation date 2026-11-25). Baseline is the same task attempted without the target skill. <br>
+29 evaluation tasks (29 positive), 1 attempt per task, each attempt run in its own isolated sandbox pod (`k8s-sandbox` environment); evaluator version `1.6.10`, evaluation date 2026-11-25. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -79,12 +79,12 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 80.3% — baseline ran, but no comparable score was available; uplift unavailable | 81.4% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 79.3% → 84.5% (+5.2 points) | 56.9% → 93.1% (+36.2 points) |
-| Correctness | 50.3% → 86.2% (+35.9 points) | 46.9% → 85.5% (+38.6 points) |
-| Discoverability | 85.5% — baseline ran, but no comparable score was available; uplift unavailable | 85.2% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 36.9% → 53.7% (+16.8 points) | 35.8% → 53.1% (+17.3 points) |
-| Efficiency | 91.4% — baseline ran, but no comparable score was available; uplift unavailable | 90.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 81.2% — baseline ran, but no comparable score was available; uplift unavailable | 80.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 70.7% → 89.7% (+19.0 points) | 58.6% → 86.2% (+27.6 points) |
+| Correctness | 47.6% → 87.6% (+40.0 points) | 45.5% → 83.5% (+38.0 points) |
+| Discoverability | 85.7% — baseline ran, but no comparable score was available; uplift unavailable | 84.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 31.0% → 51.4% (+20.4 points) | 37.3% → 56.0% (+18.7 points) |
+| Efficiency | 91.5% — baseline ran, but no comparable score was available; uplift unavailable | 89.8% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -92,24 +92,16 @@ Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92
 
 A partial dimension was calculated from only the available configured signals; review the detailed report before relying on it.
 
-#### Comparison details
+### Comparison details
 
 Shared-source comparisons use the same signals and weights on both conditions. They do not replace the full dimension scores above or change the publication verdict.
 
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 97.5% → 92.8% (-4.7 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 97.2% → 92.4% (-4.8 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 90.2% → 88.5% (-1.7 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
-
-### Tier Status
-
-| Tier | Purpose | Status | Evidence |
-|---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 120 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 2 finding(s) |
-| Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 29 task(s) |
+| codex | Efficiency | Token-only comparison | 89.9% → 88.3% (-1.6 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

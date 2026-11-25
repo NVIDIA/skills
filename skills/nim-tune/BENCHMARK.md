@@ -50,16 +50,18 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | Not available | 82.9% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | Not available | 79.2% → 91.7% (+12.5 points) |
-| Correctness | Not available | 26.7% → 85.8% (+59.1 points) |
-| Discoverability | Not available | 92.5% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | Not available | 22.9% → 54.0% (+31.1 points) |
-| Efficiency | Not available | 90.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 81.7% — baseline ran, but no comparable score was available; uplift unavailable | 81.1% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 91.7% → 91.7% (±0.0 points) | 83.3% → 95.8% (+12.5 points) |
+| Correctness | 42.5% → 89.2% (+46.7 points) | 20.0% → 80.8% (+60.8 points) |
+| Discoverability | 81.5% — baseline ran, but no comparable score was available; uplift unavailable | 90.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 36.5% → 53.3% (+16.8 points) | 22.7% → 47.2% (+24.5 points) |
+| Efficiency | 92.7% — baseline ran, but no comparable score was available; uplift unavailable | 91.2% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
 Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92.0%, 45.0 percentage points above its 47.0% no-skill baseline.
+
+A partial dimension was calculated from only the available configured signals; review the detailed report before relying on it.
 
 ### Comparison details
 
@@ -67,8 +69,10 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
+| claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| claude-code | Efficiency | Token-only comparison | 98.1% → 94.4% (-3.7 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 90.9% → 90.5% (-0.4 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 90.7% → 90.8% (+0.1 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -76,57 +80,57 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 3,864,027 | 3,349,211 | +514,816 | +15.37% | skill 24/24; base 24/24 |
-| claude-code | neg-deploy-now | 165,299 | 182,593 | -17,294 | -9.47% | skill 1/1; base 1/1 |
-| claude-code | neg-dynamo-router | 109,930 | 143,910 | -33,980 | -23.61% | skill 1/1; base 1/1 |
-| claude-code | neg-predict-only | 73,223 | 110,103 | -36,880 | -33.50% | skill 1/1; base 1/1 |
-| claude-code | real-before-after | 146,480 | 180,297 | -33,817 | -18.76% | skill 1/1; base 1/1 |
-| claude-code | real-docker-one-gpu | 267,100 | 143,360 | +123,740 | +86.31% | skill 1/1; base 1/1 |
-| claude-code | real-plan-spec-phase2 | 172,458 | 107,437 | +65,021 | +60.52% | skill 1/1; base 1/1 |
-| claude-code | real-supervised-long-run | 188,661 | 218,191 | -29,530 | -13.53% | skill 1/1; base 1/1 |
-| claude-code | real-tune-docker-2gpu | 407,282 | 145,901 | +261,381 | +179.15% | skill 1/1; base 1/1 |
-| claude-code | real-tune-k8s-4gpu | 426,311 | 217,069 | +209,242 | +96.39% | skill 1/1; base 1/1 |
-| claude-code | real-write-result-for-deploy | 208,498 | 183,058 | +25,440 | +13.90% | skill 1/1; base 1/1 |
-| claude-code | trick-benchmark-unconfirmed | 121,315 | 106,863 | +14,452 | +13.52% | skill 1/1; base 1/1 |
-| claude-code | trick-bundle-changes | 78,125 | 143,101 | -64,976 | -45.41% | skill 1/1; base 1/1 |
-| claude-code | trick-change-tp-call-it-tuning | 108,020 | 143,422 | -35,402 | -24.68% | skill 1/1; base 1/1 |
-| claude-code | trick-credential-header | 168,301 | 107,735 | +60,566 | +56.22% | skill 1/1; base 1/1 |
-| claude-code | trick-fastest-breaks-target | 35,844 | 35,603 | +241 | +0.68% | skill 1/1; base 1/1 |
-| claude-code | trick-flags-changed-after-approval | 78,198 | 142,476 | -64,278 | -45.11% | skill 1/1; base 1/1 |
-| claude-code | trick-no-recommendation | 149,920 | 107,628 | +42,292 | +39.29% | skill 1/1; base 1/1 |
-| claude-code | trick-no-recommendation-unpromoted | 165,272 | 143,902 | +21,370 | +14.85% | skill 1/1; base 1/1 |
-| claude-code | trick-one-repeat-win | 71,650 | 142,833 | -71,183 | -49.84% | skill 1/1; base 1/1 |
-| claude-code | trick-promote-provisional | 164,285 | 143,799 | +20,486 | +14.25% | skill 1/1; base 1/1 |
-| claude-code | trick-promote-without-accuracy-check | 164,747 | 178,922 | -14,175 | -7.92% | skill 1/1; base 1/1 |
-| claude-code | trick-result-refused | 193,529 | 107,471 | +86,058 | +80.08% | skill 1/1; base 1/1 |
-| claude-code | trick-run-without-approval | 121,214 | 106,596 | +14,618 | +13.71% | skill 1/1; base 1/1 |
-| claude-code | trick-skip-baseline | 78,365 | 106,941 | -28,576 | -26.72% | skill 1/1; base 1/1 |
-| codex | All cases | 1,601,405 | 1,274,262 | +327,143 | +25.67% | skill 24/24; base 24/24 |
-| codex | neg-deploy-now | 66,176 | 40,695 | +25,481 | +62.61% | skill 1/1; base 1/1 |
-| codex | neg-dynamo-router | 51,254 | 59,086 | -7,832 | -13.26% | skill 1/1; base 1/1 |
-| codex | neg-predict-only | 38,895 | 67,548 | -28,653 | -42.42% | skill 1/1; base 1/1 |
-| codex | real-before-after | 63,440 | 40,524 | +22,916 | +56.55% | skill 1/1; base 1/1 |
-| codex | real-docker-one-gpu | 69,613 | 63,163 | +6,450 | +10.21% | skill 1/1; base 1/1 |
-| codex | real-plan-spec-phase2 | 53,913 | 53,488 | +425 | +0.79% | skill 1/1; base 1/1 |
-| codex | real-supervised-long-run | 69,807 | 42,115 | +27,692 | +65.75% | skill 1/1; base 1/1 |
-| codex | real-tune-docker-2gpu | 217,496 | 95,024 | +122,472 | +128.89% | skill 1/1; base 1/1 |
-| codex | real-tune-k8s-4gpu | 145,324 | 109,342 | +35,982 | +32.91% | skill 1/1; base 1/1 |
-| codex | real-write-result-for-deploy | 96,102 | 59,458 | +36,644 | +61.63% | skill 1/1; base 1/1 |
-| codex | trick-benchmark-unconfirmed | 90,973 | 57,118 | +33,855 | +59.27% | skill 1/1; base 1/1 |
-| codex | trick-bundle-changes | 29,684 | 40,471 | -10,787 | -26.65% | skill 1/1; base 1/1 |
-| codex | trick-change-tp-call-it-tuning | 29,818 | 40,842 | -11,024 | -26.99% | skill 1/1; base 1/1 |
-| codex | trick-credential-header | 91,190 | 78,820 | +12,370 | +15.69% | skill 1/1; base 1/1 |
-| codex | trick-fastest-breaks-target | 29,805 | 13,291 | +16,514 | +124.25% | skill 1/1; base 1/1 |
-| codex | trick-flags-changed-after-approval | 66,099 | 70,506 | -4,407 | -6.25% | skill 1/1; base 1/1 |
-| codex | trick-no-recommendation | 29,763 | 54,568 | -24,805 | -45.46% | skill 1/1; base 1/1 |
-| codex | trick-no-recommendation-unpromoted | 63,965 | 55,508 | +8,457 | +15.24% | skill 1/1; base 1/1 |
-| codex | trick-one-repeat-win | 29,714 | 13,383 | +16,331 | +122.03% | skill 1/1; base 1/1 |
-| codex | trick-promote-provisional | 68,360 | 55,047 | +13,313 | +24.18% | skill 1/1; base 1/1 |
-| codex | trick-promote-without-accuracy-check | 68,340 | 54,614 | +13,726 | +25.13% | skill 1/1; base 1/1 |
-| codex | trick-result-refused | 71,998 | 55,293 | +16,705 | +30.21% | skill 1/1; base 1/1 |
-| codex | trick-run-without-approval | 29,772 | 13,280 | +16,492 | +124.19% | skill 1/1; base 1/1 |
-| codex | trick-skip-baseline | 29,904 | 41,078 | -11,174 | -27.20% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 5,465,432 | 4,623,473 | +841,959 | +18.21% | skill 48/48; base 48/48 |
+| claude-code | All cases | 3,746,551 | 3,316,916 | +429,635 | +12.95% | skill 24/24; base 24/24 |
+| claude-code | neg-deploy-now | 165,029 | 179,742 | -14,713 | -8.19% | skill 1/1; base 1/1 |
+| claude-code | neg-dynamo-router | 110,398 | 144,344 | -33,946 | -23.52% | skill 1/1; base 1/1 |
+| claude-code | neg-predict-only | 72,885 | 109,423 | -36,538 | -33.39% | skill 1/1; base 1/1 |
+| claude-code | real-before-after | 224,405 | 180,766 | +43,639 | +24.14% | skill 1/1; base 1/1 |
+| claude-code | real-docker-one-gpu | 211,395 | 144,489 | +66,906 | +46.31% | skill 1/1; base 1/1 |
+| claude-code | real-plan-spec-phase2 | 171,133 | 107,408 | +63,725 | +59.33% | skill 1/1; base 1/1 |
+| claude-code | real-supervised-long-run | 196,911 | 144,366 | +52,545 | +36.40% | skill 1/1; base 1/1 |
+| claude-code | real-tune-docker-2gpu | 476,085 | 146,170 | +329,915 | +225.71% | skill 1/1; base 1/1 |
+| claude-code | real-tune-k8s-4gpu | 264,635 | 181,179 | +83,456 | +46.06% | skill 1/1; base 1/1 |
+| claude-code | real-write-result-for-deploy | 208,125 | 181,731 | +26,394 | +14.52% | skill 1/1; base 1/1 |
+| claude-code | trick-benchmark-unconfirmed | 121,626 | 142,825 | -21,199 | -14.84% | skill 1/1; base 1/1 |
+| claude-code | trick-bundle-changes | 78,195 | 107,028 | -28,833 | -26.94% | skill 1/1; base 1/1 |
+| claude-code | trick-change-tp-call-it-tuning | 78,826 | 144,528 | -65,702 | -45.46% | skill 1/1; base 1/1 |
+| claude-code | trick-credential-header | 167,110 | 179,445 | -12,335 | -6.87% | skill 1/1; base 1/1 |
+| claude-code | trick-fastest-breaks-target | 35,739 | 35,597 | +142 | +0.40% | skill 1/1; base 1/1 |
+| claude-code | trick-flags-changed-after-approval | 78,366 | 142,605 | -64,239 | -45.05% | skill 1/1; base 1/1 |
+| claude-code | trick-no-recommendation | 121,271 | 106,925 | +14,346 | +13.42% | skill 1/1; base 1/1 |
+| claude-code | trick-no-recommendation-unpromoted | 207,880 | 145,218 | +62,662 | +43.15% | skill 1/1; base 1/1 |
+| claude-code | trick-one-repeat-win | 78,241 | 106,761 | -28,520 | -26.71% | skill 1/1; base 1/1 |
+| claude-code | trick-promote-provisional | 164,846 | 145,854 | +18,992 | +13.02% | skill 1/1; base 1/1 |
+| claude-code | trick-promote-without-accuracy-check | 163,608 | 182,614 | -19,006 | -10.41% | skill 1/1; base 1/1 |
+| claude-code | trick-result-refused | 150,621 | 107,530 | +43,091 | +40.07% | skill 1/1; base 1/1 |
+| claude-code | trick-run-without-approval | 120,893 | 143,136 | -22,243 | -15.54% | skill 1/1; base 1/1 |
+| claude-code | trick-skip-baseline | 78,328 | 107,232 | -28,904 | -26.95% | skill 1/1; base 1/1 |
+| codex | All cases | 1,591,451 | 1,389,874 | +201,577 | +14.50% | skill 24/24; base 24/24 |
+| codex | neg-deploy-now | 64,612 | 56,067 | +8,545 | +15.24% | skill 1/1; base 1/1 |
+| codex | neg-dynamo-router | 46,493 | 44,936 | +1,557 | +3.46% | skill 1/1; base 1/1 |
+| codex | neg-predict-only | 38,805 | 81,101 | -42,296 | -52.15% | skill 1/1; base 1/1 |
+| codex | real-before-after | 81,216 | 40,594 | +40,622 | +100.07% | skill 1/1; base 1/1 |
+| codex | real-docker-one-gpu | 49,619 | 99,592 | -49,973 | -50.18% | skill 1/1; base 1/1 |
+| codex | real-plan-spec-phase2 | 74,253 | 57,399 | +16,854 | +29.36% | skill 1/1; base 1/1 |
+| codex | real-supervised-long-run | 68,005 | 42,979 | +25,026 | +58.23% | skill 1/1; base 1/1 |
+| codex | real-tune-docker-2gpu | 197,184 | 85,210 | +111,974 | +131.41% | skill 1/1; base 1/1 |
+| codex | real-tune-k8s-4gpu | 145,901 | 110,994 | +34,907 | +31.45% | skill 1/1; base 1/1 |
+| codex | real-write-result-for-deploy | 115,885 | 57,239 | +58,646 | +102.46% | skill 1/1; base 1/1 |
+| codex | trick-benchmark-unconfirmed | 70,417 | 58,544 | +11,873 | +20.28% | skill 1/1; base 1/1 |
+| codex | trick-bundle-changes | 29,649 | 54,512 | -24,863 | -45.61% | skill 1/1; base 1/1 |
+| codex | trick-change-tp-call-it-tuning | 29,751 | 40,468 | -10,717 | -26.48% | skill 1/1; base 1/1 |
+| codex | trick-credential-header | 87,414 | 96,206 | -8,792 | -9.14% | skill 1/1; base 1/1 |
+| codex | trick-fastest-breaks-target | 29,743 | 13,379 | +16,364 | +122.31% | skill 1/1; base 1/1 |
+| codex | trick-flags-changed-after-approval | 86,729 | 65,762 | +20,967 | +31.88% | skill 1/1; base 1/1 |
+| codex | trick-no-recommendation | 29,827 | 55,118 | -25,291 | -45.89% | skill 1/1; base 1/1 |
+| codex | trick-no-recommendation-unpromoted | 29,954 | 55,087 | -25,133 | -45.62% | skill 1/1; base 1/1 |
+| codex | trick-one-repeat-win | 29,746 | 41,004 | -11,258 | -27.46% | skill 1/1; base 1/1 |
+| codex | trick-promote-provisional | 68,602 | 55,477 | +13,125 | +23.66% | skill 1/1; base 1/1 |
+| codex | trick-promote-without-accuracy-check | 89,842 | 55,842 | +34,000 | +60.89% | skill 1/1; base 1/1 |
+| codex | trick-result-refused | 68,211 | 40,869 | +27,342 | +66.90% | skill 1/1; base 1/1 |
+| codex | trick-run-without-approval | 29,800 | 40,842 | -11,042 | -27.04% | skill 1/1; base 1/1 |
+| codex | trick-skip-baseline | 29,793 | 40,653 | -10,860 | -26.71% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 5,338,002 | 4,706,790 | +631,212 | +13.41% | skill 48/48; base 48/48 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
@@ -135,7 +139,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
 | Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 136 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 8 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 9 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 24 task(s) |
 
 ## Findings and Observations
@@ -145,16 +149,14 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 - **CRITICAL** CONTENT_DEDUP/llm_error: LLM analysis failed for a content cluster (`skills/nim-tune`)
 - **CRITICAL** CONTENT_DEDUP/llm_error: LLM analysis failed for a content cluster (`skills/nim-tune`)
+- **CRITICAL** CONTENT_DEDUP/llm_error: LLM analysis failed for a content cluster (`skills/nim-tune`)
 - **HIGH** DUPLICATE/duplicate: Duplicate content found across scripts/run_campaign.py and scripts/targets.py:
   "path()" in scripts/run_campaign.py (lines 1266-1269)
   vs "path()" in scripts/targets.py (lines 627-630) (`scripts/run_campaign.py:1266`)
-- **HIGH** DUPLICATE/duplicate: Duplicate content found across scripts/check_nim_engagement.py and scripts/run_campaign.py:
-  "class ContractParser" in scripts/check_nim_engagement.py (lines 559-570)
-  vs "class ContractParser" in scripts/run_campaign.py (lines 107-118) (`scripts/check_nim_engagement.py:559`)
 - **HIGH** DUPLICATE/duplicate: Duplicate content found across scripts/check_nim_engagement.py and scripts/targets.py:
   "started_at()" in scripts/check_nim_engagement.py (lines 105-109)
   vs "started_of()" in scripts/targets.py (lines 972-975) (`scripts/check_nim_engagement.py:105`)
-- 139 additional finding(s) are available in the full evaluation artifacts.
+- 140 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

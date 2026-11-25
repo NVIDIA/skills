@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 CC-BY-4.0 AND Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to benchmark a running NVIDIA NIM endpoint, measuring its latency and throughput with AIPerf and its accuracy with NeMo Gym, optionally comparing against a baseline endpoint or earlier run. <br>
+Developers and engineers use this skill to benchmark a running NIM endpoint, measuring its latency and throughput with AIPerf or checking its accuracy with NeMo Gym, optionally against a baseline endpoint or saved run, after approving a dry-run plan. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,16 +25,16 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Performance mode](references/perf.md) <br>
-- [Accuracy mode](references/accuracy.md) <br>
-- [Guard hook](references/hook.md) <br>
+- [Performance mode (references/perf.md)](references/perf.md) <br>
+- [Accuracy mode (references/accuracy.md)](references/accuracy.md) <br>
+- [Guard hook (references/hook.md)](references/hook.md) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Shell commands, Analysis, Files] <br>
-**Output Format:** [Markdown report and JSON result files] <br>
+**Output Format:** [JSON from scripts; Markdown report (report.md) with manifest.json, compare.json and per-run result folders] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [Every score is reported with its 95% range; reports contain numbers only, no prompts or answers.] <br>
+**Other Properties Related to Output:** [Every score is reported with its 95% range; reports contain numbers only, no prompts or answers] <br>
 
 ## Evaluation Agents Used: <br>
 - Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`) <br>
@@ -43,7 +43,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-24 evaluation tasks (24 positive), 1 attempt per task, each in its own isolated sandbox pod (environment `k8s-sandbox`); dataset digest `sha256:fba927bb52e9e44c2bacb40398ca881bc41ac987d716803379a3b338ced8953f` (skill-evaluator-dataset-snapshot/1); evaluator version `1.6.10`; evaluated 2026-11-25. <br>
+24 evaluation tasks (24 positive), 1 attempt per task, each task attempt run in its own isolated sandbox pod in the `k8s-sandbox` environment; each task was also attempted without the skill as a baseline. Evaluator version `1.6.10`, evaluation date 2026-11-25. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -65,24 +65,24 @@ Underlying evaluation signals used in this run: <br>
 
 
 ## Evaluation Results: <br>
-> ✅ **Overall verdict: PASS — Recommended for publication**
+**Overall verdict:** ✅ **PASS — Recommended for publication**
 
-### Publication Recommendation
-
-Recommended for publication based on the completed evaluation evidence in this report.
+**Publication Recommendation:** Recommended for publication based on the completed evaluation evidence in this report.
 
 ### Results at a Glance
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 82.9% — baseline ran, but no comparable score was available; uplift unavailable | 83.3% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 83.3% → 95.8% (+12.5 points) | 72.9% → 93.8% (+20.9 points) |
-| Correctness | 35.8% → 88.3% (+52.5 points) | 28.3% → 82.5% (+54.2 points) |
-| Discoverability | 80.0% — baseline ran, but no comparable score was available; uplift unavailable | 86.9% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 30.4% → 64.1% (+33.7 points) | 25.3% → 59.9% (+34.6 points) |
-| Efficiency | 86.3% — baseline ran, but no comparable score was available; uplift unavailable | 93.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 81.2% — baseline ran, but no comparable score was available; uplift unavailable | 84.1% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 89.6% → 95.8% (+6.2 points) | 81.3% → 95.8% (+14.5 points) |
+| Correctness | 40.8% → 86.7% (+45.9 points) | 26.7% → 85.0% (+58.3 points) |
+| Discoverability | 76.9% — baseline ran, but no comparable score was available; uplift unavailable | 87.9% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 29.4% → 62.1% (+32.7 points) | 25.8% → 58.7% (+32.9 points) |
+| Efficiency | 84.4% — baseline ran, but no comparable score was available; uplift unavailable | 93.1% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
+
+A partial dimension was calculated from only the available configured signals; review the detailed report before relying on it.
 
 ### Comparison details
 
@@ -91,9 +91,17 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 97.9% → 96.2% (-1.7 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 97.8% → 96.1% (-1.7 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 90.5% → 91.0% (+0.5 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 91.0% → 91.1% (+0.1 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+
+### Tier Status
+
+| Tier | Purpose | Status | Evidence |
+|---|---|---|---|
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 63 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 2 finding(s) |
+| Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 24 task(s) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>
