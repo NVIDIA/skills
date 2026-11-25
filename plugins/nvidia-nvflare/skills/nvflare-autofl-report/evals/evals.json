@@ -1,0 +1,118 @@
+{
+  "skill_name": "nvflare-autofl-report",
+  "evals": [
+    {
+      "id": "autofl-report-stopped-campaign",
+      "prompt": "The Auto-FL campaign in ./job has been manually stopped. Generate its final report and explain what the literature reviews taught us.",
+      "expected_output": "The agent selects nvflare-autofl-report, verifies stopped state and absence of pending candidates, resolves the bundled reporter relative to the skill root, generates the Markdown and JSON reports, refreshes the progress plot when available, then summarizes measured trajectory, metric provenance, candidate lineage, explicitly linked literature outcomes, failures, and comparability caveats.",
+      "files": [],
+      "assertions": [
+        "The agent verifies that campaign execution has stopped and no candidate remains pending before finalizing.",
+        "The agent generates autofl_final_report.md and autofl_report_summary.json, and reports whether progress.png is available.",
+        "The agent reports baseline, best score, delta, exact command and metric provenance, candidate lineage, and artifacts.",
+        "The agent connects each literature checkpoint to measured candidates through literature_event_id rather than ledger position.",
+        "The agent surfaces test-metric and changed-compute warnings when applicable."
+      ],
+      "nvflare": {
+        "expected_skill": "nvflare-autofl-report",
+        "mandatory_behavior": [
+          {
+            "id": "verify-stopped-state",
+            "description": "requires finalized campaign state or explicit independently confirmed interruption, and always refuses unfinished candidate evidence"
+          },
+          {
+            "id": "deterministic-report-artifacts",
+            "description": "generates Markdown and JSON from recorded Auto-FL artifacts and refreshes the plot when plotting is available"
+          },
+          {
+            "id": "candidate-lineage",
+            "description": "reports base-candidate lineage, inherited changed files, manifest, patch hash, commands, and artifacts"
+          },
+          {
+            "id": "literature-outcome-synthesis",
+            "description": "links literature checkpoints and source markers to measured candidate evidence through literature_event_id"
+          },
+          {
+            "id": "comparability-warnings",
+            "description": "distinguishes declared and executed budgets and warns about test-like selection metrics"
+          }
+        ],
+        "prohibited_behavior": [
+          {
+            "id": "no-active-finalization",
+            "description": "does not finalize a campaign that is still running"
+          },
+          {
+            "id": "no-invented-evidence",
+            "description": "does not invent scores, literature outcomes, manifests, or source citations"
+          },
+          {
+            "id": "no-source-or-state-edits",
+            "description": "does not modify job source, ledger, candidate manifests, or campaign state"
+          },
+          {
+            "id": "no-git-requirement",
+            "description": "does not require or automatically commit to a Git repository"
+          }
+        ],
+        "process_metrics": [
+          {
+            "id": "artifact_completeness",
+            "description": "whether Markdown, JSON summary, and progress plot paths are reported"
+          },
+          {
+            "id": "literature_evidence_coverage",
+            "description": "fraction of recorded literature checkpoints with synthesized candidate outcomes"
+          },
+          {
+            "id": "provenance_completeness",
+            "description": "whether best-candidate lineage, command, manifest, hash, and artifacts are represented"
+          },
+          {
+            "id": "unsupported_claim_count",
+            "description": "number of report conclusions not supported by ledger or campaign artifacts"
+          }
+        ]
+      }
+    },
+    {
+      "id": "autofl-report-active-negative",
+      "prompt": "Show me a status snapshot of the Auto-FL campaign that is still running, but do not interrupt it.",
+      "expected_output": "The reporting skill does not finalize or stop the campaign; the active Auto-FL workflow provides status instead.",
+      "files": [],
+      "assertions": [
+        "The agent does not generate a final stopped-campaign report or interrupt execution."
+      ],
+      "nvflare": {
+        "expected_skill": "nvflare-autofl",
+        "negative_for": "nvflare-autofl-report"
+      }
+    },
+    {
+      "id": "autofl-report-optimize-negative",
+      "prompt": "Optimize ./job.py for validation accuracy in simulation.",
+      "expected_output": "The active optimization skill handles the campaign rather than the final-report skill.",
+      "files": [],
+      "assertions": [
+        "The selected skill is nvflare-autofl, not nvflare-autofl-report."
+      ],
+      "nvflare": {
+        "expected_skill": "nvflare-autofl",
+        "negative_for": "nvflare-autofl-report"
+      }
+    },
+    {
+      "id": "autofl-report-global-negative",
+      "prompt": "Create a quarterly sales report from this spreadsheet.",
+      "expected_output": "No FLARE skill should trigger.",
+      "files": [],
+      "assertions": [
+        "The selected skill is none."
+      ],
+      "nvflare": {
+        "expected_skill": null,
+        "negative_for": "*"
+      }
+    }
+  ]
+}

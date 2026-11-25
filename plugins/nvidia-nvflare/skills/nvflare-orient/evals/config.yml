@@ -1,0 +1,11 @@
+schema_version: 1
+harbor:
+  sandbox:
+    templates:
+      claude-code: harbor-eval-nvflare-claude-code-16g-c16exp
+      codex: harbor-eval-nvflare-codex-16g-c16exp
+  runtime_env:
+    OMP_NUM_THREADS: "2"
+    MKL_NUM_THREADS: "2"
+    OPENBLAS_NUM_THREADS: "2"
+    TOKENIZERS_PARALLELISM: "false"

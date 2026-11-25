@@ -1,0 +1,5 @@
+2026-06-02 10:15:20 - worker_process - ERROR - FL client execution exception
+[USER_CODE_EXCEPTION] Traceback (most recent call last):
+  File "/workspace/app/custom/train.py", line 8, in <module>
+    import missing_training_lib
+ModuleNotFoundError: No module named 'missing_training_lib'

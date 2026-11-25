@@ -219,6 +219,7 @@ The `nvidia-skills` discovery plugin is the one exception: it is built in this r
 | Plugin | Description | Version | Skills | Source |
 |--------|-------------|---------|--------|--------|
 | `nvidia-doca-plugin` | NVIDIA DOCA skills for developing, deploying, operating, and debugging applications on BlueField DPUs and ConnectX networking devices. | `1.0.0` | 53 | [DOCA](https://github.com/NVIDIA-DOCA/doca-skills) |
+| `nvidia-nvflare` | NVIDIA FLARE skills for federated learning conversion, job diagnosis, federated statistics, and Auto-FL optimization and reporting. | `1.0.0` | 9 | [NVIDIA FLARE](https://github.com/NVIDIA/NVFlare) |
 | `nvidia-skills` | Find the right NVIDIA skill for GPU acceleration, CUDA, AI agents, data loading, training, inference, robotics, Physical AI, Omniverse, simulation, and other NVIDIA-powered workflows. | `1.5.0` | 1 | This repo (built from `plugins.d/`) |
 | `nvidia-tao-toolkit` | NVIDIA TAO skill bank with generated capability discovery for model training, data processing, application workflows, AutoML, and platform execution. | `0.1.19` | 82 | [TAO Toolkit](https://github.com/NVIDIA-TAO/tao-skill-bank) |
 <!-- plugins-table-end -->

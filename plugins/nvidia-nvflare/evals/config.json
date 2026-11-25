@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "execution": {
+    "runtime": {
+      "system_packages": [
+        "git",
+        "curl"
+      ]
+    },
+    "openshell": {
+      "filesystem_policy": {
+        "read_only": [
+          "/proc"
+        ]
+      },
+      "allowed_origins": [
+        "https://cas-bridge.xethub.hf.co",
+        "https://cas-server.xethub.hf.co",
+        "https://transfer.xethub.hf.co"
+      ]
+    }
+  }
+}
