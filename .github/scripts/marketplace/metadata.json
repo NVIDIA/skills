@@ -3889,18 +3889,6 @@
       }
     },
     {
-      "path": "skills/nv-monai-autoresearch",
-      "name": "nv-monai-autoresearch",
-      "description": "Used for NV-MONAI-Autoresearch medical-imaging research, experiment planning, diagnosis, and resumable optimization. Not for clinical decisions or standalone model inference.",
-      "metadata": {
-        "product.primary": "MONAI",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "agentic-ai",
-        "audience": "research_academic,research_non_academic,ml_engineer,ai_engineer,application_developer",
-        "discovery.activity_tags": "optimize,evaluate,orchestrate,benchmark,select"
-      }
-    },
-    {
       "path": "skills/nv-reason-ct",
       "name": "nv-reason-ct",
       "description": "Run NV-Reason-CT inference on user-provided 3D NIfTI chest or abdominal CT volumes for engineering and research workflows. Not for diagnosis, treatment, or clinical reporting.",

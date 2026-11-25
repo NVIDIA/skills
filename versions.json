@@ -2270,13 +2270,6 @@
       "last_modified": "2026-11-20"
     },
     {
-      "name": "nv-monai-autoresearch",
-      "path": "skills/nv-monai-autoresearch",
-      "content_digest": "sha256:7bdd1231de6e35bd0f57221c6939b5b07fe5699c475630ffc2bc84a2d71ad6d6",
-      "last_commit": "f6f05709a2a1e16fe57a708fc680f2a83020e0b4",
-      "last_modified": "2026-11-25"
-    },
-    {
       "name": "nv-reason-ct",
       "path": "skills/nv-reason-ct",
       "content_digest": "sha256:ef5f11474304785cac2e097fb31bc8596cb2a57c1e25761eff93f47851c21a13",
