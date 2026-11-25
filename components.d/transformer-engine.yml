@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+
+name: Transformer Engine
+product_primary: Transformer Engine
+repo: NVIDIA/TransformerEngine
+ref: main
+description: Adapt Hugging Face PyTorch models for training with Transformer Engine.
+links:
+  contributing: CONTRIBUTING.rst
+skills:
+  - path: skills/convert-hf-to-te/
+    catalog_dir: convert-hf-to-te
