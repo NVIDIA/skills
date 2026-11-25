@@ -8,3 +8,5 @@ links:
 skills:
   - path: skills/nemo-gym-reward-profiling/
     catalog_dir: nemo-gym-reward-profiling
+  - path: skills/nemo-gym-run-and-babysit-eval/
+    catalog_dir: nemo-gym-run-and-babysit-eval
