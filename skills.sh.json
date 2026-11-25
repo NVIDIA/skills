@@ -554,6 +554,7 @@
       "title": "Networking",
       "description": "Configure, operate, optimize, and troubleshoot networking workflows for data centers, clusters, edge systems, and accelerated infrastructure.",
       "skills": [
+        "daqiri-onboarding",
         "doca-aes-gcm",
         "doca-argp",
         "doca-bare-metal-deployment",

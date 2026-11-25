@@ -555,6 +555,13 @@
       "last_modified": "2026-08-11"
     },
     {
+      "name": "daqiri-onboarding",
+      "path": "skills/daqiri-onboarding",
+      "content_digest": "sha256:35fe856cd3f1340a52b100efce1e1c11230d20cfdefba5a490e4e05ae954da9b",
+      "last_commit": "28190ff6276b72da27eeaeb3e1bbcee7eb72c23b",
+      "last_modified": "2026-11-25"
+    },
+    {
       "name": "data-designer",
       "path": "skills/data-designer",
       "content_digest": "sha256:99a666705cbe85a36f9338a3e6c677fb44d486f6a536be3688ec660cefa8a6cb",

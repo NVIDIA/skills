@@ -1,9 +1,10 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 489,
+  "skill_count": 490,
   "result_row_count": 4594,
   "skills_without_results": [
+    "daqiri-onboarding",
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
     "dynamo-interconnect-check",
@@ -1683,6 +1684,26 @@
       "component": "DALI",
       "has_results": true,
       "average_uplift_pct": 32.4
+    },
+    {
+      "skill": "daqiri-onboarding",
+      "evaluation_date": "2026-11-25",
+      "environment": "not recorded (legacy or non-live result)",
+      "evaluator_version": "daqiri-paired-cli-byoe",
+      "dataset_digest": "not",
+      "validation_status": "passed",
+      "tasks": 14,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude"
+      ],
+      "evaluation_source": "self-assessed",
+      "catalog_dir": "daqiri-onboarding",
+      "component": "DAQIRI",
+      "has_results": false,
+      "average_uplift_pct": null
     },
     {
       "skill": "data-designer",
