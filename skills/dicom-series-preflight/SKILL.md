@@ -78,7 +78,7 @@ header checks for engineering use. If PHI tags are populated, de-identify
 before sharing. If orientation fails, hold downstream segmentation and
 confirm the source geometry.
 
-Pair with `verifiers/dicom_preflight_quality_v1` for a trusted preflight pack:
+Pair with `verifiers/dicom-preflight-quality-v1` for a trusted preflight pack:
 
 ```bash
 make run-trusted SKILL=dicom_series_preflight \

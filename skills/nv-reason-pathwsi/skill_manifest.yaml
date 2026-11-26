@@ -1,0 +1,144 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+id: medagent.nv_reason_pathwsi
+version: 0.1.0
+license: Apache-2.0
+upstream_refs:
+  - kind: github_repo
+    name: NVIDIA-Medtech/NV-Reason-PathWSI
+    repo_url: https://github.com/NVIDIA-Medtech/NV-Reason-PathWSI
+    git_commit: 02872ea0deac62b977ad7e3da9a708193c40b779
+    notes: >
+      Public commit checked for this release. Callers may use another checkout;
+      each live result records its commit and entrypoint SHA-256.
+  - kind: huggingface_repo
+    name: nvidia/NV-Reason-PathWSI
+    repo_id: nvidia/NV-Reason-PathWSI
+    revision: caller-selected-local-snapshot
+    notes: >
+      Caller supplies a complete local snapshot or Hugging Face cache; no weights
+      are distributed with this skill. Pin the public release revision before
+      publishing evidence.
+license_restrictions:
+  wrapper: Apache-2.0
+  upstream_code_and_weights: OpenMDW-1.1
+  notes: Upstream code and weights are not vendored; obtain and review their terms separately.
+intended_use:
+  summary: >
+    Engineering-time wrapper around NVIDIA-Medtech/NV-Reason-PathWSI
+    single-image inference for a user-provided PNG/JPEG pathology patch or
+    whole-slide image tile and text prompt. Invokes the upstream inference.py
+    CLI unmodified and emits structured JSON with input provenance, response
+    text, command, logs, runtime identity, dependency versions, and limitations.
+  scope: development
+  not_for:
+    - clinical deployment
+    - clinical interpretation
+    - autonomous diagnosis
+    - treatment decisions
+    - triage
+    - patient-facing report generation
+    - regulatory submission
+    - raw whole-slide ingestion or slide-level aggregation
+inputs:
+  - name: pathology_image_or_request
+    type: file_path
+    formats: [png, jpeg, json]
+    description: PNG/JPEG tile or JSON request; relative image paths resolve from the request file.
+outputs:
+  - name: result_json
+    type: json
+    schema: validators/output_schema.json
+runtime:
+  language: python
+  python: ">=3.11"
+  entrypoint: scripts/run_nv_reason_pathwsi.py
+  args: ["${python}", "${script}", "${fixture}", "--out-dir", "${out}/artifacts"]
+  # Tested lower bounds only; SKILL.md records the tested environment.
+  dependencies:
+    torch: ">=2.10"
+    torchvision: ">=0.25"
+    transformers: ">=5.8"
+    accelerate: ">=1.13"
+    Pillow: ">=10.0"
+  test_dependencies: {pytest: ">=8", jsonschema: ">=4", PyYAML: ">=6"}
+  env_required: []
+  env_optional: [NV_REASON_PATHWSI_ROOT, NV_REASON_PATHWSI_MODEL, HF_TOKEN, HF_HOME, HF_HUB_OFFLINE, TRANSFORMERS_OFFLINE]
+  external_assets:
+    - kind: upstream_repo
+      repo_url: https://github.com/NVIDIA-Medtech/NV-Reason-PathWSI
+      contains: [inference.py, requirements.txt, examples/sample_1.png, examples/sample_2.png, examples/sample_3.png]
+    - kind: huggingface_repo
+      repo_id: nvidia/NV-Reason-PathWSI
+      notes: Requires a complete local snapshot or Hugging Face access; never downloaded in mock mode.
+  side_effects:
+    pip_packages: ["torch>=2.10", "torchvision>=0.25", "transformers>=5.8", "accelerate>=1.13", "Pillow>=10.0"]
+    local_writes:
+      - {path: "<caller-provided --out-dir>", approx_mb_max: 12000}
+      - {path: "<explicit --hf-home, if supplied>", approx_mb_max: 12000, optional: true}
+    home_writes: []
+    network_endpoints: [https://huggingface.co, https://*.huggingface.co, https://*.xethub.hf.co]
+    requires_docker: false
+    requires_gpu: cuda
+    gpu_fallback: mock only; no automatic CPU or mock fallback
+    environment:
+      clean_environment_required: false
+      clean_environment_recommended: true
+      modifies_active_python_environment: false
+      user_environment_modification_ok: false
+      recommended_isolation: disposable virtual environment with the tested environment from SKILL.md installed
+      notes: >
+        The wrapper never installs packages, modifies shell configuration, or
+        edits upstream code. Child-process caches live under out-dir unless
+        --hf-home explicitly selects an existing Hugging Face cache. Network
+        downloads require --allow-downloads; inherited offline settings are respected.
+    env_required: []
+    env_optional: [NV_REASON_PATHWSI_ROOT, NV_REASON_PATHWSI_MODEL, HF_TOKEN, HF_HOME, HF_HUB_OFFLINE, TRANSFORMERS_OFFLINE]
+limitations:
+  - The Hugging Face reference names a caller-selected snapshot, not an immutable release revision; pin it before publishing evidence.
+  - Research and engineering use only, without medical-correctness or clinical-quality validation.
+  - Only PNG/JPEG patches or tiles are supported; raw SVS/TIFF slides and slide-level aggregation are out of scope.
+  - The bundled synthetic RGB fixture is mock-only; it does not test the model or represent histopathology.
+  - Real inference requires the model weights, the upstream checkout, the Transformers environment recorded in SKILL.md, and a suitable CUDA GPU; package versions are recorded but not enforced.
+  - Upstream does not expose token counts or stop reasons; response truncation cannot be established from CLI output.
+  - >-
+    Upstream inference.py stops only at the model package's generation EOS ids. When those omit the tokenizer
+    end-of-turn token, responses can continue past the first answer up to --max-new-tokens; --check-setup
+    warns about this, and the wrapper returns upstream text unchanged.
+  - No independent domain-quality verifier or authentication of caller-supplied local weights is implemented.
+validation:
+  # Gate only what this wrapper process runs in both modes. The model stack runs in
+  # the upstream child; its versions are recorded in output, not pinned here.
+  env_pin: {Pillow: ">=10.0"}
+  expected_runtime_seconds: {min: 0, max: 930, inference_path: runtime.inference_seconds}
+  expected_cost:
+    wall_seconds: {max: 930}
+    rss_mb_peak: {max: 32000}
+    gpu_memory_mb_peak: {max: 48000}
+  sanity_checks:
+    - {path: skill, eq: nv_reason_pathwsi}
+    - {path: input.image.format, matches: "^(png|jpeg)$"}
+    - {path: input.image.width, gte: 1}
+    - {path: input.image.height, gte: 1}
+    - {path: input.image.sha256, matches: "^[0-9a-f]{64}$"}
+    - {path: output.response_text, length_gte: 1}
+    - {path: output.response_sha256, matches: "^[0-9a-f]{64}$"}
+    - {path: runtime.mode, matches: "^(mock|upstream_cli)$"}
+    - {path: limitations, length_gte: 1}
+  reproducibility:
+    mode: repeat
+    fixture: fixtures/synthetic_pathology_input.json
+    runs: 2
