@@ -1,0 +1,12 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+version: 2
+scanner_version: 2.13.5
+rules:
+- id: PE3
+  path: references/install-and-docs.md
+  message: '*keyring*'
+  reason: 'Reviewed false positive: NVIDIA cuda-keyring installs public APT repository-signing
+    keys; these installation instructions do not access user credentials.'
+fingerprints: []

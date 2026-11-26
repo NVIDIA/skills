@@ -1,0 +1,159 @@
+[
+  {
+    "id": "nvat-guide-blackwell-responder",
+    "question": "I have a Blackwell GPU. Should I collect legacy TCG evidence or CMW for CoRIM? I have not identified its responder. Explain how the answer changes for GSP and FSP.",
+    "expected_skill": "nvat-install-and-guide",
+    "expected_script": null,
+    "ground_truth": "Blackwell architecture alone does not choose the workflow. Current GSP responders use TCG RIM and FSP responders use CoRIM, subject to deployment model and installed release support.",
+    "expected_behavior": [
+      "Asks for responder information from deployment configuration or validated device certificate information",
+      "Explains the current GSP/TCG and FSP/CoRIM distinction with the deployment-model and release qualification",
+      "Distinguishes legacy collection JSON from CoRIM-compatible CMW",
+      "Does not choose a verifier solely from the BLACKWELL architecture value or invent an automatic routing API"
+    ]
+  },
+  {
+    "id": "nvat-install-ubuntu-network-repository",
+    "question": "Give me the network package installation steps for NVAT on Ubuntu 24.04 x86_64. There is no NVIDIA apt repository configured yet. Should I just run apt-get install nvattest?",
+    "expected_skill": "nvat-install-and-guide",
+    "expected_script": null,
+    "ground_truth": "The official network installation requires the platform-specific CUDA keyring setup, then apt update and package installation. Verify the current official download instructions rather than applying the example to every target.",
+    "expected_behavior": [
+      "Checks the current official Ubuntu 24.04 x86_64 network instructions",
+      "Includes cuda-keyring installation before apt-get update and nvattest installation",
+      "Distinguishes network repository setup from a local repository installer or tarball installation",
+      "Verifies the installed version and required commands without claiming hardware attestation succeeded"
+    ]
+  },
+  {
+    "id": "nvat-guide-gpu-nvml-checks",
+    "question": "You said to check GPU visibility and NVML in my target container. How do I actually do that? Python 3 is available, but nvidia-smi may not be installed.",
+    "expected_skill": "nvat-install-and-guide",
+    "expected_script": null,
+    "ground_truth": "Check utility availability, device enumeration where possible, and native NVML loadability in the target environment. Missing nvidia-smi does not prove absence of hardware, and loading NVML does not establish collection permission.",
+    "expected_behavior": [
+      "Provides nvidia-smi -L when the utility is available and a concrete ctypes.CDLL load check for libnvidia-ml.so.1",
+      "Runs or directs checks inside the target container rather than relying on the host result",
+      "Distinguishes missing utilities, missing libraries, device exposure and evidence-collection permission",
+      "Does not replace drivers or change GPU mode without an established need"
+    ]
+  },
+  {
+    "id": "nvat-guide-hopper-legacy-evidence",
+    "question": "How do I collect evidence for Hopper? I need the legacy/TCG evidence format for our existing verifier, not CoRIM. Give me commands to save it to a file on my target host and explain what is inside. This workspace has no target GPU or NVAT CLI. Show the prerequisite checks and collection commands for me to run on that host; do not attempt collection here or claim a capture was produced.",
+    "expected_skill": "nvat-install-and-guide",
+    "expected_script": null,
+    "ground_truth": "Use the legacy collect-evidence command with NVML and explicit JSON output in a supported Hopper CC environment. It emits a result_code/result_message/evidences wrapper, not a CMW collection.",
+    "expected_behavior": [
+      "Checks the installed version/help, GPU/NVML access and supported CC environment",
+      "Uses collect-evidence --device gpu --gpu-evidence-source nvml with --format json and separate stdout/stderr files",
+      "Explains result_code, result_message and evidences, including HOPPER evidence entries",
+      "Uses a supplied challenge nonce when needed and does not invent a Hopper Corelib selector",
+      "Explains that legacy file appraisal needs the evidence array and matching nonce, and that the wrapper is not attest-v2 input",
+      "Provides target-host prerequisite checks and collection commands without attempting GPU collection in the sandbox or claiming a capture was produced"
+    ]
+  },
+  {
+    "id": "nvat-install-container-arm64",
+    "question": "Give me installation commands and prerequisite checks for NVAT in my Ubuntu 24.04 aarch64 target container; I need CoRIM. The host has a GPU. Is apt install nvattest enough? Also where do I find the C and Rust APIs? This workspace is separate from the target container. Explain how I should confirm its platform, package availability and GPU access; do not install packages or treat this sandbox as the target.",
+    "expected_skill": "nvat-install-and-guide",
+    "expected_script": null,
+    "ground_truth": "Select an officially available artifact for the target container, verify repository configuration and CoRIM capability, and distinguish CLI installation from native headers and Rust bindings. Host GPU presence does not prove container evidence-collection capability.",
+    "expected_behavior": [
+      "Confirms the target environment and normalizes aarch64/arm64 artifact naming",
+      "Checks official downloads and repository setup before giving exact installation commands",
+      "Checks version and collect-evidence-v2/attest-v2 help rather than assuming CoRIM is packaged",
+      "Checks GPU/NVML access inside the container and distinguishes CC CVM requirements",
+      "Links official C and Rust documentation and identifies libnvat-dev for C development",
+      "Provides commands and checks for the target container without installing packages in the sandbox or treating sandbox metadata as target metadata"
+    ]
+  },
+  {
+    "id": "nvat-install-unsupported-host",
+    "question": "I am on macOS arm64. Install the Linux NVAT GPU package here and attest the NVIDIA GPU on my remote Ubuntu CVM. You have shell access only to this Mac.",
+    "expected_skill": "nvat-install-and-guide",
+    "expected_script": null,
+    "ground_truth": "The execution target is the remote CVM. Local macOS arm64 is not enough to choose a Linux artifact or attest remote hardware.",
+    "expected_behavior": [
+      "Does not install a Linux artifact on macOS or infer the CVM architecture from the Mac",
+      "Requests remote OS/version/architecture or authorized access to inspect the CVM",
+      "Explains which checks belong in the remote environment",
+      "Does not invent a native macOS GPU-attestation installation path"
+    ]
+  },
+  {
+    "id": "nvat-guide-version-drift",
+    "question": "The latest docs mention attest-v2, but nvattest --help on this host has only attest and collect-evidence. Give me the CoRIM command for this installed build.",
+    "expected_skill": "nvat-install-and-guide",
+    "expected_script": null,
+    "ground_truth": "Missing v2 commands indicate a capability mismatch. Establish the installed release and locate a compatible public upgrade or source revision.",
+    "expected_behavior": [
+      "Requests or inspects nvattest version and uses matching release documentation",
+      "Explains that legacy attest is not a CoRIM substitute",
+      "Does not invent verify-v2 or pass v2-only flags to legacy commands",
+      "Offers a verified compatible release or states that availability remains unconfirmed"
+    ]
+  },
+  {
+    "id": "nvat-guide-rust-native-dependency",
+    "question": "I want the Rust NVAT API. Can I just add a crates.io dependency and avoid installing the C library?",
+    "expected_skill": "nvat-install-and-guide",
+    "expected_script": null,
+    "ground_truth": "The Rust wrapper uses native C bindings. Confirm the selected release's registry availability and native build/link requirements from metadata and official documentation.",
+    "expected_behavior": [
+      "Identifies the safe wrapper and sys crate and their C-library dependency",
+      "Checks the selected revision's Cargo metadata before recommending a registry, Git, or path dependency",
+      "Explains applicable Clang/libclang and Rust toolchain prerequisites",
+      "Cites the relevant official Rust documentation and does not fabricate Cargo dependency keys"
+    ]
+  },
+  {
+    "id": "nvat-guide-unavailable-docs",
+    "question": "Show me the exact C function for adding a CoRIM signing root in my pinned NVAT release. The latest documentation is unavailable and I have not told you the version.",
+    "expected_skill": "nvat-install-and-guide",
+    "expected_script": null,
+    "ground_truth": "Establish the release, inspect matching local headers/docs or public source, and distinguish CoRIM signing roots from device identity roots and HTTPS CA configuration.",
+    "expected_behavior": [
+      "Asks for or detects the pinned version before asserting its exact API",
+      "Uses matching headers or public source when hosted docs cannot be read",
+      "Distinguishes the signing trust store from device identity and TLS trust stores",
+      "States any remaining source limitation without inventing a signature"
+    ]
+  },
+  {
+    "id": "nvat-install-and-guide-negative-cuda-toolkit",
+    "question": "Install the CUDA Toolkit on Ubuntu 24.04 so I can compile a vector-add program with nvcc. I do not need GPU attestation.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "This is CUDA compiler/toolkit installation, outside the NVIDIA Attestation SDK installation and API workflow.",
+    "expected_behavior": [
+      "Does not activate nvat-install-and-guide",
+      "Uses CUDA Toolkit installation documentation and checks the target platform",
+      "Does not install nvattest or introduce evidence collection, CoRIM, or attestation prerequisites"
+    ]
+  },
+  {
+    "id": "nvat-install-and-guide-negative-nvml-monitoring",
+    "question": "I want a Python script that reads GPU temperature and utilization through NVML. Which Python package should I install, and how do I query those values?",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "NVML telemetry and its Python bindings are separate from NVAT installation, evidence collection, and attestation.",
+    "expected_behavior": [
+      "Does not activate nvat-install-and-guide",
+      "Answers the NVML telemetry package/API question using the relevant documentation",
+      "Does not treat ordinary monitoring as an attestation task or require an NVAT package"
+    ]
+  },
+  {
+    "id": "nvat-install-and-guide-negative-cublas-api",
+    "question": "Show a minimal C++ example using the cuBLAS API to multiply two matrices on an NVIDIA GPU. Include the library link options.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "This is a cuBLAS programming question. NVIDIA GPU and C API keywords alone do not make it an NVAT API question.",
+    "expected_behavior": [
+      "Does not activate nvat-install-and-guide",
+      "Uses the cuBLAS API and build documentation",
+      "Does not substitute NVAT C functions or add attestation setup to the example"
+    ]
+  }
+]
