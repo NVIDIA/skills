@@ -618,7 +618,10 @@
       "title": "Cybersecurity",
       "description": "Secure systems, detect threats, analyze vulnerabilities, and support secure AI and infrastructure workflows.",
       "skills": [
-        "doca-argus"
+        "doca-argus",
+        "nvat-corim-attestation",
+        "nvat-install-and-guide",
+        "nvat-troubleshooting"
       ]
     },
     {
