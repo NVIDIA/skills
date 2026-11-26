@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 CC-BY-4.0 AND Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to check, from published NIM metadata and read-only host or Kubernetes inspection, whether an NVIDIA NIM fits their GPUs, to list the NIMs that fit, and to pick a pinned NGC or China NIM distributor image, tag and profile before handing off to deployment. <br>
+Developers and engineers use this skill to check, before pulling or deploying, whether an NVIDIA NIM fits their GPU host or Kubernetes cluster, to list the NIM models compatible with their GPUs, and to pick the pinned NGC or China NIM distributor image, tag and profile to hand off for deployment. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,18 +25,18 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [china-distributors.md](references/china-distributors.md) <br>
-- [fit-rules.md](references/fit-rules.md) <br>
-- [list-mode.md](references/list-mode.md) <br>
-- [metadata-api.md](references/metadata-api.md) <br>
-- [security.md](references/security.md) <br>
+- [China NIM distributors (CNDs)](references/china-distributors.md) <br>
+- [Fit rules](references/fit-rules.md) <br>
+- [The list of compatible models](references/list-mode.md) <br>
+- [NIM Metadata API](references/metadata-api.md) <br>
+- [Security: endpoints, programs and the environment](references/security.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Analysis, Shell commands] <br>
-**Output Format:** [Markdown answers grounded in JSON script output] <br>
+**Output Type(s):** [Analysis, Shell commands, Files] <br>
+**Output Format:** [Markdown with inline bash code blocks, based on JSON script output] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [Read-only; the skill never pulls, runs or deploys images and never logs in to a registry.] <br>
+**Other Properties Related to Output:** [Read-only: scripts write JSON result files to a user-private cache folder; the skill never pulls, runs, or deploys images.] <br>
 
 ## Evaluation Agents Used: <br>
 - Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`) <br>
@@ -45,7 +45,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-36 evaluation tasks (36 positive), 1 attempt per task, each attempt in its own isolated sandbox pod in the `k8s-sandbox` environment (evaluator version `1.6.10`, evaluation date 2026-11-26). Baseline runs attempted the same tasks without the target skill. <br>
+36 evaluation tasks (36 positive), 1 attempt per task, each attempt in its own isolated sandbox pod (environment `k8s-sandbox`); each task also run as a no-skill baseline. Dataset digest `sha256:56820f16a7580a22f2ebc2adb6773432ffded122b6fcec60da496513b75dd797` (skill-evaluator-dataset-snapshot/1); evaluator version `1.6.10`; evaluation date 2026-11-26. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -67,22 +67,20 @@ Underlying evaluation signals used in this run: <br>
 
 
 ## Evaluation Results: <br>
-> ✅ **Overall verdict: PASS — Recommended for publication**
+> ⚠️ **Overall verdict: INCOMPLETE — Required evidence is missing**
 
-### Publication Recommendation
-
-Recommended for publication based on the completed evaluation evidence in this report.
+One or more required evaluation tiers did not complete, so this benchmark is not publication-complete.
 
 ### Results at a Glance
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 87.6% — baseline ran, but no comparable score was available; uplift unavailable | 85.8% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 91.7% → 97.2% (+5.5 points) | 76.4% → 95.8% (+19.4 points) |
-| Correctness | 32.2% → 90.6% (+58.4 points) | 28.9% → 87.8% (+58.9 points) |
-| Discoverability | 90.6% — baseline ran, but no comparable score was available; uplift unavailable | 91.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 19.6% → 65.2% (+45.6 points) | 18.6% → 63.9% (+45.3 points) |
-| Efficiency | 94.5% — baseline ran, but no comparable score was available; uplift unavailable | 90.5% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 88.0% — baseline ran, but no comparable score was available; uplift unavailable | 85.5% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 93.1% → 98.6% (+5.5 points) | 81.9% → 95.8% (+13.9 points) |
+| Correctness | 33.3% → 92.2% (+58.9 points) | 31.1% → 89.4% (+58.3 points) |
+| Discoverability | 91.8% — baseline ran, but no comparable score was available; uplift unavailable | 90.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 20.4% → 62.8% (+42.4 points) | 19.0% → 61.5% (+42.5 points) |
+| Efficiency | 94.5% — baseline ran, but no comparable score was available; uplift unavailable | 90.0% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -90,24 +88,28 @@ Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92
 
 A partial dimension was calculated from only the available configured signals; review the detailed report before relying on it.
 
-#### Comparison details
+### Comparison details
 
 Shared-source comparisons use the same signals and weights on both conditions. They do not replace the full dimension scores above or change the publication verdict.
 
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 97.8% → 91.0% (-6.8 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 98.1% → 91.3% (-6.8 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 83.6% → 89.2% (+5.6 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 83.7% → 89.2% (+5.5 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ### Tier Status
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
 | Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 70 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
+| Tier 2 | Semantic deduplication | **INCOMPLETE** | Tier 2 scan incomplete: a content cluster has more than 64 members. |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 36 task(s) |
+
+### Incomplete Coverage
+
+- **Context Deduplication:** Tier 2 scan incomplete: a content cluster has more than 64 members.
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>
