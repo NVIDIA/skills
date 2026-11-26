@@ -841,6 +841,18 @@
       }
     },
     {
+      "path": "skills/convert-hf-to-te",
+      "name": "convert-hf-to-te",
+      "description": "Adapt a Hugging Face PyTorch model for training with compatible Transformer Engine modules. Replace a decoder layer, sublayer or individual operation and map its checkpoint weights. Choose fusions that preserve the requested workload's behavior.",
+      "metadata": {
+        "product.primary": "Transformer Engine",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,ai_engineer,developer,application_developer",
+        "discovery.activity_tags": "convert,integrate,optimize,fine_tune,train"
+      }
+    },
+    {
       "path": "skills/cuda-python",
       "name": "cuda-python",
       "description": "Use for any task or question involving CUDA Python Core libraries: cuda-core, cuda-bindings and cuda-pathfinder. Use when asked to write, port, review, debug Python code that compiles and launches its own CUDA kernels (Program, launch, LaunchConfig, Device, Stream, Buffer, Linker, CUDA graphs). When porting PyCUDA or old CUDA bindings APIs to cuda.core and cuda.bindings. When interacting with passing CuPy, PyTorch or Numba arrays and streams to a custom kernel. When locating CUDA headers or libraries from Python, and for install questions about cuda-python, cuda-core or conda. Use before hand-rolling cuda.bindings driver / nvrtc / nvml calls for something cuda.core provides. Not for plain CuPy, Numba or PyTorch array code, or for cuda.compute (CCCL).",

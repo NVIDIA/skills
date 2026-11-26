@@ -492,6 +492,13 @@
       "last_modified": "2026-10-19"
     },
     {
+      "name": "convert-hf-to-te",
+      "path": "skills/convert-hf-to-te",
+      "content_digest": "sha256:91ae36f2cc0dc69a546e17f370dd5619baba9590aeac54daa5929a617a147aff",
+      "last_commit": "09f4e7b40f50f76cf11de942178771d1e4d5037e",
+      "last_modified": "2026-11-25"
+    },
+    {
       "name": "cuda-python",
       "path": "skills/cuda-python",
       "content_digest": "sha256:24d5f6a3402d1bafcad6f6013f222de19688eb0e2d1974f7b3e94c97d3a39d2b",
