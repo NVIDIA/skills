@@ -634,9 +634,9 @@
     {
       "name": "dicom-series-preflight",
       "path": "skills/dicom-series-preflight",
-      "content_digest": "sha256:ec3bcddf094ff8f343f3d585541d14964fd0455c3ca3aa5e81a1fc32e9ec0065",
-      "last_commit": "8df252007802af6b51520881281d8c48c8103e2f",
-      "last_modified": "2026-11-20"
+      "content_digest": "sha256:be665b60c6def220bf4b07edd556a1235c3d12eba5b2fc58eb41bede65f12bc7",
+      "last_commit": "815794985317c45b2cd8cf70e63d50241423e248",
+      "last_modified": "2026-11-26"
     },
     {
       "name": "dicom-series-to-volume",
@@ -2286,9 +2286,9 @@
     {
       "name": "nv-generate-ct-rflow",
       "path": "skills/nv-generate-ct-rflow",
-      "content_digest": "sha256:f5ffea56c811ff301c00d26041928a3bb34993291919c09d6c1b91fabc010b83",
-      "last_commit": "8df252007802af6b51520881281d8c48c8103e2f",
-      "last_modified": "2026-11-20"
+      "content_digest": "sha256:1ff955f12a72a23b3e8fbc815de2928a03a583941e25185fdc6c7c944c6eb2bb",
+      "last_commit": "815794985317c45b2cd8cf70e63d50241423e248",
+      "last_modified": "2026-11-26"
     },
     {
       "name": "nv-generate-mr",
@@ -2333,11 +2333,18 @@
       "last_modified": "2026-11-20"
     },
     {
+      "name": "nv-reason-pathwsi",
+      "path": "skills/nv-reason-pathwsi",
+      "content_digest": "sha256:357e1503d7f7186ff54b09b92f894a677d090cfcb7fe52af6f9ab933c27d5f97",
+      "last_commit": "815794985317c45b2cd8cf70e63d50241423e248",
+      "last_modified": "2026-11-26"
+    },
+    {
       "name": "nv-segment-ct",
       "path": "skills/nv-segment-ct",
-      "content_digest": "sha256:994659f1f473a6befc01368a82784c8d1be747eb52dca169c6e77fb685b9653f",
-      "last_commit": "8df252007802af6b51520881281d8c48c8103e2f",
-      "last_modified": "2026-11-20"
+      "content_digest": "sha256:0c7f2993c9225021963afa0733be975f939f73af1ddc8a7be4c775bd049158ff",
+      "last_commit": "815794985317c45b2cd8cf70e63d50241423e248",
+      "last_modified": "2026-11-26"
     },
     {
       "name": "nv-segment-ct-finetune",
@@ -2349,9 +2356,9 @@
     {
       "name": "nv-segment-ctmr",
       "path": "skills/nv-segment-ctmr",
-      "content_digest": "sha256:9ea244ec0704e79fadf33e110576d5ddbcb15fd150af7ce5657ad2933ed6ab93",
-      "last_commit": "8df252007802af6b51520881281d8c48c8103e2f",
-      "last_modified": "2026-11-20"
+      "content_digest": "sha256:059950836ded72b3a1fa2c88f994fa728569ecbc262a7efefe8180db2c25492c",
+      "last_commit": "815794985317c45b2cd8cf70e63d50241423e248",
+      "last_modified": "2026-11-26"
     },
     {
       "name": "nvalchemi-toolkit",

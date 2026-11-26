@@ -3997,6 +3997,18 @@
       }
     },
     {
+      "path": "skills/nv-reason-pathwsi",
+      "name": "nv-reason-pathwsi",
+      "description": "Run NV-Reason-PathWSI inference on user-provided PNG/JPEG pathology patches or tiles for engineering and research workflows. Not for diagnosis, treatment, clinical reporting, or whole-slide files.",
+      "metadata": {
+        "product.primary": "MONAI",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "application_developer,ai_engineer,ml_engineer,research_academic,research_non_academic",
+        "discovery.activity_tags": "inference,generate,inspect,evaluate"
+      }
+    },
+    {
       "path": "skills/nv-segment-ct",
       "name": "nv-segment-ct",
       "description": "Used for running NV-Segment-CT VISTA3D on CT NIfTI volumes and recording label-map evidence.",

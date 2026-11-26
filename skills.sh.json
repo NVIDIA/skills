@@ -429,6 +429,7 @@
         "nim-tune",
         "nixl-docs",
         "nv-reason-ct",
+        "nv-reason-pathwsi",
         "openfold2-nim",
         "openfold3-nim",
         "proteinmpnn-nim",
