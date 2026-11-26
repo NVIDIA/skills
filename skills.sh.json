@@ -300,6 +300,7 @@
       "description": "Build, validate, tune, and maintain large-scale model training workflows, including distributed training, model support, training validation, performance tuning, and training-stack CI.",
       "skills": [
         "codonfm-finetune",
+        "convert-hf-to-te",
         "cuequivariance",
         "dali-dynamic-mode",
         "data-designer",

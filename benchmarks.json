@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 495,
-  "result_row_count": 4644,
+  "skill_count": 496,
+  "result_row_count": 4654,
   "skills_without_results": [
     "daqiri-onboarding",
     "deepstream-generate-pipeline",
@@ -1495,6 +1495,27 @@
       "component": "Nsight",
       "has_results": true,
       "average_uplift_pct": 6.12
+    },
+    {
+      "skill": "convert-hf-to-te",
+      "evaluation_date": "2026-11-26",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.10",
+      "dataset_digest": "sha256:b956789e60d2f41f23acc718ddcf99f42a96405ca2a6a86f54ac6ab0efae1aa3",
+      "validation_status": "passed",
+      "tasks": 6,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "convert-hf-to-te",
+      "component": "Transformer Engine",
+      "has_results": true,
+      "average_uplift_pct": -5.03
     },
     {
       "skill": "cuda-python",
@@ -16573,6 +16594,96 @@
       "num": null,
       "agent": "codex",
       "score_pct": 90.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "convert-hf-to-te",
+      "component": "Transformer Engine",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 75.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "convert-hf-to-te",
+      "component": "Transformer Engine",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 58.3,
+      "uplift_pct": -8.4
+    },
+    {
+      "catalog_dir": "convert-hf-to-te",
+      "component": "Transformer Engine",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 86.7,
+      "uplift_pct": -13.3
+    },
+    {
+      "catalog_dir": "convert-hf-to-te",
+      "component": "Transformer Engine",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 96.7,
+      "uplift_pct": -3.3
+    },
+    {
+      "catalog_dir": "convert-hf-to-te",
+      "component": "Transformer Engine",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 83.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "convert-hf-to-te",
+      "component": "Transformer Engine",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 84.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "convert-hf-to-te",
+      "component": "Transformer Engine",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 98.3,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "convert-hf-to-te",
+      "component": "Transformer Engine",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 88.3,
+      "uplift_pct": -5.2
+    },
+    {
+      "catalog_dir": "convert-hf-to-te",
+      "component": "Transformer Engine",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 76.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "convert-hf-to-te",
+      "component": "Transformer Engine",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 60.4,
       "uplift_pct": null
     },
     {
