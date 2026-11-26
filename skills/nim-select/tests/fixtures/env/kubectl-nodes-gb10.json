@@ -1,0 +1,101 @@
+{
+ "apiVersion": "v1",
+ "items": [
+  {
+   "apiVersion": "v1",
+   "kind": "Node",
+   "metadata": {
+    "labels": {
+     "beta.kubernetes.io/arch": "arm64",
+     "beta.kubernetes.io/instance-type": "k3s",
+     "beta.kubernetes.io/os": "linux",
+     "feature.node.kubernetes.io/pci-10de.present": "true",
+     "feature.node.kubernetes.io/system-os_release.ID": "ubuntu",
+     "feature.node.kubernetes.io/system-os_release.VERSION_ID": "24.04",
+     "kubernetes.io/arch": "arm64",
+     "kubernetes.io/hostname": "spark-1",
+     "kubernetes.io/os": "linux",
+     "node.kubernetes.io/instance-type": "k3s",
+     "nvidia.com/cuda.driver-version.full": "580.95.05",
+     "nvidia.com/cuda.driver-version.major": "580",
+     "nvidia.com/cuda.driver-version.minor": "95",
+     "nvidia.com/cuda.driver-version.revision": "05",
+     "nvidia.com/cuda.driver.major": "580",
+     "nvidia.com/cuda.driver.minor": "95",
+     "nvidia.com/cuda.driver.rev": "05",
+     "nvidia.com/cuda.runtime-version.full": "13.0",
+     "nvidia.com/cuda.runtime-version.major": "13",
+     "nvidia.com/cuda.runtime-version.minor": "0",
+     "nvidia.com/cuda.runtime.major": "13",
+     "nvidia.com/cuda.runtime.minor": "0",
+     "nvidia.com/gfd.timestamp": "1794960000",
+     "nvidia.com/gpu.compute.major": "12",
+     "nvidia.com/gpu.compute.minor": "1",
+     "nvidia.com/gpu.count": "1",
+     "nvidia.com/gpu.deploy.container-toolkit": "true",
+     "nvidia.com/gpu.deploy.device-plugin": "true",
+     "nvidia.com/gpu.deploy.driver": "pre-installed",
+     "nvidia.com/gpu.deploy.gpu-feature-discovery": "true",
+     "nvidia.com/gpu.family": "blackwell",
+     "nvidia.com/gpu.present": "true",
+     "nvidia.com/gpu.product": "NVIDIA-GB10",
+     "nvidia.com/gpu.replicas": "1",
+     "nvidia.com/gpu.sharing-strategy": "none",
+     "nvidia.com/mig.capable": "false",
+     "nvidia.com/mps.capable": "false",
+     "nvidia.com/vgpu.present": "false"
+    },
+    "name": "spark-1"
+   },
+   "spec": {},
+   "status": {
+    "allocatable": {
+     "cpu": "20",
+     "ephemeral-storage": "3738588838366",
+     "hugepages-1Gi": "0",
+     "hugepages-2Mi": "0",
+     "hugepages-32Mi": "0",
+     "hugepages-64Ki": "0",
+     "memory": "127715172Ki",
+     "nvidia.com/gpu": "1",
+     "pods": "110"
+    },
+    "capacity": {
+     "cpu": "20",
+     "ephemeral-storage": "3843128900Ki",
+     "hugepages-1Gi": "0",
+     "hugepages-2Mi": "0",
+     "hugepages-32Mi": "0",
+     "hugepages-64Ki": "0",
+     "memory": "127817572Ki",
+     "nvidia.com/gpu": "1",
+     "pods": "110"
+    },
+    "conditions": [
+     {
+      "status": "False",
+      "type": "MemoryPressure"
+     },
+     {
+      "status": "False",
+      "type": "DiskPressure"
+     },
+     {
+      "status": "False",
+      "type": "PIDPressure"
+     },
+     {
+      "status": "True",
+      "type": "Ready"
+     }
+    ],
+    "nodeInfo": {
+     "architecture": "arm64",
+     "kubeletVersion": "v1.35.9+k3s1",
+     "operatingSystem": "linux"
+    }
+   }
+  }
+ ],
+ "kind": "List"
+}

@@ -1,0 +1,19 @@
+{
+ "digest": "sha256:efd6e93849fa23ee07f46e79bbb4d55a513d97d3537311b60b310805f97a3986",
+ "extra_attrs": {
+  "architecture": "amd64",
+  "config": {
+   "Labels": {
+    "com.nvidia.cudnn.version": "9.13.0.50-1",
+    "maintainer": "NVIDIA CORPORATION <cudatools@nvidia.com>",
+    "org.opencontainers.image.ref.name": "ubuntu",
+    "org.opencontainers.image.version": "24.04"
+   }
+  },
+  "os": "linux"
+ },
+ "media_type": "application/vnd.oci.image.config.v1+json",
+ "references": null,
+ "size": 12746456621,
+ "tags": null
+}

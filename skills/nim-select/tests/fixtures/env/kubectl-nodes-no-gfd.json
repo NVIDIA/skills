@@ -1,0 +1,31 @@
+{
+ "apiVersion": "v1",
+ "items": [
+  {
+   "apiVersion": "v1",
+   "kind": "Node",
+   "metadata": {
+    "labels": {
+     "kubernetes.io/arch": "amd64"
+    },
+    "name": "plain-gpu"
+   },
+   "spec": {},
+   "status": {
+    "allocatable": {
+     "cpu": "63900m",
+     "memory": "527950836Ki",
+     "nvidia.com/gpu": "2",
+     "pods": "110"
+    },
+    "conditions": [
+     {
+      "status": "True",
+      "type": "Ready"
+     }
+    ]
+   }
+  }
+ ],
+ "kind": "List"
+}

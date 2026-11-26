@@ -1,0 +1,30 @@
+[
+ {
+  "digest": "sha256:f61ef366a8f5f2f70adeb791e8f610a446482e54525be02aad1d20e7476a003b",
+  "tags": [
+   {
+    "name": "1.0.0"
+   },
+   {
+    "name": "1.0"
+   },
+   {
+    "name": "1"
+   },
+   {
+    "name": "latest"
+   }
+  ],
+  "extra_attrs": {
+   "architecture": "amd64",
+   "config": {
+    "Labels": {
+     "com.nvidia.nim.category": "vlm",
+     "com.nvidia.nim.ngc_url": "nvcr.io/example-org/nim/qwen3.5-35b-a3b:modelscope_2",
+     "com.nvidia.nim.type": "multimodal",
+     "com.nvidia.nim.version": "1.7.0-variant"
+    }
+   }
+  }
+ }
+]

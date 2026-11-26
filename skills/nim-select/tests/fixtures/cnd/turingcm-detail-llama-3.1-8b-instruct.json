@@ -1,0 +1,8 @@
+{
+ "code": 200,
+ "data": {
+  "deploy": "deployMegacube:\nstep 1: <pre><code>docker run -it --rm \\\n    --gpus all \\\n    --shm-size=16GB \\\n    -p 8000:8000 \\\n    resource.turingcm.com/megacube/llama-3.1-8b-instruct-dgx-spark:latest</code></pre>\n\ndeployDocker:\nstep 1: <pre><code>docker run -it --rm \\\n    --gpus all \\\n    --shm-size=16GB \\\n    -p 8000:8000 \\\n    -u $(id -u) \\\n    resource.turingcm.com/nim/llama-3.1-8b-instruct:latest</code></pre>\n\ndeployTuringCm:",
+  "id": "5",
+  "name": "llama-3.1-8b-instruct"
+ }
+}

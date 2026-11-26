@@ -1,0 +1,35 @@
+[
+ {
+  "digest": "sha256:f849cdb587aa12e24804737c03fceac4157303a60ee6e0eecd85f4b26f907119",
+  "extra_attrs": null,
+  "media_type": "application/vnd.oci.image.index.v1+json",
+  "references": [
+   {
+    "child_digest": "sha256:efd6e93849fa23ee07f46e79bbb4d55a513d97d3537311b60b310805f97a3986",
+    "platform": {
+     "architecture": "amd64",
+     "os": "linux"
+    }
+   },
+   {
+    "child_digest": "sha256:1472b911d93ef9f07e471ea923b3eaddd0165769d87250e2f745d1258a5497fb",
+    "platform": {
+     "architecture": "unknown",
+     "os": "unknown"
+    }
+   }
+  ],
+  "size": 12746459261,
+  "tags": [
+   {
+    "name": "1.0"
+   },
+   {
+    "name": "1"
+   },
+   {
+    "name": "latest"
+   }
+  ]
+ }
+]

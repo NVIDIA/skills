@@ -1,0 +1,42 @@
+{
+ "images": [
+  {
+   "tag": "1.7.1-variant",
+   "digest": "sha256:2c025a06fa577c36cddcb666d739a5ecfbff5e751cf6efc487acc4419150f27b",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "arm64"
+    }
+   ]
+  },
+  {
+   "tag": "1.7.0-variant",
+   "digest": "sha256:5fdc3333af921392fdc23df4ee322221a1e7aed8f4848929779bd10cd8324ea5",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    },
+    {
+     "os": "linux",
+     "architecture": "arm64"
+    }
+   ]
+  },
+  {
+   "tag": "latest",
+   "digest": "sha256:5fdc3333af921392fdc23df4ee322221a1e7aed8f4848929779bd10cd8324ea5",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    },
+    {
+     "os": "linux",
+     "architecture": "arm64"
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,21 @@
+{
+ "code": 200,
+ "data": {
+  "id": 100335,
+  "name": "Qwen3.6-35B-A3B",
+  "model_type": "vlm",
+  "arch": "amd64",
+  "ngc_url": "nvcr.io/nim/qwen/qwen3.6-35b-a3b:1.7.0-variant",
+  "supported_devices": "B200*1,Generic GPU*1,Generic GPU*2,H100-80GB-HBM3*1,H100-80GB-HBM3*2,H20-141GB*1,H20-141GB*2,H20-96GB*1,H20-96GB*2,H200*1,H200*2",
+  "image_tags": [
+   {
+    "tag_name": "latest",
+    "docker_url": "tgcr-gz.turing-agi.com/public/qwen/qwen3.6-35b-a3b:latest",
+    "ngc_url": "nvcr.io/nim/qwen/qwen3.6-35b-a3b:1.7.0-variant",
+    "arch": "amd64",
+    "digest": "sha256:669fca59f7037b971f65cfc2db8d63685982ff2eb0eebdbdf1a587877802e196",
+    "create_time": "2026-04-18 19:52:22.968100"
+   }
+  ]
+ }
+}

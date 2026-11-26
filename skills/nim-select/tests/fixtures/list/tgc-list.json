@@ -1,0 +1,66 @@
+{
+ "code": 200,
+ "data": {
+  "items": [
+   {
+    "id": 100370,
+    "name": "vLLM Model-Free NIM",
+    "model_type": "llm",
+    "arch": "amd64",
+    "ngc_url": null,
+    "supported_devices": "Generic"
+   },
+   {
+    "id": 100373,
+    "name": "DIX AI Credit Agent",
+    "model_type": "llm",
+    "arch": "amd64",
+    "ngc_url": null,
+    "supported_devices": "Generic"
+   },
+   {
+    "id": 100367,
+    "name": "bge-m3 spark",
+    "model_type": "llm",
+    "arch": "arm64",
+    "ngc_url": null,
+    "supported_devices": "DGX Spark"
+   },
+   {
+    "id": 100339,
+    "name": "Qwen3.6-27B-FP8",
+    "model_type": "vlm",
+    "arch": "amd64",
+    "ngc_url": null,
+    "supported_devices": "Generic"
+   },
+   {
+    "id": 100338,
+    "name": "BGE Reranker v2 M3",
+    "model_type": "reranker",
+    "arch": "amd64",
+    "ngc_url": "nvcr.io/example-org/nim/bge-reranker-v2-m3-new:1.11.0-rc.20260420104800",
+    "supported_devices": "Generic"
+   },
+   {
+    "id": 100335,
+    "name": "Qwen3.6-35B-A3B",
+    "model_type": "vlm",
+    "arch": "amd64",
+    "ngc_url": "nvcr.io/nim/qwen/qwen3.6-35b-a3b:1.7.0-variant",
+    "supported_devices": "B200*1,Generic GPU*1,Generic GPU*2,H100-80GB-HBM3*1,H100-80GB-HBM3*2,H20-141GB*1,H20-141GB*2,H20-96GB*1,H20-96GB*2,H200*1,H200*2"
+   },
+   {
+    "id": 100293,
+    "name": "MACE-ADA89 NIM",
+    "model_type": "ai4science",
+    "arch": null,
+    "ngc_url": null,
+    "supported_devices": "Generic"
+   }
+  ],
+  "page": 1,
+  "size": 100,
+  "total": 7
+ }
+}

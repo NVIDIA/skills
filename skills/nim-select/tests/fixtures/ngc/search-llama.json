@@ -1,0 +1,1225 @@
+{
+ "resultPageTotal": 1,
+ "resultTotal": 63,
+ "results": [
+  {
+   "groupValue": "_scored",
+   "totalCount": 5,
+   "resources": [
+    {
+     "resourceId": "nim/defog/llama-3-sqlcoder-8b",
+     "name": "llama-3-sqlcoder-8b",
+     "displayName": "Llama-3-SQLCoder-8B",
+     "labels": [
+      {
+       "key": "general",
+       "values": [
+        "Defog",
+        "NSPECT-8QWX-APW6",
+        "NVIDIA NIM",
+        "NIM",
+        "Automotive / Transportation",
+        "Experimental",
+        "Llama-3-SQLCoder-8B-Instruct",
+        "NSPECT-187S-1CYP"
+       ],
+       "unresolvedValues": [
+        "Defog",
+        "NSPECT-8QWX-APW6",
+        "nimmcro_nvidia_nim",
+        "NIM",
+        "indus_automotive_transportation",
+        "Experimental",
+        "Llama-3-SQLCoder-8B-Instruct",
+        "NSPECT-187S-1CYP"
+       ]
+      },
+      {
+       "key": "system",
+       "values": [
+        "signed images"
+       ],
+       "unresolvedValues": [
+        "signed images"
+       ]
+      },
+      {
+       "key": "hasSignedTag",
+       "values": [
+        "true"
+       ],
+       "unresolvedValues": [
+        "true"
+       ]
+      },
+      {
+       "key": "publisher",
+       "values": [
+        "NVIDIA"
+       ],
+       "unresolvedValues": [
+        "NVIDIA"
+       ]
+      },
+      {
+       "key": "productNames",
+       "values": [
+        "nim-dev",
+        "nv-ai-enterprise"
+       ],
+       "unresolvedValues": [
+        "nim-dev",
+        "nv-ai-enterprise"
+       ]
+      }
+     ],
+     "attributes": [
+      {
+       "key": "latestTag",
+       "value": "latest"
+      },
+      {
+       "key": "size",
+       "value": "6835135128"
+      },
+      {
+       "key": "hasSignedTag",
+       "value": "true"
+      },
+      {
+       "key": "oneClickDeploy",
+       "value": "false"
+      },
+      {
+       "key": "latestTagPushedDate",
+       "value": "2024-10-31T17:36:37.873Z"
+      },
+      {
+       "key": "logo",
+       "value": "https://assets.ngc.nvidia.com/products/catalog/images/Llama-3-SQLCoder-8B.jpg"
+      }
+     ],
+     "resourceType": "CONTAINER"
+    },
+    {
+     "resourceId": "nim/meta/llama-3.1-405b-instruct",
+     "name": "llama-3.1-405b-instruct",
+     "displayName": "Llama-3.1-405b-instruct",
+     "labels": [
+      {
+       "key": "general",
+       "values": [
+        "Llama3.1-405b-instruct",
+        "NVIDIA NIM",
+        "NIM",
+        "Automotive / Transportation",
+        "Experimental",
+        "Llama3.1",
+        "NSPECT-346W-0PAH"
+       ],
+       "unresolvedValues": [
+        "Llama3.1-405b-instruct",
+        "nimmcro_nvidia_nim",
+        "NIM",
+        "indus_automotive_transportation",
+        "Experimental",
+        "Llama3.1",
+        "NSPECT-346W-0PAH"
+       ]
+      },
+      {
+       "key": "system",
+       "values": [
+        "containers:elastic_nim",
+        "containers:multinode",
+        "signed images"
+       ],
+       "unresolvedValues": [
+        "containers:elastic_nim",
+        "containers:multinode",
+        "signed images"
+       ]
+      },
+      {
+       "key": "hasSignedTag",
+       "values": [
+        "true"
+       ],
+       "unresolvedValues": [
+        "true"
+       ]
+      },
+      {
+       "key": "publisher",
+       "values": [
+        "NVIDIA"
+       ],
+       "unresolvedValues": [
+        "NVIDIA"
+       ]
+      },
+      {
+       "key": "productNames",
+       "values": [
+        "nim-dev",
+        "nv-ai-enterprise"
+       ],
+       "unresolvedValues": [
+        "nim-dev",
+        "nv-ai-enterprise"
+       ]
+      }
+     ],
+     "attributes": [
+      {
+       "key": "latestTag",
+       "value": "1.3.0"
+      },
+      {
+       "key": "size",
+       "value": "7540295370"
+      },
+      {
+       "key": "hasSignedTag",
+       "value": "true"
+      },
+      {
+       "key": "oneClickDeploy",
+       "value": "false"
+      },
+      {
+       "key": "latestTagPushedDate",
+       "value": "2024-12-05T18:27:59.659Z"
+      },
+      {
+       "key": "logo",
+       "value": "https://assets.ngc.nvidia.com/products/api-catalog/images/llama-3_1-405b-instruct.jpg"
+      }
+     ],
+     "resourceType": "CONTAINER"
+    },
+    {
+     "resourceId": "nim/meta/llama-3.1-8b-base",
+     "name": "llama-3.1-8b-base",
+     "displayName": "Llama-3.1-8b-base",
+     "labels": [
+      {
+       "key": "general",
+       "values": [
+        "NVIDIA NIM",
+        "NIM",
+        "Automotive / Transportation",
+        "NVIDIA AI Enterprise Supported",
+        "Llama3.1-8b-base",
+        "Llama3.1",
+        "NSPECT-1P5Q-JXBV"
+       ],
+       "unresolvedValues": [
+        "nimmcro_nvidia_nim",
+        "NIM",
+        "indus_automotive_transportation",
+        "nvaie_supported",
+        "Llama3.1-8b-base",
+        "Llama3.1",
+        "NSPECT-1P5Q-JXBV"
+       ]
+      },
+      {
+       "key": "system",
+       "values": [
+        "signed images"
+       ],
+       "unresolvedValues": [
+        "signed images"
+       ]
+      },
+      {
+       "key": "hasSignedTag",
+       "values": [
+        "true"
+       ],
+       "unresolvedValues": [
+        "true"
+       ]
+      },
+      {
+       "key": "publisher",
+       "values": [
+        "NVIDIA"
+       ],
+       "unresolvedValues": [
+        "NVIDIA"
+       ]
+      },
+      {
+       "key": "productNames",
+       "values": [
+        "nim-dev",
+        "nv-ai-enterprise"
+       ],
+       "unresolvedValues": [
+        "nim-dev",
+        "nv-ai-enterprise"
+       ]
+      }
+     ],
+     "attributes": [
+      {
+       "key": "latestTag",
+       "value": "1.1.2"
+      },
+      {
+       "key": "size",
+       "value": "6729258664"
+      },
+      {
+       "key": "hasSignedTag",
+       "value": "true"
+      },
+      {
+       "key": "oneClickDeploy",
+       "value": "false"
+      },
+      {
+       "key": "latestTagPushedDate",
+       "value": "2024-08-19T22:26:09.668Z"
+      },
+      {
+       "key": "logo",
+       "value": "https://assets.ngc.nvidia.com/products/api-catalog/images/llama-3_1-8b-instruct.jpg"
+      }
+     ],
+     "resourceType": "CONTAINER"
+    },
+    {
+     "resourceId": "nim/meta/llama-3.1-8b-instruct",
+     "name": "llama-3.1-8b-instruct",
+     "displayName": "Llama-3.1-8B-Instruct",
+     "labels": [
+      {
+       "key": "general",
+       "values": [
+        "NSPECT-ZP6P-5LPY",
+        "NVIDIA NIM",
+        "NIM",
+        "DGX Spark",
+        "Llama3.1-8b-instruct",
+        "NVIDIA AI Enterprise Supported",
+        "Llama3.1"
+       ],
+       "unresolvedValues": [
+        "NSPECT-ZP6P-5LPY",
+        "nimmcro_nvidia_nim",
+        "NIM",
+        "DGX Spark",
+        "Llama3.1-8b-instruct",
+        "nvaie_supported",
+        "Llama3.1"
+       ]
+      },
+      {
+       "key": "system",
+       "values": [
+        "containers:elastic_nim",
+        "containers:multiarch",
+        "signed images"
+       ],
+       "unresolvedValues": [
+        "containers:elastic_nim",
+        "containers:multiarch",
+        "signed images"
+       ]
+      },
+      {
+       "key": "hasSignedTag",
+       "values": [
+        "true"
+       ],
+       "unresolvedValues": [
+        "true"
+       ]
+      },
+      {
+       "key": "publisher",
+       "values": [
+        "NVIDIA"
+       ],
+       "unresolvedValues": [
+        "NVIDIA"
+       ]
+      }
+     ],
+     "attributes": [
+      {
+       "key": "latestTag",
+       "value": "latest"
+      },
+      {
+       "key": "size",
+       "value": "13819792120"
+      },
+      {
+       "key": "hasSignedTag",
+       "value": "true"
+      },
+      {
+       "key": "oneClickDeploy",
+       "value": "false"
+      },
+      {
+       "key": "latestTagPushedDate",
+       "value": "2025-09-15T17:49:33.090Z"
+      },
+      {
+       "key": "logo",
+       "value": "https://assets.ngc.nvidia.com/products/api-catalog/images/llama-3_1-8b-instruct.jpg"
+      }
+     ],
+     "resourceType": "CONTAINER"
+    },
+    {
+     "resourceId": "nim/meta/llama-3.1-70b-instruct",
+     "name": "llama-3.1-70b-instruct",
+     "displayName": "Llama-3.1-70b-instruct",
+     "labels": [
+      {
+       "key": "general",
+       "values": [
+        "NVIDIA NIM",
+        "NVIDIA AI Enterprise Supported",
+        "NSPECT-X37N-G0O5"
+       ],
+       "unresolvedValues": [
+        "nimmcro_nvidia_nim",
+        "nvaie_supported",
+        "NSPECT-X37N-G0O5",
+        "NVIDIA NIM"
+       ]
+      },
+      {
+       "key": "system",
+       "values": [
+        "containers:elastic_nim",
+        "containers:multiarch",
+        "signed images"
+       ],
+       "unresolvedValues": [
+        "containers:elastic_nim",
+        "containers:multiarch",
+        "signed images"
+       ]
+      },
+      {
+       "key": "hasSignedTag",
+       "values": [
+        "true"
+       ],
+       "unresolvedValues": [
+        "true"
+       ]
+      },
+      {
+       "key": "publisher",
+       "values": [
+        "NVIDIA"
+       ],
+       "unresolvedValues": [
+        "NVIDIA"
+       ]
+      }
+     ],
+     "attributes": [
+      {
+       "key": "latestTag",
+       "value": "latest"
+      },
+      {
+       "key": "size",
+       "value": "13819800316"
+      },
+      {
+       "key": "hasSignedTag",
+       "value": "true"
+      },
+      {
+       "key": "oneClickDeploy",
+       "value": "false"
+      },
+      {
+       "key": "latestTagPushedDate",
+       "value": "2026-10-09T16:26:32.187Z"
+      },
+      {
+       "key": "logo",
+       "value": "https://assets.ngc.nvidia.com/products/api-catalog/images/llama-3_1-70b-instruct.jpg"
+      }
+     ],
+     "resourceType": "CONTAINER"
+    }
+   ]
+  },
+  {
+   "groupValue": "CONTAINER",
+   "totalCount": 63,
+   "resources": [
+    {
+     "resourceId": "nim/defog/llama-3-sqlcoder-8b",
+     "name": "llama-3-sqlcoder-8b",
+     "displayName": "Llama-3-SQLCoder-8B",
+     "labels": [
+      {
+       "key": "general",
+       "values": [
+        "Defog",
+        "NSPECT-8QWX-APW6",
+        "NVIDIA NIM",
+        "NIM",
+        "Automotive / Transportation",
+        "Experimental",
+        "Llama-3-SQLCoder-8B-Instruct",
+        "NSPECT-187S-1CYP"
+       ],
+       "unresolvedValues": [
+        "Defog",
+        "NSPECT-8QWX-APW6",
+        "nimmcro_nvidia_nim",
+        "NIM",
+        "indus_automotive_transportation",
+        "Experimental",
+        "Llama-3-SQLCoder-8B-Instruct",
+        "NSPECT-187S-1CYP"
+       ]
+      },
+      {
+       "key": "system",
+       "values": [
+        "signed images"
+       ],
+       "unresolvedValues": [
+        "signed images"
+       ]
+      },
+      {
+       "key": "hasSignedTag",
+       "values": [
+        "true"
+       ],
+       "unresolvedValues": [
+        "true"
+       ]
+      },
+      {
+       "key": "publisher",
+       "values": [
+        "NVIDIA"
+       ],
+       "unresolvedValues": [
+        "NVIDIA"
+       ]
+      },
+      {
+       "key": "productNames",
+       "values": [
+        "nim-dev",
+        "nv-ai-enterprise"
+       ],
+       "unresolvedValues": [
+        "nim-dev",
+        "nv-ai-enterprise"
+       ]
+      }
+     ],
+     "attributes": [
+      {
+       "key": "latestTag",
+       "value": "latest"
+      },
+      {
+       "key": "size",
+       "value": "6835135128"
+      },
+      {
+       "key": "hasSignedTag",
+       "value": "true"
+      },
+      {
+       "key": "oneClickDeploy",
+       "value": "false"
+      },
+      {
+       "key": "latestTagPushedDate",
+       "value": "2024-10-31T17:36:37.873Z"
+      },
+      {
+       "key": "logo",
+       "value": "https://assets.ngc.nvidia.com/products/catalog/images/Llama-3-SQLCoder-8B.jpg"
+      }
+     ],
+     "resourceType": "CONTAINER"
+    },
+    {
+     "resourceId": "nim/meta/llama-3.1-405b-instruct",
+     "name": "llama-3.1-405b-instruct",
+     "displayName": "Llama-3.1-405b-instruct",
+     "labels": [
+      {
+       "key": "general",
+       "values": [
+        "Llama3.1-405b-instruct",
+        "NVIDIA NIM",
+        "NIM",
+        "Automotive / Transportation",
+        "Experimental",
+        "Llama3.1",
+        "NSPECT-346W-0PAH"
+       ],
+       "unresolvedValues": [
+        "Llama3.1-405b-instruct",
+        "nimmcro_nvidia_nim",
+        "NIM",
+        "indus_automotive_transportation",
+        "Experimental",
+        "Llama3.1",
+        "NSPECT-346W-0PAH"
+       ]
+      },
+      {
+       "key": "system",
+       "values": [
+        "containers:elastic_nim",
+        "containers:multinode",
+        "signed images"
+       ],
+       "unresolvedValues": [
+        "containers:elastic_nim",
+        "containers:multinode",
+        "signed images"
+       ]
+      },
+      {
+       "key": "hasSignedTag",
+       "values": [
+        "true"
+       ],
+       "unresolvedValues": [
+        "true"
+       ]
+      },
+      {
+       "key": "publisher",
+       "values": [
+        "NVIDIA"
+       ],
+       "unresolvedValues": [
+        "NVIDIA"
+       ]
+      },
+      {
+       "key": "productNames",
+       "values": [
+        "nim-dev",
+        "nv-ai-enterprise"
+       ],
+       "unresolvedValues": [
+        "nim-dev",
+        "nv-ai-enterprise"
+       ]
+      }
+     ],
+     "attributes": [
+      {
+       "key": "latestTag",
+       "value": "1.3.0"
+      },
+      {
+       "key": "size",
+       "value": "7540295370"
+      },
+      {
+       "key": "hasSignedTag",
+       "value": "true"
+      },
+      {
+       "key": "oneClickDeploy",
+       "value": "false"
+      },
+      {
+       "key": "latestTagPushedDate",
+       "value": "2024-12-05T18:27:59.659Z"
+      },
+      {
+       "key": "logo",
+       "value": "https://assets.ngc.nvidia.com/products/api-catalog/images/llama-3_1-405b-instruct.jpg"
+      }
+     ],
+     "resourceType": "CONTAINER"
+    },
+    {
+     "resourceId": "nim/meta/llama-3.1-8b-base",
+     "name": "llama-3.1-8b-base",
+     "displayName": "Llama-3.1-8b-base",
+     "labels": [
+      {
+       "key": "general",
+       "values": [
+        "NVIDIA NIM",
+        "NIM",
+        "Automotive / Transportation",
+        "NVIDIA AI Enterprise Supported",
+        "Llama3.1-8b-base",
+        "Llama3.1",
+        "NSPECT-1P5Q-JXBV"
+       ],
+       "unresolvedValues": [
+        "nimmcro_nvidia_nim",
+        "NIM",
+        "indus_automotive_transportation",
+        "nvaie_supported",
+        "Llama3.1-8b-base",
+        "Llama3.1",
+        "NSPECT-1P5Q-JXBV"
+       ]
+      },
+      {
+       "key": "system",
+       "values": [
+        "signed images"
+       ],
+       "unresolvedValues": [
+        "signed images"
+       ]
+      },
+      {
+       "key": "hasSignedTag",
+       "values": [
+        "true"
+       ],
+       "unresolvedValues": [
+        "true"
+       ]
+      },
+      {
+       "key": "publisher",
+       "values": [
+        "NVIDIA"
+       ],
+       "unresolvedValues": [
+        "NVIDIA"
+       ]
+      },
+      {
+       "key": "productNames",
+       "values": [
+        "nim-dev",
+        "nv-ai-enterprise"
+       ],
+       "unresolvedValues": [
+        "nim-dev",
+        "nv-ai-enterprise"
+       ]
+      }
+     ],
+     "attributes": [
+      {
+       "key": "latestTag",
+       "value": "1.1.2"
+      },
+      {
+       "key": "size",
+       "value": "6729258664"
+      },
+      {
+       "key": "hasSignedTag",
+       "value": "true"
+      },
+      {
+       "key": "oneClickDeploy",
+       "value": "false"
+      },
+      {
+       "key": "latestTagPushedDate",
+       "value": "2024-08-19T22:26:09.668Z"
+      },
+      {
+       "key": "logo",
+       "value": "https://assets.ngc.nvidia.com/products/api-catalog/images/llama-3_1-8b-instruct.jpg"
+      }
+     ],
+     "resourceType": "CONTAINER"
+    },
+    {
+     "resourceId": "nim/meta/llama-3.1-8b-instruct",
+     "name": "llama-3.1-8b-instruct",
+     "displayName": "Llama-3.1-8B-Instruct",
+     "labels": [
+      {
+       "key": "general",
+       "values": [
+        "NSPECT-ZP6P-5LPY",
+        "NVIDIA NIM",
+        "NIM",
+        "DGX Spark",
+        "Llama3.1-8b-instruct",
+        "NVIDIA AI Enterprise Supported",
+        "Llama3.1"
+       ],
+       "unresolvedValues": [
+        "NSPECT-ZP6P-5LPY",
+        "nimmcro_nvidia_nim",
+        "NIM",
+        "DGX Spark",
+        "Llama3.1-8b-instruct",
+        "nvaie_supported",
+        "Llama3.1"
+       ]
+      },
+      {
+       "key": "system",
+       "values": [
+        "containers:elastic_nim",
+        "containers:multiarch",
+        "signed images"
+       ],
+       "unresolvedValues": [
+        "containers:elastic_nim",
+        "containers:multiarch",
+        "signed images"
+       ]
+      },
+      {
+       "key": "hasSignedTag",
+       "values": [
+        "true"
+       ],
+       "unresolvedValues": [
+        "true"
+       ]
+      },
+      {
+       "key": "publisher",
+       "values": [
+        "NVIDIA"
+       ],
+       "unresolvedValues": [
+        "NVIDIA"
+       ]
+      }
+     ],
+     "attributes": [
+      {
+       "key": "latestTag",
+       "value": "latest"
+      },
+      {
+       "key": "size",
+       "value": "13819792120"
+      },
+      {
+       "key": "hasSignedTag",
+       "value": "true"
+      },
+      {
+       "key": "oneClickDeploy",
+       "value": "false"
+      },
+      {
+       "key": "latestTagPushedDate",
+       "value": "2025-09-15T17:49:33.090Z"
+      },
+      {
+       "key": "logo",
+       "value": "https://assets.ngc.nvidia.com/products/api-catalog/images/llama-3_1-8b-instruct.jpg"
+      }
+     ],
+     "resourceType": "CONTAINER"
+    },
+    {
+     "resourceId": "nim/meta/llama-3.1-70b-instruct",
+     "name": "llama-3.1-70b-instruct",
+     "displayName": "Llama-3.1-70b-instruct",
+     "labels": [
+      {
+       "key": "general",
+       "values": [
+        "NVIDIA NIM",
+        "NVIDIA AI Enterprise Supported",
+        "NSPECT-X37N-G0O5"
+       ],
+       "unresolvedValues": [
+        "nimmcro_nvidia_nim",
+        "nvaie_supported",
+        "NSPECT-X37N-G0O5",
+        "NVIDIA NIM"
+       ]
+      },
+      {
+       "key": "system",
+       "values": [
+        "containers:elastic_nim",
+        "containers:multiarch",
+        "signed images"
+       ],
+       "unresolvedValues": [
+        "containers:elastic_nim",
+        "containers:multiarch",
+        "signed images"
+       ]
+      },
+      {
+       "key": "hasSignedTag",
+       "values": [
+        "true"
+       ],
+       "unresolvedValues": [
+        "true"
+       ]
+      },
+      {
+       "key": "publisher",
+       "values": [
+        "NVIDIA"
+       ],
+       "unresolvedValues": [
+        "NVIDIA"
+       ]
+      }
+     ],
+     "attributes": [
+      {
+       "key": "latestTag",
+       "value": "latest"
+      },
+      {
+       "key": "size",
+       "value": "13819800316"
+      },
+      {
+       "key": "hasSignedTag",
+       "value": "true"
+      },
+      {
+       "key": "oneClickDeploy",
+       "value": "false"
+      },
+      {
+       "key": "latestTagPushedDate",
+       "value": "2026-10-09T16:26:32.187Z"
+      },
+      {
+       "key": "logo",
+       "value": "https://assets.ngc.nvidia.com/products/api-catalog/images/llama-3_1-70b-instruct.jpg"
+      }
+     ],
+     "resourceType": "CONTAINER"
+    },
+    {
+     "resourceId": "nim/meta/llama-3.2-3b-instruct",
+     "name": "llama-3.2-3b-instruct",
+     "displayName": "Llama-3.2-3B-Instruct",
+     "labels": [
+      {
+       "key": "general",
+       "values": [
+        "B200",
+        "Experimental",
+        "A100 PG509 200",
+        "H100 NVL",
+        "GH200 480GB",
+        "NVIDIA NIM",
+        "A100 SXM4 80GB",
+        "GH200 120GB",
+        "H200",
+        "L40S",
+        "A10G",
+        "NSPECT-R8KF-MSNB",
+        "H100 80GB HBM3"
+       ],
+       "unresolvedValues": [
+        "gpu_type_b200",
+        "Experimental",
+        "gpu_type_a100_pg509_200",
+        "gpu_type_h100_nvl",
+        "gpu_type_gh200_480gb",
+        "nimmcro_nvidia_nim",
+        "gpu_type_a100_sxm4_80gb",
+        "gpu_type_gh200_120gb",
+        "gpu_type_h200",
+        "gpu_type_l40s",
+        "gpu_type_a10g",
+        "NSPECT-R8KF-MSNB",
+        "gpu_type_h100_80gb_hbm3"
+       ]
+      },
+      {
+       "key": "system",
+       "values": [
+        "containers:multiarch",
+        "signed images"
+       ],
+       "unresolvedValues": [
+        "containers:multiarch",
+        "signed images"
+       ]
+      },
+      {
+       "key": "hasSignedTag",
+       "values": [
+        "true"
+       ],
+       "unresolvedValues": [
+        "true"
+       ]
+      },
+      {
+       "key": "publisher",
+       "values": [
+        "NVIDIA"
+       ],
+       "unresolvedValues": [
+        "NVIDIA"
+       ]
+      },
+      {
+       "key": "productNames",
+       "values": [
+        "nim-dev",
+        "nv-ai-enterprise"
+       ],
+       "unresolvedValues": [
+        "nim-dev",
+        "nv-ai-enterprise"
+       ]
+      }
+     ],
+     "attributes": [
+      {
+       "key": "latestTag",
+       "value": "latest"
+      },
+      {
+       "key": "size",
+       "value": "10876800653"
+      },
+      {
+       "key": "hasSignedTag",
+       "value": "true"
+      },
+      {
+       "key": "oneClickDeploy",
+       "value": "false"
+      },
+      {
+       "key": "latestTagPushedDate",
+       "value": "2025-02-20T19:24:47.622Z"
+      },
+      {
+       "key": "logo",
+       "value": "https://assets.ngc.nvidia.com/products/api-catalog/images/llama-3_2-3b-instruct.jpg"
+      }
+     ],
+     "resourceType": "CONTAINER"
+    },
+    {
+     "resourceId": "nim/meta/llama-3.2-1b-instruct",
+     "name": "llama-3.2-1b-instruct",
+     "displayName": "Llama-3.2-1B-Instruct",
+     "labels": [
+      {
+       "key": "general",
+       "values": [
+        "B200",
+        "Experimental",
+        "A100 PG509 200",
+        "H100 NVL",
+        "GH200 480GB",
+        "GH200 144G HBM3e",
+        "H200 NVL",
+        "GB200",
+        "NVIDIA NIM",
+        "RTX PRO 6000 Blackwell Server Edition",
+        "A100 SXM4 80GB",
+        "GH200 120GB",
+        "H200",
+        "L40S",
+        "A10G",
+        "NSPECT-B16X-9RUJ",
+        "H100 80GB HBM3"
+       ],
+       "unresolvedValues": [
+        "gpu_type_b200",
+        "Experimental",
+        "gpu_type_a100_pg509_200",
+        "gpu_type_h100_nvl",
+        "gpu_type_gh200_480gb",
+        "gpu_type_gh200_144g_hbm3e",
+        "gpu_type_h200_nvl",
+        "gpu_type_gb200",
+        "nimmcro_nvidia_nim",
+        "gpu_type_rtx_pro_6000_blackwell_server_edition",
+        "gpu_type_a100_sxm4_80gb",
+        "gpu_type_gh200_120gb",
+        "gpu_type_h200",
+        "gpu_type_l40s",
+        "gpu_type_a10g",
+        "NSPECT-B16X-9RUJ",
+        "gpu_type_h100_80gb_hbm3"
+       ]
+      },
+      {
+       "key": "system",
+       "values": [
+        "containers:multiarch",
+        "signed images"
+       ],
+       "unresolvedValues": [
+        "containers:multiarch",
+        "signed images"
+       ]
+      },
+      {
+       "key": "hasSignedTag",
+       "values": [
+        "true"
+       ],
+       "unresolvedValues": [
+        "true"
+       ]
+      },
+      {
+       "key": "publisher",
+       "values": [
+        "NVIDIA"
+       ],
+       "unresolvedValues": [
+        "NVIDIA"
+       ]
+      },
+      {
+       "key": "productNames",
+       "values": [
+        "nim-dev",
+        "nv-ai-enterprise"
+       ],
+       "unresolvedValues": [
+        "nim-dev",
+        "nv-ai-enterprise"
+       ]
+      }
+     ],
+     "attributes": [
+      {
+       "key": "latestTag",
+       "value": "1.12.0"
+      },
+      {
+       "key": "size",
+       "value": "12887220908"
+      },
+      {
+       "key": "hasSignedTag",
+       "value": "true"
+      },
+      {
+       "key": "oneClickDeploy",
+       "value": "false"
+      },
+      {
+       "key": "latestTagPushedDate",
+       "value": "2025-08-27T23:54:56.555Z"
+      },
+      {
+       "key": "logo",
+       "value": "https://assets.ngc.nvidia.com/products/api-catalog/images/llama-3_2-1b-instruct.jpg"
+      }
+     ],
+     "resourceType": "CONTAINER"
+    },
+    {
+     "resourceId": "nim/meta/llama-3.3-70b-instruct",
+     "name": "llama-3.3-70b-instruct",
+     "displayName": "Llama-3.3-70b-Instruct",
+     "labels": [
+      {
+       "key": "builtBy",
+       "values": [
+        "meta"
+       ],
+       "unresolvedValues": [
+        "meta"
+       ]
+      },
+      {
+       "key": "general",
+       "values": [
+        "NVIDIA NIM",
+        "NVIDIA AI Enterprise Supported",
+        "NSPECT-0JUQ-8PSN"
+       ],
+       "unresolvedValues": [
+        "nimmcro_nvidia_nim",
+        "nvaie_supported",
+        "NSPECT-0JUQ-8PSN"
+       ]
+      },
+      {
+       "key": "system",
+       "values": [
+        "containers:multiarch",
+        "signed images"
+       ],
+       "unresolvedValues": [
+        "containers:multiarch",
+        "signed images"
+       ]
+      },
+      {
+       "key": "hasSignedTag",
+       "values": [
+        "true"
+       ],
+       "unresolvedValues": [
+        "true"
+       ]
+      },
+      {
+       "key": "publisher",
+       "values": [
+        "NVIDIA"
+       ],
+       "unresolvedValues": [
+        "NVIDIA"
+       ]
+      }
+     ],
+     "attributes": [
+      {
+       "key": "latestTag",
+       "value": "latest"
+      },
+      {
+       "key": "size",
+       "value": "13819801526"
+      },
+      {
+       "key": "hasSignedTag",
+       "value": "true"
+      },
+      {
+       "key": "oneClickDeploy",
+       "value": "false"
+      },
+      {
+       "key": "latestTagPushedDate",
+       "value": "2025-01-17T22:19:33.487Z"
+      },
+      {
+       "key": "logo",
+       "value": "https://assets.ngc.nvidia.com/products/api-catalog/images/llama-3_3-70b-instruct.jpg"
+      }
+     ],
+     "resourceType": "CONTAINER"
+    }
+   ]
+  }
+ ]
+}

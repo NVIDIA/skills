@@ -1,0 +1,21 @@
+{
+ "code": 200,
+ "data": {
+  "id": 100339,
+  "name": "Qwen3.6-27B-FP8",
+  "model_type": "vlm",
+  "arch": "amd64",
+  "ngc_url": null,
+  "supported_devices": "Generic",
+  "image_tags": [
+   {
+    "tag_name": "latest",
+    "docker_url": "tgcr-gz.turing-agi.com/public/qwen/qwen3.6-27b-fp8:latest",
+    "ngc_url": null,
+    "arch": "amd64",
+    "digest": "sha256:a33ee4eacf2a7f2cda0f0af94abb87354f37f3e5cdb17ea260b2f752c743e360",
+    "create_time": "2026-04-24 11:08:28.872244"
+   }
+  ]
+ }
+}

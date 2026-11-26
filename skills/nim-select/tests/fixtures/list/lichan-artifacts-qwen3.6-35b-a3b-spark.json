@@ -1,0 +1,16 @@
+[
+ {
+  "digest": "sha256:79e6f4fa6348625e4f0e21ba0c42b1ba1c9941ca315eeed551aea55eeaeedb8a",
+  "tags": [
+   {
+    "name": "latest"
+   }
+  ],
+  "extra_attrs": {
+   "architecture": "arm64",
+   "config": {
+    "Labels": {}
+   }
+  }
+ }
+]

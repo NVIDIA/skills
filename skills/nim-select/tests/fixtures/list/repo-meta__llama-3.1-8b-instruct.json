@@ -1,0 +1,63 @@
+{
+ "name": "llama-3.1-8b-instruct",
+ "displayName": "Llama-3.1-8B-Instruct",
+ "tags": [
+  "2.1.6",
+  "2.1.5",
+  "2.1.4",
+  "2.0.13",
+  "2.0.12",
+  "2.0.11",
+  "2.0.10",
+  "2.0.9",
+  "2.0.8",
+  "2.0.7",
+  "2.0.6",
+  "2.0.5",
+  "2.0.4",
+  "2.0.3",
+  "2.0.2",
+  "2.0.1",
+  "1.15.5",
+  "1.15.4",
+  "1.15",
+  "1.13.1",
+  "1.13",
+  "1.12.0",
+  "1.12",
+  "1.10.1",
+  "1.10",
+  "1",
+  "latest",
+  "1.8.6",
+  "1.8.5",
+  "1.8.4",
+  "1.8.3",
+  "1.8",
+  "1.8.0-RTX",
+  "1.3.3",
+  "1.3",
+  "1.3.0",
+  "1.2.2",
+  "1.2",
+  "1.1.2",
+  "1.1.1",
+  "1.1",
+  "1.1.0"
+ ],
+ "latestTag": "latest",
+ "latestArchitectureVariants": [
+  {
+   "os": "linux",
+   "architecture": "amd64"
+  },
+  {
+   "os": "linux",
+   "architecture": "arm64"
+  }
+ ],
+ "latestImageSize": 11975570220,
+ "canGuestPull": true,
+ "isPublic": true,
+ "description": "# **Deployment Geography:**\n\nGlobal \n\n## **Release Date:**\n\nBuild.NVIDIA.com 07/23/2024 via  \n[https://build.nvidia.com/meta/llama-3_1-8b-instruct](https://build.nvidia.com/meta/llama-"
+}

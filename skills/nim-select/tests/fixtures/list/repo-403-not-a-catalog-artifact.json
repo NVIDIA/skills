@@ -1,0 +1,7 @@
+{
+ "requestStatus": {
+  "statusCode": "FORBIDDEN",
+  "statusDescription": "403 FORBIDDEN, ProblemDetail[type='urn:kaizen:problem-details:forbidden', title='Forbidden', status=403, detail='Not a catalog artifact!', instance='null', properties='null']",
+  "requestId": "0457a240-3d28-4981-814d-207794cfe78e"
+ }
+}

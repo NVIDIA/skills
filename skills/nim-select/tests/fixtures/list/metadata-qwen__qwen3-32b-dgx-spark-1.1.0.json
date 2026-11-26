@@ -1,0 +1,14 @@
+{
+ "profiles": [
+  {
+   "profile_id": "c4f105d92c72ab56200884dfacde9d2128b139755c06b9c883eeb3e287b7408a",
+   "gpu": "dgx_spark",
+   "precision": "nvfp4",
+   "inference_backend": "vllm",
+   "workspace_hash": "2e823ab4aae92ac73370253a6c1b58a2ed0456c80cab47c67393daebc31a588b",
+   "feat_lora": false,
+   "gpu_device": "2e12:10de",
+   "tested_gpu_devices": []
+  }
+ ]
+}

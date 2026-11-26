@@ -1,0 +1,20 @@
+{
+ "code": 200,
+ "data": {
+  "arch": "amd64",
+  "id": 100301,
+  "image_tags": [
+   {
+    "arch": "amd64",
+    "create_time": "2026-02-14 20:06:59.337412",
+    "digest": "sha256:d33f8521c3e627337338bf42a26dde1dc99f80ed15d26c5fbe8fae8d09cae8c4",
+    "docker_url": "tgcr.turing-agi.com/cnd/z-ai/glm5:1.0.0",
+    "ngc_url": "nvcr.io/nim/zai-org/glm-5:1.7-variant",
+    "tag_name": "1.0.0"
+   }
+  ],
+  "model_type": "llm",
+  "name": "GLM-5",
+  "ngc_url": "nvcr.io/nim/zai-org/glm-5:1.7-variant"
+ }
+}

@@ -1,0 +1,8 @@
+{
+ "errors": [
+  {
+   "code": "UNAUTHORIZED",
+   "message": "unauthorized"
+  }
+ ]
+}

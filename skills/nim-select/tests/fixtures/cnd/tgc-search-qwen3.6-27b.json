@@ -1,0 +1,31 @@
+{
+ "code": 200,
+ "data": {
+  "items": [
+   {
+    "arch": null,
+    "id": 100341,
+    "model_type": "vlm",
+    "name": "Qwen3.6-27B",
+    "ngc_url": "nvcr.io/nim/qwen/qwen3.6-27b:1.7.0-variant"
+   },
+   {
+    "arch": "amd64",
+    "id": 100339,
+    "model_type": "vlm",
+    "name": "Qwen3.6-27B-FP8",
+    "ngc_url": null
+   },
+   {
+    "arch": "arm64",
+    "id": 100340,
+    "model_type": "vlm",
+    "name": "Qwen3.6-27B-FP8-DGX-Spark",
+    "ngc_url": null
+   }
+  ],
+  "page": 1,
+  "size": 100,
+  "total": 3
+ }
+}

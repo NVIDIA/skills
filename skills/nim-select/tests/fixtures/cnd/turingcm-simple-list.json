@@ -1,0 +1,463 @@
+{
+ "code": 200,
+ "data": {
+  "records": [
+   {
+    "arch": null,
+    "id": "-47",
+    "model_type": null,
+    "name": "DeepSeek-V4.1-Flash"
+   },
+   {
+    "arch": null,
+    "id": "-46",
+    "model_type": null,
+    "name": "muse-glimmer-30b"
+   },
+   {
+    "arch": null,
+    "id": "-45",
+    "model_type": null,
+    "name": "glm-5.3-flash"
+   },
+   {
+    "arch": "amd64",
+    "id": "-48",
+    "model_type": null,
+    "name": "vllm-model-free-nim-spark"
+   },
+   {
+    "arch": null,
+    "id": "-44",
+    "model_type": null,
+    "name": "sglang-model-free-nim-spark"
+   },
+   {
+    "arch": null,
+    "id": "-43",
+    "model_type": null,
+    "name": "DeepSeek-V4-Pro-0813"
+   },
+   {
+    "arch": null,
+    "id": "-42",
+    "model_type": null,
+    "name": "qwen3.8-27b"
+   },
+   {
+    "arch": null,
+    "id": "-41",
+    "model_type": null,
+    "name": "DeepSeek-V4-Flash-0731"
+   },
+   {
+    "arch": null,
+    "id": "-39",
+    "model_type": null,
+    "name": "Qwen3.6-35B-A3B-spark"
+   },
+   {
+    "arch": null,
+    "id": "-36",
+    "model_type": null,
+    "name": "GLM-5.2-FP8"
+   },
+   {
+    "arch": "amd64",
+    "id": "-38",
+    "model_type": null,
+    "name": "sglang-model-free-nim"
+   },
+   {
+    "arch": null,
+    "id": "-37",
+    "model_type": null,
+    "name": "cosmos3-generator"
+   },
+   {
+    "arch": null,
+    "id": "-35",
+    "model_type": null,
+    "name": "bge-m3"
+   },
+   {
+    "arch": null,
+    "id": "-33",
+    "model_type": null,
+    "name": "diffusiongemma-26B-A4B-it"
+   },
+   {
+    "arch": null,
+    "id": "-32",
+    "model_type": null,
+    "name": "LocateAnything-3B"
+   },
+   {
+    "arch": null,
+    "id": "-27",
+    "model_type": null,
+    "name": "gemma-4-26b"
+   },
+   {
+    "arch": null,
+    "id": "-31",
+    "model_type": null,
+    "name": "Nemotron-3-Ultra-550B-A55B"
+   },
+   {
+    "arch": null,
+    "id": "-30",
+    "model_type": null,
+    "name": "cosmos3-nano-reasoner\n"
+   },
+   {
+    "arch": null,
+    "id": "-28",
+    "model_type": null,
+    "name": "Step-3.7-Flash"
+   },
+   {
+    "arch": null,
+    "id": "-11",
+    "model_type": null,
+    "name": "gemma-4-31b-it"
+   },
+   {
+    "arch": null,
+    "id": "23",
+    "model_type": null,
+    "name": "llama-3.1-nemoguard-8b-content-safety"
+   },
+   {
+    "arch": null,
+    "id": "-23",
+    "model_type": null,
+    "name": "nemotron-3-nano-omni-30b-a3b-reasoning"
+   },
+   {
+    "arch": null,
+    "id": "-22",
+    "model_type": null,
+    "name": "DeepSeek-V4-Flash"
+   },
+   {
+    "arch": null,
+    "id": "-21",
+    "model_type": null,
+    "name": "DeepSeek-V4-Pro"
+   },
+   {
+    "arch": null,
+    "id": "-20",
+    "model_type": null,
+    "name": "Qwen3.6-27B"
+   },
+   {
+    "arch": null,
+    "id": "-19",
+    "model_type": null,
+    "name": "bge-reranker-v2-m3"
+   },
+   {
+    "arch": null,
+    "id": "-18",
+    "model_type": null,
+    "name": "Kimi-K2.6"
+   },
+   {
+    "arch": null,
+    "id": "-12",
+    "model_type": null,
+    "name": "MiniMax-M2.7"
+   },
+   {
+    "arch": null,
+    "id": "-17",
+    "model_type": null,
+    "name": "Qwen3.6-35B-A3B"
+   },
+   {
+    "arch": null,
+    "id": "-26",
+    "model_type": null,
+    "name": "gpt-oss-20b"
+   },
+   {
+    "arch": null,
+    "id": "-25",
+    "model_type": null,
+    "name": "ising-calibration-1-35b-a3b"
+   },
+   {
+    "arch": null,
+    "id": "-9",
+    "model_type": null,
+    "name": "NIM-BaseContainer"
+   },
+   {
+    "arch": null,
+    "id": "-16",
+    "model_type": null,
+    "name": "GLM-5.1"
+   },
+   {
+    "arch": null,
+    "id": "-15",
+    "model_type": null,
+    "name": "geo-gpt"
+   },
+   {
+    "arch": null,
+    "id": "-14",
+    "model_type": null,
+    "name": "genos-10b-v2"
+   },
+   {
+    "arch": "amd64",
+    "id": "-13",
+    "model_type": null,
+    "name": "vLLM-model-free-nim"
+   },
+   {
+    "arch": null,
+    "id": "0",
+    "model_type": null,
+    "name": "Qwen-Image"
+   },
+   {
+    "arch": null,
+    "id": "-24",
+    "model_type": null,
+    "name": "Qwen-Image-Edit"
+   },
+   {
+    "arch": null,
+    "id": "-10",
+    "model_type": null,
+    "name": "Qwen3.5-35B-A3B"
+   },
+   {
+    "arch": null,
+    "id": "-8",
+    "model_type": null,
+    "name": "Nemotron-3-Super-120B-A12B\n"
+   },
+   {
+    "arch": null,
+    "id": "-7",
+    "model_type": null,
+    "name": "Qwen3.5-397B-A17B"
+   },
+   {
+    "arch": null,
+    "id": "-5",
+    "model_type": null,
+    "name": "MiniMax-M2.5"
+   },
+   {
+    "arch": null,
+    "id": "-6",
+    "model_type": null,
+    "name": "Kimi-K2.5"
+   },
+   {
+    "arch": null,
+    "id": "1",
+    "model_type": null,
+    "name": "cosmos-reason2-8b"
+   },
+   {
+    "arch": null,
+    "id": "-4",
+    "model_type": null,
+    "name": "GLM-5"
+   },
+   {
+    "arch": null,
+    "id": "-3",
+    "model_type": null,
+    "name": "qwen3-coder-next\n"
+   },
+   {
+    "arch": null,
+    "id": "-2",
+    "model_type": null,
+    "name": "qwen3-vl-235b-a22b-instruct\n"
+   },
+   {
+    "arch": null,
+    "id": "-1",
+    "model_type": null,
+    "name": "qwen3-235b-a22b-instruct-2507-fp8"
+   },
+   {
+    "arch": null,
+    "id": "2",
+    "model_type": null,
+    "name": "RDT-1B"
+   },
+   {
+    "arch": null,
+    "id": "3",
+    "model_type": null,
+    "name": "MACE-ADA89"
+   },
+   {
+    "arch": null,
+    "id": "4",
+    "model_type": null,
+    "name": "Qwen3-Next-80B-A3B-Thinking"
+   },
+   {
+    "arch": null,
+    "id": "5",
+    "model_type": null,
+    "name": "llama-3.1-8b-instruct"
+   },
+   {
+    "arch": null,
+    "id": "6",
+    "model_type": null,
+    "name": "paddleocr"
+   },
+   {
+    "arch": null,
+    "id": "7",
+    "model_type": null,
+    "name": "deepseek-v3.2"
+   },
+   {
+    "arch": null,
+    "id": "8",
+    "model_type": null,
+    "name": "Step-3.5-Flash"
+   },
+   {
+    "arch": null,
+    "id": "9",
+    "model_type": null,
+    "name": "TRELLIS"
+   },
+   {
+    "arch": null,
+    "id": "10",
+    "model_type": null,
+    "name": "audio2face-3d"
+   },
+   {
+    "arch": null,
+    "id": "11",
+    "model_type": null,
+    "name": "nemotron-parse"
+   },
+   {
+    "arch": null,
+    "id": "12",
+    "model_type": null,
+    "name": "deepseek-r1-distill-qwen-32b"
+   },
+   {
+    "arch": null,
+    "id": "13",
+    "model_type": null,
+    "name": "parakeet-ctc-0.6b-zh-cn"
+   },
+   {
+    "arch": null,
+    "id": "14",
+    "model_type": null,
+    "name": "cuopt"
+   },
+   {
+    "arch": null,
+    "id": "15",
+    "model_type": null,
+    "name": "magpie-tts-multilingual"
+   },
+   {
+    "arch": null,
+    "id": "16",
+    "model_type": null,
+    "name": "gemma-3-1b-it"
+   },
+   {
+    "arch": null,
+    "id": "17",
+    "model_type": null,
+    "name": "whisper-large-v3"
+   },
+   {
+    "arch": null,
+    "id": "18",
+    "model_type": null,
+    "name": "canary-1b-asr"
+   },
+   {
+    "arch": null,
+    "id": "19",
+    "model_type": null,
+    "name": "evo2-40b"
+   },
+   {
+    "arch": null,
+    "id": "20",
+    "model_type": null,
+    "name": "Boltz-2"
+   },
+   {
+    "arch": null,
+    "id": "21",
+    "model_type": null,
+    "name": "Qwen-32b"
+   },
+   {
+    "arch": null,
+    "id": "22",
+    "model_type": null,
+    "name": "openfold3"
+   },
+   {
+    "arch": null,
+    "id": "24",
+    "model_type": null,
+    "name": "deepseek-v3.1-terminus"
+   },
+   {
+    "arch": null,
+    "id": "28",
+    "model_type": null,
+    "name": "Isaac Sim"
+   },
+   {
+    "arch": null,
+    "id": "29",
+    "model_type": null,
+    "name": "qwen3-30b-a3b-nvfp4"
+   },
+   {
+    "arch": null,
+    "id": "27",
+    "model_type": null,
+    "name": "nemoretriever-ocr-v1"
+   },
+   {
+    "arch": null,
+    "id": "101",
+    "model_type": null,
+    "name": "genmol"
+   },
+   {
+    "arch": null,
+    "id": "147",
+    "model_type": null,
+    "name": "proteinmpnn"
+   },
+   {
+    "arch": null,
+    "id": "178",
+    "model_type": null,
+    "name": "rfdiffusion"
+   }
+  ]
+ }
+}

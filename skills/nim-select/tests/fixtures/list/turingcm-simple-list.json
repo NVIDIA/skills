@@ -1,0 +1,66 @@
+{
+ "code": 200,
+ "message": "success",
+ "data": {
+  "records": [
+   {
+    "id": "-38",
+    "name": "sglang-model-free-nim",
+    "model_type": null,
+    "arch": "amd64",
+    "badges": [
+     "通用"
+    ]
+   },
+   {
+    "id": "-35",
+    "name": "bge-m3",
+    "model_type": null,
+    "arch": null,
+    "badges": [
+     "通用"
+    ]
+   },
+   {
+    "id": "-20",
+    "name": "Qwen3.6-27B",
+    "model_type": null,
+    "arch": null,
+    "badges": [
+     "通用",
+     "H100-80GB-HBM3",
+     "H20-141GB",
+     "H20-96GB",
+     "H200"
+    ]
+   },
+   {
+    "id": "-10",
+    "name": "Qwen3.5-35B-A3B",
+    "model_type": null,
+    "arch": null,
+    "badges": [
+     "通用"
+    ]
+   },
+   {
+    "id": "14",
+    "name": "cuopt",
+    "model_type": null,
+    "arch": null,
+    "badges": [
+     "通用"
+    ]
+   },
+   {
+    "id": "28",
+    "name": "Isaac Sim",
+    "model_type": null,
+    "arch": null,
+    "badges": [
+     "通用"
+    ]
+   }
+  ]
+ }
+}

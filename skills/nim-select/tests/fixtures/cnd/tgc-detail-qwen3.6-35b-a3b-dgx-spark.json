@@ -1,0 +1,20 @@
+{
+ "code": 200,
+ "data": {
+  "arch": null,
+  "id": 100336,
+  "image_tags": [
+   {
+    "arch": null,
+    "create_time": "2026-04-18 22:59:29.538626",
+    "digest": "sha256:b2adac23459c21856a9a166001427ce23dbcc95af8576475d6ae8e4c86cf3b0f",
+    "docker_url": "tgcr-gz.turing-agi.com/public/qwen/qwen3.6-35b-a3b-spark:latest",
+    "ngc_url": "nvcr.io/nim/qwen/qwen3.6-35b-a3b:1.7.0-variant",
+    "tag_name": "latest"
+   }
+  ],
+  "model_type": "vlm",
+  "name": "Qwen3.6-35B-A3B-DGX-Spark",
+  "ngc_url": "nvcr.io/nim/qwen/qwen3.6-35b-a3b:1.7.0-variant"
+ }
+}

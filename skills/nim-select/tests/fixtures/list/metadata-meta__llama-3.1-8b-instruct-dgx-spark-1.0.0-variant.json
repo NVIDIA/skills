@@ -1,0 +1,14 @@
+{
+ "profiles": [
+  {
+   "profile_id": "bfb2c8a2d4dceba7d2629c856113eb12f5ce60d6de4e10369b4b334242229cfa",
+   "precision": "fp8",
+   "inference_backend": "vllm",
+   "tensor_parallel_size": 1,
+   "workspace_hash": "e8fd1d4848c7c3354b9a71c368608fd82e89e32a4b76493c25652b94722bce2d",
+   "feat_lora": false,
+   "gpu_device": "2e12:10de",
+   "tested_gpu_devices": []
+  }
+ ]
+}

@@ -1,0 +1,81 @@
+{
+ "apiVersion": "v1",
+ "items": [
+  {
+   "metadata": {
+    "name": "team-gpus"
+   },
+   "spec": {
+    "hard": {
+     "requests.nvidia.com/gpu": "8"
+    }
+   },
+   "status": {
+    "hard": {
+     "requests.nvidia.com/gpu": "8"
+    },
+    "used": {
+     "requests.nvidia.com/gpu": "2"
+    }
+   }
+  },
+  {
+   "metadata": {
+    "name": "tight-gpus"
+   },
+   "spec": {
+    "hard": {
+     "requests.nvidia.com/gpu": "4"
+    }
+   },
+   "status": {
+    "hard": {
+     "requests.nvidia.com/gpu": "4"
+    },
+    "used": {
+     "requests.nvidia.com/gpu": "1"
+    }
+   }
+  },
+  {
+   "metadata": {
+    "name": "batch-only"
+   },
+   "spec": {
+    "hard": {
+     "requests.nvidia.com/gpu": "1"
+    },
+    "scopes": [
+     "NotBestEffort"
+    ]
+   },
+   "status": {
+    "hard": {
+     "requests.nvidia.com/gpu": "1"
+    },
+    "used": {
+     "requests.nvidia.com/gpu": "0"
+    }
+   }
+  },
+  {
+   "metadata": {
+    "name": "cpu"
+   },
+   "spec": {
+    "hard": {
+     "requests.cpu": "64"
+    }
+   },
+   "status": {
+    "hard": {
+     "requests.cpu": "64"
+    },
+    "used": {
+     "requests.cpu": "3"
+    }
+   }
+  }
+ ],
+ "kind": "List"
+}

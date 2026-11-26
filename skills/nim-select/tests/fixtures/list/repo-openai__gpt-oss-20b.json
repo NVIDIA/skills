@@ -1,0 +1,45 @@
+{
+ "name": "gpt-oss-20b",
+ "displayName": "GPT-OSS-20B",
+ "tags": [
+  "2.1.5",
+  "2.1.4",
+  "2.0.13",
+  "2.0.12",
+  "2.0.11",
+  "2.0.10",
+  "2.0.9",
+  "2.0.8",
+  "2.0.7",
+  "2.0.6",
+  "2.0.5",
+  "2.0.4",
+  "2.0.3",
+  "2.0.2",
+  "2.0.1",
+  "1.6.1-variant",
+  "1.6.1",
+  "1.5.2-variant",
+  "1.12.4",
+  "1.12.3",
+  "latest",
+  "1.12.1",
+  "1.12",
+  "1"
+ ],
+ "latestTag": "latest",
+ "latestArchitectureVariants": [
+  {
+   "os": "linux",
+   "architecture": "arm64"
+  },
+  {
+   "os": "linux",
+   "architecture": "amd64"
+  }
+ ],
+ "latestImageSize": 11975569582,
+ "canGuestPull": true,
+ "isPublic": true,
+ "description": "# **Deployment Geography:**\n\nGlobal \n\n## **Release Date:**\n\nBuild.Nvidia.com 08/05/2025 via  \n[GTP-OSS-20B Model by OpenAI | NVIDIA NIM](https://build.nvidia.com/openai/gpt-oss-20b)\n\nH"
+}
