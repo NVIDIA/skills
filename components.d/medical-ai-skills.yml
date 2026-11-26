@@ -31,6 +31,8 @@ skills:
     catalog_dir: nv-reason-ct
   - path: skills/nv-reason-cxr/
     catalog_dir: nv-reason-cxr
+  - path: skills/nv-reason-pathwsi/
+    catalog_dir: nv-reason-pathwsi
   - path: skills/nv-segment-ct/
     catalog_dir: nv-segment-ct
   - path: skills/nv-segment-ct-finetune/
