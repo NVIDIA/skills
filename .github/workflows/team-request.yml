@@ -150,8 +150,8 @@ jobs:
             page=$((page + 1))
           done
 
-          # Same rule as require-nvskills-status.yml: a path under plugins/
-          # is watched only when plugins/<name>/plugin.json exists at the PR
+          # Plugin validation can still be requested even though the required
+          # status check excludes plugins/. Watch plugin.json at the PR
           # head or base. Any answer other than 200 or 404 counts as a plugin.
           is_plugin_dir_at() {
             local encoded code
