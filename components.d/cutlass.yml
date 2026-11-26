@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: Apache-2.0 AND CC-BY-4.0
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+name: CUTLASS
+repo: NVIDIA/cutlass
+ref: main
+description: Help developers migrate CuTe DSL code across releases using official deprecation guidance.
+skills:
+  - path: skills/cute-dsl-deprecation-migration/
+    catalog_dir: cute-dsl-deprecation-migration
+links:
+  contributing: README.md
+  security: false
