@@ -1,0 +1,40 @@
+{
+ "profiles": [
+  {
+   "feat_lora": false,
+   "inference_backend": "vllm",
+   "precision": "fp8",
+   "profile_id": "38190c8448a64eca2c7eb94bd64884e516af8f252d7d55207ab6147ed85aaa87",
+   "tensor_parallel_size": 1,
+   "tested_gpu_devices": [],
+   "workspace_hash": "4407bc8b860a5ab4e98beb0a1aabb1eb7ef5409703fa8d4aa2bd088e513723b0"
+  },
+  {
+   "feat_lora": false,
+   "inference_backend": "vllm",
+   "precision": "bf16",
+   "profile_id": "667687465061487702bb16109bafab38155534c0691ad88bbe92587f5fd1096b",
+   "tensor_parallel_size": 1,
+   "tested_gpu_devices": [],
+   "workspace_hash": "cd2a70b69557e2d13e08a75c000c50cc758646bfd67def53856b41fdf2745055"
+  },
+  {
+   "feat_lora": false,
+   "inference_backend": "vllm",
+   "precision": "fp8",
+   "profile_id": "b86caa3119174abb952c5a2eef949985e34ee4feb21c1ccb3e520ddeb6342463",
+   "tensor_parallel_size": 2,
+   "tested_gpu_devices": [],
+   "workspace_hash": "4407bc8b860a5ab4e98beb0a1aabb1eb7ef5409703fa8d4aa2bd088e513723b0"
+  },
+  {
+   "feat_lora": false,
+   "inference_backend": "vllm",
+   "precision": "bf16",
+   "profile_id": "c7f51d026a5191bc59a52b6344302e56e93ab64cb6db94a66b0f545405406534",
+   "tensor_parallel_size": 2,
+   "tested_gpu_devices": [],
+   "workspace_hash": "cd2a70b69557e2d13e08a75c000c50cc758646bfd67def53856b41fdf2745055"
+  }
+ ]
+}

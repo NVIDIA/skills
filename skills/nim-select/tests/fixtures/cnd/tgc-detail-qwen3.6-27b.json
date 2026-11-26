@@ -1,0 +1,20 @@
+{
+ "code": 200,
+ "data": {
+  "arch": null,
+  "id": 100341,
+  "image_tags": [
+   {
+    "arch": null,
+    "create_time": "2026-04-24 12:36:20.961259",
+    "digest": "sha256:9bfb636e4694c2ec7f4ce9f6993b6211c4f593060f1b070c6e06a295090fe469",
+    "docker_url": "tgcr-gz.turing-agi.com/public/qwen/qwen3.6-27b:latest",
+    "ngc_url": "nvcr.io/nim/qwen/qwen3.6-27b:1.7.0-variant",
+    "tag_name": "latest"
+   }
+  ],
+  "model_type": "vlm",
+  "name": "Qwen3.6-27B",
+  "ngc_url": "nvcr.io/nim/qwen/qwen3.6-27b:1.7.0-variant"
+ }
+}

@@ -1,0 +1,24 @@
+{
+ "code": 200,
+ "data": {
+  "items": [
+   {
+    "arch": "amd64",
+    "id": 100332,
+    "model_type": "llm",
+    "name": " GLM-5.1",
+    "ngc_url": "nvcr.io/nim/zai-org/glm-51:1.8.0-turbo"
+   },
+   {
+    "arch": "amd64",
+    "id": 100301,
+    "model_type": "llm",
+    "name": "GLM-5",
+    "ngc_url": "nvcr.io/nim/zai-org/glm-5:1.7-variant"
+   }
+  ],
+  "page": 1,
+  "size": 100,
+  "total": 2
+ }
+}

@@ -1,0 +1,149 @@
+[
+ {
+  "name": "cnd/nim-base-container/vllm-model-free-nim-spark"
+ },
+ {
+  "name": "cnd/qwen/qwen3.5-35b-a3b"
+ },
+ {
+  "name": "cnd/z-ai/glm-5.3-flash"
+ },
+ {
+  "name": "cnd/nim-base-container/sglang-model-free-nim-spark"
+ },
+ {
+  "name": "cnd/deepseek-ai/deepseek-v4-flash-0731-spark"
+ },
+ {
+  "name": "cnd/qwen/qwen3.6-35b-a3b-spark"
+ },
+ {
+  "name": "cnd/google/gemma-4-26b-a4b-spark"
+ },
+ {
+  "name": "cnd/qwen3.6-35b-a3b-spark"
+ },
+ {
+  "name": "cnd/nim-base-container/china-sglang-basecontainer-spark"
+ },
+ {
+  "name": "cnd/minimaxai/minimax-m2.5-spark"
+ },
+ {
+  "name": "cnd/qwen3.5-35b-a3b-spark-nim"
+ },
+ {
+  "name": "cnd/nim/rdt"
+ },
+ {
+  "name": "cnd/isaac-sim"
+ },
+ {
+  "name": "cnd/nvidia/isaac-sim"
+ },
+ {
+  "name": "cnd/nim/qwen/qwen3-32b-dgx-spark-s3"
+ },
+ {
+  "name": "cnd/nvidia/blueprint/vss-engine"
+ },
+ {
+  "name": "cnd/nim/nvidia/llama-3.2-nv-rerankqa-1b-v2-s3"
+ },
+ {
+  "name": "cnd/qwen3-30b-a3b-nvfp4"
+ },
+ {
+  "name": "cnd/qwen/qwen3-32b-dgx-spark-s3"
+ },
+ {
+  "name": "cnd/nim/meta/llama-3.1-8b-instruct-dgx-spark-s3"
+ },
+ {
+  "name": "cnd/nim/nvidia/nvidia-nemotron-nano-9b-v2-dgx-spark-s3"
+ },
+ {
+  "name": "cnd/nim/nvidia/parakeet-ctc-1.1b-asr-s3"
+ },
+ {
+  "name": "cnd/minio"
+ },
+ {
+  "name": "cnd/neo4j"
+ },
+ {
+  "name": "cnd/milvus"
+ },
+ {
+  "name": "cnd/etcd"
+ },
+ {
+  "name": "cnd/busybox"
+ },
+ {
+  "name": "cnd/ubuntu_oras"
+ },
+ {
+  "name": "cnd/vllm-openai"
+ },
+ {
+  "name": "cnd/nim/deepseek-ai/deepseek-r1"
+ },
+ {
+  "name": "cnd/nim/leaper/comfyui"
+ },
+ {
+  "name": "cnd/aitrepreneur/comfyui"
+ },
+ {
+  "name": "cnd/stable-diffusion"
+ },
+ {
+  "name": "cnd/nim/ipd/proteinmpnn"
+ },
+ {
+  "name": "cnd/nim/nvidia/vista3d"
+ },
+ {
+  "name": "cnd/nim/nvidia/nv-embedqa-mistral-7b-v2"
+ },
+ {
+  "name": "cnd/nim/nvidia/molmim"
+ },
+ {
+  "name": "cnd/nim/nvidia/nv-rerankqa-mistral-4b-v3"
+ },
+ {
+  "name": "cnd/nim/nvidia/fastpitch-hifigan-tts"
+ },
+ {
+  "name": "cnd/nim/nvidia/parakeet-ctc-1.1b-asr"
+ },
+ {
+  "name": "cnd/nim/nvidia/megatron-1b-nmt"
+ },
+ {
+  "name": "cnd/nim/nvidia/nvclip"
+ },
+ {
+  "name": "cnd/nim/nvidia/maxine-eye-contact"
+ },
+ {
+  "name": "cnd/nim/nvidia/nv-embedqa-e5-v5"
+ },
+ {
+  "name": "cnd/nim/nvidia/fourcastnet"
+ },
+ {
+  "name": "cnd/nim/deepmind/alphafold2"
+ },
+ {
+  "name": "cnd/nim/deepmind/alphafold2-multimer"
+ },
+ {
+  "name": "cnd/nim/qwen/qwen-2.5-7b-instruct"
+ },
+ {
+  "name": "cnd/stable-diffusion-3.5-large"
+ }
+]

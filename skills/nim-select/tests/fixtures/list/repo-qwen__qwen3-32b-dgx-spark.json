@@ -1,0 +1,22 @@
+{
+ "name": "qwen3-32b-dgx-spark",
+ "displayName": "Qwen3-32B NIM for DGX Spark",
+ "tags": [
+  "1.1.0-variant",
+  "1.1",
+  "1.1.0",
+  "1.0",
+  "1.0.0",
+  "1.0.0-variant",
+  "latest"
+ ],
+ "latestTag": "1.1.0-variant",
+ "latestArchitectureVariants": [
+  {
+   "os": "linux",
+   "architecture": "arm64"
+  }
+ ],
+ "latestImageSize": 9877765810,
+ "description": "### Deployment Geography: \nGlobal \n\n### Release Date: <br>\n\nHuggingface 04/28/2025 via [Qwen3-32B](https://huggingface.co/Qwen/Qwen3-32B)\n\n\n## Program Classes: <br>\n\nThis container hou"
+}

@@ -1,0 +1,269 @@
+{
+ "profiles": [
+  {
+   "profile_id": "00485b5bd82e34735afbc25936b27f5dc296b90274644bf2111f1e53dbeafdb3",
+   "gpu": "H100-PCIe",
+   "precision": "fp8",
+   "inference_backend": "vllm",
+   "tensor_parallel_size": 8,
+   "workspace_hash": "e3e1770fd66420f39a9b8fb217ef995d6cf34f20113b5dbfa2f5d55b37611049",
+   "feat_lora": false,
+   "gpu_device": "2331:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "05e9b92a93f75a4781af617d8e850b631eb6fd8c1bbd59c144746b4477af2d65",
+   "gpu": "H100",
+   "precision": "fp8",
+   "inference_backend": "vllm",
+   "tensor_parallel_size": 4,
+   "workspace_hash": "e3e1770fd66420f39a9b8fb217ef995d6cf34f20113b5dbfa2f5d55b37611049",
+   "feat_lora": false,
+   "gpu_device": "2330:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "0d0b28aa802d81e3ebaf52b7777977c5abfe81a1ca826c0e2715c083a67f053d",
+   "gpu": "H100",
+   "precision": "fp8",
+   "inference_backend": "vllm",
+   "tensor_parallel_size": 4,
+   "workspace_hash": "e3e1770fd66420f39a9b8fb217ef995d6cf34f20113b5dbfa2f5d55b37611049",
+   "feat_lora": true,
+   "gpu_device": "2330:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "154292bdf403cb0ad27b5e3bfb4a68c37cc470c6723fa87cc8b4ff1c0e70eca0",
+   "gpu": "H100-PCIe",
+   "precision": "fp8",
+   "inference_backend": "vllm",
+   "tensor_parallel_size": 4,
+   "workspace_hash": "e3e1770fd66420f39a9b8fb217ef995d6cf34f20113b5dbfa2f5d55b37611049",
+   "feat_lora": false,
+   "gpu_device": "2331:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "2997727b9ccc5571b124b4530211bce2362f9e6cbba85b3906f80b987620cb3e",
+   "gpu": "H100",
+   "precision": "fp8",
+   "inference_backend": "vllm",
+   "tensor_parallel_size": 8,
+   "workspace_hash": "e3e1770fd66420f39a9b8fb217ef995d6cf34f20113b5dbfa2f5d55b37611049",
+   "feat_lora": true,
+   "gpu_device": "2330:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "5221233bfcdab28833da4970905d1311afc980d69b3bfc1cf13b976d624e241f",
+   "gpu": "H200",
+   "precision": "fp8",
+   "inference_backend": "vllm",
+   "tensor_parallel_size": 2,
+   "workspace_hash": "e3e1770fd66420f39a9b8fb217ef995d6cf34f20113b5dbfa2f5d55b37611049",
+   "feat_lora": true,
+   "gpu_device": "2335:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "54a7c061690ebbf69e3ad0f14d10e5f8bad9e505bf9b2279f0f8ded15f1ab02e",
+   "gpu": "L40S",
+   "precision": "fp8",
+   "inference_backend": "vllm",
+   "tensor_parallel_size": 8,
+   "workspace_hash": "e3e1770fd66420f39a9b8fb217ef995d6cf34f20113b5dbfa2f5d55b37611049",
+   "feat_lora": true,
+   "gpu_device": "26b9:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "5abb1c2af067199566d69549a2acab3fb0f2c2b5a3c3f273e96acd833a0d5540",
+   "gpu": "H200",
+   "precision": "fp8",
+   "inference_backend": "vllm",
+   "tensor_parallel_size": 4,
+   "workspace_hash": "e3e1770fd66420f39a9b8fb217ef995d6cf34f20113b5dbfa2f5d55b37611049",
+   "feat_lora": true,
+   "gpu_device": "2335:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "646e4c46ada34ff357e65b8603e1eca8d9c532a1ad8603fe662f638bb4fe9e10",
+   "gpu": "H200",
+   "precision": "fp8",
+   "inference_backend": "vllm",
+   "tensor_parallel_size": 8,
+   "workspace_hash": "e3e1770fd66420f39a9b8fb217ef995d6cf34f20113b5dbfa2f5d55b37611049",
+   "feat_lora": true,
+   "gpu_device": "2335:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "6ac27245a8c48e3f4edc603d0932ed84fdc9364755e6e61e60999d93ce3737d2",
+   "gpu": "H100-NVL",
+   "precision": "fp8",
+   "inference_backend": "vllm",
+   "tensor_parallel_size": 8,
+   "workspace_hash": "e3e1770fd66420f39a9b8fb217ef995d6cf34f20113b5dbfa2f5d55b37611049",
+   "feat_lora": false,
+   "gpu_device": "2321:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "74ccfc41aba21121eb3ac8e8e46f6f935dc4605c760c4b4d2ba87d2d7ab9a289",
+   "gpu": "H100-PCIe",
+   "precision": "fp8",
+   "inference_backend": "vllm",
+   "tensor_parallel_size": 4,
+   "workspace_hash": "e3e1770fd66420f39a9b8fb217ef995d6cf34f20113b5dbfa2f5d55b37611049",
+   "feat_lora": true,
+   "gpu_device": "2331:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "7fa4a5a68c0338f16aef61de94977acfdacb7cabd848d38c49c48d2f639f04b3",
+   "precision": "bf16",
+   "inference_backend": "vllm",
+   "tensor_parallel_size": 2,
+   "workspace_hash": "e3e1770fd66420f39a9b8fb217ef995d6cf34f20113b5dbfa2f5d55b37611049",
+   "feat_lora": false,
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "9b7a88101964ebd9d30c1b48ed56c51ebe23f889f7a559533da85de1b864bccb",
+   "gpu": "H100-NVL",
+   "precision": "fp8",
+   "inference_backend": "vllm",
+   "tensor_parallel_size": 4,
+   "workspace_hash": "e3e1770fd66420f39a9b8fb217ef995d6cf34f20113b5dbfa2f5d55b37611049",
+   "feat_lora": false,
+   "gpu_device": "2321:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "a0308e11226d270761b54cbc15623e098958a2acffed9b24c02beacbf66e2378",
+   "gpu": "H200",
+   "precision": "fp8",
+   "inference_backend": "vllm",
+   "tensor_parallel_size": 4,
+   "workspace_hash": "e3e1770fd66420f39a9b8fb217ef995d6cf34f20113b5dbfa2f5d55b37611049",
+   "feat_lora": false,
+   "gpu_device": "2335:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "a16663db8933e8bbb6b587d3defa4a21cc340b476f87d98e0238487f26656433",
+   "gpu": "L40S",
+   "precision": "fp8",
+   "inference_backend": "vllm",
+   "tensor_parallel_size": 8,
+   "workspace_hash": "e3e1770fd66420f39a9b8fb217ef995d6cf34f20113b5dbfa2f5d55b37611049",
+   "feat_lora": false,
+   "gpu_device": "26b9:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "abb6a10845ba94c78e4d4113df83198f7bbbbd57b3ee7956a0567f64fedecc0c",
+   "gpu": "H200",
+   "precision": "fp8",
+   "inference_backend": "vllm",
+   "tensor_parallel_size": 2,
+   "workspace_hash": "e3e1770fd66420f39a9b8fb217ef995d6cf34f20113b5dbfa2f5d55b37611049",
+   "feat_lora": false,
+   "gpu_device": "2335:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "b41fd78c82397a0689e3e4ab4d7837ec6804886d4316fbfa02ebdbfbc99380aa",
+   "gpu": "H100",
+   "precision": "fp8",
+   "inference_backend": "vllm",
+   "tensor_parallel_size": 8,
+   "workspace_hash": "e3e1770fd66420f39a9b8fb217ef995d6cf34f20113b5dbfa2f5d55b37611049",
+   "feat_lora": false,
+   "gpu_device": "2330:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "b4d59a98b3451cf6d057551f0737a2429c81c0546e67436636f20483a5c63fe7",
+   "gpu": "H200",
+   "precision": "fp8",
+   "inference_backend": "vllm",
+   "tensor_parallel_size": 8,
+   "workspace_hash": "e3e1770fd66420f39a9b8fb217ef995d6cf34f20113b5dbfa2f5d55b37611049",
+   "feat_lora": false,
+   "gpu_device": "2335:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "c84b2a068e56a551906563035ed77f88c88cbe1a63c6768fb2d4a9e0af1e67ba",
+   "precision": "bf16",
+   "inference_backend": "vllm",
+   "tensor_parallel_size": 4,
+   "workspace_hash": "e3e1770fd66420f39a9b8fb217ef995d6cf34f20113b5dbfa2f5d55b37611049",
+   "feat_lora": false,
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "c9970cc64485fff403143b0e7757b404f0ebee8ffb2bdf5d323e41eaf1671e05",
+   "gpu": "H100-NVL",
+   "precision": "fp8",
+   "inference_backend": "vllm",
+   "tensor_parallel_size": 8,
+   "workspace_hash": "e3e1770fd66420f39a9b8fb217ef995d6cf34f20113b5dbfa2f5d55b37611049",
+   "feat_lora": true,
+   "gpu_device": "2321:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "cfe3c1b951b411cb952f7cafd7cef6543594dce1420f717612b00c6cecb5b7b4",
+   "precision": "bf16",
+   "inference_backend": "vllm",
+   "tensor_parallel_size": 4,
+   "workspace_hash": "e3e1770fd66420f39a9b8fb217ef995d6cf34f20113b5dbfa2f5d55b37611049",
+   "feat_lora": true,
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "e2b54e687585d75aa3e42d5f095fc46ca7e01431631815af13051c0497a2ce82",
+   "gpu": "H100-PCIe",
+   "precision": "fp8",
+   "inference_backend": "vllm",
+   "tensor_parallel_size": 8,
+   "workspace_hash": "e3e1770fd66420f39a9b8fb217ef995d6cf34f20113b5dbfa2f5d55b37611049",
+   "feat_lora": true,
+   "gpu_device": "2331:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "ea63a1ec997d8c4e33d5142086a0250000cd80190683a92aa85e5aa3ef4cf24f",
+   "precision": "bf16",
+   "inference_backend": "vllm",
+   "tensor_parallel_size": 8,
+   "workspace_hash": "e3e1770fd66420f39a9b8fb217ef995d6cf34f20113b5dbfa2f5d55b37611049",
+   "feat_lora": true,
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "eff6e1713ac81315260a650b7bf84c02087b5fabf3830216d15f17aa605c44fd",
+   "gpu": "H100-NVL",
+   "precision": "fp8",
+   "inference_backend": "vllm",
+   "tensor_parallel_size": 4,
+   "workspace_hash": "e3e1770fd66420f39a9b8fb217ef995d6cf34f20113b5dbfa2f5d55b37611049",
+   "feat_lora": true,
+   "gpu_device": "2321:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "f95be114df33dd6613105f76fd567a071ed3bd08232888a5ba2f0545a99dbd92",
+   "precision": "bf16",
+   "inference_backend": "vllm",
+   "tensor_parallel_size": 8,
+   "workspace_hash": "e3e1770fd66420f39a9b8fb217ef995d6cf34f20113b5dbfa2f5d55b37611049",
+   "feat_lora": false,
+   "tested_gpu_devices": []
+  }
+ ]
+}

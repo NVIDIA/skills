@@ -1,0 +1,37 @@
+{
+ "profiles": [
+  {
+   "profile_id": "1babcf07a50d04fb59c027a21006d6da5bc395305b77b3f1e90ca100bca3d674",
+   "gpu": "H20",
+   "precision": "fp8",
+   "inference_backend": "tensorrt_llm",
+   "tensor_parallel_size": 1,
+   "workspace_hash": "21b378c74657666770bb1cd9a9a356c16017e6a842809b9fdb35fb55bda2fce3",
+   "feat_lora": false,
+   "gpu_device": "232c:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "40ebabe3e5ae0940af07de2559bca9615360dc2c388570748d9cfc77292ac2c4",
+   "gpu": "h100",
+   "precision": "bf16",
+   "inference_backend": "tensorrt_llm",
+   "tensor_parallel_size": 1,
+   "workspace_hash": "6069765f27b5a67442862426fb6b23c092dfdd5ed455da33d3f4c703df6729f0",
+   "feat_lora": false,
+   "gpu_device": "2330:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "a2df598d4a8db85fe35d6dcc06a9d29a182916004b1bb362d67cae1027287701",
+   "gpu": "H20",
+   "precision": "bf16",
+   "inference_backend": "tensorrt_llm",
+   "tensor_parallel_size": 1,
+   "workspace_hash": "6069765f27b5a67442862426fb6b23c092dfdd5ed455da33d3f4c703df6729f0",
+   "feat_lora": false,
+   "gpu_device": "232c:10de",
+   "tested_gpu_devices": []
+  }
+ ]
+}

@@ -1,0 +1,8 @@
+{
+ "code": 200,
+ "data": {
+  "deploy": "deployDocker:\nstep 1: 命令会自动拉取模型文件，用户无需额外下载<pre><code>    docker run -it --rm \\\n    --gpus all \\\n    --shm-size=16GB \\\n    -u $(id -u)  \\\n    -e NIM_SDK_MAX_PARALLEL_DOWNLOAD_REQUESTS=3 \\\n     -e NIM_SDK_MAX_PARALLEL_FILE_REQUESTS=3  \\\n    -v \"/opt/nim/qwen3.6-27b:/opt/nim/.cache\" \\\n    -p 8000:8000 \\\nresource.turingcm.com/qwen/qwen3.6-27b:latest\n</code></pre>",
+  "id": "-20",
+  "name": "Qwen3.6-27B"
+ }
+}

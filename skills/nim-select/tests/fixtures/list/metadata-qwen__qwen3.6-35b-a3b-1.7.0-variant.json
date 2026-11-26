@@ -1,0 +1,238 @@
+{
+ "profiles": [
+  {
+   "profile_id": "05d57f70c6be5fed3bc2ac32f99dadf5082b537641f611645ebb680e5053d92d",
+   "gpu": "H20-3e",
+   "precision": "bf16",
+   "inference_backend": "sglang",
+   "tensor_parallel_size": 2,
+   "workspace_hash": "cdefa6b183ceaf38bc982efd24a1bfaed62cd9f44d0946cb272d4d10aeb724ee",
+   "feat_lora": false,
+   "gpu_device": "232c:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "10e92bba7459bfcd845bf2d0e23cd6d9db4453154211b79954d5d2a93748d2e1",
+   "precision": "fp8",
+   "inference_backend": "sglang",
+   "tensor_parallel_size": 1,
+   "workspace_hash": "bbdc9859bef319103249e21278813af489f0eb56af1bcc03ef3e3e77c43e8db9",
+   "feat_lora": false,
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "16a57ea0b2b5082b8ce78b06894c765d224990da09dbb532fddfda69992191ce",
+   "gpu": "H20-3e",
+   "precision": "bf16",
+   "inference_backend": "sglang",
+   "tensor_parallel_size": 1,
+   "workspace_hash": "cdefa6b183ceaf38bc982efd24a1bfaed62cd9f44d0946cb272d4d10aeb724ee",
+   "feat_lora": false,
+   "gpu_device": "232c:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "24b9dc1d8a82cf7c3e66eff9b8b6eb5e9f2c4d94daf702ace0c37f5fb1c76c87",
+   "gpu": "GB10",
+   "precision": "fp8",
+   "inference_backend": "sglang",
+   "tensor_parallel_size": 1,
+   "workspace_hash": "bbdc9859bef319103249e21278813af489f0eb56af1bcc03ef3e3e77c43e8db9",
+   "feat_lora": false,
+   "gpu_device": "2e12:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "2812910e90a3376403d057937426cab2c4ad57be03274269760404ba3f7cbfb1",
+   "precision": "bf16",
+   "inference_backend": "sglang",
+   "tensor_parallel_size": 1,
+   "workspace_hash": "cdefa6b183ceaf38bc982efd24a1bfaed62cd9f44d0946cb272d4d10aeb724ee",
+   "feat_lora": false,
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "288015217732f932a244c3ef2de4e379a440c9e219795905b88bf2f41ebecdda",
+   "gpu": "H100",
+   "precision": "fp8",
+   "inference_backend": "sglang",
+   "tensor_parallel_size": 1,
+   "workspace_hash": "bbdc9859bef319103249e21278813af489f0eb56af1bcc03ef3e3e77c43e8db9",
+   "feat_lora": false,
+   "gpu_device": "2330:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "2d53018cf44c4de87b8cbf4774ea4f5b50983a377d571712f562abdbdafabb2b",
+   "gpu": "H20-3e",
+   "precision": "fp8",
+   "inference_backend": "sglang",
+   "tensor_parallel_size": 2,
+   "workspace_hash": "bbdc9859bef319103249e21278813af489f0eb56af1bcc03ef3e3e77c43e8db9",
+   "feat_lora": false,
+   "gpu_device": "232c:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "2f7693e286f3f902b93742bb2ab7b41faadce1659e0fa4c1a1949e43f6f9d752",
+   "gpu": "H200",
+   "precision": "fp8",
+   "inference_backend": "sglang",
+   "tensor_parallel_size": 1,
+   "workspace_hash": "bbdc9859bef319103249e21278813af489f0eb56af1bcc03ef3e3e77c43e8db9",
+   "feat_lora": false,
+   "gpu_device": "2335:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "34a4be977b174af42a8e3dda87ceb1963781db357f91ebb032b458d86a24b00a",
+   "gpu": "H20",
+   "precision": "fp8",
+   "inference_backend": "sglang",
+   "tensor_parallel_size": 2,
+   "workspace_hash": "bbdc9859bef319103249e21278813af489f0eb56af1bcc03ef3e3e77c43e8db9",
+   "feat_lora": false,
+   "gpu_device": "2329:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "546ccc590ad4f56ce40064aebedc4d4024c21dac481a3d3535e10645778d722b",
+   "gpu": "H20",
+   "precision": "bf16",
+   "inference_backend": "sglang",
+   "tensor_parallel_size": 2,
+   "workspace_hash": "cdefa6b183ceaf38bc982efd24a1bfaed62cd9f44d0946cb272d4d10aeb724ee",
+   "feat_lora": false,
+   "gpu_device": "2329:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "5847e43be2748aa29d94b7e771273343779bbfe7082e6d54fcabcec2707de552",
+   "gpu": "H200",
+   "precision": "bf16",
+   "inference_backend": "sglang",
+   "tensor_parallel_size": 1,
+   "workspace_hash": "cdefa6b183ceaf38bc982efd24a1bfaed62cd9f44d0946cb272d4d10aeb724ee",
+   "feat_lora": false,
+   "gpu_device": "2335:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "8125a43d2dcaa31e543fb05946f6cd536ccfcfa05201bf7d42e69c4200a2917f",
+   "gpu": "H20",
+   "precision": "bf16",
+   "inference_backend": "sglang",
+   "tensor_parallel_size": 1,
+   "workspace_hash": "cdefa6b183ceaf38bc982efd24a1bfaed62cd9f44d0946cb272d4d10aeb724ee",
+   "feat_lora": false,
+   "gpu_device": "2329:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "89ca651363d4b371783d0a0e3c5f561f1f6cff043760f5ad28f21a8bbcf89f70",
+   "gpu": "H100",
+   "precision": "fp8",
+   "inference_backend": "sglang",
+   "tensor_parallel_size": 2,
+   "workspace_hash": "bbdc9859bef319103249e21278813af489f0eb56af1bcc03ef3e3e77c43e8db9",
+   "feat_lora": false,
+   "gpu_device": "2330:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "8db50f45f984c04553e87c959e7e9183e210af4b6880636526d2b7ef3925d957",
+   "precision": "fp8",
+   "inference_backend": "sglang",
+   "tensor_parallel_size": 2,
+   "workspace_hash": "bbdc9859bef319103249e21278813af489f0eb56af1bcc03ef3e3e77c43e8db9",
+   "feat_lora": false,
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "931e266d9411aeeb01f7439004e71972f3e6bae6662cf7d5a8fd6ab45f22f6f8",
+   "gpu": "H200",
+   "precision": "fp8",
+   "inference_backend": "sglang",
+   "tensor_parallel_size": 2,
+   "workspace_hash": "bbdc9859bef319103249e21278813af489f0eb56af1bcc03ef3e3e77c43e8db9",
+   "feat_lora": false,
+   "gpu_device": "2335:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "a88273098385cecb6c58f08d400f590fc1b8d8690636412c5877c874fb2fedef",
+   "gpu": "H20",
+   "precision": "fp8",
+   "inference_backend": "sglang",
+   "tensor_parallel_size": 1,
+   "workspace_hash": "bbdc9859bef319103249e21278813af489f0eb56af1bcc03ef3e3e77c43e8db9",
+   "feat_lora": false,
+   "gpu_device": "2329:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "b1e339090bd9aaaeb807dbc9e0dffbc89e1669093429be68445ad35fbec69005",
+   "gpu": "H100",
+   "precision": "bf16",
+   "inference_backend": "sglang",
+   "tensor_parallel_size": 2,
+   "workspace_hash": "cdefa6b183ceaf38bc982efd24a1bfaed62cd9f44d0946cb272d4d10aeb724ee",
+   "feat_lora": false,
+   "gpu_device": "2330:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "b3efdadc6674924a39c5a8bd54b04c44b1c7f8c99507c4f1ecc9c3ab4206ca43",
+   "gpu": "H20-3e",
+   "precision": "fp8",
+   "inference_backend": "sglang",
+   "tensor_parallel_size": 1,
+   "workspace_hash": "bbdc9859bef319103249e21278813af489f0eb56af1bcc03ef3e3e77c43e8db9",
+   "feat_lora": false,
+   "gpu_device": "232c:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "c7cef4741902cf35ccc1993db9820c20ed420276e02e8540de10502b97e1f8ba",
+   "precision": "bf16",
+   "inference_backend": "sglang",
+   "tensor_parallel_size": 2,
+   "workspace_hash": "cdefa6b183ceaf38bc982efd24a1bfaed62cd9f44d0946cb272d4d10aeb724ee",
+   "feat_lora": false,
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "ceb7c3d46bded77ecb6b51b87b80fe3a114a246dcdaeb8aa046465be1a800da3",
+   "gpu": "H200",
+   "precision": "bf16",
+   "inference_backend": "sglang",
+   "tensor_parallel_size": 2,
+   "workspace_hash": "cdefa6b183ceaf38bc982efd24a1bfaed62cd9f44d0946cb272d4d10aeb724ee",
+   "feat_lora": false,
+   "gpu_device": "2335:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "e1dfa2f48501a9afadf4310568823b241bd879612afaafe07945031d670ba7da",
+   "gpu": "B200",
+   "precision": "bf16",
+   "inference_backend": "sglang",
+   "tensor_parallel_size": 1,
+   "workspace_hash": "cdefa6b183ceaf38bc982efd24a1bfaed62cd9f44d0946cb272d4d10aeb724ee",
+   "feat_lora": false,
+   "gpu_device": "2901:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "f5a3413688a57214570476200cfa3c7e47202251fcb55ac47030d8d8866b6cdd",
+   "gpu": "B200",
+   "precision": "fp8",
+   "inference_backend": "sglang",
+   "tensor_parallel_size": 1,
+   "workspace_hash": "bbdc9859bef319103249e21278813af489f0eb56af1bcc03ef3e3e77c43e8db9",
+   "feat_lora": false,
+   "gpu_device": "2901:10de",
+   "tested_gpu_devices": []
+  }
+ ]
+}

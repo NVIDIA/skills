@@ -1,0 +1,59 @@
+{
+ "Architecture": "x86_64",
+ "OSType": "linux",
+ "NCPU": 256,
+ "MemTotal": 2434696544256,
+ "ServerVersion": "28.3.3",
+ "Driver": "overlay2",
+ "DockerRootDir": "/var/lib/docker",
+ "Runtimes": {
+  "io.containerd.runc.v2": {
+   "path": "runc"
+  },
+  "nvidia": {
+   "path": "nvidia-container-runtime"
+  },
+  "runc": {
+   "path": "runc"
+  }
+ },
+ "DefaultRuntime": "runc",
+ "DiscoveredDevices": [
+  {
+   "Source": "cdi",
+   "ID": "k8s.device-plugin.nvidia.com/gpu=GPU-23935a9e-d85b-925c-9b02-b2cb88bce597"
+  },
+  {
+   "Source": "cdi",
+   "ID": "k8s.device-plugin.nvidia.com/gpu=GPU-26d07992-9feb-e203-1d07-b64d69b4b977"
+  },
+  {
+   "Source": "cdi",
+   "ID": "k8s.device-plugin.nvidia.com/gpu=GPU-5c3d9cda-bd3a-307a-89f1-0a7680645548"
+  },
+  {
+   "Source": "cdi",
+   "ID": "k8s.device-plugin.nvidia.com/gpu=GPU-658e2bf7-0647-1c94-0674-68cdecdb970f"
+  },
+  {
+   "Source": "cdi",
+   "ID": "k8s.device-plugin.nvidia.com/gpu=GPU-775eeec4-9f32-8d50-5967-d3e96ae1dd8c"
+  },
+  {
+   "Source": "cdi",
+   "ID": "k8s.device-plugin.nvidia.com/gpu=GPU-7c6653ff-efde-73a1-8752-399a605d7d65"
+  },
+  {
+   "Source": "cdi",
+   "ID": "k8s.device-plugin.nvidia.com/gpu=GPU-8b6635c7-30b2-3f88-5ebf-320d09ec48f5"
+  },
+  {
+   "Source": "cdi",
+   "ID": "k8s.device-plugin.nvidia.com/gpu=GPU-e0a7ddc3-3b18-9a2f-8774-4ab990276160"
+  }
+ ],
+ "CDISpecDirs": [
+  "/etc/cdi",
+  "/var/run/cdi"
+ ]
+}

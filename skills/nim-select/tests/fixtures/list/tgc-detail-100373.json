@@ -1,0 +1,21 @@
+{
+ "code": 200,
+ "data": {
+  "id": 100373,
+  "name": "DIX AI Credit Agent",
+  "model_type": "llm",
+  "arch": "amd64",
+  "ngc_url": null,
+  "supported_devices": "Generic",
+  "image_tags": [
+   {
+    "tag_name": "1.0.0",
+    "docker_url": "tgcr.turing-agi.com/cnd/trngt/dix-credit-nim-proxy:1.0.0",
+    "ngc_url": null,
+    "arch": "amd64",
+    "digest": "sha256:a7a32a9b9feb82e54e2e470e67831d98f1a1b5b7b997e1827a8e485dcde1d70b",
+    "create_time": "2026-09-08 11:00:45.607642"
+   }
+  ]
+ }
+}

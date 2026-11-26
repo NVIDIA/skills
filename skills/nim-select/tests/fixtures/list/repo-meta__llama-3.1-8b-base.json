@@ -1,0 +1,23 @@
+{
+ "name": "llama-3.1-8b-base",
+ "displayName": "Llama-3.1-8b-base",
+ "tags": [
+  "1.1.2",
+  "1.1.1",
+  "1.1",
+  "1",
+  "latest",
+  "1.1.0"
+ ],
+ "latestTag": "1.1.2",
+ "latestArchitectureVariants": [
+  {
+   "os": "linux",
+   "architecture": "amd64"
+  }
+ ],
+ "latestImageSize": 6729258664,
+ "canGuestPull": false,
+ "isPublic": false,
+ "description": "## Model Overview\n(the rest of the card is left out; it names no region)\n"
+}

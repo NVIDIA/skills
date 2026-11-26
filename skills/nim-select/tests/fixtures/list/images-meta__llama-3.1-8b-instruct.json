@@ -1,0 +1,566 @@
+{
+ "images": [
+  {
+   "tag": "latest",
+   "digest": "sha256:7f2dbcb2d4919371cacc037647a572ff53a0cc60d49655ed10a11d7bd998cb7d",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    },
+    {
+     "os": "linux",
+     "architecture": "arm64"
+    }
+   ]
+  },
+  {
+   "tag": "2.1.6",
+   "digest": "sha256:7f2dbcb2d4919371cacc037647a572ff53a0cc60d49655ed10a11d7bd998cb7d",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    },
+    {
+     "os": "linux",
+     "architecture": "arm64"
+    }
+   ]
+  },
+  {
+   "tag": "2.1.5",
+   "digest": "sha256:0583c3c2f068b2386341b193482d9ac148ace85bc8c2f0d54310c1707d9c22d6",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    },
+    {
+     "os": "linux",
+     "architecture": "arm64"
+    }
+   ]
+  },
+  {
+   "tag": "2.1.4",
+   "digest": "sha256:20d83a3e4e14ccb4364cd4aaebb9d93ab8cfeaeef586075f821a1f1caf8c8f4d",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    },
+    {
+     "os": "linux",
+     "architecture": "arm64"
+    }
+   ]
+  },
+  {
+   "tag": "2.0.13",
+   "digest": "sha256:9d6faef811583204d33124f1339ddea77e8fa2706d530ab115e51dbf4eb9e493",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    },
+    {
+     "os": "linux",
+     "architecture": "arm64"
+    }
+   ]
+  },
+  {
+   "tag": "2.0.12",
+   "digest": "sha256:d2c94c1d654c3e80b8bc08cc83298d2ba4e219dff41d1092555795edb93c6545",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "arm64"
+    },
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    }
+   ]
+  },
+  {
+   "tag": "2.0.11",
+   "digest": "sha256:4bd86b250c7eac29e037fe2edadc627c9754329133e6d0c72976d9294ebdcdef",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    },
+    {
+     "os": "linux",
+     "architecture": "arm64"
+    }
+   ]
+  },
+  {
+   "tag": "2.0.10",
+   "digest": "sha256:524f75bb099c8c6946890a570e00891ace2de9c03239d0d7805d85e1d25ff658",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "arm64"
+    },
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    }
+   ]
+  },
+  {
+   "tag": "2.0.9",
+   "digest": "sha256:ff4a361f02cafb2c32c910c51a4abeffa8907d40a6fd5f92595cb18c01a0d2ca",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    },
+    {
+     "os": "linux",
+     "architecture": "arm64"
+    }
+   ]
+  },
+  {
+   "tag": "2.0.8",
+   "digest": "sha256:a4df8d34443c424811d83fdf9e284e51c5fe71b1444bc12cb5875ea851197c73",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    },
+    {
+     "os": "linux",
+     "architecture": "arm64"
+    }
+   ]
+  },
+  {
+   "tag": "2.0.7",
+   "digest": "sha256:e553e0ca352e5cba77cd4f87f954007eac6e7b6f35b7e75a52074d5b8ceb1dec",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    },
+    {
+     "os": "linux",
+     "architecture": "arm64"
+    }
+   ]
+  },
+  {
+   "tag": "2.0.6",
+   "digest": "sha256:31e360dbb15f825d69e5d68c2032e334301523b4957091270385ed7ef3db5e81",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "arm64"
+    },
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    }
+   ]
+  },
+  {
+   "tag": "2.0.5",
+   "digest": "sha256:f638f47091ac546fab64af017460e7e3ec8ffd8789c4bc40778e921363201cf3",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "arm64"
+    },
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    }
+   ]
+  },
+  {
+   "tag": "2.0.4",
+   "digest": "sha256:b921b5c79f38491afe181564d70f4675ad99ff9a7f714233da0120b6eda77e97",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "arm64"
+    },
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    }
+   ]
+  },
+  {
+   "tag": "2.0.3",
+   "digest": "sha256:4c912ccaf0d9ddf84a230df2dc196b4e68be882a29974429dbec58808374cfc0",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    },
+    {
+     "os": "linux",
+     "architecture": "arm64"
+    }
+   ]
+  },
+  {
+   "tag": "2.0.2",
+   "digest": "sha256:acc67e90d5eb62c4bb514ae679a5e895ce70bd2b105379ada24b4f7d63babee7",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    },
+    {
+     "os": "linux",
+     "architecture": "arm64"
+    }
+   ]
+  },
+  {
+   "tag": "2.0.1",
+   "digest": "sha256:d1e8bcd4f638592cb409a83f87997a7f4ea4f8f380bc2e2f7db27ad7f9e9794a",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    },
+    {
+     "os": "linux",
+     "architecture": "arm64"
+    }
+   ]
+  },
+  {
+   "tag": "1.15",
+   "digest": "sha256:982d053fd6f0a3808709c70d699bbd29d9329152e8c62a325e16df317abfab1b",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    },
+    {
+     "os": "linux",
+     "architecture": "arm64"
+    }
+   ]
+  },
+  {
+   "tag": "1.15.5",
+   "digest": "sha256:982d053fd6f0a3808709c70d699bbd29d9329152e8c62a325e16df317abfab1b",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    },
+    {
+     "os": "linux",
+     "architecture": "arm64"
+    }
+   ]
+  },
+  {
+   "tag": "1",
+   "digest": "sha256:982d053fd6f0a3808709c70d699bbd29d9329152e8c62a325e16df317abfab1b",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    },
+    {
+     "os": "linux",
+     "architecture": "arm64"
+    }
+   ]
+  },
+  {
+   "tag": "1.15.4",
+   "digest": "sha256:7573e2b868b25a1457668c02b8fb9f5145af3858acafbc68d23c56a5dbfc1ff0",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    },
+    {
+     "os": "linux",
+     "architecture": "arm64"
+    }
+   ]
+  },
+  {
+   "tag": "1.15.2",
+   "digest": "sha256:7883cc9041e7d306e180fa7c054888f0287804a4df341e2cffe988d60e9cfe4c",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    },
+    {
+     "os": "linux",
+     "architecture": "arm64"
+    }
+   ]
+  },
+  {
+   "tag": "1.13.1",
+   "digest": "sha256:bc8a12da7ca78599609a60d30cdcce576de5bbb80ad7a87b9a9a5c6ade634c99",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "arm64"
+    },
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    }
+   ]
+  },
+  {
+   "tag": "1.13",
+   "digest": "sha256:bc8a12da7ca78599609a60d30cdcce576de5bbb80ad7a87b9a9a5c6ade634c99",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "arm64"
+    },
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    }
+   ]
+  },
+  {
+   "tag": "1.10.1",
+   "digest": "sha256:0635c4b22dc9716bade24a4c4461fa5c7595698e65eda26b4e9a2dc3b87b11ae",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "arm64"
+    },
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    }
+   ]
+  },
+  {
+   "tag": "1.10",
+   "digest": "sha256:0635c4b22dc9716bade24a4c4461fa5c7595698e65eda26b4e9a2dc3b87b11ae",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "arm64"
+    },
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    }
+   ]
+  },
+  {
+   "tag": "1.12.0",
+   "digest": "sha256:4b8c96eb046ec6355d1db12c6b1e7c95d7048acf2ff949f93750c76f4ffd7382",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    },
+    {
+     "os": "linux",
+     "architecture": "arm64"
+    }
+   ]
+  },
+  {
+   "tag": "1.12",
+   "digest": "sha256:4b8c96eb046ec6355d1db12c6b1e7c95d7048acf2ff949f93750c76f4ffd7382",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    },
+    {
+     "os": "linux",
+     "architecture": "arm64"
+    }
+   ]
+  },
+  {
+   "tag": "1.8.6",
+   "digest": "sha256:52254d9919876dfcf3be3d14e1adfe9cc324a756b81048ac4f203ae8ade2e39a",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    },
+    {
+     "os": "linux",
+     "architecture": "arm64"
+    }
+   ]
+  },
+  {
+   "tag": "1.8",
+   "digest": "sha256:52254d9919876dfcf3be3d14e1adfe9cc324a756b81048ac4f203ae8ade2e39a",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    },
+    {
+     "os": "linux",
+     "architecture": "arm64"
+    }
+   ]
+  },
+  {
+   "tag": "1.8.5",
+   "digest": "sha256:f14ac872407404d7aedc7333fe856298e372e2b712f40634bdf5a10c2b70ec24",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    },
+    {
+     "os": "linux",
+     "architecture": "arm64"
+    }
+   ]
+  },
+  {
+   "tag": "1.8.4",
+   "digest": "sha256:7d5c5a0a6fff6d815eb9a04b6685e198f6061e8c79bd4a730ddf6fd27bf6d517",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "arm64"
+    },
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    }
+   ]
+  },
+  {
+   "tag": "1.8.3",
+   "digest": "sha256:01174cf9d292b0a32a1e64da149b0fbfce7a99390d3c0ad1cdbba5158bc7a8e9",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    },
+    {
+     "os": "linux",
+     "architecture": "arm64"
+    }
+   ]
+  },
+  {
+   "tag": "1.8.0-RTX",
+   "digest": "sha256:ef58fdd066bea8a4550a8400af1ebe11f1ec91d23c6c3bf38363cf39445aa72c",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    }
+   ]
+  },
+  {
+   "tag": "1.3.3",
+   "digest": "sha256:088a7f400286291e9c1512e326596f4caedd2ed7aa30b909d78cbd3727b55ee8",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    }
+   ]
+  },
+  {
+   "tag": "1.3",
+   "digest": "sha256:088a7f400286291e9c1512e326596f4caedd2ed7aa30b909d78cbd3727b55ee8",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    }
+   ]
+  },
+  {
+   "tag": "1.3.0",
+   "digest": "sha256:fa271015bde1ffb6d932a38b39ba698c585ca92c0373c09322c90b72cd0fc21c",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    }
+   ]
+  },
+  {
+   "tag": "1.2.2",
+   "digest": "sha256:e990eb6915c0917509318942bb5440291b0a2d498bdd6f2ebc1b8dfc4580f2d4",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    }
+   ]
+  },
+  {
+   "tag": "1.2",
+   "digest": "sha256:e990eb6915c0917509318942bb5440291b0a2d498bdd6f2ebc1b8dfc4580f2d4",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    }
+   ]
+  },
+  {
+   "tag": "1.1.2",
+   "digest": "sha256:c53ac18b1161899e3b7006e4cb24737c218f90c320ca2552a5d75e75d9fc4931",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    }
+   ]
+  },
+  {
+   "tag": "1.1",
+   "digest": "sha256:c53ac18b1161899e3b7006e4cb24737c218f90c320ca2552a5d75e75d9fc4931",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    }
+   ]
+  },
+  {
+   "tag": "1.1.1",
+   "digest": "sha256:0ce5690ab1bdaa3aae758a5aa9570fa65dcb56ad8d91d16a6e583c46bcca6bed",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    }
+   ]
+  },
+  {
+   "tag": "1.1.0",
+   "digest": "sha256:5dbfefe3788551319db70a63607089d4bd1aab4d05940402ab75d6ea5e3d3467",
+   "architectureVariants": [
+    {
+     "os": "linux",
+     "architecture": "amd64"
+    }
+   ]
+  }
+ ]
+}

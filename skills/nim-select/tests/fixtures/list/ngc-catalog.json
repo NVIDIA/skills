@@ -1,0 +1,135 @@
+{
+ "resultTotal": 12,
+ "resultPageTotal": 1,
+ "results": [
+  {
+   "groupValue": "_scored",
+   "totalCount": 1,
+   "resources": [
+    {
+     "resourceType": "CONTAINER",
+     "resourceId": "nim/arc/evo2",
+     "orgName": "nim",
+     "teamName": "arc",
+     "name": "evo2",
+     "displayName": "Evo 2",
+     "description": "Evo 2 is a biological foundation model that is able to integrate information over long genomic sequences."
+    }
+   ]
+  },
+  {
+   "groupValue": "CONTAINER",
+   "totalCount": 12,
+   "resources": [
+    {
+     "resourceType": "CONTAINER",
+     "resourceId": "nim/meta/llama-3.1-8b-base",
+     "orgName": "nim",
+     "teamName": "meta",
+     "name": "llama-3.1-8b-base",
+     "displayName": "Llama-3.1-8b-base",
+     "description": "NVIDIA NIM for GPU accelerated Llama 3.1 8B inference through OpenAI compatible APIs"
+    },
+    {
+     "resourceType": "CONTAINER",
+     "resourceId": "nim/meta/llama-3.1-8b-instruct",
+     "orgName": "nim",
+     "teamName": "meta",
+     "name": "llama-3.1-8b-instruct",
+     "displayName": "Llama-3.1-8B-Instruct",
+     "description": "NVIDIA NIM for GPU accelerated Llama-3.1-8B-Instruct inference through OpenAI compatible APIs"
+    },
+    {
+     "resourceType": "CONTAINER",
+     "resourceId": "nim/meta/llama-3.1-8b-instruct-dgx-spark",
+     "orgName": "nim",
+     "teamName": "meta",
+     "name": "llama-3.1-8b-instruct-dgx-spark",
+     "displayName": "Llama-3.1-8b-Instruct-DGX-Spark",
+     "description": "Llama 3.1 8B is optimized for dialogue and conversational use cases, making capable of following user instructions to perform a wide variety of natural language processing tasks. This container is designed to run on NVIDIA DGX Spark."
+    },
+    {
+     "resourceType": "CONTAINER",
+     "resourceId": "nim/meta/llama-3.1-8b-instruct-pb6",
+     "orgName": "nim",
+     "teamName": "meta",
+     "name": "llama-3.1-8b-instruct-pb6",
+     "displayName": "llama-3.1-8b-instruct-pb6",
+     "description": "This container houses the Llama-3.1-8B-Instruct, which is an 8 billion parameter, instruction-tuned large language model created by Meta."
+    },
+    {
+     "resourceType": "CONTAINER",
+     "resourceId": "nim/meta/llama-4-scout-17b-16e-instruct",
+     "orgName": "nim",
+     "teamName": "meta",
+     "name": "llama-4-scout-17b-16e-instruct",
+     "displayName": "Llama 4 Scout 17B 16E Instruct",
+     "description": "The Llama 4 collection of models are natively multimodal AI models that enable text and multimodal experiences."
+    },
+    {
+     "resourceType": "CONTAINER",
+     "resourceId": "nim/nvidia/model-free-nim",
+     "orgName": "nim",
+     "teamName": "nvidia",
+     "name": "model-free-nim",
+     "displayName": "Model-Free NIM",
+     "description": "Model-Free NIM container"
+    },
+    {
+     "resourceType": "CONTAINER",
+     "resourceId": "nim/nvidia/nv-embedqa-e5-v5",
+     "orgName": "nim",
+     "teamName": "nvidia",
+     "name": "nv-embedqa-e5-v5",
+     "displayName": "NVIDIA Retrieval QA E5 Embedding v5",
+     "description": "NVIDIA NIM for GPU accelerated NVIDIA Retrieval QA E5 Embedding v5 inference"
+    },
+    {
+     "resourceType": "CONTAINER",
+     "resourceId": "nim/nvidia/vllm-base-enterprise-nightly",
+     "orgName": "nim",
+     "teamName": "nvidia",
+     "name": "vllm-base-enterprise-nightly",
+     "displayName": "vLLM Model-Free NIM",
+     "description": "vLLM Model-Free NIM container."
+    },
+    {
+     "resourceType": "CONTAINER",
+     "resourceId": "nim/openai/gpt-oss-20b",
+     "orgName": "nim",
+     "teamName": "openai",
+     "name": "gpt-oss-20b",
+     "displayName": "GPT-OSS-20B",
+     "description": "NVIDIA NIM for GPU accelerated GPT-OSS-20B Model inference through OpenAI compatible APIs"
+    },
+    {
+     "resourceType": "CONTAINER",
+     "resourceId": "nim/qwen/qwen3-32b",
+     "orgName": "nim",
+     "teamName": "qwen",
+     "name": "qwen3-32b",
+     "displayName": "Qwen3-32B",
+     "description": "Qwen3-32B is a large language model with 32 billion parameters of the Qwen3 series that delivers groundbreaking advancements in reasoning"
+    },
+    {
+     "resourceType": "CONTAINER",
+     "resourceId": "nim/qwen/qwen3-32b-dgx-spark",
+     "orgName": "nim",
+     "teamName": "qwen",
+     "name": "qwen3-32b-dgx-spark",
+     "displayName": "Qwen3-32B NIM for DGX Spark",
+     "description": "Qwen3-32B NIM for DGX Spark"
+    },
+    {
+     "resourceType": "CONTAINER",
+     "resourceId": "nvidia/nemo-microservices/llama-3.2-nv-embedqa-1b-v2",
+     "orgName": "nvidia",
+     "teamName": "nemo-microservices",
+     "name": "llama-3.2-nv-embedqa-1b-v2",
+     "displayName": "NVIDIA Retrieval QA Llama 3.2 1B Embedding v2",
+     "description": "The NVIDIA Retrieval QA Llama3.2 1b Embedding NIM is an embedding NIM optimized for multilingual and crosslingual text question-answering retrieval."
+    }
+   ]
+  }
+ ]
+}

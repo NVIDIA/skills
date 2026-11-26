@@ -1,0 +1,23 @@
+[
+ {
+  "name": "cnd/nim-base-container/vllm-model-free-nim-spark"
+ },
+ {
+  "name": "cnd/qwen/qwen3.5-35b-a3b"
+ },
+ {
+  "name": "cnd/qwen3.6-35b-a3b-spark"
+ },
+ {
+  "name": "cnd/nim/nvidia/llama-3.2-nv-rerankqa-1b-v2-s3"
+ },
+ {
+  "name": "cnd/minio"
+ },
+ {
+  "name": "cnd/etcd"
+ },
+ {
+  "name": "cnd/nim/nvidia/parakeet-ctc-1.1b-asr"
+ }
+]

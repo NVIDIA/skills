@@ -37,9 +37,10 @@ components:
       - pva-setup
       - pva-spec
   - name: NIM
-    description: Deploy NVIDIA NIM LLMs with Docker, Helm or the NIM Operator, smoke-check which features work, tune runtime settings on measured evidence, and benchmark speed and accuracy.
+    description: Select an NVIDIA NIM that fits your GPUs, deploy NIM LLMs with Docker, Helm or the NIM Operator, smoke-check which features work, tune runtime settings on measured evidence, and benchmark speed and accuracy.
     catalog_dirs:
       - nim-benchmark
       - nim-deploy
+      - nim-select
       - nim-smoke-check
       - nim-tune

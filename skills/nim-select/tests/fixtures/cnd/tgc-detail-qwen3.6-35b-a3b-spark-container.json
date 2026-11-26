@@ -1,0 +1,20 @@
+{
+ "code": 200,
+ "data": {
+  "arch": "arm64",
+  "id": 100360,
+  "image_tags": [
+   {
+    "arch": "arm64",
+    "create_time": "2026-07-15 20:03:49.064374",
+    "digest": "sha256:b2adac23459c21856a9a166001427ce23dbcc95af8576475d6ae8e4c86cf3b0f",
+    "docker_url": "tgcr-gz.turing-agi.com/public/qwen/qwen3.6-35b-a3b-spark:latest",
+    "ngc_url": "nvcr.io/nim/qwen/qwen3.6-35b-a3b:1.7.0-variant",
+    "tag_name": "latest"
+   }
+  ],
+  "model_type": "vlm",
+  "name": "Qwen3.6-35B-A3B NIM Container for DGX Spark",
+  "ngc_url": "nvcr.io/nim/qwen/qwen3.6-35b-a3b:1.7.0-variant"
+ }
+}

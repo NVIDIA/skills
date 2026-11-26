@@ -1,0 +1,23 @@
+{
+ "name": "llama-3.1-8b-instruct-dgx-spark",
+ "displayName": "Llama-3.1-8b-Instruct-DGX-Spark",
+ "tags": [
+  "1.0",
+  "1.0.0-variant",
+  "1",
+  "latest"
+ ],
+ "latestTag": "1.0.0-variant",
+ "latestArchitectureVariants": [
+  {
+   "os": "linux",
+   "architecture": "amd64"
+  },
+  {
+   "os": "linux",
+   "architecture": "arm64"
+  }
+ ],
+ "latestImageSize": 9876776931,
+ "description": "# **Deployment Geography:**\n\nGlobal \n\n## **Release Date:**\n\nBuild.Nvidia.com 07/23/2024 via  \n[https://build.nvidia.com/meta/llama-3_1-8b-instruct](https://build.nvidia.com/meta/llama-"
+}

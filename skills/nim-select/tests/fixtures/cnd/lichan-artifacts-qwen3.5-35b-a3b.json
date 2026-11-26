@@ -1,0 +1,32 @@
+[
+ {
+  "digest": "sha256:59bfe493c0ab65a1f077349337f9f7dcb86fcc7de70f42fbda58e5af6982f972",
+  "extra_attrs": {
+   "architecture": "amd64",
+   "config": {
+    "Labels": {
+     "com.nvidia.nim.ngc_url": "nvcr.io/example-org/nim/qwen3.5-35b-a3b:modelscope_2",
+     "com.nvidia.nim.version": "1.7.0-variant"
+    }
+   },
+   "os": "linux"
+  },
+  "media_type": "application/vnd.docker.container.image.v1+json",
+  "references": null,
+  "size": 8482695050,
+  "tags": [
+   {
+    "name": "1.0.0"
+   },
+   {
+    "name": "1.0"
+   },
+   {
+    "name": "1"
+   },
+   {
+    "name": "latest"
+   }
+  ]
+ }
+]

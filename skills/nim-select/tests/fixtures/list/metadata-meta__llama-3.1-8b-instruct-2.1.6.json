@@ -1,0 +1,132 @@
+{
+ "profiles": [
+  {
+   "profile_id": "092ed4213624e774d24cdaf84e3b6222839bab2008a21d3c214ab46626366f90",
+   "precision": "bf16",
+   "inference_backend": "vllm",
+   "tensor_parallel_size": 1,
+   "pipeline_parallel_size": 1,
+   "workspace_hash": "24060b03a762f8091bac9b0a91ca378e8b84d9705ff444fa9672bf82df894c6c",
+   "min_vram_per_device_gb": 33.0,
+   "feat_lora": false,
+   "tested_gpu_devices": [
+    "20b0:10de",
+    "20b2:10de"
+   ]
+  },
+  {
+   "profile_id": "20739fe3e660205a0a64339c06bf2aa5c90f4935dd5e547b2b22d96f9c91fbc4",
+   "precision": "nvfp4",
+   "inference_backend": "vllm",
+   "tensor_parallel_size": 1,
+   "pipeline_parallel_size": 1,
+   "workspace_hash": "159f74e60af109fce4df933931fcabff18946bb6694add579b7cfa548a78ddbd",
+   "min_vram_per_device_gb": 24.0,
+   "feat_lora": true,
+   "tested_gpu_devices": [
+    "2901:10de"
+   ]
+  },
+  {
+   "profile_id": "2c84d95e1636bb8991b37a34ef4e7f46bf26448883ca133e8aaa2015fbcd0d91",
+   "gpu": "NVIDIA-H200",
+   "precision": "fp8",
+   "inference_backend": "vllm",
+   "tensor_parallel_size": 1,
+   "pipeline_parallel_size": 1,
+   "workspace_hash": "937c59e60e77dc6dae074242d8547504705e9eedebb260f9b298d6ece4f8c67d",
+   "min_vram_per_device_gb": 27.0,
+   "feat_lora": false,
+   "gpu_device": "2335:10de",
+   "tested_gpu_devices": [
+    "2335:10de"
+   ]
+  },
+  {
+   "profile_id": "4d9fed9cb9fa4c5694b793a6421b62077b812e4e0326a10032b948cc9ddc0712",
+   "precision": "fp8",
+   "inference_backend": "vllm",
+   "tensor_parallel_size": 1,
+   "pipeline_parallel_size": 1,
+   "workspace_hash": "937c59e60e77dc6dae074242d8547504705e9eedebb260f9b298d6ece4f8c67d",
+   "min_vram_per_device_gb": 27.0,
+   "feat_lora": true,
+   "tested_gpu_devices": [
+    "2330:10de"
+   ]
+  },
+  {
+   "profile_id": "82b90feb610821551179fa2292aad15c0392b18d123be19a1a71ad7088eed7a5",
+   "precision": "bf16",
+   "inference_backend": "vllm",
+   "tensor_parallel_size": 1,
+   "pipeline_parallel_size": 1,
+   "workspace_hash": "24060b03a762f8091bac9b0a91ca378e8b84d9705ff444fa9672bf82df894c6c",
+   "min_vram_per_device_gb": 33.0,
+   "feat_lora": true,
+   "tested_gpu_devices": [
+    "20b0:10de"
+   ]
+  },
+  {
+   "profile_id": "a28963301b18077db3454d5eb21f5678304936c5a425ddc552443de1f5449f2a",
+   "precision": "nvfp4",
+   "inference_backend": "vllm",
+   "tensor_parallel_size": 1,
+   "pipeline_parallel_size": 1,
+   "workspace_hash": "159f74e60af109fce4df933931fcabff18946bb6694add579b7cfa548a78ddbd",
+   "min_vram_per_device_gb": 24.0,
+   "feat_lora": false,
+   "tested_gpu_devices": [
+    "2941:10de",
+    "2bb5:10de",
+    "2c3a:10de",
+    "2e12:10de",
+    "3182:10de"
+   ]
+  },
+  {
+   "profile_id": "a4535ded75cd71a2495d8b334fee016f690176a0b333f27119a62a091d2dbee3",
+   "gpu": "NVIDIA-GB300",
+   "precision": "nvfp4",
+   "inference_backend": "vllm",
+   "tensor_parallel_size": 1,
+   "pipeline_parallel_size": 1,
+   "workspace_hash": "159f74e60af109fce4df933931fcabff18946bb6694add579b7cfa548a78ddbd",
+   "min_vram_per_device_gb": 24.0,
+   "feat_lora": false,
+   "gpu_device": "31c2:10de",
+   "tested_gpu_devices": []
+  },
+  {
+   "profile_id": "c4789f7af56c770c1c88b73da666886365534d6980b6b922b41fd97036c77d73",
+   "precision": "fp8",
+   "inference_backend": "vllm",
+   "tensor_parallel_size": 1,
+   "pipeline_parallel_size": 1,
+   "workspace_hash": "937c59e60e77dc6dae074242d8547504705e9eedebb260f9b298d6ece4f8c67d",
+   "min_vram_per_device_gb": 27.0,
+   "feat_lora": false,
+   "tested_gpu_devices": [
+    "2330:10de",
+    "233b:10de",
+    "26b9:10de"
+   ]
+  },
+  {
+   "profile_id": "ed8b932a6346eb9c2c761c9a456c315d30d822d27d016a0fc0848dcde18b49d2",
+   "gpu": "NVIDIA-B200",
+   "precision": "nvfp4",
+   "inference_backend": "vllm",
+   "tensor_parallel_size": 1,
+   "pipeline_parallel_size": 1,
+   "workspace_hash": "159f74e60af109fce4df933931fcabff18946bb6694add579b7cfa548a78ddbd",
+   "min_vram_per_device_gb": 24.0,
+   "feat_lora": false,
+   "gpu_device": "2901:10de",
+   "tested_gpu_devices": [
+    "2901:10de"
+   ]
+  }
+ ]
+}

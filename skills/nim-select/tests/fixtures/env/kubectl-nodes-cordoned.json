@@ -1,0 +1,125 @@
+{
+ "apiVersion": "v1",
+ "items": [
+  {
+   "apiVersion": "v1",
+   "kind": "Node",
+   "metadata": {
+    "labels": {
+     "kubernetes.io/arch": "amd64",
+     "nvidia.com/cuda.driver-version.full": "570.124.06",
+     "nvidia.com/gpu.compute.major": "9",
+     "nvidia.com/gpu.compute.minor": "0",
+     "nvidia.com/gpu.memory": "81559",
+     "nvidia.com/gpu.present": "true",
+     "nvidia.com/gpu.product": "NVIDIA-H100-80GB-HBM3"
+    },
+    "name": "h100-cordoned"
+   },
+   "spec": {
+    "unschedulable": true
+   },
+   "status": {
+    "allocatable": {
+     "cpu": "63900m",
+     "memory": "527950836Ki",
+     "nvidia.com/gpu": "8",
+     "pods": "110"
+    },
+    "conditions": [
+     {
+      "status": "True",
+      "type": "Ready"
+     }
+    ]
+   }
+  },
+  {
+   "apiVersion": "v1",
+   "kind": "Node",
+   "metadata": {
+    "labels": {
+     "kubernetes.io/arch": "amd64",
+     "nvidia.com/cuda.driver-version.full": "570.124.06",
+     "nvidia.com/gpu.compute.major": "8",
+     "nvidia.com/gpu.compute.minor": "9",
+     "nvidia.com/gpu.memory": "46068",
+     "nvidia.com/gpu.present": "true",
+     "nvidia.com/gpu.product": "NVIDIA-L40S"
+    },
+    "name": "l40s-1"
+   },
+   "spec": {},
+   "status": {
+    "allocatable": {
+     "cpu": "63900m",
+     "memory": "527950836Ki",
+     "nvidia.com/gpu": "4",
+     "pods": "110"
+    },
+    "conditions": [
+     {
+      "status": "True",
+      "type": "Ready"
+     }
+    ]
+   }
+  },
+  {
+   "apiVersion": "v1",
+   "kind": "Node",
+   "metadata": {
+    "labels": {
+     "kubernetes.io/arch": "amd64",
+     "nvidia.com/cuda.driver-version.full": "570.124.06",
+     "nvidia.com/gpu.compute.major": "8",
+     "nvidia.com/gpu.compute.minor": "9",
+     "nvidia.com/gpu.memory": "46068",
+     "nvidia.com/gpu.present": "true",
+     "nvidia.com/gpu.product": "NVIDIA-L40S"
+    },
+    "name": "l40s-2"
+   },
+   "spec": {},
+   "status": {
+    "allocatable": {
+     "cpu": "63900m",
+     "memory": "527950836Ki",
+     "nvidia.com/gpu": "4",
+     "pods": "110"
+    },
+    "conditions": [
+     {
+      "status": "True",
+      "type": "Ready"
+     }
+    ]
+   }
+  },
+  {
+   "apiVersion": "v1",
+   "kind": "Node",
+   "metadata": {
+    "labels": {
+     "kubernetes.io/arch": "amd64"
+    },
+    "name": "cpu-only"
+   },
+   "spec": {},
+   "status": {
+    "allocatable": {
+     "cpu": "63900m",
+     "memory": "527950836Ki",
+     "pods": "110"
+    },
+    "conditions": [
+     {
+      "status": "True",
+      "type": "Ready"
+     }
+    ]
+   }
+  }
+ ],
+ "kind": "List"
+}

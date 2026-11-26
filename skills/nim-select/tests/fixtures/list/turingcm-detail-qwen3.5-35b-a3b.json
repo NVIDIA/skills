@@ -1,0 +1,9 @@
+{
+ "code": 200,
+ "message": "success",
+ "data": {
+  "id": "-10",
+  "name": "Qwen3.5-35B-A3B",
+  "deploy": "deployDocker:\nstep 1: <pre><code>docker run -it  \\\n     --gpus all  \\\n     -p 8000:8000 \\\n     -e NIM_SDK_MAX_PARALLEL_DOWNLOAD_REQUESTS=3 \\\n     -e NIM_SDK_MAX_PARALLEL_FILE_REQUESTS=3  \\\n     -v \"/opt/nim/qwen3.5-35b-a3b\":/opt/nim/.cache  \\\n     -u $(id -u)   \\\n     resource.turingcm.com/qwen/qwen3.5-35b-a3b:latest</code></pre>\n\ndeployMegacube:\nstep 1: <pre><code>docker run -it  \\\n     --gpus all  \\\n     -p 8000:8000 \\\n     -e NIM_SDK_MAX_PARALLEL_DOWNLOAD_REQUESTS=3 \\\n     -e NIM_SDK_MAX_PARALLEL_FILE_REQUESTS=3  \\\n     resource.turingcm.com/qwen/qwen3.5-35b-a3b-spark-nim:latest</code></pre>"
+ }
+}

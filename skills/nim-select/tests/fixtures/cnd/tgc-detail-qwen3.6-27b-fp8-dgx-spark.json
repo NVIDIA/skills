@@ -1,0 +1,20 @@
+{
+ "code": 200,
+ "data": {
+  "arch": "arm64",
+  "id": 100340,
+  "image_tags": [
+   {
+    "arch": "arm64",
+    "create_time": "2026-04-24 11:08:16.641945",
+    "digest": "sha256:04c177728b18010cdbafc79acbec6ab73eac87607c97fd27125d39ef20969856",
+    "docker_url": "tgcr-gz.turing-agi.com/public/qwen/qwen3.6-27b-fp8-spark-nim:latest",
+    "ngc_url": null,
+    "tag_name": "latest"
+   }
+  ],
+  "model_type": "vlm",
+  "name": "Qwen3.6-27B-FP8-DGX-Spark",
+  "ngc_url": null
+ }
+}

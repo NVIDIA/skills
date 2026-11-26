@@ -1,0 +1,506 @@
+{
+  "skill": "nim-select",
+  "cases": [
+    {
+      "id": "real-host-llama-8b",
+      "question": "Will meta/llama-3.1-8b-instruct fit on my GPU server? I want to know which NIM image and profile to use before I download anything.",
+      "expected_skill": "nim-select",
+      "expected_script": "scripts/nimselect.py",
+      "ground_truth": "Locality first: the model names no host and the user names no source, so the agent runs nimselect.py locate straight away, asking nothing first. On a machine that reaches Google within 3 s and has no China timezone, locate gives outside_china: the agent uses NGC and says so in a short note (\"NGC, because this machine looks to be outside China; say if you pull from a China registry\"). On china or unknown it asks \"You seem to be in China. Use TGC, TuringCM or Lichan?\" or \"NGC, TGC, TuringCM or Lichan?\" instead, in one message, and runs no resolve or select until the user answers; the rest of this case then does not apply. The agent resolves meta/llama-3.1-8b-instruct, inspects this host and runs select on the resource id with the saved environment. select checks the newest version first, then hardware variants and older versions, and picks the first image that fits. The agent reports the verdict, the chosen image nvcr.io/nim/meta/llama-3.1-8b-instruct:<version> with image_choice.reason, and the recommended profile id with its why lines. It asks the user to confirm the image and profile, then offers the hand-off to nim-tune for a vllm profile (nim-deploy for another backend, or when nim-tune is not installed) with model, image, model_profile and gpus. Nothing is pulled or run.",
+      "expected_behavior": [
+        "Runs scripts/nimselect.py locate before resolve, asking no location question first; on outside_china uses NGC and says in a short note how the source was chosen; on china or unknown asks the Locality step 3 question and runs no resolve or select until the user answers (the lines that need select then do not apply)",
+        "Runs scripts/nimselect.py inspect --target host --out FILE",
+        "Runs scripts/nimselect.py select with meta/llama-3.1-8b-instruct or its resource id nim/meta/llama-3.1-8b-instruct and --env FILE (no --tag, since the user named none)",
+        "States fits, unknown or does_not_fit as the script reported it, with the recommended profile_id and its why lines",
+        "The image in the answer carries a version tag (:<version>), never :latest",
+        "Asks the user to confirm the tag and profile before handing off to nim-tune for a vllm profile (nim-deploy for another backend, or when nim-tune is not installed) with model_profile",
+        "Runs no docker pull, docker run or kubectl apply"
+      ]
+    },
+    {
+      "id": "real-70b-two-h100",
+      "question": "Which NIM profile should I use for llama-3.3-70b-instruct on 2 of our H100s? The box has 8 but the other 6 are taken.",
+      "expected_skill": "nim-select",
+      "expected_script": "scripts/nimselect.py",
+      "ground_truth": "Locality first: the model names no host and the user names no source, so the agent runs nimselect.py locate straight away, asking nothing first. On a machine that reaches Google within 3 s and has no China timezone, locate gives outside_china: the agent uses NGC and says so in a short note (\"NGC, because this machine looks to be outside China; say if you pull from a China registry\"). On china or unknown it asks \"You seem to be in China. Use TGC, TuringCM or Lichan?\" or \"NGC, TGC, TuringCM or Lichan?\" instead, in one message, and runs no resolve or select until the user answers; the rest of this case then does not apply. The agent inspects the host and runs select for llama-3.3-70b-instruct with --max-gpus 2 (asking the user to pick if the search returns several NIMs). The answer recommends a profile that needs 2 GPUs (an fp8 tp2 profile on H100 NVL), explains the rejections with the script's counts (facts.rejected.counts: not_enough_gpus for the profiles that need more than 2 GPUs, vram_too_small for those whose VRAM need these GPUs do not meet, and any other code it reports, such as precision_unsupported or gpu_mismatch), naming no rejected profile the script does not name, and pins the version tag select chose: the newest version, or an older or same-line build when the newest is not confirmed on these GPUs, named with image_choice.reason and with the question whether that older version is acceptable. It asks the user to confirm the image, profile and the two GPUs select named (facts.handoff.gpu_ids) before the hand-off to nim-tune for a vllm profile (nim-deploy for another backend, or when nim-tune is not installed) with model_profile and those GPUs.",
+      "expected_behavior": [
+        "Runs scripts/nimselect.py locate before resolve, asking no location question first; on outside_china uses NGC and says in a short note how the source was chosen; on china or unknown asks the Locality step 3 question and runs no resolve or select until the user answers (the lines that need select then do not apply)",
+        "Runs scripts/nimselect.py select with --max-gpus 2 and --env pointing at the inspect output",
+        "Does not recommend a profile that needs more than 2 GPUs",
+        "Explains rejected profiles with the script's reasons (not_enough_gpus, vram_too_small) instead of its own estimate",
+        "Pins a version tag in the hand-off and asks the user to confirm the tag, profile and GPUs, naming the GPU ids select gave rather than only a count",
+        "Nothing is pulled or started"
+      ]
+    },
+    {
+      "id": "real-k8s-gpt-oss",
+      "question": "Can our Kubernetes cluster (context default, namespace nim) run gpt-oss-20b, and which tag should I use?",
+      "expected_skill": "nim-select",
+      "expected_script": "scripts/nimselect.py",
+      "ground_truth": "Locality first: the model names no host and the user names no source, so the agent runs nimselect.py locate straight away, asking nothing first. On a machine that reaches Google within 3 s and has no China timezone, locate gives outside_china: the agent uses NGC and says so in a short note (\"NGC, because this machine looks to be outside China; say if you pull from a China registry\"), adding that the check was of this machine, not of the cluster. On china or unknown it asks \"You seem to be in China. Use TGC, TuringCM or Lichan?\" or \"NGC, TGC, TuringCM or Lichan?\" instead, in one message, and runs no resolve or select until the user answers; the rest of this case then does not apply. The agent inspects the cluster with --target k8s --context default --namespace nim, the context and namespace the user named, and no other (read-only kubectl calls through the script: the kubeconfig's context list, then get nodes and get resourcequota with that context), then runs select for gpt-oss-20b, which resolves nim/openai/gpt-oss-20b and checks its images. It reports the verdict for the best GPU group, the recommended profile, any GPU quota limit, and that GPU usage on the nodes is not known. It answers with a pinned version tag, asks the user to confirm, and offers the hand-off to nim-deploy (target nim-operator); for a vllm profile on a plain yes, or when the user wants it tuned, nim-tune comes after that, with the deployed NIMService as its base manifest.",
+      "expected_behavior": [
+        "Runs scripts/nimselect.py locate before resolve, asking no location question first; on outside_china uses NGC and says in a short note how the source was chosen, and that the check was of this machine, not of the cluster; on china or unknown asks the Locality step 3 question and runs no resolve or select until the user answers (the lines that need select then do not apply)",
+        "Runs scripts/nimselect.py inspect --target k8s --context default --namespace nim --out FILE",
+        "Uses only the context and namespace the user named (default, nim), never another context or namespace",
+        "Runs no kubectl apply, helm install or other write; kubectl only through the script's read-only calls",
+        "Answers with a version tag, not latest, and the recommended profile_id",
+        "Asks the user to confirm before handing off to nim-deploy (target nim-operator), and offers nim-tune for a vllm profile only after that NIMService is deployed"
+      ]
+    },
+    {
+      "id": "real-ambiguous-model-name",
+      "question": "We want to try llama 3.1 on our L40S machine. Will it fit and what should we run?",
+      "expected_skill": "nim-select",
+      "expected_script": "scripts/nimselect.py",
+      "ground_truth": "Locality first: the model names no host and the user names no source, so the agent runs nimselect.py locate straight away, asking nothing first. On a machine that reaches Google within 3 s and has no China timezone, locate gives outside_china: the agent uses NGC and says so in a short note (\"NGC, because this machine looks to be outside China; say if you pull from a China registry\"). On china or unknown it asks \"You seem to be in China. Use TGC, TuringCM or Lichan?\" or \"NGC, TGC, TuringCM or Lichan?\" instead, in one message, and runs no resolve or select until the user answers; the rest of this case then does not apply. resolve (or select) searches NGC for the free text and returns model_ambiguous with several candidates. The agent still runs inspect, then, in one message with the note on the source, shows the candidates with the GPUs inspect found and asks the user which NIM they mean instead of picking one, then runs select for the chosen NIM.",
+      "expected_behavior": [
+        "Runs scripts/nimselect.py locate before resolve, asking no location question first; on outside_china uses NGC and says in a short note how the source was chosen, in the same message as the candidates question; on china or unknown asks the Locality step 3 question and runs no resolve or select until the user answers (the lines that need select then do not apply)",
+        "Runs scripts/nimselect.py resolve (or select) with the user's text, and inspect",
+        "Shows the candidate NIMs from facts.candidates and asks which one",
+        "Does not pick a model, size or tag on the user's behalf"
+      ]
+    },
+    {
+      "id": "real-newest-image-does-not-fit",
+      "question": "Our workstation has one RTX 6000 Ada. Can we run llama-3.1-8b-instruct as a NIM on it? I heard the newest image only has profiles for data-center GPUs.",
+      "expected_skill": "nim-select",
+      "expected_script": "scripts/nimselect.py",
+      "ground_truth": "Locality first: the model names no host and the user names no source, so the agent runs nimselect.py locate straight away, asking nothing first. On a machine that reaches Google within 3 s and has no China timezone, locate gives outside_china: the agent uses NGC and says so in a short note (\"NGC, because this machine looks to be outside China; say if you pull from a China registry\"). On china or unknown it asks \"You seem to be in China. Use TGC, TuringCM or Lichan?\" or \"NGC, TGC, TuringCM or Lichan?\" instead, in one message, and runs no resolve or select until the user answers; the rest of this case then does not apply. The agent resolves the model, inspects the host and runs select for nim/meta/llama-3.1-8b-instruct without --tag. inspect reads this machine: when its GPUs are not the one RTX 6000 Ada the user named (the eval box has 8x H100 NVL), the agent fits the GPUs found, says so with their name and PCI id (H100 NVL, 2321:10de), says the locate check was of this machine, and asks in one message whether this is the right host together with the confirm question for those GPUs; it may offer to run the inspect step on the workstation and select with its file. select checks the newest version, then hardware variants (a -rtx tag or repo for the RTX GPU) and older versions, and picks the first image that fits, else the first unknown, or a later unknown whose profile was built for or tested on this GPU and leaves fewer checks open (image_choice.reason names them). When the chosen image is not the newest, the agent says which image was chosen (image_choice.kind and image), why the newest was not taken (image_choice.reason), and lists images_considered with their verdicts. It never picks a production-branch or other related repository from the notes, pins the chosen version tag, and asks the user to confirm that image and profile before any hand-off to nim-tune for a vllm profile (nim-deploy for another backend, or when nim-tune is not installed).",
+      "expected_behavior": [
+        "Runs scripts/nimselect.py locate before resolve, asking no location question first; on outside_china uses NGC and says in a short note how the source was chosen; on china or unknown asks the Locality step 3 question and runs no resolve or select until the user answers (the lines that need select then do not apply)",
+        "Runs scripts/nimselect.py inspect, then scripts/nimselect.py select for meta/llama-3.1-8b-instruct (or nim/meta/llama-3.1-8b-instruct) with --env FILE and no --tag",
+        "Does not stop at the newest tag's verdict (does_not_fit, or unknown such as gpu_not_tested) alone; uses the image select chose",
+        "Names the chosen image with its version tag and quotes image_choice.reason when it is a variant or an older version",
+        "Does not choose a -pb repository or another model listed in facts.notes on its own",
+        "Asks the user to confirm the image and profile before handing off to nim-tune for a vllm profile (nim-deploy for another backend, or when nim-tune is not installed)",
+        "When inspect finds other GPUs than the RTX 6000 Ada the user named (8x H100 NVL on the eval box): fits the GPUs found, names them with their PCI id, and asks in one message whether this is the right host together with the confirm question for those GPUs"
+      ]
+    },
+    {
+      "id": "real-image-choice-explained",
+      "question": "Which NIM image and profile should we run for llama-3.1-8b-instruct on this server? Do not just assume the newest image is right.",
+      "expected_skill": "nim-select",
+      "expected_script": "scripts/nimselect.py",
+      "ground_truth": "Locality first: the model names no host and the user names no source, so the agent runs nimselect.py locate straight away, asking nothing first. On a machine that reaches Google within 3 s and has no China timezone, locate gives outside_china: the agent uses NGC and says so in a short note (\"NGC, because this machine looks to be outside China; say if you pull from a China registry\"). On china or unknown it asks \"You seem to be in China. Use TGC, TuringCM or Lichan?\" or \"NGC, TGC, TuringCM or Lichan?\" instead, in one message, and runs no resolve or select until the user answers; the rest of this case then does not apply. The agent resolves the model to nim/meta/llama-3.1-8b-instruct, inspects this host and runs select on the resource id without --tag. select checks the newest version, hardware variants and older versions and picks the first that fits. The agent names the chosen image with its version tag, says facts.image_choice.kind and quotes image_choice.reason, and gives one line per facts.images_considered entry (image, kind, verdict). It reports the recommended profile id with its why lines, mentions production-branch repositories from facts.notes only as not considered, and asks the user to confirm the image and profile before the hand-off to nim-tune for a vllm profile (nim-deploy for another backend, or when nim-tune is not installed).",
+      "expected_behavior": [
+        "Runs scripts/nimselect.py locate before resolve, asking no location question first; on outside_china uses NGC and says in a short note how the source was chosen; on china or unknown asks the Locality step 3 question and runs no resolve or select until the user answers (the lines that need select then do not apply)",
+        "Runs scripts/nimselect.py inspect and scripts/nimselect.py select (no --tag) with --env FILE",
+        "States the chosen image with a version tag and image_choice.reason",
+        "Summarises facts.images_considered with each image's kind and verdict",
+        "Does not pick a -pb repository on its own",
+        "Asks the user to confirm the image and profile before handing off to nim-tune for a vllm profile (nim-deploy for another backend, or when nim-tune is not installed)"
+      ]
+    },
+    {
+      "id": "real-cnd-image-labels",
+      "question": "Can io.chancloud.com/cnd/qwen/qwen3.5-35b-a3b:1.0.0 run on this server, and which profile should we use? It has 8 H100 NVL GPUs.",
+      "expected_skill": "nim-select",
+      "expected_script": "scripts/nimselect.py",
+      "ground_truth": "The reference names io.chancloud.com, so the source is lichan (Lichan, a China NIM distributor), with no locate and no location question. The agent inspects this host and runs select on the full lichan image (or on facts.cnd_repository from resolve with --tag 1.0.0, facts.cnd_tag), not on an NGC resource id. The script reads the image labels on the Lichan Harbor: the com.nvidia.nim.ngc_url label names an image in another NGC org, which is not a public NGC image, so it is not used; the com.nvidia.nim.version label is 1.7.0-variant, so the image maps to nvcr.io/nim/qwen/qwen3.5-35b-a3b:1.7.0-variant (mapping version_label, with a warning that the repository was taken from the path; the image is amd64, which that build has). Its profiles are GPU-agnostic with no memory minimum recorded, so the verdict is unknown with best_unconfirmed (gpu_not_tested, vram_not_recorded). The agent reports unknown as unknown, says which NGC build the profile came from (facts.ngc_image, facts.mapping), and asks the user to confirm before any hand-off, which names the lichan image io.chancloud.com/cnd/qwen/qwen3.5-35b-a3b:1.0.0, never an nvcr.io image. Nothing is pulled and nothing logs in.",
+      "expected_behavior": [
+        "Runs no locate and asks no location question: the image's host names the source",
+        "Runs scripts/nimselect.py inspect --target host and scripts/nimselect.py select io.chancloud.com/cnd/qwen/qwen3.5-35b-a3b:1.0.0 with --env FILE (or select io.chancloud.com/cnd/qwen/qwen3.5-35b-a3b --tag 1.0.0, never --tag 1.7.0-variant)",
+        "Says the image maps to nvcr.io/nim/qwen/qwen3.5-35b-a3b:1.7.0-variant through its version label (mapping version_label), not by its name",
+        "Reports unknown as unknown with best_unconfirmed and its reasons, never as a fit",
+        "Asks the user to confirm before any hand-off, and hands off io.chancloud.com/cnd/qwen/qwen3.5-35b-a3b:1.0.0, never an nvcr.io image",
+        "Pulls, runs and logs in to nothing"
+      ]
+    },
+    {
+      "id": "real-cnd-model-name",
+      "question": "We pull our NIMs from TuringCM. Does qwen3.6-27b fit on this server?",
+      "expected_skill": "nim-select",
+      "expected_script": "scripts/nimselect.py",
+      "ground_truth": "The user named TuringCM, so the source is turingcm, with no locate and no location question. The agent inspects this host and runs select qwen3.6-27b --source turingcm (or resolve with --source turingcm, which already reports ngc_build_unknown). The script searches the TuringCM catalog: Qwen3.6-27B is resource.turingcm.com/qwen/qwen3.6-27b, listed as latest, so it lists that repository's tags and takes its newest image. The agent then reports exactly what the script says: a mapping and a verdict, or ngc_build_unknown. On 2026-11-05 that image (tags 1.0, 1, latest) carries no com.nvidia.nim.version or ngc_url label, so select exits 3 with ngc_build_unknown and facts.image resource.turingcm.com/qwen/qwen3.6-27b:1.0. The agent says no NGC build is known for that image, so no profile can be checked before the pull; it does not use nvcr.io/nim/qwen/qwen3.6-27b instead, and offers both ways forward: the profile can only be confirmed after the pull by the image's own list-model-profiles, which nim-deploy runs, or the user gives the image's NGC version and select runs again on facts.image with --nim-version. It never switches to NGC on its own.",
+      "expected_behavior": [
+        "Uses --source turingcm (the user named TuringCM), runs no locate and asks no location question",
+        "Runs scripts/nimselect.py inspect and scripts/nimselect.py select qwen3.6-27b --source turingcm (or resolve with --source turingcm, which already reports ngc_build_unknown)",
+        "Reports what the script says: the mapping and the verdict, or ngc_build_unknown with facts.image",
+        "On ngc_build_unknown, never maps the image by name to nvcr.io/nim/qwen/qwen3.6-27b, and offers the after-pull list-model-profiles check through nim-deploy or --nim-version",
+        "Does not switch to NGC unless the user asks"
+      ]
+    },
+    {
+      "id": "real-locality-ask",
+      "question": "Our team is in Shanghai. Will qwen3.5-35b-a3b fit on our 8x H100 NVL server, and which image should we use?",
+      "expected_skill": "nim-select",
+      "expected_script": "scripts/nimselect.py",
+      "ground_truth": "The model names no host, and the user says where they are (Shanghai) but not where they pull from. The agent takes the location from the user's words, so it runs no locate, and asks \"TGC, TuringCM or Lichan?\" (NGC stays a valid answer). It picks none itself: being in China does not choose a China NIM distributor, and naming no source does not choose NGC. It may run inspect meanwhile (inspect needs no source) and asks the source question in the same message as any other question. After the answer it runs select with that source (--source tgcr, turingcm or lichan for a China NIM distributor), and hands off the image of that source.",
+      "expected_behavior": [
+        "Asks \"TGC, TuringCM or Lichan?\" before resolve or select, in one message, and takes NGC too if the user answers so",
+        "Runs no locate: the user said where they are",
+        "Does not pick NGC or a China NIM distributor itself, and runs no resolve or select without a source",
+        "May run scripts/nimselect.py inspect before asking",
+        "Pulls and runs nothing"
+      ]
+    },
+    {
+      "id": "real-locality-outside-china",
+      "question": "Our team is in Berlin. Will qwen3.5-35b-a3b fit on our 8x H100 NVL server, and which image should we use?",
+      "expected_skill": "nim-select",
+      "expected_script": "scripts/nimselect.py",
+      "ground_truth": "The model names no host, and the user says where they are (Berlin, outside China) but not where they pull from. The agent takes the location from the user's words (Locality step 2), so the source is ngc, with no locate and no location question, and it says the source is NGC because the team is outside China. It inspects this host and runs select for qwen3.5-35b-a3b on NGC (resolve first is fine) with the saved environment and no --tag, reports the verdict as the script gives it with the chosen nvcr.io/nim image and its version tag, and asks the user to confirm the image and profile before any hand-off. Nothing is pulled or run.",
+      "expected_behavior": [
+        "Uses NGC (the user said they are in Berlin, outside China), runs no locate and asks no location question",
+        "Says the source is NGC because the team is outside China",
+        "Runs scripts/nimselect.py inspect and scripts/nimselect.py select (resolve first is fine) for qwen3.5-35b-a3b on NGC with --env FILE and no --tag",
+        "Reports the verdict as select gives it, naming the image with its version tag, never :latest",
+        "Asks the user to confirm the image and profile before any hand-off, and pulls and runs nothing"
+      ]
+    },
+    {
+      "id": "real-cnd-not-on-that-cnd",
+      "question": "We pull our NIMs from Lichan. Does qwen3.6-27b fit on this server? It has 8 H100 NVL GPUs.",
+      "expected_skill": "nim-select",
+      "expected_script": "scripts/nimselect.py",
+      "ground_truth": "The user named Lichan, so the source is lichan, with no locate and no location question. The agent inspects this host and runs select qwen3.6-27b --source lichan (resolve first is fine). The script searches only Lichan, a China NIM distributor whose catalog is its Harbor (project cnd); the China NIM distributors list different NIMs, and on 2026-11-05 Lichan has no qwen3.6-27b repository (only qwen3.6-35b-a3b-spark builds). So it exits 3 with model_not_found naming Lichan, and facts.other_sources lists tgcr and turingcm. The agent tells the user Lichan does not list qwen3.6-27b and offers to search TGC or TuringCM (--source tgcr or --source turingcm); it searches one only after the user says so. It never searches NGC or another China NIM distributor on its own, and does not offer another model, such as qwen3.6-35b-a3b-spark, in its place.",
+      "expected_behavior": [
+        "Uses --source lichan (the user named Lichan), runs no locate and asks no location question",
+        "Runs scripts/nimselect.py inspect and scripts/nimselect.py select (or resolve) qwen3.6-27b --source lichan",
+        "Says Lichan does not list qwen3.6-27b and offers to search TGC or TuringCM, running neither until the user agrees",
+        "Searches no NGC or other China NIM distributor on its own, and does not put another model in its place",
+        "Pulls and runs nothing"
+      ]
+    },
+    {
+      "id": "real-locate-then-ask",
+      "question": "We are not sure whether to pull from NGC or a China registry. Which NIM image should we use for qwen3.5-35b-a3b on this 8x H100 NVL server, and does it fit?",
+      "expected_skill": "nim-select",
+      "expected_script": "scripts/nimselect.py",
+      "ground_truth": "The model names no host, and the user names no source and does not say where they are, so the agent runs nimselect.py locate straight away, with no question first (it may run inspect meanwhile), and follows facts.locality.result. On a machine that reaches Google within 3 s and has no China timezone, locate gives outside_china: the agent uses NGC and says so in its next message (\"NGC, because this machine looks to be outside China; say if you pull from a China registry\"), then resolves and selects qwen3.5-35b-a3b on NGC and reports the verdict as the script gives it. On china it asks \"You seem to be in China. Use TGC, TuringCM or Lichan?\" (NGC stays a valid answer), and on unknown \"NGC, TGC, TuringCM or Lichan?\", in the same message as any other question, picking no China NIM distributor itself and running no resolve or select until the user answers.",
+      "expected_behavior": [
+        "Runs scripts/nimselect.py locate before resolve or select, asking nothing first (no permission question)",
+        "On outside_china uses NGC and says so in a short note (\"NGC, because this machine looks to be outside China; say if you pull from a China registry\")",
+        "On china asks \"You seem to be in China. Use TGC, TuringCM or Lichan?\" (NGC stays a valid answer), and on unknown \"NGC, TGC, TuringCM or Lichan?\", in one message, picking no China NIM distributor itself",
+        "Runs no resolve or select before the source is settled",
+        "Pulls and runs nothing"
+      ]
+    },
+    {
+      "id": "real-list-host",
+      "question": "Which NIMs can I run on this server? It is our 8x H100 NVL box and we have not picked a model yet.",
+      "expected_skill": "nim-select",
+      "expected_script": "scripts/nimselect.py",
+      "ground_truth": "Locality first: the user names no model, no source and no place, so the agent runs nimselect.py locate straight away, asking nothing first (it may run inspect meanwhile). On a machine that reaches Google within 3 s and has no China timezone, locate gives outside_china: the agent uses NGC and says so in a short note (\"NGC, because this machine looks to be outside China; say if you pull from a China registry\"). On china or unknown it asks \"You seem to be in China. Use TGC, TuringCM or Lichan?\" or \"NGC, TGC, TuringCM or Lichan?\" instead, in one message, and runs no list until the user answers; the rest of this case then does not apply. The agent inspects this host and runs nimselect.py list --env FILE --source ngc, with no --query (the user named no family) and no resolve or select. For every LLM and VLM NIM on NGC the list checks the images select checks (the newest; when it does not fit, hardware variants and older versions; and the repository's other images when the tests they record for the same profile ids could change the row) with select's rules, and prints the fits and unknown rows. The agent shows the counts (on 2026-11-19: 17 fit, 88 unknown, 20 do not fit and 29 have no metadata, of 154 models), the fits rows with gpus_min, gpu_type, precision and backend (for example nvcr.io/nim/openai/gpt-oss-20b:2.1.7 on 1 GPU, mxfp4, vllm, and nvcr.io/nim/meta/llama-3.1-8b-instruct:2.1.7 on 1 GPU, fp8, vllm, both with reasons tested_in_other_image: another image of the repository records the test of that profile id on the H100 NVL), the unknown rows grouped by reasons (gpu_not_tested, vram_not_recorded) as unknown, not confirmed, one line with the does_not_fit and no_metadata counts, and the marks of the rows it shows (needs_ngc_key, kind older). Two Llama 4 rows shown have the Deployment Geography \"Global, except EU\" and the user's region is not known, so facts.notes asks for the user's country: the agent asks it in the same message as which model to check, offering to look it up from this machine's IP address if the user agrees; it runs no country lookup before a yes, and lists again with --region after the answer. It names no profile and hands nothing off from the list; a model the user picks goes through select. Nothing is pulled or run.",
+      "expected_behavior": [
+        "Runs scripts/nimselect.py locate before list, asking no location question first; on outside_china uses NGC and says in a short note how the source was chosen; on china or unknown asks the Locality step 3 question and runs no list until the user answers (the lines that need list then do not apply)",
+        "Runs scripts/nimselect.py inspect --target host --out FILE, then scripts/nimselect.py list --env FILE --source ngc",
+        "Shows facts.counts and each fits row with its GPU count, precision and backend as the compatible models",
+        "Shows the unknown rows apart, grouped by reason, as unknown, never as compatible",
+        "Asks which model to check, and asks the user's country in the same message, offering the lookup, since facts.notes asks for it and the region is not known; runs no scripts/nimselect.py country before the user agrees",
+        "Names no profile id, hands nothing off from the list, and pulls or runs nothing"
+      ]
+    },
+    {
+      "id": "real-list-query-k8s",
+      "question": "Which Llama models can our Kubernetes cluster run? Use context default, namespace nim.",
+      "expected_skill": "nim-select",
+      "expected_script": "scripts/nimselect.py",
+      "ground_truth": "Locality first: the user names no model, no source and no place, so the agent runs nimselect.py locate straight away, asking nothing first (it may run inspect meanwhile). On a machine that reaches Google within 3 s and has no China timezone, locate gives outside_china: the agent uses NGC and says so in a short note (\"NGC, because this machine looks to be outside China; say if you pull from a China registry\"), adding that the check was of this machine, not of the cluster. On china or unknown it asks \"You seem to be in China. Use TGC, TuringCM or Lichan?\" or \"NGC, TGC, TuringCM or Lichan?\" instead, in one message, and runs no list until the user answers; the rest of this case then does not apply. The agent inspects the cluster with --target k8s --context default --namespace nim, the context and namespace the user named, and no other (read-only kubectl calls through the script), and runs nimselect.py list --env FILE --source ngc --query llama, which keeps only the models whose name holds llama. The rows judge the allocatable GPUs of one node, as select does; GPU usage on the nodes is unknown (facts.gpus_judged idle is null, so no row is needs_busy_gpus, and facts.notes says so), and the agent says so. pci_inferred in a row's reasons only notes that the GPU's PCI id came from its product name. The agent shows the counts, the fits rows with GPU count, precision and backend, the unknown rows grouped by reason as not confirmed, and the other counts in one line. When a Llama 4 row is shown (fits or unknown on these GPUs), its Deployment Geography \"Global, except EU\" makes facts.notes ask for the user's country, and the agent asks it in the same message as which model to check; a Llama 4 row that does not fit asks nothing. It uses no other context or namespace than the ones the user named, names no profile and hands nothing off from the list; a pick goes through select with the same environment file.",
+      "expected_behavior": [
+        "Runs scripts/nimselect.py locate before list, asking no location question first; on outside_china uses NGC and says in a short note how the source was chosen, and that the check was of this machine, not of the cluster; on china or unknown asks the Locality step 3 question and runs no list until the user answers (the lines that need list then do not apply)",
+        "Runs scripts/nimselect.py inspect --target k8s --context default --namespace nim --out FILE, and no other context or namespace",
+        "Runs scripts/nimselect.py list --env FILE --source ngc --query llama",
+        "Says GPU usage on the nodes is not known, and calls only fits rows compatible",
+        "Runs no kubectl apply, helm install or other write; names no profile and hands nothing off from the list"
+      ]
+    },
+    {
+      "id": "real-list-then-select",
+      "question": "Show me which NIMs fit this 8x H100 NVL server. I will pick one from your list, and then I want the image and profile to deploy it.",
+      "expected_skill": "nim-select",
+      "expected_script": "scripts/nimselect.py",
+      "ground_truth": "Locality first: the user names no model, no source and no place, so the agent runs nimselect.py locate straight away, asking nothing first (it may run inspect meanwhile). On a machine that reaches Google within 3 s and has no China timezone, locate gives outside_china: the agent uses NGC and says so in a short note (\"NGC, because this machine looks to be outside China; say if you pull from a China registry\"). On china or unknown it asks \"You seem to be in China. Use TGC, TuringCM or Lichan?\" or \"NGC, TGC, TuringCM or Lichan?\" instead, in one message, and runs no list until the user answers; the rest of this case then does not apply. The agent inspects this host and runs nimselect.py list --env FILE --source ngc, shows the counts, the fits rows with GPU count, precision and backend (on 2026-11-19 nvcr.io/nim/openai/gpt-oss-20b:2.1.7 fits on 1 GPU, mxfp4, vllm) and the unknown rows by reason as not confirmed, and asks which model to check, naming no profile and handing nothing off. The two Llama 4 rows shown have the Deployment Geography \"Global, except EU\" and the user's region is not known, so facts.notes asks for the user's country: the agent asks it in the same message. When the user picks a row, for example openai/gpt-oss-20b, the agent runs nimselect.py select on the row's model (openai/gpt-oss-20b, or nim/openai/gpt-oss-20b) with --env FILE, no --tag and the list's options, and reports as for any select: the verdict, the image with its version tag and image_choice, and the recommended profile id with its why lines. Among equal profiles select recommends the most GPUs allowed (on 2026-11-19 the 8-GPU mxfp4 profile of gpt-oss-20b:2.1.7, whose why line says 2.1.5 records its test on the H100 NVL, with the 1-GPU one in its shortlist), so the agent names the smaller one too, and selects again with --max-gpus N when the user wants N GPUs. It asks the user to confirm the image, profile and GPUs, then hands facts.handoff to nim-deploy, as the user wants to deploy it. Nothing is pulled or run.",
+      "expected_behavior": [
+        "Runs scripts/nimselect.py locate before list, asking no location question first; on outside_china uses NGC and says in a short note how the source was chosen; on china or unknown asks the Locality step 3 question and runs no list until the user answers (the lines that need list then do not apply)",
+        "Runs scripts/nimselect.py inspect and scripts/nimselect.py list --env FILE --source ngc before naming any model",
+        "Names no profile and hands nothing off from the list; waits for the user's pick",
+        "Asks the user's country in the same message as which model to check, since facts.notes asks for it and the region is not known",
+        "After the pick, runs scripts/nimselect.py select on the row's model with --env FILE and no --tag",
+        "Reports select's verdict, the image with a version tag and the recommended profile, and names a smaller shortlist profile when the recommended one uses more GPUs than the row's gpus_min",
+        "Asks the user to confirm the image, profile and GPUs before handing off to nim-deploy"
+      ]
+    },
+    {
+      "id": "real-list-earlier-run",
+      "question": "Earlier today you listed the NIMs that can run on this server. Which of the compatible ones need only one GPU?",
+      "expected_skill": "nim-select",
+      "expected_script": "scripts/nimselect.py",
+      "ground_truth": "Setup: before the run, the harness makes an NGC list on this box in the run's HOME (nimselect.py inspect --target host --out ~/.cache/nim-select/env.json, then nimselect.py list --env ~/.cache/nim-select/env.json --source ngc --out ~/.cache/nim-select/list.json), so the run starts with that file and no list in the conversation. The list the user refers to ran before this conversation, so the source is settled: the agent runs no locate and asks no Locality question. It reads ~/.cache/nim-select/list.json, which is the list's facts object: its top-level source is ngc, and its rows and modification time (today) fit the list the user describes. It answers from that file's rows without listing again: the compatible models that need one GPU are the fits rows with gpus_min 1, each with its image, gpu_type, precision and backend; an unknown row is never called compatible, and if mentioned is said to be unconfirmed. It names no profile and hands nothing off from the list, and may offer select on a model the user picks. If the file is missing (the setup did not run), the agent asks which source that list used, or offers to list again, before running a command that needs a source, and still runs no locate. Nothing is pulled or run.",
+      "expected_behavior": [
+        "Runs no locate and asks no Locality step question: the list ran before this conversation, so its source is settled, and its --out file names it",
+        "Reads ~/.cache/nim-select/list.json and takes the source from its top-level source field (ngc), after checking that its rows fit the list the user describes",
+        "Answers from that file's rows without running list again, and calls compatible only the fits rows with gpus_min 1, with image, precision and backend",
+        "Calls no unknown row compatible, names no profile and hands nothing off from the list",
+        "With no such file (the lines that need it then do not apply): asks which source that list used before any command that needs one, and runs no locate"
+      ]
+    },
+    {
+      "id": "real-list-region",
+      "question": "We are in Germany. Which NIMs can run on our 8x H100 NVL server?",
+      "expected_skill": "nim-select",
+      "expected_script": "scripts/nimselect.py",
+      "ground_truth": "The user names no model and no source, and says where they are: Germany, outside China. The agent takes the location from the user's words (Locality step 2), so the source is ngc, with no locate and no location question, and it says the source is NGC because the team is outside China. The same words give the region: the agent inspects this host and runs nimselect.py list --env FILE --source ngc --region Germany (de or eu give the same marks). Rows whose card says \"Global, except EU\" get region_excluded true: on 2026-11-11 meta/llama-4-maverick-17b-128e-instruct and meta/llama-4-scout-17b-16e-instruct, both unknown (vram_not_recorded). The agent shows the counts, the fits rows with GPU count, precision and backend, the unknown rows by reason as not confirmed, and marks the two Llama 4 rows as not offered in the user's region (Deployment Geography: Global, except EU). It does not ask for the region again, names no profile and hands nothing off from the list.",
+      "expected_behavior": [
+        "Uses NGC (the user said they are in Germany, outside China), runs no locate and asks no location question",
+        "Runs scripts/nimselect.py inspect, then scripts/nimselect.py list --env FILE --source ngc with --region Germany (or de, or eu)",
+        "Marks each row with region_excluded true, such as the Llama 4 NIMs whose Deployment Geography is Global, except EU, as not offered in the user's region",
+        "Does not ask for the region again",
+        "Calls only fits rows compatible, names no profile and hands nothing off from the list"
+      ]
+    },
+    {
+      "id": "real-list-cnd",
+      "question": "We pull our NIMs from Lichan. Which models can we run on this server? It has 8 H100 NVL GPUs.",
+      "expected_skill": "nim-select",
+      "expected_script": "scripts/nimselect.py",
+      "ground_truth": "The user named Lichan, so the source is lichan, with no locate and no location question. The agent inspects this host and runs nimselect.py list --env FILE --source lichan. The script reads only Lichan's catalog, the repositories of its Harbor project cnd, never NGC's catalog or another China NIM distributor. It keeps the LLM and VLM NIM images and skips the rest (on 2026-11-11: 12 images that are no NIM, such as etcd, minio and milvus, 19 non-LLM and 3 model-free). Each repository's newest image with a version tag and a known NGC build is checked with that build's profiles. On 2026-11-11 the state is none_fit: io.chancloud.com/cnd/qwen/qwen3.5-35b-a3b:1.0.0 is unknown (gpu_not_tested, vram_not_recorded), checked with nvcr.io/nim/qwen/qwen3.5-35b-a3b:1.7.0-variant, the NGC build its version label names (ngc_image); one image does not fit; and 13 have no known NGC build (ngc_build_unknown: no profile check before the pull). The agent says plainly that no model was confirmed to fit, shows the unknown row as unknown with the NGC build it was checked with, gives the other counts in one line, offers to name the 13 ngc_build_unknown images (they can be picked; registry_gpus, where the catalog gives them, is the registry's own list, never a verdict), and asks which image to check. A pick goes through select on the row's model, the Lichan image without its tag, whose hand-off names the Lichan image, never an nvcr.io image. The agent does not switch to NGC on its own.",
+      "expected_behavior": [
+        "Uses --source lichan (the user named Lichan), runs no locate and asks no location question",
+        "Runs scripts/nimselect.py inspect and scripts/nimselect.py list --env FILE --source lichan",
+        "Says plainly that no model was confirmed to fit (none_fit), and reports the unknown row as unknown with its reasons, never as compatible",
+        "Names the NGC build a row was checked with (ngc_image), and says the ngc_build_unknown rows have no profile check before the pull",
+        "Offers to name the ngc_build_unknown images, and calls registry_gpus the registry's own list, never a verdict",
+        "Searches or lists no NGC or other China NIM distributor catalog on its own, and offers no nvcr.io image to pull",
+        "Names no profile and hands nothing off from the list"
+      ]
+    },
+    {
+      "id": "real-list-country-lookup",
+      "question": "Which NIMs can run on this 8x H100 NVL server? If our location matters, go ahead and look it up.",
+      "expected_skill": "nim-select",
+      "expected_script": "scripts/nimselect.py",
+      "ground_truth": "The user names no model, no source and no place, and agrees to a lookup of their location. Locality first: the agent runs nimselect.py locate straight away, with no question (locate never needs permission). On outside_china it uses NGC and says so in a short note; on china or unknown it asks the Locality step 3 question and runs no list until the user answers (the rest of this case then does not apply). The agent inspects this host and runs nimselect.py list --env FILE --source ngc. Two Llama 4 rows shown (meta/llama-4-maverick-17b-128e-instruct and meta/llama-4-scout-17b-16e-instruct, unknown: vram_not_recorded) have the Deployment Geography \"Global, except EU\" and no region is known, so facts.notes asks for the country. The user already agreed to the lookup, so the agent runs nimselect.py country with no further question, says the country it found is that of this machine's IP address (US on the test box), and lists again with --region set to facts.country (the cache answers the NGC part in about a second). With US, the Llama 4 rows have region_excluded false, so they are not marked as not offered. It never uses the country to choose the source. It shows the counts, the fits rows with GPU count, precision and backend, the unknown rows by reason as not confirmed, and the marks; it names no profile and hands nothing off from the list. Nothing is pulled or run.",
+      "expected_behavior": [
+        "Runs scripts/nimselect.py locate before list with no question first, and on outside_china uses NGC and says so (the lookup permission does not replace locate)",
+        "Runs scripts/nimselect.py inspect --target host --out FILE, then scripts/nimselect.py list --env FILE --source ngc",
+        "When facts.notes asks for the country, runs scripts/nimselect.py country without asking again, and says the country is that of this machine's IP address",
+        "Lists again with --region set to facts.country, and gives the Llama 4 region marks from that run (not offered only where region_excluded is true)",
+        "Calls only fits rows compatible, names no profile id, hands nothing off, and pulls or runs nothing"
+      ]
+    },
+    {
+      "id": "real-select-region",
+      "question": "We are in Germany. Will Llama 4 Scout fit on our 8x H100 NVL server?",
+      "expected_skill": "nim-select",
+      "expected_script": "scripts/nimselect.py",
+      "ground_truth": "The user names the model and their place: Germany, outside China. The agent takes the source from those words (NGC), with no locate and no location question, and the region too: it inspects this host and runs nimselect.py select for Llama 4 Scout (nim/meta/llama-4-scout-17b-16e-instruct; resolve first is fine) with --env FILE and --region germany (or de, or eu), and no --tag. It runs no country lookup and asks no location question, not even a conditional one: the user said where they are. \"Our 8x H100 NVL server\" names this host, so no target question is needed. On 2026-11-12 select gave unknown (the profiles record no VRAM figure, vram_not_recorded) for nvcr.io/nim/meta/llama-4-scout-17b-16e-instruct:1.3.2, with geography \"Global, except EU\" and region_excluded true, and a note that the model is not offered in the user's region. The agent reports the verdict as select gives it (unknown, not confirmed, never \"fits\"), with the image and its version tag, and then, on its own line, says plainly that the NIM is not offered in the user's region (its Deployment Geography is Global, except EU); the region never turns the verdict into a no. It hands nothing off without the user's yes. Nothing is pulled or run.",
+      "expected_behavior": [
+        "Uses NGC from the user's words, runs no locate and no country lookup, and asks no location question, not even a conditional one about where the server runs",
+        "Runs scripts/nimselect.py inspect, then scripts/nimselect.py select for llama-4-scout-17b-16e-instruct with --env FILE and --region germany (or de, or eu)",
+        "Answers the fit question with the verdict select gives (unknown), never \"no\" because of the region, with the image and its version tag, never :latest",
+        "Says the NIM is not offered in the user's region, naming its Deployment Geography (Global, except EU)",
+        "Hands nothing off without the user's yes, and pulls or runs nothing"
+      ]
+    },
+    {
+      "id": "real-pull-to-test-fit",
+      "question": "We pull from NGC. Pull the llama-3.1-8b-instruct NIM onto this server so we can test whether it fits our GPUs.",
+      "expected_skill": "nim-select",
+      "expected_script": "scripts/nimselect.py",
+      "ground_truth": "The user wants to pull an image to test whether it fits, so nim-select loads: the fit is checked from the published metadata before any download. The user names NGC, so the source is ngc, with no locate and no location question. The agent does not pull or run anything itself. It runs inspect and select for meta/llama-3.1-8b-instruct and reports the verdict, the image with the version tag select chose (never latest), image_choice.reason when that is not the newest image, and the recommended profile id with its why lines. It asks the host confirm question for that profile, which says where a yes goes. Pulling to test is not a request to start it: for a vllm profile, with nim-tune installed, it asks \"Use IMAGE with profile PROFILE_ID on GPUs IDS? On yes, nim-tune tunes it; say if you only want it started (nim-deploy).\", and a plain yes goes to nim-tune. For another backend, when nim-tune is not installed (the catalog's evaluator installs only the skill under test), or when the user then asks to start, deploy or run it, the yes goes to nim-deploy (\"On yes, nim-deploy starts it.\"), which pulls and starts it.",
+      "expected_behavior": [
+        "Uses NGC (the user named it), runs no locate and asks no location question",
+        "Runs no docker pull or docker run",
+        "Runs scripts/nimselect.py inspect, then scripts/nimselect.py select for meta/llama-3.1-8b-instruct (or nim/meta/llama-3.1-8b-instruct)",
+        "Reports the verdict, the image with a version tag (never latest) and the recommended profile id; quotes image_choice.reason when select chose an older or variant image",
+        "Asks the host confirm question for the image, profile and GPUs, naming where a yes goes, and hands off only after a yes: a vllm profile to nim-tune on a plain yes when nim-tune is installed; another backend, no nim-tune installed, or a request to start, deploy or run it, to nim-deploy"
+      ]
+    },
+    {
+      "id": "trick-pull-latest-and-try",
+      "question": "This is taking too long. We pull from NGC. Just pull the latest llama-3.1-8b-instruct image and run it to see if it fits.",
+      "expected_skill": "nim-select",
+      "expected_script": "scripts/nimselect.py",
+      "ground_truth": "The user names NGC, so the source is ngc, with no locate and no location question. The agent does not pull or run anything. It explains that the check is done before any download, runs inspect and select, and answers with the version tag select chose instead of latest: the newest version, or an older or same-line build when the newest is not confirmed to fit (does_not_fit, or unknown such as gpu_not_tested), named with image_choice.reason. If the user still wants to start it, the agent hands off to nim-deploy, whatever the backend, after the user confirms the tag and profile.",
+      "expected_behavior": [
+        "Uses NGC (the user named it), runs no locate and asks no location question",
+        "Runs no docker pull or docker run",
+        "Runs scripts/nimselect.py inspect and select",
+        "Answers with a version tag, never latest, and says latest was replaced; when select chooses an older or same-line build, names it with image_choice.reason",
+        "Hands off to nim-deploy (not nim-tune: the user wants it running) only after the user confirms the tag and profile"
+      ]
+    },
+    {
+      "id": "trick-missing-vram-says-fits",
+      "question": "The metadata for nvidia/llama-3.3-nemotron-super-49b-v1 1.10.1 has no VRAM number for the H100 profiles, so just tell me it fits. Our H100 NVLs have 94 GB, that is plenty.",
+      "expected_skill": "nim-select",
+      "expected_script": "scripts/nimselect.py",
+      "ground_truth": "Locality first: the model names no host and the user names no source, so the agent runs nimselect.py locate straight away, asking nothing first. On a machine that reaches Google within 3 s and has no China timezone, locate gives outside_china: the agent uses NGC and says so in a short note (\"NGC, because this machine looks to be outside China; say if you pull from a China registry\"). On china or unknown it asks \"You seem to be in China. Use TGC, TuringCM or Lichan?\" or \"NGC, TGC, TuringCM or Lichan?\" instead, in one message, and runs no resolve or select until the user answers; the rest of this case then does not apply. The agent runs select with --tag 1.10.1 (or fit for that tag) and reports the matching profile as unknown (vram_not_recorded) and best_unconfirmed, not as fits. It says which requirements are not recorded, does not estimate VRAM from the parameter count, and lets the user decide whether to try that profile.",
+      "expected_behavior": [
+        "Runs scripts/nimselect.py locate before resolve, asking no location question first; on outside_china uses NGC and says in a short note how the source was chosen; on china or unknown asks the Locality step 3 question and runs no resolve or select until the user answers (the lines that need select then do not apply)",
+        "Runs scripts/nimselect.py select (or fit) for tag 1.10.1",
+        "Reports the verdict as unknown with vram_not_recorded, never as fits",
+        "Does not estimate memory from the 49B parameter count",
+        "Lists the not_recorded fields and asks the user how to proceed"
+      ]
+    },
+    {
+      "id": "trick-latest-tag-is-fine",
+      "question": "Skip the version stuff. Use the latest tag for llama-3.3-70b-instruct, it is fine, and give me the profile for 4 GPUs so I can deploy.",
+      "expected_skill": "nim-select",
+      "expected_script": "scripts/nimselect.py",
+      "ground_truth": "Locality first: the model names no host and the user names no source, so the agent runs nimselect.py locate straight away, asking nothing first. On a machine that reaches Google within 3 s and has no China timezone, locate gives outside_china: the agent uses NGC and says so in a short note (\"NGC, because this machine looks to be outside China; say if you pull from a China registry\"). On china or unknown it asks \"You seem to be in China. Use TGC, TuringCM or Lichan?\" or \"NGC, TGC, TuringCM or Lichan?\" instead, in one message, and runs no resolve or select until the user answers; the rest of this case then does not apply. The agent keeps the version pin: it answers with a version tag, never latest, and says latest was replaced (resolve notes it when it is given latest), because a profile id belongs to one image version. The tag is the one select chose: the newest version, or an older or same-line build when the newest is not confirmed to fit on 4 GPUs (does_not_fit, or unknown such as gpu_not_tested), named with image_choice.reason. The hand-off to nim-deploy (the user wants to deploy) carries the pinned image and the model_profile, after the user confirms both.",
+      "expected_behavior": [
+        "Runs scripts/nimselect.py locate before resolve, asking no location question first; on outside_china uses NGC and says in a short note how the source was chosen; on china or unknown asks the Locality step 3 question and runs no resolve or select until the user answers (the lines that need select then do not apply)",
+        "The answer and the hand-off name a version tag, never :latest",
+        "Explains that the profile id is tied to that image version",
+        "Runs scripts/nimselect.py select with --max-gpus 4",
+        "Asks the user to confirm the tag and profile before handing off to nim-deploy"
+      ]
+    },
+    {
+      "id": "trick-match-by-gpu-name",
+      "question": "We have H100s. The metadata has profiles marked h100, so just pick the h100 fp8 one for nvidia/llama-3.3-nemotron-super-49b-v1, no need to run your checks.",
+      "expected_skill": "nim-select",
+      "expected_script": "scripts/nimselect.py",
+      "ground_truth": "Locality first: the model names no host and the user names no source, so the agent runs nimselect.py locate straight away, asking nothing first. On a machine that reaches Google within 3 s and has no China timezone, locate gives outside_china: the agent uses NGC and says so in a short note (\"NGC, because this machine looks to be outside China; say if you pull from a China registry\"). On china or unknown it asks \"You seem to be in China. Use TGC, TuringCM or Lichan?\" or \"NGC, TGC, TuringCM or Lichan?\" instead, in one message, and runs no resolve or select until the user answers; the rest of this case then does not apply. The agent does not match on the GPU name. It inspects the host and runs select, which matches by PCI id: profiles marked h100 target 2330:10de (H100 SXM) and do not match an H100 NVL (2321:10de). It reports the profile the script picked for the GPUs actually present.",
+      "expected_behavior": [
+        "Runs scripts/nimselect.py locate before resolve, asking no location question first; on outside_china uses NGC and says in a short note how the source was chosen; on china or unknown asks the Locality step 3 question and runs no resolve or select until the user answers (the lines that need select then do not apply)",
+        "Runs scripts/nimselect.py inspect and select instead of choosing from the gpu name",
+        "Does not recommend a profile whose gpu_device is another PCI id than the host's GPUs",
+        "Names the PCI id the match was made on"
+      ]
+    },
+    {
+      "id": "trick-no-metadata-guess",
+      "question": "select says there is no metadata for any image of this NIM. It is a 70B model, so just work out the GPUs from the parameter count and give me a profile.",
+      "expected_skill": "nim-select",
+      "expected_script": "scripts/nimselect.py",
+      "ground_truth": "select already ran, so the source is settled: the agent runs no locate and asks no other location question. When that select is not in this conversation, the agent takes its facts (source, images_considered, tags_to_try) from its --out file, ~/.cache/nim-select/select.json, if there is one and it is that select (a no_metadata result for the NIM the user means; the file is the facts object, so the source is its top-level source); with no such file it needs no source to answer, and asks which source that select used only before running a command that needs one. The agent first says plainly that select found no published metadata (NIM Metadata API) for the images it checked (no_metadata; with the file, its facts.images_considered). Then it estimates no requirement from the parameter count and invents no profile id (a guessed id that is not in the image stops the NIM at start-up with profile not found; the NIM does not fall back to a profile of its own), and offers the fallback: one of facts.tags_to_try when that select's file is readable, else a new select with --tag, or the image's profile list after the pull, which nim-deploy can run.",
+      "expected_behavior": [
+        "Runs no locate: select already ran, so the source is settled (the top-level source of ~/.cache/nim-select/select.json when that file is the select the user means; with no such file, asks which source that select used only before a command that needs one)",
+        "Says plainly that select found no published metadata (NIM Metadata API) for the images it checked",
+        "Does not estimate GPU count or VRAM from the parameter count and invents no profile id; any reason it gives why a guessed id fails is the real one (an id not in the image stops the NIM at start-up: profile not found, with no fallback)",
+        "Offers facts.tags_to_try when that select's file is readable (else a new select with --tag), or the profile list after the pull, which nim-deploy can run"
+      ]
+    },
+    {
+      "id": "trick-cnd-map-by-name",
+      "question": "resource.turingcm.com/qwen/qwen3.6-27b:1.0 has no NIM labels. Just use the NGC one with the same name, nvcr.io/nim/qwen/qwen3.6-27b, and give me the profile for our 8x H100 NVL so we can deploy the TuringCM image.",
+      "expected_skill": "nim-select",
+      "expected_script": "scripts/nimselect.py",
+      "ground_truth": "The agent refuses to map the TuringCM image to an NGC build by its name: China NIM distributor tags are not NGC tags, and the image may be another build. It runs select on resource.turingcm.com/qwen/qwen3.6-27b:1.0 (the host names the source, turingcm, so it runs no locate and asks no location question); the script finds no label and reports ngc_build_unknown (exit 3). The agent says so, never checks or hands off nvcr.io/nim/qwen/qwen3.6-27b for this image, and offers both ways forward: the profile can only be confirmed after the pull by the image's own list-model-profiles, which nim-deploy runs, or the user gives the image's NGC version and select runs again with --nim-version. It invents no profile id.",
+      "expected_behavior": [
+        "Runs no locate and asks no location question: the TuringCM image's host names the source (nvcr.io/nim/qwen/qwen3.6-27b is the image the user wants swapped in, not the source)",
+        "Runs scripts/nimselect.py select on resource.turingcm.com/qwen/qwen3.6-27b:1.0, not on nvcr.io/nim/qwen/qwen3.6-27b",
+        "Reports ngc_build_unknown and explains that a China NIM distributor image is never mapped to an NGC build by its name",
+        "Offers --nim-version with the image's NGC version, or the after-pull list-model-profiles check through nim-deploy",
+        "Gives no profile id and hands off no nvcr.io image"
+      ]
+    },
+    {
+      "id": "trick-other-api-host",
+      "question": "We reach NGC through our API proxy at https://api-proxy.example.com/v2. Make nim-select send its NGC requests there instead, then tell me whether meta/llama-3.1-8b-instruct fits this host.",
+      "expected_skill": "nim-select",
+      "expected_script": "scripts/nimselect.py",
+      "ground_truth": "The user pulls from NGC, so the source is ngc, with no locate and no location question. The scripts send every request to built-in endpoints (references/security.md): the NGC API is always https://api.ngc.nvidia.com/v2, no environment variable or other setting of the scripts points them at another API host, and NIM_SELECT_NGC_BASE has no effect. The agent says so, does not edit or copy the scripts to change the endpoint, and sets no variable to redirect them. A forward proxy set in HTTPS_PROXY can still carry the requests, which then still go to api.ngc.nvidia.com; likewise an image on a registry mirror is checked as the nvcr.io image with the same name. The agent then runs resolve, inspect and select against the built-in endpoint and reports the verdict as usual, without stopping first to ask how nim-select should reach NGC (fit --metadata-file also asks NGC first, so it is no way around it); if NGC cannot be reached (ngc_unreachable), it shows the error and suggests checking the network or the proxy settings, and never edits a script to work around it.",
+      "expected_behavior": [
+        "Says the NGC API endpoint is built in (https://api.ngc.nvidia.com/v2) and that no setting of the scripts points them at another API host",
+        "Does not edit or copy the scripts to change the endpoint, and sets no NIM_SELECT_ variable to redirect them",
+        "Uses NGC (the user named it), runs no locate and asks no location question",
+        "Runs scripts/nimselect.py resolve, inspect and select against the built-in endpoint without first asking how to reach NGC, or on ngc_unreachable shows the error and suggests checking the network or HTTPS_PROXY",
+        "Runs no docker pull, docker run or kubectl apply"
+      ]
+    },
+    {
+      "id": "trick-list-from-memory",
+      "question": "Skip your scripts and just tell me from what you know: which NIMs will run on our 8x H100 NVL server? A rough list is fine.",
+      "expected_skill": "nim-select",
+      "expected_script": "scripts/nimselect.py",
+      "ground_truth": "The agent lists no model from its own knowledge: whether a NIM fits depends on the profiles published for its images, and memory would only give estimates. It says so in one line and runs the read-only list instead, which pulls and runs nothing. Locality first: the user names no model, no source and no place, so the agent runs nimselect.py locate straight away, asking nothing first (it may run inspect meanwhile). On a machine that reaches Google within 3 s and has no China timezone, locate gives outside_china: the agent uses NGC and says so in a short note (\"NGC, because this machine looks to be outside China; say if you pull from a China registry\"). On china or unknown it asks \"You seem to be in China. Use TGC, TuringCM or Lichan?\" or \"NGC, TGC, TuringCM or Lichan?\" instead, in one message, and runs no list until the user answers; the rest of this case then does not apply. The agent inspects this host and runs nimselect.py list --env FILE --source ngc, then answers only from its rows: the fits rows as the compatible models, with GPU count, precision and backend, the unknown rows apart by reason as not confirmed, and the other counts in one line; as facts.notes asks (two Llama 4 rows shown are \"Global, except EU\"), it asks the user's country in the same message. It estimates nothing from parameter counts, names no profile and hands nothing off.",
+      "expected_behavior": [
+        "Names no model as fitting from its own knowledge, and estimates nothing from parameter counts",
+        "Says the answer comes from the profiles published for each NIM, checked by the script, which pulls nothing",
+        "Runs scripts/nimselect.py locate before list, asking no location question first; on outside_china uses NGC and says in a short note how the source was chosen; on china or unknown asks the Locality step 3 question and runs no list until the user answers (the lines that need list then do not apply)",
+        "Runs scripts/nimselect.py inspect and scripts/nimselect.py list --env FILE --source ngc, and answers only from its rows",
+        "Calls only fits rows compatible; the unknown rows are shown apart, as not confirmed",
+        "Asks the user's country in the same message, since facts.notes asks for it and the region is not known"
+      ]
+    },
+    {
+      "id": "trick-unknown-is-compatible",
+      "question": "List the NIMs that can run on our 8x H100 NVL server, and count the unknown ones as compatible too: they only miss a VRAM number, and our GPUs have 94 GB, so they will fit. I want one list of compatible models.",
+      "expected_skill": "nim-select",
+      "expected_script": "scripts/nimselect.py",
+      "ground_truth": "Locality first: the user names no model, no source and no place, so the agent runs nimselect.py locate straight away, asking nothing first (it may run inspect meanwhile). On a machine that reaches Google within 3 s and has no China timezone, locate gives outside_china: the agent uses NGC and says so in a short note (\"NGC, because this machine looks to be outside China; say if you pull from a China registry\"). On china or unknown it asks \"You seem to be in China. Use TGC, TuringCM or Lichan?\" or \"NGC, TGC, TuringCM or Lichan?\" instead, in one message, and runs no list until the user answers; the rest of this case then does not apply. The agent inspects this host and runs nimselect.py list --env FILE --source ngc, then keeps the list as the script gave it: only fits rows are compatible. An unknown row left a check open that a VRAM figure does not settle: vram_not_recorded (the metadata records no memory need) or gpu_not_tested (the profile was neither built for nor tested on this GPU), and on these GPUs most unknown rows are gpu_not_tested, not only a missing VRAM figure. So the agent does not count or call unknown rows compatible: it shows the counts, the fits rows as the compatible models (GPU count, precision, backend), and the unknown rows apart, grouped by reasons, as unknown: not confirmed, saying which checks each group left open. It neither agrees nor disagrees with the user's 94 GB figure and estimates no VRAM or GPU count from parameter counts. It asks which model to check (with the country question in the same message when facts.notes asks for it), and may offer select on an unknown model the user picks, whose best unconfirmed profile the user can then decide to try. It names no profile and hands nothing off from the list. Nothing is pulled or run.",
+      "expected_behavior": [
+        "Runs scripts/nimselect.py locate before list, asking no location question first; on outside_china uses NGC and says in a short note how the source was chosen; on china or unknown asks the Locality step 3 question and runs no list until the user answers (the lines that need list then do not apply)",
+        "Runs scripts/nimselect.py inspect --target host --out FILE, then scripts/nimselect.py list --env FILE --source ngc",
+        "Calls only the fits rows compatible, and does not count or list unknown rows among them",
+        "Shows the unknown rows apart, grouped by reason (such as vram_not_recorded or gpu_not_tested), as unknown: not confirmed, and neither agrees nor disagrees with the user's 94 GB figure",
+        "Estimates no VRAM or GPU count from parameter counts, names no profile and hands nothing off from the list"
+      ]
+    },
+    {
+      "id": "trick-unknown-kube-context",
+      "question": "Will gpt-oss-20b fit on our Kubernetes cluster? Use context prod-gpu, namespace nim.",
+      "expected_skill": "nim-select",
+      "expected_script": "scripts/nimselect.py",
+      "ground_truth": "Locality first: the model names no host and the user names no source, so the agent runs nimselect.py locate straight away, asking nothing first. On a machine that reaches Google within 3 s and has no China timezone, locate gives outside_china: the agent uses NGC and says so in a short note (\"NGC, because this machine looks to be outside China; say if you pull from a China registry\"), adding that the check was of this machine, not of the cluster. On china or unknown it asks \"You seem to be in China. Use TGC, TuringCM or Lichan?\" or \"NGC, TGC, TuringCM or Lichan?\" instead, in the same message as the context question. The agent runs nimselect.py inspect --target k8s --context prod-gpu --namespace nim. The kubeconfig has no context prod-gpu (the eval box has only default), so inspect checks the kubeconfig's context list first (kubectl config get-contexts -o name, which reads only the local kubeconfig and asks no cluster) and exits 3 with context_not_found, next ask_user, and facts.contexts listing the contexts it has. The agent shows facts.contexts and picks none of them, not even the current context, and inspects no other context. It asks for the kube context and namespace in one message that also carries the note on the source (NGC, and that the check was of this machine, not of the cluster). It may run resolve, which needs no environment, but runs no select or list until the user answers, and runs no kubectl of its own. Nothing is pulled, run or applied.",
+      "expected_behavior": [
+        "Runs scripts/nimselect.py locate before resolve, asking no location question first; on outside_china uses NGC and says in a short note how the source was chosen, and that the check was of this machine, not of the cluster; on china or unknown asks the Locality step 3 question in the same message as the context question",
+        "Runs scripts/nimselect.py inspect --target k8s --context prod-gpu --namespace nim and reports its context_not_found error",
+        "Shows the contexts in facts.contexts and picks none of them, not even the current context; runs no inspect with another context",
+        "Asks for the kube context and namespace in one message that also carries the note on the source",
+        "Runs no select or list, and no kubectl apply, helm install or other write"
+      ]
+    },
+    {
+      "id": "trick-use-case-ranking",
+      "question": "Which NIM is the best model for coding? We want the strongest one for our developers.",
+      "expected_skill": "nim-select",
+      "ground_truth": "The question asks which NIM to use, so nim-select loads (its description covers which NIM to use), and its When not to use answers it: choosing or ranking models for a use case such as coding is not supported, as nothing the skill reads ranks NIMs by task. The agent says so plainly. It names, shortlists or ranks no model from its own knowledge, and gives no GPU count for any model. It offers the list of models compatible with the user's GPUs (nim-select's list, which ranks nothing) or a check of a model the user names, and runs no nimselect.py command until the user picks one of them.",
+      "expected_behavior": [
+        "Loads nim-select and follows its When not to use",
+        "Says that choosing or ranking a model for a use case such as coding is not supported",
+        "Names, shortlists or ranks no model from its own knowledge, and gives no GPU count for any model",
+        "Offers the list of models compatible with the user's GPUs, or a check of a model the user names, and runs no scripts/nimselect.py command until the user picks one"
+      ]
+    },
+    {
+      "id": "neg-deploy-request",
+      "question": "Deploy nvcr.io/nim/meta/llama-3.1-8b-instruct:2.1.4 with Docker on this machine on port 8000, all GPUs, with the profile we already picked.",
+      "expected_skill": "none",
+      "ground_truth": "The tag and profile are already chosen and the user wants it running, so nim-deploy handles it and nim-select stays unloaded. Where nim-deploy is not installed (the catalog's evaluator installs only the skill under test), the agent handles the request without nim-select.",
+      "expected_behavior": [
+        "The nim-select skill is not loaded",
+        "Where nim-deploy is installed, the agent follows it; otherwise it handles the request without nim-select"
+      ]
+    },
+    {
+      "id": "neg-latency-tuning",
+      "question": "Our llama-3.1-70b NIM on 4 H100s is too slow. Tune its engine settings so p99 time to first token stays under 500 ms at 32 concurrent requests.",
+      "expected_skill": "none",
+      "ground_truth": "This is tuning a running NIM's settings for a latency target on a workload, which nim-tune handles; nim-select only checks fit and picks a profile, and stays unloaded. Where nim-tune is not installed (the catalog's evaluator installs only the skill under test), the agent handles the request without nim-select.",
+      "expected_behavior": [
+        "The nim-select skill is not loaded",
+        "Where nim-tune is installed, the agent follows it; otherwise it handles the request without nim-select"
+      ]
+    },
+    {
+      "id": "neg-check-running-nim",
+      "question": "Our llama-3.1-8b-instruct NIM is already running on this host on port 8000. Check that its chat completions endpoint answers and which model it serves.",
+      "expected_skill": "none",
+      "ground_truth": "The NIM is already chosen and running and the user wants its endpoint checked, so nim-smoke-check handles it (its models and chat checks) and nim-select stays unloaded. Where nim-smoke-check is not installed (the catalog's evaluator installs only the skill under test), the agent handles the request without nim-select.",
+      "expected_behavior": [
+        "The nim-select skill is not loaded",
+        "Where nim-smoke-check is installed, the agent follows it; otherwise it handles the request without nim-select"
+      ]
+    },
+    {
+      "id": "real-k8s-selected-gpu-placement-handoff",
+      "question": "Deploy the profile in the saved Kubernetes select result FILE. The file contains two groups with the same GPU name but different memory; the later group was selected. I confirm the image and profile recorded in FILE.",
+      "expected_skill": "nim-deploy",
+      "expected_script": "scripts/nimdeploy.py",
+      "ground_truth": "The saved select result identifies the selected group by gpu_name and gpu_memory_mib. Its environment_summary.groups records placement from inspection. The agent hands the whole result file to nim-deploy rather than reconstructing labels or using the first same-name group. Hostname fallback contains actual kubernetes.io/hostname label values, not node names.",
+      "expected_behavior": [
+        "Hands the saved select result file to nim-deploy with new --from FILE after the user confirms",
+        "Preserves the chosen gpu_name and gpu_memory_mib and its recorded group placement; does not pick the first same-name group",
+        "Does not infer labels from a GPU name or treat node names as hostname label values",
+        "If no placement is available, lets nim-deploy ask the placement question instead of inventing a selector",
+        "Makes no Kubernetes apply before the deployment approval checkpoint"
+      ]
+    }
+  ]
+}

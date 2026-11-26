@@ -1,0 +1,7 @@
+{
+ "requestStatus": {
+  "statusCode": "NOT_FOUND",
+  "statusDescription": "404 NOT_FOUND, ProblemDetail[type='urn:kaizen:problem-details:not-found', title='Not Found', status=404, detail='NIM metadata does not exist for 1046798667019644/meta/llama-3.1-8b-base:1.1.2', instance='null', properties='null']",
+  "requestId": "dc8f785f-063b-4226-b94a-1b3409e63b61"
+ }
+}
