@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 496,
-  "result_row_count": 4654,
+  "skill_count": 499,
+  "result_row_count": 4674,
   "skills_without_results": [
     "daqiri-onboarding",
     "deepstream-generate-pipeline",
@@ -7059,6 +7059,69 @@
       "component": "ALCHEMI Toolkit",
       "has_results": true,
       "average_uplift_pct": 3.83
+    },
+    {
+      "skill": "nvat-corim-attestation",
+      "evaluation_date": "2026-11-25",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.10",
+      "dataset_digest": "sha256:839cf32c19d82f932ba2e5d6be7de923270121fada773b2d20db88ce2700bde5",
+      "validation_status": "passed",
+      "tasks": 16,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "nvat-corim-attestation",
+      "component": "NVIDIA Attestation SDK",
+      "has_results": true,
+      "average_uplift_pct": 11.23
+    },
+    {
+      "skill": "nvat-install-and-guide",
+      "evaluation_date": "2026-11-25",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.10",
+      "dataset_digest": "sha256:dfc8e7ed487842d39a52f196f73afa1c0c86a819f644e534a2f98b05273c3e88",
+      "validation_status": "passed",
+      "tasks": 12,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "nvat-install-and-guide",
+      "component": "NVIDIA Attestation SDK",
+      "has_results": true,
+      "average_uplift_pct": 4.63
+    },
+    {
+      "skill": "nvat-troubleshooting",
+      "evaluation_date": "2026-11-25",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.10",
+      "dataset_digest": "sha256:1b3402000c3036b9e92b4adb7263edcb219d4f76029082126af37622fbfa2d22",
+      "validation_status": "passed",
+      "tasks": 15,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "nvat-troubleshooting",
+      "component": "NVIDIA Attestation SDK",
+      "has_results": true,
+      "average_uplift_pct": 13.65
     },
     {
       "skill": "nvflare-autofl",
@@ -38599,6 +38662,186 @@
       "num": null,
       "agent": "codex",
       "score_pct": 75.2,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvat-corim-attestation",
+      "component": "NVIDIA Attestation SDK",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 96.9,
+      "uplift_pct": 6.3
+    },
+    {
+      "catalog_dir": "nvat-corim-attestation",
+      "component": "NVIDIA Attestation SDK",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 15.0
+    },
+    {
+      "catalog_dir": "nvat-corim-attestation",
+      "component": "NVIDIA Attestation SDK",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 93.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvat-corim-attestation",
+      "component": "NVIDIA Attestation SDK",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 83.0,
+      "uplift_pct": 12.4
+    },
+    {
+      "catalog_dir": "nvat-corim-attestation",
+      "component": "NVIDIA Attestation SDK",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 66.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvat-install-and-guide",
+      "component": "NVIDIA Attestation SDK",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 87.5,
+      "uplift_pct": 4.2
+    },
+    {
+      "catalog_dir": "nvat-install-and-guide",
+      "component": "NVIDIA Attestation SDK",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 98.3,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nvat-install-and-guide",
+      "component": "NVIDIA Attestation SDK",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvat-install-and-guide",
+      "component": "NVIDIA Attestation SDK",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 79.5,
+      "uplift_pct": 9.7
+    },
+    {
+      "catalog_dir": "nvat-install-and-guide",
+      "component": "NVIDIA Attestation SDK",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 68.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvat-troubleshooting",
+      "component": "NVIDIA Attestation SDK",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nvat-troubleshooting",
+      "component": "NVIDIA Attestation SDK",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 96.7,
+      "uplift_pct": 3.4
+    },
+    {
+      "catalog_dir": "nvat-troubleshooting",
+      "component": "NVIDIA Attestation SDK",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 26.7
+    },
+    {
+      "catalog_dir": "nvat-troubleshooting",
+      "component": "NVIDIA Attestation SDK",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 5.3
+    },
+    {
+      "catalog_dir": "nvat-troubleshooting",
+      "component": "NVIDIA Attestation SDK",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 94.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvat-troubleshooting",
+      "component": "NVIDIA Attestation SDK",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 93.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvat-troubleshooting",
+      "component": "NVIDIA Attestation SDK",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 37.3
+    },
+    {
+      "catalog_dir": "nvat-troubleshooting",
+      "component": "NVIDIA Attestation SDK",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 83.4,
+      "uplift_pct": 9.2
+    },
+    {
+      "catalog_dir": "nvat-troubleshooting",
+      "component": "NVIDIA Attestation SDK",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 92.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvat-troubleshooting",
+      "component": "NVIDIA Attestation SDK",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 71.3,
       "uplift_pct": null
     },
     {

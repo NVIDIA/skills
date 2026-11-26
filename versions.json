@@ -2361,6 +2361,27 @@
       "last_modified": "2026-11-16"
     },
     {
+      "name": "nvat-corim-attestation",
+      "path": "skills/nvat-corim-attestation",
+      "content_digest": "sha256:f86f2378e23f2334c0a0c4ffd3f6a35a0dd8ea7134f6df214934dfb7d22c10e7",
+      "last_commit": "edb36f970627cda1f131237afb459d95aa0da549",
+      "last_modified": "2026-11-26"
+    },
+    {
+      "name": "nvat-install-and-guide",
+      "path": "skills/nvat-install-and-guide",
+      "content_digest": "sha256:7b9c17afbdd4c9e9f1e70b349e710c8c0f5a37f4c86016a50e5904e2e3809043",
+      "last_commit": "edb36f970627cda1f131237afb459d95aa0da549",
+      "last_modified": "2026-11-26"
+    },
+    {
+      "name": "nvat-troubleshooting",
+      "path": "skills/nvat-troubleshooting",
+      "content_digest": "sha256:1d922d9059379038d7c4698799fd4e235874d2cd2d19e937a74a77981bebef9b",
+      "last_commit": "edb36f970627cda1f131237afb459d95aa0da549",
+      "last_modified": "2026-11-26"
+    },
+    {
       "name": "nvflare-autofl",
       "path": "skills/nvflare-autofl",
       "content_digest": "sha256:33734eef8afd0b89fb40586e5bce616ce9bbe91257d84caca05bcf635e60fbb4",

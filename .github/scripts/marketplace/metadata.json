@@ -4045,6 +4045,42 @@
       }
     },
     {
+      "path": "skills/nvat-corim-attestation",
+      "name": "nvat-corim-attestation",
+      "description": "Use when collecting CMW evidence or performing GPU attestation with the NVIDIA Attestation SDK CoRIM verifier, selecting an appraisal policy, or interpreting EAR results from nvattest.",
+      "metadata": {
+        "product.primary": "Attestation",
+        "classification.category.primary": "infrastructure",
+        "catalog.subdomain": "cybersecurity",
+        "audience": "security_engineer,platform_engineer,devops_engineer,developer",
+        "discovery.activity_tags": "validate,assess,select,inspect,configure"
+      }
+    },
+    {
+      "path": "skills/nvat-install-and-guide",
+      "name": "nvat-install-and-guide",
+      "description": "Use when installing or upgrading the NVIDIA Attestation SDK (NVAT or nvattest), checking platform compatibility, or answering questions about its CLI, C API, or Rust bindings from official documentation.",
+      "metadata": {
+        "product.primary": "Attestation",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "cybersecurity",
+        "audience": "security_engineer,application_developer,platform_engineer,devops_engineer,developer",
+        "discovery.activity_tags": "get_started,configure,integrate,validate,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/nvat-troubleshooting",
+      "name": "nvat-troubleshooting",
+      "description": "Use when NVAT installation, linking, evidence collection, CoRIM appraisal, EAR verification, or relying-party policy fails, or when investigating runtime versus reference measurements, measurement indices, and OID meanings.",
+      "metadata": {
+        "product.primary": "Attestation",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "cybersecurity",
+        "audience": "security_engineer,developer,platform_engineer,devops_engineer",
+        "discovery.activity_tags": "troubleshoot,debug,validate,inspect,configure"
+      }
+    },
+    {
       "path": "skills/nvflare-autofl",
       "name": "nvflare-autofl",
       "description": "Use for agent-assisted Auto-FL optimization of an existing NVFLARE job in simulation, POC, or production. Do not use for code conversion, diagnosis-only work, or deployment setup.",
