@@ -1,13 +1,15 @@
 # Skill Benchmark: nim-select
 
-> ⚠️ **Overall verdict: INCOMPLETE — Required evidence is missing**
+> ✅ **Overall verdict: PASS — Recommended for publication**
 
-One or more required evaluation tiers did not complete, so this benchmark is not publication-complete.
+## Publication Recommendation
+
+Recommended for publication based on the completed evaluation evidence in this report.
 
 ## Evaluation Metadata
 
 - Skill: `nim-select`
-- Validation status: `incomplete`
+- Validation status: `passed`
 - Evaluation date: 2026-11-26
 - Evaluator version: `1.6.10`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
@@ -48,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 88.0% — baseline ran, but no comparable score was available; uplift unavailable | 85.5% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 93.1% → 98.6% (+5.5 points) | 81.9% → 95.8% (+13.9 points) |
-| Correctness | 33.3% → 92.2% (+58.9 points) | 31.1% → 89.4% (+58.3 points) |
-| Discoverability | 91.8% — baseline ran, but no comparable score was available; uplift unavailable | 90.8% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 20.4% → 62.8% (+42.4 points) | 19.0% → 61.5% (+42.5 points) |
-| Efficiency | 94.5% — baseline ran, but no comparable score was available; uplift unavailable | 90.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 87.9% — baseline ran, but no comparable score was available; uplift unavailable | 85.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 93.1% → 98.6% (+5.5 points) | 83.3% → 95.8% (+12.5 points) |
+| Correctness | 34.4% → 90.6% (+56.2 points) | 28.9% → 91.7% (+62.8 points) |
+| Discoverability | 89.8% — baseline ran, but no comparable score was available; uplift unavailable | 89.6% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 19.8% → 65.9% (+46.1 points) | 19.2% → 59.9% (+40.7 points) |
+| Efficiency | 94.5% — baseline ran, but no comparable score was available; uplift unavailable | 89.7% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -68,9 +70,9 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 98.1% → 91.3% (-6.8 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 97.8% → 91.3% (-6.5 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 83.7% → 89.2% (+5.5 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 84.1% → 89.1% (+5.0 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -78,81 +80,81 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 5,650,980 | 4,401,130 | +1,249,850 | +28.40% | skill 36/36; base 36/36 |
-| claude-code | neg-check-running-nim | 143,424 | 142,382 | +1,042 | +0.73% | skill 1/1; base 1/1 |
-| claude-code | neg-deploy-request | 109,389 | 181,069 | -71,680 | -39.59% | skill 1/1; base 1/1 |
-| claude-code | neg-latency-tuning | 191,450 | 143,952 | +47,498 | +33.00% | skill 1/1; base 1/1 |
-| claude-code | real-70b-two-h100 | 142,251 | 36,243 | +106,008 | +292.49% | skill 1/1; base 1/1 |
-| claude-code | real-ambiguous-model-name | 144,258 | 72,087 | +72,171 | +100.12% | skill 1/1; base 1/1 |
-| claude-code | real-cnd-image-labels | 197,212 | 144,031 | +53,181 | +36.92% | skill 1/1; base 1/1 |
-| claude-code | real-cnd-model-name | 196,390 | 108,041 | +88,349 | +81.77% | skill 1/1; base 1/1 |
-| claude-code | real-cnd-not-on-that-cnd | 196,654 | 70,915 | +125,739 | +177.31% | skill 1/1; base 1/1 |
-| claude-code | real-host-llama-8b | 141,925 | 108,464 | +33,461 | +30.85% | skill 1/1; base 1/1 |
-| claude-code | real-image-choice-explained | 142,639 | 182,169 | -39,530 | -21.70% | skill 1/1; base 1/1 |
-| claude-code | real-k8s-gpt-oss | 142,032 | 142,577 | -545 | -0.38% | skill 1/1; base 1/1 |
-| claude-code | real-k8s-selected-gpu-placement-handoff | 197,867 | 143,258 | +54,609 | +38.12% | skill 1/1; base 1/1 |
-| claude-code | real-list-cnd | 141,637 | 72,130 | +69,507 | +96.36% | skill 1/1; base 1/1 |
-| claude-code | real-list-country-lookup | 142,032 | 182,764 | -40,732 | -22.29% | skill 1/1; base 1/1 |
-| claude-code | real-list-earlier-run | 195,825 | 216,616 | -20,791 | -9.60% | skill 1/1; base 1/1 |
-| claude-code | real-list-host | 141,878 | 108,777 | +33,101 | +30.43% | skill 1/1; base 1/1 |
-| claude-code | real-list-query-k8s | 141,960 | 143,662 | -1,702 | -1.18% | skill 1/1; base 1/1 |
-| claude-code | real-list-region | 141,594 | 147,151 | -5,557 | -3.78% | skill 1/1; base 1/1 |
-| claude-code | real-list-then-select | 141,841 | 184,924 | -43,083 | -23.30% | skill 1/1; base 1/1 |
-| claude-code | real-locality-ask | 141,846 | 107,622 | +34,224 | +31.80% | skill 1/1; base 1/1 |
-| claude-code | real-locality-outside-china | 252,111 | 143,655 | +108,456 | +75.50% | skill 1/1; base 1/1 |
-| claude-code | real-locate-then-ask | 142,275 | 107,982 | +34,293 | +31.76% | skill 1/1; base 1/1 |
-| claude-code | real-newest-image-does-not-fit | 142,404 | 72,333 | +70,071 | +96.87% | skill 1/1; base 1/1 |
-| claude-code | real-pull-to-test-fit | 142,466 | 107,066 | +35,400 | +33.06% | skill 1/1; base 1/1 |
-| claude-code | real-select-region | 251,898 | 36,107 | +215,791 | +597.64% | skill 1/1; base 1/1 |
-| claude-code | trick-cnd-map-by-name | 197,753 | 181,431 | +16,322 | +9.00% | skill 1/1; base 1/1 |
-| claude-code | trick-latest-tag-is-fine | 143,443 | 107,523 | +35,920 | +33.41% | skill 1/1; base 1/1 |
-| claude-code | trick-list-from-memory | 36,633 | 36,477 | +156 | +0.43% | skill 1/1; base 1/1 |
-| claude-code | trick-match-by-gpu-name | 144,100 | 179,471 | -35,371 | -19.71% | skill 1/1; base 1/1 |
-| claude-code | trick-missing-vram-says-fits | 143,347 | 70,894 | +72,453 | +102.20% | skill 1/1; base 1/1 |
-| claude-code | trick-no-metadata-guess | 142,734 | 143,883 | -1,149 | -0.80% | skill 1/1; base 1/1 |
-| claude-code | trick-other-api-host | 262,000 | 217,594 | +44,406 | +20.41% | skill 1/1; base 1/1 |
-| claude-code | trick-pull-latest-and-try | 142,929 | 71,052 | +71,877 | +101.16% | skill 1/1; base 1/1 |
-| claude-code | trick-unknown-is-compatible | 142,368 | 106,940 | +35,428 | +33.13% | skill 1/1; base 1/1 |
-| claude-code | trick-unknown-kube-context | 141,971 | 107,392 | +34,579 | +32.20% | skill 1/1; base 1/1 |
-| claude-code | trick-use-case-ranking | 88,444 | 72,496 | +15,948 | +22.00% | skill 1/1; base 1/1 |
-| codex | All cases | 3,307,248 | 2,537,081 | +770,167 | +30.36% | skill 36/36; base 36/36 |
-| codex | neg-check-running-nim | 55,598 | 40,505 | +15,093 | +37.26% | skill 1/1; base 1/1 |
-| codex | neg-deploy-request | 42,204 | 42,327 | -123 | -0.29% | skill 1/1; base 1/1 |
-| codex | neg-latency-tuning | 51,404 | 80,666 | -29,262 | -36.28% | skill 1/1; base 1/1 |
-| codex | real-70b-two-h100 | 99,923 | 47,079 | +52,844 | +112.25% | skill 1/1; base 1/1 |
-| codex | real-ambiguous-model-name | 95,516 | 35,094 | +60,422 | +172.17% | skill 1/1; base 1/1 |
-| codex | real-cnd-image-labels | 93,859 | 74,362 | +19,497 | +26.22% | skill 1/1; base 1/1 |
-| codex | real-cnd-model-name | 118,552 | 66,393 | +52,159 | +78.56% | skill 1/1; base 1/1 |
-| codex | real-cnd-not-on-that-cnd | 95,209 | 61,622 | +33,587 | +54.50% | skill 1/1; base 1/1 |
-| codex | real-host-llama-8b | 95,710 | 79,085 | +16,625 | +21.02% | skill 1/1; base 1/1 |
-| codex | real-image-choice-explained | 95,779 | 132,528 | -36,749 | -27.73% | skill 1/1; base 1/1 |
-| codex | real-k8s-gpt-oss | 95,554 | 301,630 | -206,076 | -68.32% | skill 1/1; base 1/1 |
-| codex | real-k8s-selected-gpu-placement-handoff | 117,103 | 58,364 | +58,739 | +100.64% | skill 1/1; base 1/1 |
-| codex | real-list-cnd | 75,232 | 57,041 | +18,191 | +31.89% | skill 1/1; base 1/1 |
-| codex | real-list-country-lookup | 126,146 | 86,897 | +39,249 | +45.17% | skill 1/1; base 1/1 |
-| codex | real-list-earlier-run | 95,845 | 13,306 | +82,539 | +620.31% | skill 1/1; base 1/1 |
-| codex | real-list-host | 72,879 | 74,742 | -1,863 | -2.49% | skill 1/1; base 1/1 |
-| codex | real-list-query-k8s | 119,426 | 74,980 | +44,446 | +59.28% | skill 1/1; base 1/1 |
-| codex | real-list-region | 99,911 | 73,417 | +26,494 | +36.09% | skill 1/1; base 1/1 |
-| codex | real-list-then-select | 96,092 | 59,992 | +36,100 | +60.17% | skill 1/1; base 1/1 |
-| codex | real-locality-ask | 89,670 | 52,766 | +36,904 | +69.94% | skill 1/1; base 1/1 |
-| codex | real-locality-outside-china | 149,041 | 60,178 | +88,863 | +147.67% | skill 1/1; base 1/1 |
-| codex | real-locate-then-ask | 100,099 | 72,066 | +28,033 | +38.90% | skill 1/1; base 1/1 |
-| codex | real-newest-image-does-not-fit | 99,972 | 46,830 | +53,142 | +113.48% | skill 1/1; base 1/1 |
-| codex | real-pull-to-test-fit | 124,019 | 69,414 | +54,605 | +78.67% | skill 1/1; base 1/1 |
-| codex | real-select-region | 167,520 | 47,318 | +120,202 | +254.03% | skill 1/1; base 1/1 |
-| codex | trick-cnd-map-by-name | 116,206 | 78,671 | +37,535 | +47.71% | skill 1/1; base 1/1 |
-| codex | trick-latest-tag-is-fine | 72,583 | 47,500 | +25,083 | +52.81% | skill 1/1; base 1/1 |
-| codex | trick-list-from-memory | 34,228 | 13,823 | +20,405 | +147.62% | skill 1/1; base 1/1 |
-| codex | trick-match-by-gpu-name | 99,878 | 40,533 | +59,345 | +146.41% | skill 1/1; base 1/1 |
-| codex | trick-missing-vram-says-fits | 75,125 | 39,342 | +35,783 | +90.95% | skill 1/1; base 1/1 |
-| codex | trick-no-metadata-guess | 48,936 | 53,682 | -4,746 | -8.84% | skill 1/1; base 1/1 |
-| codex | trick-other-api-host | 119,367 | 98,427 | +20,940 | +21.27% | skill 1/1; base 1/1 |
-| codex | trick-pull-latest-and-try | 70,315 | 48,684 | +21,631 | +44.43% | skill 1/1; base 1/1 |
-| codex | trick-unknown-is-compatible | 72,929 | 39,578 | +33,351 | +84.27% | skill 1/1; base 1/1 |
-| codex | trick-unknown-kube-context | 95,564 | 224,092 | -128,528 | -57.36% | skill 1/1; base 1/1 |
-| codex | trick-use-case-ranking | 29,854 | 44,147 | -14,293 | -32.38% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 8,958,228 | 6,938,211 | +2,020,017 | +29.11% | skill 72/72; base 72/72 |
+| claude-code | All cases | 5,459,656 | 4,645,430 | +814,226 | +17.53% | skill 36/36; base 36/36 |
+| claude-code | neg-check-running-nim | 142,982 | 146,732 | -3,750 | -2.56% | skill 1/1; base 1/1 |
+| claude-code | neg-deploy-request | 107,769 | 217,816 | -110,047 | -50.52% | skill 1/1; base 1/1 |
+| claude-code | neg-latency-tuning | 180,956 | 145,559 | +35,397 | +24.32% | skill 1/1; base 1/1 |
+| claude-code | real-70b-two-h100 | 142,971 | 71,873 | +71,098 | +98.92% | skill 1/1; base 1/1 |
+| claude-code | real-ambiguous-model-name | 142,209 | 72,436 | +69,773 | +96.32% | skill 1/1; base 1/1 |
+| claude-code | real-cnd-image-labels | 197,061 | 107,660 | +89,401 | +83.04% | skill 1/1; base 1/1 |
+| claude-code | real-cnd-model-name | 196,318 | 145,212 | +51,106 | +35.19% | skill 1/1; base 1/1 |
+| claude-code | real-cnd-not-on-that-cnd | 196,329 | 71,463 | +124,866 | +174.73% | skill 1/1; base 1/1 |
+| claude-code | real-host-llama-8b | 141,959 | 184,890 | -42,931 | -23.22% | skill 1/1; base 1/1 |
+| claude-code | real-image-choice-explained | 141,995 | 182,106 | -40,111 | -22.03% | skill 1/1; base 1/1 |
+| claude-code | real-k8s-gpt-oss | 142,043 | 178,556 | -36,513 | -20.45% | skill 1/1; base 1/1 |
+| claude-code | real-k8s-selected-gpu-placement-handoff | 187,820 | 180,810 | +7,010 | +3.88% | skill 1/1; base 1/1 |
+| claude-code | real-list-cnd | 141,656 | 108,080 | +33,576 | +31.07% | skill 1/1; base 1/1 |
+| claude-code | real-list-country-lookup | 141,963 | 187,150 | -45,187 | -24.14% | skill 1/1; base 1/1 |
+| claude-code | real-list-earlier-run | 195,579 | 142,746 | +52,833 | +37.01% | skill 1/1; base 1/1 |
+| claude-code | real-list-host | 141,878 | 108,613 | +33,265 | +30.63% | skill 1/1; base 1/1 |
+| claude-code | real-list-query-k8s | 141,701 | 142,524 | -823 | -0.58% | skill 1/1; base 1/1 |
+| claude-code | real-list-region | 141,805 | 108,896 | +32,909 | +30.22% | skill 1/1; base 1/1 |
+| claude-code | real-list-then-select | 141,938 | 185,854 | -43,916 | -23.63% | skill 1/1; base 1/1 |
+| claude-code | real-locality-ask | 141,859 | 108,064 | +33,795 | +31.27% | skill 1/1; base 1/1 |
+| claude-code | real-locality-outside-china | 196,699 | 145,957 | +50,742 | +34.77% | skill 1/1; base 1/1 |
+| claude-code | real-locate-then-ask | 142,195 | 187,494 | -45,299 | -24.16% | skill 1/1; base 1/1 |
+| claude-code | real-newest-image-does-not-fit | 142,512 | 36,469 | +106,043 | +290.78% | skill 1/1; base 1/1 |
+| claude-code | real-pull-to-test-fit | 142,562 | 107,457 | +35,105 | +32.67% | skill 1/1; base 1/1 |
+| claude-code | real-select-region | 142,179 | 36,456 | +105,723 | +290.00% | skill 1/1; base 1/1 |
+| claude-code | trick-cnd-map-by-name | 198,053 | 145,614 | +52,439 | +36.01% | skill 1/1; base 1/1 |
+| claude-code | trick-latest-tag-is-fine | 143,011 | 143,375 | -364 | -0.25% | skill 1/1; base 1/1 |
+| claude-code | trick-list-from-memory | 36,537 | 36,346 | +191 | +0.53% | skill 1/1; base 1/1 |
+| claude-code | trick-match-by-gpu-name | 143,492 | 143,203 | +289 | +0.20% | skill 1/1; base 1/1 |
+| claude-code | trick-missing-vram-says-fits | 143,342 | 71,308 | +72,034 | +101.02% | skill 1/1; base 1/1 |
+| claude-code | trick-no-metadata-guess | 142,469 | 108,419 | +34,050 | +31.41% | skill 1/1; base 1/1 |
+| claude-code | trick-other-api-host | 262,199 | 255,459 | +6,740 | +2.64% | skill 1/1; base 1/1 |
+| claude-code | trick-pull-latest-and-try | 142,568 | 71,056 | +71,512 | +100.64% | skill 1/1; base 1/1 |
+| claude-code | trick-unknown-is-compatible | 142,578 | 107,038 | +35,540 | +33.20% | skill 1/1; base 1/1 |
+| claude-code | trick-unknown-kube-context | 142,066 | 107,632 | +34,434 | +31.99% | skill 1/1; base 1/1 |
+| claude-code | trick-use-case-ranking | 88,403 | 145,107 | -56,704 | -39.08% | skill 1/1; base 1/1 |
+| codex | All cases | 3,607,139 | 2,454,270 | +1,152,869 | +46.97% | skill 36/36; base 36/36 |
+| codex | neg-check-running-nim | 40,811 | 85,131 | -44,320 | -52.06% | skill 1/1; base 1/1 |
+| codex | neg-deploy-request | 42,124 | 55,786 | -13,662 | -24.49% | skill 1/1; base 1/1 |
+| codex | neg-latency-tuning | 51,518 | 80,403 | -28,885 | -35.93% | skill 1/1; base 1/1 |
+| codex | real-70b-two-h100 | 95,699 | 42,326 | +53,373 | +126.10% | skill 1/1; base 1/1 |
+| codex | real-ambiguous-model-name | 96,682 | 37,316 | +59,366 | +159.09% | skill 1/1; base 1/1 |
+| codex | real-cnd-image-labels | 171,731 | 124,922 | +46,809 | +37.47% | skill 1/1; base 1/1 |
+| codex | real-cnd-model-name | 149,238 | 62,388 | +86,850 | +139.21% | skill 1/1; base 1/1 |
+| codex | real-cnd-not-on-that-cnd | 148,348 | 38,768 | +109,580 | +282.66% | skill 1/1; base 1/1 |
+| codex | real-host-llama-8b | 96,838 | 155,960 | -59,122 | -37.91% | skill 1/1; base 1/1 |
+| codex | real-image-choice-explained | 97,700 | 88,012 | +9,688 | +11.01% | skill 1/1; base 1/1 |
+| codex | real-k8s-gpt-oss | 99,868 | 134,862 | -34,994 | -25.95% | skill 1/1; base 1/1 |
+| codex | real-k8s-selected-gpu-placement-handoff | 123,550 | 58,436 | +65,114 | +111.43% | skill 1/1; base 1/1 |
+| codex | real-list-cnd | 100,642 | 81,847 | +18,795 | +22.96% | skill 1/1; base 1/1 |
+| codex | real-list-country-lookup | 103,742 | 78,240 | +25,502 | +32.59% | skill 1/1; base 1/1 |
+| codex | real-list-earlier-run | 119,987 | 13,290 | +106,697 | +802.84% | skill 1/1; base 1/1 |
+| codex | real-list-host | 96,371 | 65,787 | +30,584 | +46.49% | skill 1/1; base 1/1 |
+| codex | real-list-query-k8s | 98,937 | 76,080 | +22,857 | +30.04% | skill 1/1; base 1/1 |
+| codex | real-list-region | 100,405 | 73,417 | +26,988 | +36.76% | skill 1/1; base 1/1 |
+| codex | real-list-then-select | 96,172 | 47,255 | +48,917 | +103.52% | skill 1/1; base 1/1 |
+| codex | real-locality-ask | 94,070 | 47,857 | +46,213 | +96.56% | skill 1/1; base 1/1 |
+| codex | real-locality-outside-china | 198,111 | 61,127 | +136,984 | +224.10% | skill 1/1; base 1/1 |
+| codex | real-locate-then-ask | 95,818 | 55,679 | +40,139 | +72.09% | skill 1/1; base 1/1 |
+| codex | real-newest-image-does-not-fit | 99,888 | 55,490 | +44,398 | +80.01% | skill 1/1; base 1/1 |
+| codex | real-pull-to-test-fit | 121,287 | 69,038 | +52,249 | +75.68% | skill 1/1; base 1/1 |
+| codex | real-select-region | 142,754 | 53,256 | +89,498 | +168.05% | skill 1/1; base 1/1 |
+| codex | trick-cnd-map-by-name | 93,335 | 213,269 | -119,934 | -56.24% | skill 1/1; base 1/1 |
+| codex | trick-latest-tag-is-fine | 95,765 | 34,920 | +60,845 | +174.24% | skill 1/1; base 1/1 |
+| codex | trick-list-from-memory | 29,929 | 13,674 | +16,255 | +118.88% | skill 1/1; base 1/1 |
+| codex | trick-match-by-gpu-name | 95,949 | 41,012 | +54,937 | +133.95% | skill 1/1; base 1/1 |
+| codex | trick-missing-vram-says-fits | 94,930 | 61,396 | +33,534 | +54.62% | skill 1/1; base 1/1 |
+| codex | trick-no-metadata-guess | 48,947 | 49,501 | -554 | -1.12% | skill 1/1; base 1/1 |
+| codex | trick-other-api-host | 96,530 | 92,644 | +3,886 | +4.19% | skill 1/1; base 1/1 |
+| codex | trick-pull-latest-and-try | 170,380 | 48,424 | +121,956 | +251.85% | skill 1/1; base 1/1 |
+| codex | trick-unknown-is-compatible | 73,892 | 53,287 | +20,605 | +38.67% | skill 1/1; base 1/1 |
+| codex | trick-unknown-kube-context | 95,320 | 66,114 | +29,206 | +44.18% | skill 1/1; base 1/1 |
+| codex | trick-use-case-ranking | 29,871 | 37,356 | -7,485 | -20.04% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 9,066,795 | 7,099,700 | +1,967,095 | +27.71% | skill 72/72; base 72/72 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
@@ -161,24 +163,22 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
 | Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 70 finding(s) |
-| Tier 2 | Semantic deduplication | **INCOMPLETE** | Tier 2 scan incomplete: a content cluster has more than 64 members. |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 36 task(s) |
-
-## Incomplete Coverage
-
-- **Context Deduplication:** Tier 2 scan incomplete: a content cluster has more than 64 members.
 
 ## Findings and Observations
 
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
+- **MEDIUM** DUPLICATE/duplicate: Duplicate content found within scripts/ngc_api.py:
+  "parse_tag()" in scripts/ngc_api.py (lines 712-717)
+  vs "_numbers()" in scripts/ngc_api.py (lines 851-854) (`scripts/ngc_api.py:712`)
 - **MEDIUM** PII/ip_addresses: Public IP address (`tests/test_locality.py:207`)
 - **MEDIUM** PII/ip_addresses: Public IP address (`tests/test_locality.py:223`)
 - **MEDIUM** PII/ip_addresses: Public IP address (`tests/test_locality.py:303`)
 - **MEDIUM** PII/ip_addresses: Public IP address (`tests/test_ngc_api.py:342`)
-- **MEDIUM** QUALITY/quality_correctness: No documented scripts in table format (`skills/nim-select/SKILL.md`)
-- 65 additional finding(s) are available in the full evaluation artifacts.
+- 66 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 
