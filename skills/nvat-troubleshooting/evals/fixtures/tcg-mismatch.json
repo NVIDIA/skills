@@ -1,0 +1,36 @@
+{
+  "claims": [
+    {
+      "x-nvidia-device-type": "gpu",
+      "measres": "fail",
+      "x-nvidia-mismatch-measurement-records": [
+        {
+          "index": 6,
+          "goldenSize": 32,
+          "goldenValue": "0000000000000000000000000000000000000000000000000000000000000000",
+          "runtimeSize": 32,
+          "runtimeValue": "0000000000000000000000000000000000000000000000000000000000000001",
+          "measurementSource": "Driver"
+        },
+        {
+          "index": 8,
+          "goldenSize": 32,
+          "goldenValue": "0000000000000000000000000000000000000000000000000000000000000000",
+          "runtimeSize": 0,
+          "runtimeValue": "NA",
+          "measurementSource": "Firmware"
+        }
+      ],
+      "x-nvidia-mismatch-opaque-data-records": [
+        {
+          "id": 135,
+          "name": "fixture-min-svn",
+          "goldenType": "MIN_SVN",
+          "goldenValue": 5,
+          "runtimeType": "MIN_SVN",
+          "runtimeValue": 4
+        }
+      ]
+    }
+  ]
+}

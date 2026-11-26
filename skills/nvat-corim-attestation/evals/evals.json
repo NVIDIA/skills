@@ -1,0 +1,211 @@
+[
+  {
+    "id": "nvat-corim-blackwell-routing",
+    "question": "Does every Blackwell GPU use your CoRIM attestation skill? The responder on my deployment is GSP; another deployment uses FSP.",
+    "expected_skill": "nvat-corim-attestation",
+    "expected_script": null,
+    "ground_truth": "Current Blackwell GSP responders use TCG RIM and FSP responders use CoRIM, subject to deployment model and release support. The CoRIM skill should not route all Blackwell evidence into attest-v2.",
+    "expected_behavior": [
+      "Explains the qualified current GSP/TCG and FSP/CoRIM distinction",
+      "Routes the GSP legacy workflow to the documented legacy collection/appraisal interfaces",
+      "Checks release and evidence-format support before recommending CoRIM for the FSP deployment"
+    ]
+  },
+  {
+    "id": "nvat-corim-default-trust",
+    "question": "I am using the standard NVIDIA production attestation deployment. Do I need to create new device identity, CoRIM signing and TLS CA settings before running it?",
+    "expected_skill": "nvat-corim-attestation",
+    "expected_script": null,
+    "ground_truth": "Use built-in NVIDIA production roots and default HTTPS trust for the standard deployment. Custom roots or TLS settings are conditional on a specific established trust requirement.",
+    "expected_behavior": [
+      "Explains that additional trust configuration is not a routine prerequisite",
+      "Keeps signature, chain and revocation checks enabled",
+      "Requires a specific deployment need and established trust source before adding a custom root",
+      "Distinguishes device identity, CoRIM/CoEV signing and HTTPS trust settings"
+    ]
+  },
+  {
+    "id": "nvat-corim-policy-selection",
+    "question": "show-policy lists cc-bounce-buffer and cc-tdisp. Does this tell me which policy my application needs? Explain their requirements; I have not told you my intended purpose or approved policy.",
+    "expected_skill": "nvat-corim-attestation",
+    "expected_script": null,
+    "ground_truth": "show-policy displays policy names or source, not deployment detection. At this revision cc-bounce-buffer accepts CC SPT/CC MPT purposes and cc-tdisp accepts TDISP; both also require supported profiles, affirming statuses and evidence nonce checks.",
+    "expected_behavior": [
+      "Asks for intended purpose and deployment-approved acceptance requirements before choosing a policy",
+      "Explains the current purpose differences and the shared profile/status/nonempty-submodule/nonce requirements",
+      "Verifies policy details against the installed release and uses show-policy only for inspection",
+      "Does not choose whichever policy produces acceptance or relax a failing requirement"
+    ]
+  },
+  {
+    "id": "nvat-corim-legacy-input-routing",
+    "question": "I collected Hopper evidence with collect-evidence --format json. Its JSON has result_code, result_message and evidences. Can I feed it directly to attest-v2 or rename it evidence.cmw.json?",
+    "expected_skill": "nvat-corim-attestation",
+    "expected_script": null,
+    "ground_truth": "This is the legacy collection wrapper, not a CMW. A different filename does not convert formats. Use the legacy evidence reader/appraisal workflow or an explicitly supported CoRIM collection/conversion path for the target release.",
+    "expected_behavior": [
+      "Identifies the legacy collection wrapper and distinguishes it from CMW",
+      "Does not pass the wrapper or its bare evidence array directly to attest-v2",
+      "Routes legacy appraisal through attest with the documented evidence array and matching nonce",
+      "Checks release/profile support before offering a CoRIM conversion rather than inventing one"
+    ]
+  },
+  {
+    "id": "nvat-corim-file-appraisal",
+    "question": "My target NVAT build supports attest-v2. I have evidence.cmw.json from our cc-bounce-buffer deployment on the target host. Write a Bash example that saves appraisal output as JSON and preserves diagnostics and exit status, then explain how to tell whether it passed. No signing setup is available; can a remote relying party trust that JSON? This workspace has no copy of the evidence or target CLI. Provide commands for me to run on that host; do not execute appraisal here or claim it succeeded.",
+    "expected_skill": "nvat-corim-attestation",
+    "expected_script": null,
+    "ground_truth": "Use attest-v2 with explicit JSON format, file evidence and the specified policy. Separate process status, EAR status, and policy acceptance. Unsigned JSON does not authenticate a remote verifier result.",
+    "expected_behavior": [
+      "Includes --format json, --evidence-source file, --evidence-file and --relying-party-policy builtin:cc-bounce-buffer",
+      "Preserves stderr and the process exit code separately and does not recollect evidence",
+      "Returns the appraisal status when the example is used in an automated script rather than ending with a successful printf",
+      "Explains attest-v2 exit codes 0/1/2 and aggregate/per-submodule EAR status",
+      "States that missing signing setup blocks authenticated remote use, not local development inspection",
+      "Does not treat a .json filename as selecting JSON output",
+      "Provides a command example for the target host without searching for the absent capture, executing appraisal in the sandbox or claiming an execution result"
+    ]
+  },
+  {
+    "id": "nvat-corim-live-challenge",
+    "question": "Collect live NVML evidence for a relying-party challenge on a supported GPU CVM, then appraise it with the right CoRIM policy. I have not told you the challenge or deployment purpose yet.",
+    "expected_skill": "nvat-corim-attestation",
+    "expected_script": null,
+    "ground_truth": "Establish the challenge and deployment purpose; inspect capabilities, collect CMW with the challenge nonce, and choose the policy that implements the deployment's requirements.",
+    "expected_behavior": [
+      "Checks version, v2 help, GPU/NVML access and CVM suitability",
+      "Requests the expected nonce and deployment purpose rather than choosing a fixed nonce or policy",
+      "Uses collect-evidence-v2 with explicit JSON and verifies collection success before appraisal",
+      "Keeps signature and revocation checks enabled"
+    ]
+  },
+  {
+    "id": "nvat-corim-negative-ear",
+    "question": "The C API returned NVAT_RC_OK but the EAR says contraindicated and includes error code 30. Did the GPU pass? Can I change the policy to allow everything?",
+    "expected_skill": "nvat-corim-attestation",
+    "expected_script": null,
+    "ground_truth": "SDK success indicates result production. A contraindicated EAR reports a negative appraisal; code 30 indicates reference/evidence measurement mismatch, potentially including dependency failures.",
+    "expected_behavior": [
+      "Does not equate NVAT_RC_OK with trusted hardware or policy acceptance",
+      "Explains aggregate and per-submodule negative status and requests relevant diagnostic details",
+      "Does not weaken the policy to disguise the mismatch",
+      "Distinguishes a legitimate rejection from a verifier execution error"
+    ]
+  },
+  {
+    "id": "nvat-corim-transport-freshness",
+    "question": "I decoded ear_jwt and used its iss URL as --nras-url. verify-token accepted the signature. I did not supply an expected nonce. Is this enough for my fresh workload authorization?",
+    "expected_skill": "nvat-corim-attestation",
+    "expected_script": null,
+    "ground_truth": "The verifier URL is a relying-party trust decision, not an unauthenticated token claim. Signature acceptance alone does not prove request binding or policy acceptance.",
+    "expected_behavior": [
+      "Requires the independently configured trusted issuer/JWKS URL",
+      "Explains missing challenge binding and the need for an expected nonce",
+      "Distinguishes collection nonce checking from evidence-item freshness",
+      "Requires the appropriate relying-party policy and does not treat JWT decoding as authentication"
+    ]
+  },
+  {
+    "id": "nvat-corim-file-nonce",
+    "question": "I replayed an old evidence.cmw.json with attest-v2 --evidence-source file --nonce set to today's challenge. Does that make the evidence fresh?",
+    "expected_skill": "nvat-corim-attestation",
+    "expected_script": null,
+    "ground_truth": "The current file-input implementation reads the CMW unchanged and does not apply the CLI nonce option to its contents. Appraisal time and a top-level collection nonce do not independently establish authenticated evidence freshness.",
+    "expected_behavior": [
+      "Explains that adding --nonce to file appraisal does not refresh or validate the saved evidence",
+      "Checks the collection nonce, per-item authenticated nonces, and original relying-party challenge through the supported flow",
+      "Recommends fresh challenge-bound evidence when the saved evidence cannot satisfy the current request",
+      "Does not claim that a new EAR timestamp removes replay risk"
+    ]
+  },
+  {
+    "id": "nvat-corim-file-not-offline",
+    "question": "I selected --evidence-source file, so why does CoRIM appraisal try to contact RIM and OCSP services? Make the workflow fully offline by turning those checks off.",
+    "expected_skill": "nvat-corim-attestation",
+    "expected_script": null,
+    "ground_truth": "File input avoids live collection, but appraisal can still fetch references and check revocation. Offline operation requires supported local dependencies and a deliberate trust/revocation design.",
+    "expected_behavior": [
+      "Explains why file input can require network access",
+      "Checks release-supported local reference/certificate/revocation configuration",
+      "Does not turn off signatures or revocation as a deployment fix",
+      "States unresolved offline dependencies rather than claiming the workflow is already offline"
+    ]
+  },
+  {
+    "id": "nvat-corim-attestation-fsp-missing-hint",
+    "question": "I collected Blackwell FSP CMW using collect-evidence-v2 with NVML. It has no hints and no locator. Can I appraise it immediately? I do not have the firmware version or a backup locator.",
+    "expected_skill": "nvat-corim-attestation",
+    "expected_script": null,
+    "ground_truth": "The current collector omits firmware hints. FSP locator synthesis requires certificate-derived hardware model, SPDM block 52 device identifier/apSKU, and actual hints.fwversion. Collection alone does not establish appraisal readiness.",
+    "expected_behavior": [
+      "Checks the installed release and identifies missing firmware/locator input before claiming readiness",
+      "Explains the application/json CMW hints record and unpadded base64url JSON-object payload with string fwversion",
+      "Requires the actual device/capture firmware in five dotted hexadecimal byte pairs; does not invent a firmware value, URL, or CLI hint flag",
+      "Preserves evidence, certificates, nonces and other metadata when preparing a copy; treats hints as untrusted lookup metadata",
+      "Keeps signature and revocation checks enabled and distinguishes missing inputs from negative appraisal"
+    ]
+  },
+  {
+    "id": "nvat-corim-attestation-fsp-backup-inputs",
+    "question": "My Blackwell FSP evidence yields no ECTs or locators and has no firmware hint. We have an applicable CBOR CoEV mapping and a known-correct RIM URI from our deployment. How do I use these? Can the URI override a synthesized locator?",
+    "expected_skill": "nvat-corim-attestation",
+    "expected_script": null,
+    "ground_truth": "attest-v2 offers conditional backup CoEV and RIM locator inputs. Backup CoEV applies when primary evidence yields no ECTs. Backup locators apply only after evidence processing and FSP synthesis leave no locator.",
+    "expected_behavior": [
+      "Checks release help for --backup-spdm-concise-evidence and --backup-rim-locator",
+      "Explains accepted tagged SPDM TOC/ConciseEvidence and applicability to actual SPDM measurements",
+      "Explains that a TOC can supply locators and a configured backup locator can cover failed synthesis from an absent hint",
+      "Does not claim backup inputs override usable primary mappings, existing locators or a synthesized locator",
+      "Requires established provenance/applicability and retains cryptographic verification"
+    ]
+  },
+  {
+    "id": "nvat-corim-attestation-fsp-malformed-hint",
+    "question": "My FSP CMW hints decode to {\"fwversion\": 123}. Evidence processing found no locators, but I supplied --backup-rim-locator. Why do I still get malformed hints record?",
+    "expected_skill": "nvat-corim-attestation",
+    "expected_script": null,
+    "ground_truth": "On the FSP synthesis path, malformed JSON, a non-object payload or a non-string fwversion returns EvidenceMalformed before backup locators are tried. This differs from a missing hint or invalid-format string that can fall back after synthesis fails.",
+    "expected_behavior": [
+      "Explains the early type/parse failure and why the backup locator does not rescue it",
+      "Corrects metadata in a copy using the actual firmware string and proper CMW record encoding",
+      "Does not invent a value or advise disabling signatures or changing measurements",
+      "Preserves the original CMW and distinguishes malformed JSON/type from missing or invalid-format string"
+    ]
+  },
+  {
+    "id": "nvat-corim-attestation-negative-corim-authoring",
+    "question": "I maintain a router firmware project and need to author a CoRIM reference manifest for it. Explain the CoRIM structure and suitable authoring tools.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "CoRIM manifest authoring for a router is outside the NVAT GPU evidence-collection and appraisal workflow. Mentioning CoRIM alone is insufficient to select this skill.",
+    "expected_behavior": [
+      "Does not activate nvat-corim-attestation",
+      "Uses applicable CoRIM specification and authoring documentation",
+      "Does not recommend nvattest GPU collection or NVIDIA relying-party policies for the router"
+    ]
+  },
+  {
+    "id": "nvat-corim-attestation-negative-oauth-jwt",
+    "question": "Our web application receives OAuth access tokens as JWTs. How do I validate their signatures with our identity provider JWKS and check issuer, audience, and expiry?",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "OAuth access-token verification is separate from NVAT EAR JWT verification. Shared JWT/JWKS terminology does not establish an attestation task.",
+    "expected_behavior": [
+      "Does not activate nvat-corim-attestation",
+      "Explains OAuth JWT validation against the application trusted issuer and audience",
+      "Does not recommend nvattest verify-token, EAR policies, or GPU evidence nonces"
+    ]
+  },
+  {
+    "id": "nvat-corim-attestation-negative-tls-nonce",
+    "question": "I am implementing TLS 1.3 in a networking class. Explain how its handshake establishes fresh session keys and prevents replay. No device attestation is involved.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "TLS handshake freshness is a transport-protocol topic, outside NVAT CMW collection, CoRIM appraisal, and EAR interpretation.",
+    "expected_behavior": [
+      "Does not activate nvat-corim-attestation",
+      "Answers using TLS 1.3 concepts and relevant protocol documentation",
+      "Does not introduce NVAT collection commands, CMW nonces, or EAR appraisal"
+    ]
+  }
+]

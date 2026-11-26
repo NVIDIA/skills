@@ -1,0 +1,39 @@
+{
+  "passed": false,
+  "reachable_from_root": true,
+  "environment": {
+    "class": {
+      "model": "fixture-component",
+      "index": 7
+    }
+  },
+  "reference_claims": [
+    {
+      "key": "fixture-firmware",
+      "values": {
+        "digests": ["sha-256;AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="]
+      }
+    }
+  ],
+  "attempts": [
+    {
+      "passed": false,
+      "reason": {
+        "mkey_mismatches": [
+          {
+            "mkey": "fixture-firmware",
+            "mismatch": {
+              "digests": [
+                {
+                  "reason": "value-differs",
+                  "reference": "sha-256;AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+                  "evidence": "sha-256;AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAE="
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
