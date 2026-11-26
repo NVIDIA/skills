@@ -10,7 +10,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 - Skill: `dicom-series-preflight`
 - Validation status: `passed`
-- Evaluation date: 2026-11-20
+- Evaluation date: 2026-11-26
 - Evaluator version: `1.6.10`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 3 evaluation tasks (3 positive)
@@ -50,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 87.0% — baseline ran, but no comparable score was available; uplift unavailable | 88.8% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 66.7% (-33.3 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 73.3% → 100.0% (+26.7 points) | 46.7% → 100.0% (+53.3 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 81.7% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 77.8% → 94.5% (+16.7 points) | 36.1% → 83.3% (+47.2 points) |
-| Efficiency | 73.8% — baseline ran, but no comparable score was available; uplift unavailable | 79.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 93.2% — baseline ran, but no comparable score was available; uplift unavailable | 90.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 83.3% → 100.0% (+16.7 points) |
+| Correctness | 66.7% → 100.0% (+33.3 points) | 73.3% → 100.0% (+26.7 points) |
+| Discoverability | 96.7% — baseline ran, but no comparable score was available; uplift unavailable | 86.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 68.1% → 88.9% (+20.8 points) | 38.9% → 88.9% (+50.0 points) |
+| Efficiency | 80.6% — baseline ran, but no comparable score was available; uplift unavailable | 75.7% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -68,9 +68,9 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 95.5% → 94.4% (-1.1 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 95.9% → 94.5% (-1.4 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 87.6% → 88.3% (+0.7 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 87.2% → 88.4% (+1.2 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -78,15 +78,15 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 888,744 | 500,046 | +388,698 | +77.73% | skill 3/3; base 3/3 |
-| claude-code | preflight-clean-axial-flags-phi | 282,154 | 113,318 | +168,836 | +148.99% | skill 1/1; base 1/1 |
-| claude-code | preflight-clean-no-phi-greenlights | 324,488 | 153,215 | +171,273 | +111.79% | skill 1/1; base 1/1 |
-| claude-code | preflight-flipped-lr-blocks-segmentation | 282,102 | 233,513 | +48,589 | +20.81% | skill 1/1; base 1/1 |
-| codex | All cases | 745,033 | 395,784 | +349,249 | +88.24% | skill 3/3; base 3/3 |
-| codex | preflight-clean-axial-flags-phi | 219,290 | 105,709 | +113,581 | +107.45% | skill 1/1; base 1/1 |
-| codex | preflight-clean-no-phi-greenlights | 274,884 | 195,514 | +79,370 | +40.60% | skill 1/1; base 1/1 |
-| codex | preflight-flipped-lr-blocks-segmentation | 250,859 | 94,561 | +156,298 | +165.29% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,633,777 | 895,830 | +737,947 | +82.38% | skill 6/6; base 6/6 |
+| claude-code | All cases | 928,034 | 490,133 | +437,901 | +89.34% | skill 3/3; base 3/3 |
+| claude-code | preflight-clean-axial-flags-phi | 274,400 | 185,004 | +89,396 | +48.32% | skill 1/1; base 1/1 |
+| claude-code | preflight-clean-no-phi-greenlights | 371,763 | 114,504 | +257,259 | +224.67% | skill 1/1; base 1/1 |
+| claude-code | preflight-flipped-lr-blocks-segmentation | 281,871 | 190,625 | +91,246 | +47.87% | skill 1/1; base 1/1 |
+| codex | All cases | 606,645 | 580,067 | +26,578 | +4.58% | skill 3/3; base 3/3 |
+| codex | preflight-clean-axial-flags-phi | 199,006 | 79,810 | +119,196 | +149.35% | skill 1/1; base 1/1 |
+| codex | preflight-clean-no-phi-greenlights | 205,288 | 196,773 | +8,515 | +4.33% | skill 1/1; base 1/1 |
+| codex | preflight-flipped-lr-blocks-segmentation | 202,351 | 303,484 | -101,133 | -33.32% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,534,679 | 1,070,200 | +464,479 | +43.40% | skill 6/6; base 6/6 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 

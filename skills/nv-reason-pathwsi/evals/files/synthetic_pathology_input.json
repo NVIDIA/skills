@@ -1,0 +1,6 @@
+{
+  "case_id": "synthetic-rgb-wiring",
+  "image": "generated://synthetic_rgb",
+  "prompt": "Describe this synthetic geometry fixture for a wrapper smoke test.",
+  "mock": true
+}

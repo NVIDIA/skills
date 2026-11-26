@@ -227,7 +227,7 @@ up 3D Slicer. Pass `--no-summary-card` to skip.
 
 Anatomy plausibility (label-set sanity, voxel HU range as CT, image/mask
 geometry match, declared output labels present, lung-lobe HU floor) is checked by
-`verifiers/ct_synthesis_quality_v1`.
+`verifiers/ct-synthesis-quality-v1`.
 
 Not for clinical interpretation, training data for production deployment, or
 any non-synthetic-research use.

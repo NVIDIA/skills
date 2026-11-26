@@ -160,6 +160,6 @@ paired verifier's job.
 Anatomy plausibility (per-class volume bounds, fragmentation, bilateral
 symmetry, liver larger than spleen) and optional per-class Dice/IoU against
 the recorded ground truth are checked by
-`verifiers/ct_segmentation_quality_v1`.
+`verifiers/ct-segmentation-quality-v1`.
 
 Not for clinical interpretation, production deployment, or non-CT modalities.

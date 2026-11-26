@@ -10,7 +10,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 - Skill: `nv-segment-ctmr`
 - Validation status: `passed`
-- Evaluation date: 2026-11-20
+- Evaluation date: 2026-11-26
 - Evaluator version: `1.6.10`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 2 evaluation tasks (2 positive)
@@ -50,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.2% — baseline ran, but no comparable score was available; uplift unavailable | 83.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 94.6% — baseline ran, but no comparable score was available; uplift unavailable | 84.2% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 40.0% → 100.0% (+60.0 points) | 50.0% → 80.0% (+30.0 points) |
-| Discoverability | 97.5% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 60.0% → 100.0% (+40.0 points) | 50.0% → 90.0% (+40.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 92.5% — baseline ran, but no comparable score was available; uplift unavailable |
 | Effectiveness | 22.9% → 75.0% (+52.1 points) | 56.3% → 56.3% (±0.0 points) |
-| Efficiency | 98.2% — baseline ran, but no comparable score was available; uplift unavailable | 87.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Efficiency | 98.2% — baseline ran, but no comparable score was available; uplift unavailable | 82.4% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -68,9 +68,9 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 98.4% → 96.5% (-1.9 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 98.4% → 96.4% (-2.0 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 90.5% → 90.6% (+0.1 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 90.5% → 89.8% (-0.7 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -78,13 +78,13 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 309,629 | 215,011 | +94,618 | +44.01% | skill 2/2; base 2/2 |
-| claude-code | mri-brain-preprocessing-caveat | 154,645 | 107,669 | +46,976 | +43.63% | skill 1/1; base 1/1 |
-| claude-code | run-ct-body-segmentation | 154,984 | 107,342 | +47,642 | +44.38% | skill 1/1; base 1/1 |
-| codex | All cases | 117,273 | 96,430 | +20,843 | +21.61% | skill 2/2; base 2/2 |
-| codex | mri-brain-preprocessing-caveat | 51,582 | 35,475 | +16,107 | +45.40% | skill 1/1; base 1/1 |
-| codex | run-ct-body-segmentation | 65,691 | 60,955 | +4,736 | +7.77% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 426,902 | 311,441 | +115,461 | +37.07% | skill 4/4; base 4/4 |
+| claude-code | All cases | 349,869 | 214,765 | +135,104 | +62.91% | skill 2/2; base 2/2 |
+| claude-code | mri-brain-preprocessing-caveat | 154,712 | 107,305 | +47,407 | +44.18% | skill 1/1; base 1/1 |
+| claude-code | run-ct-body-segmentation | 195,157 | 107,460 | +87,697 | +81.61% | skill 1/1; base 1/1 |
+| codex | All cases | 121,200 | 82,073 | +39,127 | +47.67% | skill 2/2; base 2/2 |
+| codex | mri-brain-preprocessing-caveat | 55,440 | 40,120 | +15,320 | +38.19% | skill 1/1; base 1/1 |
+| codex | run-ct-body-segmentation | 65,760 | 41,953 | +23,807 | +56.75% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 471,069 | 296,838 | +174,231 | +58.70% | skill 4/4; base 4/4 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 

@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "NV-Reason-PathWSI engineering result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["skill", "input", "output", "runtime", "environment", "limitations"],
+  "properties": {
+    "skill": {"const": "nv_reason_pathwsi"},
+    "input": {
+      "type": "object", "additionalProperties": false,
+      "required": ["case_id", "prompt", "image"],
+      "properties": {
+        "case_id": {"type": "string", "minLength": 1},
+        "prompt": {"type": "string", "minLength": 1},
+        "image": {
+          "type": "object", "additionalProperties": false,
+          "required": ["path", "source", "format", "width", "height", "sha256"],
+          "properties": {
+            "path": {"type": "string", "minLength": 1},
+            "source": {"type": "string", "minLength": 1},
+            "format": {"enum": ["png", "jpeg"]},
+            "width": {"type": "integer", "minimum": 1},
+            "height": {"type": "integer", "minimum": 1},
+            "sha256": {"$ref": "#/$defs/sha256"}
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object", "additionalProperties": false,
+      "required": ["response_text", "text_chars", "response_path", "response_sha256"],
+      "properties": {
+        "response_text": {"type": "string", "pattern": "\\S"},
+        "text_chars": {"type": "integer", "minimum": 1},
+        "response_path": {"type": "string", "minLength": 1},
+        "response_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "runtime": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mode", "mock", "model", "thinking", "max_new_tokens", "inference_seconds", "truncation_status", "command", "upstream_entrypoint_sha256", "upstream_commit", "process_returncode", "stdout_path", "stderr_path", "offline"],
+      "properties": {
+        "mode": {"enum": ["mock", "upstream_cli"]},
+        "mock": {"type": "boolean"},
+        "model": {"type": "string", "minLength": 1},
+        "thinking": {"type": "boolean"},
+        "max_new_tokens": {"type": "integer", "minimum": 1},
+        "inference_seconds": {"type": "number", "minimum": 0},
+        "truncation_status": {"enum": ["unknown", "not_applicable"]},
+        "command": {"type": "array", "items": {"type": "string"}},
+        "upstream_entrypoint_sha256": {"anyOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]},
+        "upstream_commit": {"type": ["string", "null"], "pattern": "^[0-9a-f]{40}$"},
+        "process_returncode": {"type": ["integer", "null"]},
+        "stdout_path": {"type": ["string", "null"]},
+        "stderr_path": {"type": ["string", "null"]},
+        "offline": {"type": "boolean"}
+      }
+    },
+    "environment": {
+      "type": "object", "additionalProperties": false,
+      "required": ["python", "packages"],
+      "properties": {
+        "python": {"type": "string", "minLength": 1},
+        "packages": {"type": "object", "additionalProperties": {"type": ["string", "null"]}}
+      }
+    },
+    "limitations": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"runtime": {"properties": {"mode": {"const": "mock"}}}}},
+      "then": {
+        "properties": {
+          "runtime": {"properties": {"mock": {"const": true}, "command": {"maxItems": 0}, "upstream_entrypoint_sha256": {"type": "null"}, "process_returncode": {"type": "null"}, "truncation_status": {"const": "not_applicable"}}},
+          "output": {"properties": {"response_text": {"pattern": "^MOCK:"}}}
+        }
+      },
+      "else": {
+        "properties": {
+          "runtime": {"properties": {"mock": {"const": false}, "command": {"minItems": 2}, "upstream_entrypoint_sha256": {"$ref": "#/$defs/sha256"}, "process_returncode": {"const": 0}, "stdout_path": {"type": "string", "minLength": 1}, "stderr_path": {"type": "string", "minLength": 1}, "truncation_status": {"const": "unknown"}}}
+        }
+      }
+    }
+  ],
+  "$defs": {"sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}
+}

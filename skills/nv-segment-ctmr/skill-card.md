@@ -7,9 +7,9 @@ This skill is for research and development only. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-CC-BY-4.0 AND Apache 2.0 <br>
+Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to run the upstream NV-Segment-CTMR MONAI bundle on their own CT or MRI NIfTI volumes (CT_BODY, MRI_BODY, or preprocessed MRI_BRAIN) and record label-map evidence such as observed label IDs, per-class voxel counts and volumes, geometry checks, and runtime for engineering verification; it is not for clinical interpretation, diagnosis, or regulatory submission. <br>
+Developers, engineers, and researchers use this skill to run the upstream NV-Segment-CTMR MONAI bundle on their own CT or MRI NIfTI volumes (CT_BODY, MRI_BODY, or MRI_BRAIN) and record label-map evidence such as observed label IDs, per-class voxel counts and volumes, and geometry checks for engineering verification; it is not for clinical interpretation. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -29,15 +29,14 @@ Mitigation: Review and scan skill before deployment. <br>
 - [nvidia/NV-Segment-CTMR model on Hugging Face](https://huggingface.co/nvidia/NV-Segment-CTMR) <br>
 - [skill_manifest.yaml](skill_manifest.yaml) <br>
 - [Output schema](validators/output_schema.json) <br>
-- [Fixtures README](fixtures/README.md) <br>
 - [BENCHMARK.md](BENCHMARK.md) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Files, Analysis, Shell commands] <br>
-**Output Format:** [NIfTI label map plus JSON result summary] <br>
-**Output Parameters:** [3D (label map); 1D (JSON summary)] <br>
-**Other Properties Related to Output:** [Outputs are written under the caller-provided --output-dir; the JSON records input geometry, observed and unexpected label IDs, per-class voxel counts and physical volumes, runtime, upstream command, model inventory, and geometry checks. Dice/IoU is not computed by this skill.] <br>
+**Output Format:** [JSON summary on stdout plus NIfTI label map written under the caller-provided output directory] <br>
+**Output Parameters:** [1D] <br>
+**Other Properties Related to Output:** [Output JSON is validated against validators/output_schema.json; records input geometry, observed and unexpected label IDs, per-class voxel counts and physical volumes, runtime, upstream command, and model inventory. Dice is not computed by the skill.] <br>
 
 ## Evaluation Agents Used: <br>
 - Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`) <br>
@@ -46,7 +45,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-2 evaluation tasks (2 positive): `run-ct-body-segmentation` and `mri-brain-preprocessing-caveat`; 1 attempt per task, each attempt in its own isolated sandbox pod (`k8s-sandbox`), compared against a no-skill baseline. Evaluator version `1.6.10`, evaluation date 2026-11-20. <br>
+2 evaluation tasks (2 positive): `mri-brain-preprocessing-caveat` and `run-ct-body-segmentation`; 1 attempt per task, each task attempt in its own isolated sandbox pod (`k8s-sandbox`), compared against a no-skill baseline. Evaluator version `1.6.10`, evaluation date 2026-11-26. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -68,37 +67,27 @@ Underlying evaluation signals used in this run: <br>
 
 
 ## Evaluation Results: <br>
-> ✅ **Overall verdict: PASS — Recommended for publication**
-
-### Publication Recommendation
-
-Recommended for publication based on the completed evaluation evidence in this report.
-
 ### Results at a Glance
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.2% — baseline ran, but no comparable score was available; uplift unavailable | 83.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 94.6% — baseline ran, but no comparable score was available; uplift unavailable | 84.2% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 40.0% → 100.0% (+60.0 points) | 50.0% → 80.0% (+30.0 points) |
-| Discoverability | 97.5% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 60.0% → 100.0% (+40.0 points) | 50.0% → 90.0% (+40.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 92.5% — baseline ran, but no comparable score was available; uplift unavailable |
 | Effectiveness | 22.9% → 75.0% (+52.1 points) | 56.3% → 56.3% (±0.0 points) |
-| Efficiency | 98.2% — baseline ran, but no comparable score was available; uplift unavailable | 87.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Efficiency | 98.2% — baseline ran, but no comparable score was available; uplift unavailable | 82.4% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
-Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92.0%, 45.0 percentage points above its 47.0% no-skill baseline.
-
-#### Comparison details
-
-Shared-source comparisons use the same signals and weights on both conditions. They do not replace the full dimension scores above or change the publication verdict.
+### Comparison details
 
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 98.4% → 96.5% (-1.9 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 98.4% → 96.4% (-2.0 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 90.5% → 90.6% (+0.1 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 90.5% → 89.8% (-0.7 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ### Tier Status
 
@@ -108,8 +97,12 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 2 task(s) |
 
+**Overall verdict: PASS — Recommended for publication**
+
+**Publication Recommendation:** Recommended for publication based on the completed evaluation evidence in this report.
+
 ## Skill Version(s): <br>
-0.1.1 (source: skill_manifest.yaml; git SHA 22175c2, committed 2026-11-20) <br>
+0.1.1 (source: skill_manifest.yaml) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

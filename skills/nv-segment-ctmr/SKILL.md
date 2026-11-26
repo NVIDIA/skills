@@ -159,7 +159,7 @@ Pass `--ground-truth PATH` to record a reference label-map path under
 paired verifier's job.
 
 Anatomy plausibility and optional per-class Dice/IoU against the recorded
-ground truth can be checked by `verifiers/ct_segmentation_quality_v1` for
+ground truth can be checked by `verifiers/ct-segmentation-quality-v1` for
 CT-body outputs.
 
 Not for clinical interpretation, production deployment, autonomous diagnosis,
