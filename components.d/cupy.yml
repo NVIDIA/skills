@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: Apache-2.0 AND CC-BY-4.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+
+name: CuPy
+repo: cupy/cupy
+ref: main
+description: Port NumPy/SciPy workflows to CuPy, optimize GPU array performance, benchmark, and debug custom CUDA kernels.
+links:
+  contributing: docs/source/contribution.rst
+  discussions: false
+  security: false
+skills:
+  - path: skills/cupy
+    catalog_dir: cupy
