@@ -1,0 +1,24 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+name: TensorRT Edge-LLM
+repo: NVIDIA/TensorRT-Edge-LLM
+description: Install, build, serve, benchmark, debug, and extend TensorRT Edge-LLM, NVIDIA's high-performance LLM and VLM inference runtime for edge platforms (Jetson, DRIVE) and GPUs.
+skills:
+  - path: skills/edge-llm-accuracy-debugging/
+    catalog_dir: edge-llm-accuracy-debugging
+  - path: skills/edge-llm-add-model/
+    catalog_dir: edge-llm-add-model
+  - path: skills/edge-llm-benchmark-accuracy/
+    catalog_dir: edge-llm-benchmark-accuracy
+  - path: skills/edge-llm-benchmark-performance/
+    catalog_dir: edge-llm-benchmark-performance
+  - path: skills/edge-llm-convert-model/
+    catalog_dir: edge-llm-convert-model
+  - path: skills/edge-llm-install/
+    catalog_dir: edge-llm-install
+  - path: skills/edge-llm-plugin-extension/
+    catalog_dir: edge-llm-plugin-extension
+  - path: skills/edge-llm-serve/
+    catalog_dir: edge-llm-serve
+  - path: skills/edge-llm-version-migration/
+    catalog_dir: edge-llm-version-migration
