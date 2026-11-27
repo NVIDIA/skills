@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "execution": {
+    "runtime": {
+      "system_packages": [
+        "curl",
+        "git"
+      ]
+    }
+  }
+}
