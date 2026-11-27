@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: Apache-2.0 AND CC-BY-4.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+
+name: FlashInfer
+repo: flashinfer-ai/flashinfer
+description: Add, benchmark, debug, and review CUDA kernels in FlashInfer.
+skills:
+  - path: skills/add-cuda-kernel/
+    catalog_dir: flashinfer-add-cuda-kernel
+  - path: skills/benchmark-kernel/
+    catalog_dir: flashinfer-benchmark-kernel
+  - path: skills/debug-cuda-crash/
+    catalog_dir: flashinfer-debug-cuda-crash
+  - path: skills/self-review/
+    catalog_dir: flashinfer-self-review
