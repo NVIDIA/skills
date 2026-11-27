@@ -45,7 +45,7 @@ A component may also publish one or more **plugins** — a directory in the prod
 | Field         | Type   | Description                                                                                     |
 |---------------|--------|-------------------------------------------------------------------------------------------------|
 | `plugins`     | list   | Plugin source locations — one entry per plugin.                                                 |
-| `plugins[].path`        | string | Directory in the source repo containing the plugin (`plugin.json` at its root). Use `plugins/<name>/`: the product-repo NVSkills CI gate only watches `plugins/<name>/` folders that contain a `plugin.json`, so a plugin kept elsewhere can change without being re-signed. |
+| `plugins[].path`        | string | Directory in the source repo containing the plugin (`plugin.json` at its root). Use `plugins/<name>/` as the source layout. The required NVSkills CI status check watches only `skills/` and `team-skills/`; `plugins/` changes are excluded. |
 | `plugins[].catalog_dir` | string | Directory name under `plugins/` in this catalog and the plugin's install name (must equal `name` in `plugin.json`, unique across components). |
 
 ```yaml
