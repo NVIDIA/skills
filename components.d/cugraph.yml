@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+name: cuGraph
+product_primary: cuGraph
+repo: rapidsai/cugraph
+ref: main
+description: Accelerate graph analytics with cuGraph and pylibcugraph, including multi-GPU and multi-node workflows.
+skills:
+  - path: skills/accelerated-computing-cugraph/
+    catalog_dir: accelerated-computing-cugraph
+links:
+  contributing: readme_pages/CONTRIBUTING.md
+  discussions: false
