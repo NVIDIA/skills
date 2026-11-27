@@ -3865,6 +3865,18 @@
       }
     },
     {
+      "path": "skills/nim-select",
+      "name": "nim-select",
+      "description": "Checks if an NVIDIA NIM fits a GPU host or cluster before a pull, never from memory; lists models that fit; picks the NGC or China distributor image, tag and profile. Use when asked which NIM or profile to use, what fits these GPUs, if a model can run here, or to pull one to test fit. Not to deploy.",
+      "metadata": {
+        "product.primary": "NIM",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "solutions_architect,platform_engineer,devops_engineer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "select,validate,assess,inspect,configure"
+      }
+    },
+    {
       "path": "skills/nim-smoke-check",
       "name": "nim-smoke-check",
       "description": "Tests which features of a running NVIDIA NIM LLM or VLM work, local, Kubernetes or hosted: health, chat, streaming, tools, reasoning, JSON schema, images, concurrency. Use when asked to smoke test or smoke check a NIM or its URL, or why a feature fails (before a restart or fix), or after a deploy.",

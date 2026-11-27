@@ -425,6 +425,7 @@
         "msa-structure-prediction-pipeline",
         "nim-benchmark",
         "nim-deploy",
+        "nim-select",
         "nim-smoke-check",
         "nim-tune",
         "nixl-docs",
