@@ -207,6 +207,7 @@
             "CUDA Tile",
             "CUDA Toolkit",
             "CUDA-Q",
+            "CUDA-Q Algorithms",
             "CUDA-Q QEC",
             "CUDA-Q Solvers",
             "cuDF",
