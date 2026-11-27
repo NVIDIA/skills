@@ -2256,6 +2256,13 @@
       "last_modified": "2026-11-25"
     },
     {
+      "name": "nim-select",
+      "path": "skills/nim-select",
+      "content_digest": "sha256:f50ee4db8bae15c8df16ff2b77aa1d66253af81f8d0eb1b9b588da617e36a8eb",
+      "last_commit": "317ed8cdcea8ac706cc9a03894818d6fb51ca898",
+      "last_modified": "2026-11-27"
+    },
+    {
       "name": "nim-smoke-check",
       "path": "skills/nim-smoke-check",
       "content_digest": "sha256:ee7b2dbecb08cf20ffaffbe98c44625eb5cb1b1b352d61703ab9e97e917317c5",
